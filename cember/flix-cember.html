@@ -1,0 +1,1211 @@
+<title>FLIX Çember</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@700;800;900&display=swap">
+<style>
+/* Layout: one full-height play column (max 560px). A 3D park scene fills it; HUD and menus are layered on top.
+   Look: late-afternoon park, teal grass, a painted FLIX-orange court, cream chalk. Single deliberate look. */
+:root {
+  --grass: #1d6e66;
+  --chalk: #fff4e0;
+  --orange: #ff7a00;
+  --orange-deep: #c94f00;
+  --gold: #ffd23f;
+  --pink: #ff5e7e;
+  --ink: #10262b;
+  --glass: rgba(10, 38, 43, 0.66);
+  --font-display: "Baloo 2", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--ink); color: var(--chalk);
+  font-family: var(--font-body); overflow: hidden;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+#app {
+  position: relative; height: 100%; max-width: 560px; margin: 0 auto;
+  background: linear-gradient(#8fd3e8, #d8f1e8 45%, var(--grass) 46%); overflow: hidden; touch-action: none;
+}
+canvas#c { display: block; width: 100%; height: 100%; }
+
+.hud { position: absolute; inset: 0; pointer-events: none; }
+.hud-top {
+  position: absolute; left: 0; right: 0; top: 0;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: start;
+  padding: 14px 16px 0; gap: 8px;
+}
+.lives { display: flex; gap: 4px; padding-top: 10px; }
+.lives svg { width: 22px; height: 22px; transition: opacity .2s, transform .2s; }
+.lives svg.lost { opacity: .22; transform: scale(.8); }
+.mid { display: flex; flex-direction: column; align-items: center; }
+.rally {
+  font: 800 clamp(54px, 16vw, 78px)/.95 var(--font-display);
+  color: var(--chalk); font-variant-numeric: tabular-nums;
+  text-shadow: 0 4px 0 var(--orange-deep), 0 8px 18px rgba(16,38,43,.35);
+}
+.rally.pop { animation: pop .2s cubic-bezier(.3,1.6,.5,1); }
+@keyframes pop { from { transform: scale(1.2); } to { transform: scale(1); } }
+.rally-label { font-size: 11px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; color: var(--ink); background: var(--gold); padding: 1px 8px; border-radius: 6px; }
+.right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-top: 8px; }
+.chip {
+  font-size: 12px; font-weight: 900; letter-spacing: .05em;
+  background: var(--glass); padding: 4px 10px; border-radius: 999px; font-variant-numeric: tabular-nums;
+}
+.chip b { color: var(--gold); }
+.chip.fire { background: var(--orange); }
+.target {
+  position: absolute; left: 50%; top: 128px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px;
+  background: var(--glass); border: 2px solid var(--gold); border-radius: 999px; padding: 6px 14px 6px 8px;
+  font-weight: 900; font-size: 15px; white-space: nowrap;
+}
+.target i { width: 18px; height: 18px; border-radius: 50%; display: block; border: 2px solid var(--chalk); }
+.target b { color: var(--gold); }
+.target.flash { animation: flash .3s ease; }
+@keyframes flash { from { transform: translateX(-50%) scale(1.15); } to { transform: translateX(-50%) scale(1); } }
+.hint {
+  position: absolute; left: 16px; right: 16px; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  text-align: center; font-weight: 900; font-size: 15px; line-height: 1.35;
+  background: var(--glass); border-radius: 14px; padding: 10px 14px;
+}
+.hint b { color: var(--gold); }
+.banner {
+  position: absolute; left: 0; right: 0; top: 30%; text-align: center; pointer-events: none;
+  font: 800 clamp(28px, 8.5vw, 40px)/1.05 var(--font-display); color: var(--gold);
+  text-shadow: 0 3px 0 var(--orange-deep), 0 6px 14px rgba(16,38,43,.4); opacity: 0;
+}
+.banner small { display: block; font-size: .5em; color: var(--chalk); text-shadow: 0 2px 6px rgba(16,38,43,.6); margin-top: 4px; }
+.banner.show { animation: banner 1.5s ease forwards; }
+@keyframes banner {
+  0% { opacity: 0; transform: scale(.6); } 15% { opacity: 1; transform: scale(1.08); }
+  25% { transform: scale(1); } 78% { opacity: 1; } 100% { opacity: 0; transform: translateY(-20px); }
+}
+.move {
+  position: absolute; left: 0; right: 0; top: 42%; text-align: center; pointer-events: none;
+  font: italic 800 clamp(34px, 11vw, 52px)/1 var(--font-display); color: var(--chalk);
+  text-shadow: 0 4px 0 var(--orange), 0 8px 0 var(--orange-deep); opacity: 0;
+}
+.move.show { animation: move 1s cubic-bezier(.2,1.3,.4,1) forwards; }
+@keyframes move {
+  0% { opacity: 0; transform: scale(1.8) rotate(-6deg); } 20% { opacity: 1; transform: scale(1) rotate(-3deg); }
+  70% { opacity: 1; } 100% { opacity: 0; transform: scale(.9) rotate(-3deg) translateY(-16px); }
+}
+
+.overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  padding-block: 20px; padding-inline: 16px;
+}
+.overlay.dim { background: rgba(10,38,43,.5); }
+.logo { text-align: center; }
+.logo .flix {
+  display: block; font: italic 800 clamp(60px, 19vw, 88px)/.8 var(--font-display);
+  color: var(--chalk); letter-spacing: -.02em;
+  text-shadow: 0 6px 0 var(--orange), 0 12px 0 var(--orange-deep), 0 18px 30px rgba(16,38,43,.35);
+}
+.logo .name {
+  display: inline-block; margin-top: 16px;
+  font: 800 clamp(24px, 7.5vw, 32px)/1 var(--font-display); color: var(--ink);
+  background: var(--gold); padding: 4px 16px 2px; border-radius: 10px; transform: rotate(-3deg);
+}
+.panel {
+  width: min(100%, 390px); background: var(--glass);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,244,224,.16); border-radius: 22px; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.overlay:not([hidden]) .panel { animation: rise .35s cubic-bezier(.2,1.3,.4,1); }
+@keyframes rise { from { transform: translateY(24px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+.label { margin: 0; font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mode {
+  text-align: left; cursor: pointer; border-radius: 14px; padding: 10px 12px;
+  background: rgba(255,244,224,.07); border: 2px solid transparent; color: var(--chalk);
+  display: flex; flex-direction: column; gap: 2px; font-family: var(--font-body);
+}
+.mode strong { font: 800 18px/1.1 var(--font-display); }
+.mode span { font-size: 12px; font-weight: 700; line-height: 1.3; opacity: .9; }
+.mode em { font-style: normal; font-size: 11px; font-weight: 900; color: var(--gold); }
+.mode[aria-pressed="true"] { border-color: var(--gold); background: rgba(255,210,63,.14); }
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.rules div { background: rgba(255,244,224,.07); border-radius: 10px; padding: 6px 9px; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.rules b { font-size: 12px; font-weight: 900; color: var(--gold); }
+.rules span { font-size: 11.5px; font-weight: 700; line-height: 1.25; opacity: .92; }
+.btn {
+  font: 800 24px/1 var(--font-display); border: 0; border-radius: 16px; padding: 15px 28px;
+  background: var(--orange); color: var(--chalk); box-shadow: 0 6px 0 var(--orange-deep);
+  cursor: pointer; touch-action: manipulation;
+}
+.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--orange-deep); }
+.btn:focus-visible, .link:focus-visible, .mode:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.result { text-align: center; }
+.result h2 { margin: 0; font: 800 26px/1.1 var(--font-display); color: var(--gold); }
+.result .big { font: 800 76px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.result .unit { font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center; }
+.stats div { background: rgba(255,244,224,.07); border-radius: 12px; padding: 8px 4px; }
+.stats b { display: block; font: 800 22px/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.stats span { font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.tip { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.4; text-align: center; opacity: .92; }
+.link { background: none; border: 0; color: var(--chalk); font: 800 15px var(--font-body); opacity: .8; cursor: pointer; padding: 6px; }
+.tag {
+  position: absolute; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); right: 12px; pointer-events: none;
+  font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase;
+  background: var(--glass); padding: 4px 8px; border-radius: 6px;
+}
+.err { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px 16px; text-align: center; font-weight: 800; line-height: 1.5; }
+@media (prefers-reduced-motion: reduce) {
+  .rally.pop, .banner.show, .move.show, .overlay:not([hidden]) .panel { animation-duration: .01s; }
+}
+</style>
+
+<div id="app">
+  <canvas id="c" aria-label="FLIX Çember oyun alanı"></canvas>
+
+  <div class="hud" id="hud" hidden>
+    <div class="hud-top">
+      <div class="lives" id="lives"></div>
+      <div class="mid">
+        <div class="rally" id="rally">0</div>
+        <div class="rally-label">Pas serisi</div>
+      </div>
+      <div class="right">
+        <div class="chip">PUAN <b id="score">0</b></div>
+        <div class="chip" id="multChip">x<b id="mult">1</b></div>
+      </div>
+    </div>
+    <div class="target" id="target" hidden><i id="tDot"></i><span>Pas ver: <b id="tName">-</b></span></div>
+    <div class="hint" id="hint" hidden></div>
+  </div>
+  <div class="banner" id="banner"></div>
+  <div class="move" id="move"></div>
+  <div class="tag">Prototip</div>
+
+  <div class="overlay" id="start">
+    <div class="logo">
+      <span class="flix">FLIX</span>
+      <span class="name">Çember</span>
+    </div>
+    <div class="panel">
+      <p class="label">Mod seç</p>
+      <div class="modes">
+        <button class="mode" id="mFree" aria-pressed="true"><strong>Serbest</strong><span>Kime istersen dokun, "Bana!" diyenleri yakala</span><em>Rekor seri <b id="bFree">0</b></em></button>
+        <button class="mode" id="mTarget" aria-pressed="false"><strong>Hedef</strong><span>Kime atacağın belli. Yanlış kişiye dokunma!</span><em>Rekor seri <b id="bTarget">0</b></em></button>
+      </div>
+      <p class="label">Hareketler</p>
+      <div class="rules">
+        <div><b>Dokun</b><span>Halka kapanınca arkadaşına dokun: ona pas</span></div>
+        <div><b>Yukarı kaydır</b><span>Rövaşata: ters takla atarak vuruş</span></div>
+        <div><b>Sağa / sola kaydır</b><span>Kasırga 360 vuruşu ve Makas</span></div>
+        <div><b>Aşağı kaydır</b><span>Kendine sektir: Diz, Topuk, Omuz</span></div>
+      </div>
+      <button class="btn" id="play">Oyna</button>
+    </div>
+  </div>
+
+  <div class="overlay dim" id="over" hidden>
+    <div class="panel">
+      <div class="result">
+        <h2 id="oTitle">FLIX düştü!</h2>
+        <div class="big" id="oRally">0</div>
+        <div class="unit">en uzun pas serisi</div>
+      </div>
+      <div class="stats">
+        <div><b id="oScore">0</b><span>Puan</span></div>
+        <div><b id="oPerfect">0</b><span>Mükemmel</span></div>
+        <div><b id="oMoves">0</b><span>Havalı hareket</span></div>
+      </div>
+      <p class="tip" id="oTip"></p>
+      <button class="btn" id="again">Tekrar</button>
+      <button class="link" id="menu">Ana menü</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  if (!window.THREE) {
+    const d = document.createElement("div"); d.className = "err";
+    d.textContent = "3D motoru yüklenemedi. İnternet bağlantını kontrol edip sayfayı yenile.";
+    $("app").appendChild(d); return;
+  }
+  const T3 = THREE;
+  const TAU = Math.PI * 2;
+
+  // ---------- data ----------
+  const PEOPLE = [
+    { name: "Ece", shirt: 0xff7a00, shorts: 0x10262b, skin: 0xf1c27d, hair: 0x3b2416, note: 0, style: "bun" },
+    { name: "Mert", shirt: 0x2f80ff, shorts: 0xfff4e0, skin: 0xe0ac69, hair: 0x1b1b1b, note: 2, style: "short" },
+    { name: "Zeynep", shirt: 0xff5e7e, shorts: 0x10262b, skin: 0xffdbac, hair: 0x7a3b12, note: 4, style: "long" },
+    { name: "Can", shirt: 0xffd23f, shorts: 0x2f80ff, skin: 0xc68642, hair: 0x1b1b1b, note: 7, style: "cap" },
+    { name: "Defne", shirt: 0x2ec27e, shorts: 0xfff4e0, skin: 0xf1c27d, hair: 0xb5651d, note: 9, style: "long" },
+    { name: "Arda", shirt: 0x9b5cff, shorts: 0x10262b, skin: 0x8d5524, hair: 0x120c08, note: 12, style: "short" },
+    { name: "Elif", shirt: 0xfff4e0, shorts: 0xff5e7e, skin: 0xffdbac, hair: 0x3b2416, note: 14, style: "bun" },
+    { name: "Kerem", shirt: 0xe11d2a, shorts: 0xfff4e0, skin: 0xe0ac69, hair: 0x5a3a1a, note: 16, style: "cap" },
+  ];
+  const JOIN_AT = [12, 28, 48, 75];
+  const TIPS = {
+    free: [
+      "Yukarı kaydır: Rövaşata. Takla atarak pas, +40.",
+      "Sağa kaydır Kasırga, sola kaydır Makas. İkisi de havada vuruş.",
+      "Aşağı kaydırıp kendine sektir: Diz, Topuk, Omuz. Her biri daha çok puan.",
+      "\"Bana!\" diyen arkadaşa 3 pas içinde ulaş: +30.",
+      "Art arda 5 Mükemmel çarpanı bir artırır, en fazla x4.",
+    ],
+    target: [
+      "Hedef modunda sarı oklu arkadaşa dokun. Yanlış kişi can götürür.",
+      "Havalı hareketler Hedef modunda her zaman doğru kişiye gider ama zamanlaması daha dar.",
+      "Kendine sektirmek hedefi değiştirmez, düşünmek için zaman kazandırır.",
+    ],
+  };
+
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+  const reduce = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } })();
+  const app = $("app"), cv = $("c");
+  let mode2 = store.get("fcm4.mode", "free");
+  const best = { free: store.get("fcm4.best.free", 0), target: store.get("fcm4.best.target", 0) };
+
+  // ---------- renderer, scene, camera ----------
+  const renderer = new T3.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: "high-performance" });
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = T3.PCFSoftShadowMap;
+  renderer.outputEncoding = T3.sRGBEncoding;
+  let pixelRatio = Math.min(window.devicePixelRatio || 1, 2.5);
+  const scene = new T3.Scene();
+  scene.fog = new T3.Fog(0xbfe6e0, 26, 55);
+  const camera = new T3.PerspectiveCamera(42, 1, 0.1, 120);
+  const R = 3.8;       // circle radius in metres
+  const CH = 1.35;     // contact height: the FLIX is met in the air, around the hip
+  const PS = 1.45;     // character scale: chunky and readable on a phone
+
+  const hemi = new T3.HemisphereLight(0xe6f8ff, 0x2a7d72, 0.8); scene.add(hemi);
+  const sun = new T3.DirectionalLight(0xfff0d6, 0.95);
+  sun.position.set(6, 13, 6); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
+  Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 2, far: 32 });
+  scene.add(sun);
+
+  // three-step cel shading plus ink outlines for a crisp cartoon look
+  const GRAD = (() => {
+    const t = new T3.DataTexture(new Uint8Array([110, 185, 255]), 3, 1, T3.LuminanceFormat);
+    t.minFilter = t.magFilter = T3.NearestFilter; t.generateMipmaps = false; t.needsUpdate = true; return t;
+  })();
+  const matCache = new Map();
+  const toon = (c) => { if (!matCache.has(c)) matCache.set(c, new T3.MeshToonMaterial({ color: c, gradientMap: GRAD })); return matCache.get(c); };
+  const OUTLINE = new T3.ShaderMaterial({
+    side: T3.BackSide,
+    uniforms: { w: { value: 0.022 } },
+    vertexShader: "uniform float w; void main(){ vec3 p = position + normalize(normal) * w; gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }",
+    fragmentShader: "void main(){ gl_FragColor = vec4(0.063, 0.149, 0.169, 1.0); }",
+  });
+  function mesh(parent, geo, col, opts = {}) {
+    const m = new T3.Mesh(geo, opts.mat || toon(col));
+    m.castShadow = opts.shadow !== false;
+    if (opts.outline !== false) { const o = new T3.Mesh(geo, OUTLINE); m.add(o); }
+    parent.add(m); return m;
+  }
+  // smooth capsule along y, centred, total length len + rb + rt
+  function capsule(rb, rt, len, seg = 16) {
+    const pts = [], n = 6;
+    for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + (i / n) * Math.PI / 2; pts.push(new T3.Vector2(Math.max(0, Math.cos(a) * rb), -len / 2 + Math.sin(a) * rb)); }
+    for (let i = 0; i <= n; i++) { const a = (i / n) * Math.PI / 2; pts.push(new T3.Vector2(Math.max(0, Math.cos(a) * rt), len / 2 + Math.sin(a) * rt)); }
+    return new T3.LatheGeometry(pts, seg);
+  }
+  const SPH = (r, w = 20, h = 14) => new T3.SphereGeometry(r, w, h);
+
+  // ground
+  const ground = new T3.Mesh(new T3.CircleGeometry(50, 64), toon(0x1d6e66));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  const courtTex = (() => {
+    const c = document.createElement("canvas"); c.width = c.height = 1024;
+    const x = c.getContext("2d"); x.scale(2, 2);
+    x.fillStyle = "#f0a663"; x.beginPath(); x.arc(256, 256, 250, 0, TAU); x.fill();
+    x.fillStyle = "rgba(255,122,0,.28)"; x.beginPath(); x.arc(256, 256, 238, 0, TAU); x.fill();
+    x.setLineDash([22, 16]); x.lineWidth = 7; x.strokeStyle = "#fff4e0";
+    x.beginPath(); x.arc(256, 256, 228, 0, TAU); x.stroke(); x.setLineDash([]);
+    x.lineWidth = 5; x.beginPath(); x.arc(256, 256, 64, 0, TAU); x.stroke();
+    x.font = "italic 800 54px 'Baloo 2', Arial, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillStyle = "#fff4e0"; x.fillText("FLIX", 256, 260);
+    const t = new T3.CanvasTexture(c); t.encoding = T3.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+  })();
+  const court = new T3.Mesh(new T3.CircleGeometry(R * 1.32, 96), new T3.MeshToonMaterial({ map: courtTex, gradientMap: GRAD }));
+  court.rotation.x = -Math.PI / 2; court.position.y = 0.01; court.receiveShadow = true; scene.add(court);
+  const rim = new T3.Mesh(new T3.TorusGeometry(R * 1.32, 0.06, 8, 96), toon(0x10262b));
+  rim.rotation.x = Math.PI / 2; rim.position.y = 0.01; scene.add(rim);
+  function tree(x, z, s) {
+    const g = new T3.Group();
+    mesh(g, new T3.CylinderGeometry(0.16 * s, 0.24 * s, 1.5 * s, 10), 0x7a4a26).position.y = 0.75 * s;
+    mesh(g, new T3.IcosahedronGeometry(1.1 * s, 1), 0x2ea36a).position.y = 2.1 * s;
+    const f2 = mesh(g, new T3.IcosahedronGeometry(0.75 * s, 1), 0x46c47f); f2.position.set(0.35 * s, 2.8 * s, 0.25 * s);
+    g.position.set(x, 0, z); g.rotation.y = Math.random() * 6; scene.add(g);
+  }
+  [[-8, -6, 1.3], [8.5, -5, 1.5], [-10, 2, 1.2], [10, 3, 1.1], [-5, -11, 1.6], [4, -12, 1.4], [0, -14, 1.7], [-12, -3, 1.4], [12, -9, 1.6]].forEach((t) => tree(...t));
+  function bench(x, z, ry) {
+    const g = new T3.Group();
+    mesh(g, new T3.BoxGeometry(2, 0.12, 0.5), 0xff7a00, { outline: false }).position.y = 0.5;
+    mesh(g, new T3.BoxGeometry(2, 0.5, 0.1), 0xff7a00, { outline: false }).position.set(0, 0.85, -0.22);
+    mesh(g, new T3.BoxGeometry(0.1, 0.5, 0.4), 0x10262b, { outline: false }).position.set(-0.8, 0.25, 0);
+    mesh(g, new T3.BoxGeometry(0.1, 0.5, 0.4), 0x10262b, { outline: false }).position.set(0.8, 0.25, 0);
+    g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g);
+  }
+  bench(-7, -1, Math.PI / 2.4); bench(7, -2, -Math.PI / 2.4);
+
+  // ---------- sprites for names and speech bubbles (drawn at 2x for sharp text) ----------
+  function labelTexture(text, bg, fg, w = 512, h = 128, size = 68) {
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const x = c.getContext("2d");
+    if (bg) { x.fillStyle = bg; const r = h / 2.4; x.beginPath(); x.moveTo(r, 8); x.arcTo(w - 8, 8, w - 8, h - 8, r); x.arcTo(w - 8, h - 8, 8, h - 8, r); x.arcTo(8, h - 8, 8, 8, r); x.arcTo(8, 8, w - 8, 8, r); x.fill(); }
+    x.font = "800 " + size + "px 'Baloo 2', Nunito, Arial, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+    if (!bg) { x.lineWidth = 12; x.lineJoin = "round"; x.strokeStyle = "rgba(16,38,43,.8)"; x.strokeText(text, w / 2, h / 2 + 4); }
+    x.fillStyle = fg; x.fillText(text, w / 2, h / 2 + 4);
+    const t = new T3.CanvasTexture(c); t.encoding = T3.sRGBEncoding; t.anisotropy = 4; return t;
+  }
+  function sprite(tex, sx, sy) {
+    const s = new T3.Sprite(new T3.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
+    s.scale.set(sx, sy, 1); s.renderOrder = 10; return s;
+  }
+
+  // ---------- 3D characters: hips > spine > head, hips > thigh > knee > foot, spine > shoulder > elbow ----------
+  const L1 = 0.44, L2 = 0.44, HIP_H = 1.01;
+  const CHANNELS = ["air", "gnd", "px", "py", "pz", "sx", "sy", "sz", "hx", "hy",
+    "t0x", "t0z", "k0", "t1x", "t1z", "k1", "a0x", "a0z", "e0", "a1x", "a1z", "e1"];
+  const LINEAR = { air: 1, gnd: 1 };
+  const neutral = () => { const p = {}; for (const c of CHANNELS) p[c] = 0; p.gnd = 1; return p; };
+
+  function makePerson(p) {
+    const root = new T3.Group();
+    const hips = new T3.Group(); hips.rotation.order = "YXZ"; hips.position.y = HIP_H; root.add(hips);
+    const pelvis = mesh(hips, SPH(0.26), p.shorts); pelvis.scale.set(1.1, 0.75, 0.9);
+    const legs = [-1, 1].map((s) => {
+      const thigh = new T3.Group(); thigh.position.set(0.14 * s, -0.02, 0); hips.add(thigh);
+      const shorts = mesh(thigh, capsule(0.14, 0.15, 0.1), p.shorts); shorts.position.y = -0.1;
+      mesh(thigh, capsule(0.09, 0.1, L1 - 0.12), p.skin).position.y = -L1 / 2;
+      const knee = new T3.Group(); knee.position.y = -L1; thigh.add(knee);
+      mesh(knee, capsule(0.085, 0.095, L2 - 0.14), p.skin).position.y = -L2 / 2;
+      const sock = mesh(knee, capsule(0.09, 0.09, 0.04), 0xfff4e0); sock.position.y = -L2 + 0.1;
+      const foot = new T3.Group(); foot.position.y = -L2; knee.add(foot);
+      const shoe = mesh(foot, SPH(0.12, 16, 10), p.shirt); shoe.scale.set(0.95, 0.6, 1.55); shoe.position.set(0, -0.045, 0.07);
+      const sole = mesh(foot, SPH(0.12, 16, 6), 0xfff4e0, { outline: false }); sole.scale.set(1, 0.25, 1.6); sole.position.set(0, -0.09, 0.07);
+      return { thigh, knee, foot, s };
+    });
+    const spine = new T3.Group(); spine.rotation.order = "YXZ"; spine.position.y = 0.06; hips.add(spine);
+    mesh(spine, capsule(0.27, 0.31, 0.3), p.shirt).position.y = 0.33;
+    const stripe = mesh(spine, new T3.CylinderGeometry(0.3, 0.29, 0.07, 24, 1, true), 0xfff4e0, { outline: false }); stripe.position.y = 0.22;
+    const arms = [-1, 1].map((s) => {
+      const sh = new T3.Group(); sh.position.set(0.37 * s, 0.56, 0); spine.add(sh);
+      mesh(sh, SPH(0.12), p.shirt);
+      mesh(sh, capsule(0.075, 0.08, 0.16), p.skin).position.y = -0.17;
+      const el = new T3.Group(); el.position.y = -0.33; sh.add(el);
+      mesh(el, capsule(0.065, 0.072, 0.15), p.skin).position.y = -0.14;
+      mesh(el, SPH(0.085), p.skin).position.y = -0.3;
+      return { sh, el, s };
+    });
+    const head = new T3.Group(); head.rotation.order = "YXZ"; head.position.y = 0.74; spine.add(head);
+    const hc = new T3.Group(); hc.position.y = 0.3; head.add(hc);
+    mesh(hc, SPH(0.34, 28, 20), p.skin);
+    const hairCap = mesh(hc, new T3.SphereGeometry(0.355, 28, 14, 0, TAU, 0, Math.PI * 0.55), p.hair); hairCap.rotation.x = -0.28;
+    if (p.style === "long") { const b = mesh(hc, capsule(0.2, 0.22, 0.25), p.hair); b.scale.set(1.35, 1, 0.6); b.position.set(0, -0.14, -0.2); }
+    if (p.style === "bun") mesh(hc, SPH(0.14), p.hair).position.set(0, 0.33, -0.16);
+    if (p.style === "short") { const f = mesh(hc, SPH(0.12), p.hair); f.scale.set(1.8, 0.6, 1); f.position.set(0.05, 0.25, 0.22); }
+    if (p.style === "cap") {
+      mesh(hc, new T3.SphereGeometry(0.365, 28, 12, 0, TAU, 0, Math.PI * 0.45), p.shirt).position.y = 0.02;
+      const brim = mesh(hc, new T3.CylinderGeometry(0.24, 0.24, 0.035, 24, 1, false, -Math.PI / 2, Math.PI), p.shirt); brim.position.set(0, 0.12, 0.24);
+    }
+    const ink = new T3.MeshBasicMaterial({ color: 0x10262b }), white = new T3.MeshBasicMaterial({ color: 0xffffff });
+    const eyes = [-1, 1].map((s) => {
+      const e = new T3.Group(); e.position.set(0.12 * s, 0.03, 0.305); hc.add(e);
+      const pupil = new T3.Mesh(SPH(0.055, 12, 10), ink); pupil.scale.z = 0.5; e.add(pupil);
+      const glint = new T3.Mesh(SPH(0.018, 8, 6), white); glint.position.set(0.018, 0.02, 0.03); e.add(glint);
+      return e;
+    });
+    const cheekMat = new T3.MeshBasicMaterial({ color: 0xff8a8a, transparent: true, opacity: 0.5 });
+    for (const s of [-1, 1]) { const c = new T3.Mesh(SPH(0.06, 10, 8), cheekMat); c.scale.z = 0.3; c.position.set(0.2 * s, -0.08, 0.27); hc.add(c); }
+    const smile = new T3.Mesh(new T3.TorusGeometry(0.07, 0.017, 6, 16, Math.PI), ink); smile.rotation.z = Math.PI; smile.position.set(0, -0.1, 0.315); hc.add(smile);
+    const mouthO = new T3.Mesh(SPH(0.055, 12, 10), ink); mouthO.scale.set(0.8, 1, 0.4); mouthO.position.set(0, -0.12, 0.31); mouthO.visible = false; hc.add(mouthO);
+
+    const tag = sprite(labelTexture(p.name, null, "#fff4e0"), 1.4, 0.35); tag.position.y = 2.9; root.add(tag);
+    const bubble = sprite(labelTexture("Bana!", "#ffd23f", "#10262b"), 1.1, 0.28); bubble.position.y = 3.2; bubble.visible = false; root.add(bubble);
+    const marker = mesh(root, new T3.ConeGeometry(0.26, 0.5, 4), 0xffd23f, { mat: new T3.MeshBasicMaterial({ color: 0xffd23f }), shadow: false });
+    marker.rotation.x = Math.PI; marker.position.y = 3.3; marker.visible = false;
+    const halo = new T3.Mesh(new T3.RingGeometry(0.55, 0.72, 48), new T3.MeshBasicMaterial({ color: 0xffd23f, transparent: true, opacity: 0.85, side: T3.DoubleSide }));
+    halo.rotation.x = -Math.PI / 2; halo.position.y = 0.04; halo.visible = false; root.add(halo);
+    root.scale.setScalar(PS);
+    scene.add(root);
+    return { p, root, hips, spine, head, legs, arms, eyes, smile, mouthO, tag, bubble, marker, halo, bubbleLeft: -1,
+             cur: neutral(), clip: null, blinkAt: Math.random() * 3,
+             x: 0, z: 0, tx: 0, tz: 0, face: 0, enter: 0 };
+  }
+
+  // ---------- FLIX model: cork base with a skirt of rainbow feathers ----------
+  const flix = new T3.Group();
+  (() => {
+    mesh(flix, new T3.SphereGeometry(0.13, 20, 12, 0, TAU, Math.PI / 2, Math.PI / 2), 0xff7a00);
+    mesh(flix, new T3.CylinderGeometry(0.135, 0.135, 0.06, 20), 0xc94f00).position.y = 0.02;
+    const sh = new T3.Shape();
+    sh.moveTo(-0.045, 0); sh.quadraticCurveTo(-0.13, 0.36, 0, 0.5); sh.quadraticCurveTo(0.13, 0.36, 0.045, 0);
+    const fg = new T3.ShapeGeometry(sh, 8);
+    const cols = [0xff3b3b, 0xffc21a, 0x2ec27e, 0x2f80ff, 0xff5fb8, 0xff7a00, 0x9b5cff, 0xfff4e0];
+    cols.forEach((c, i) => {
+      const pv = new T3.Group(); pv.rotation.y = (i / cols.length) * TAU; pv.position.y = 0.04; flix.add(pv);
+      const f = new T3.Mesh(fg, new T3.MeshToonMaterial({ color: c, gradientMap: GRAD, side: T3.DoubleSide }));
+      f.position.z = 0.1; f.rotation.x = 0.38; f.castShadow = true; pv.add(f);
+    });
+  })();
+  flix.scale.setScalar(1.45);
+  scene.add(flix);
+  const flixShadow = new T3.Mesh(new T3.CircleGeometry(0.24, 24), new T3.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 }));
+  flixShadow.rotation.x = -Math.PI / 2; flixShadow.position.y = 0.02; scene.add(flixShadow);
+  // timing ring on the ground under the meeting point
+  const ring = new T3.Mesh(new T3.RingGeometry(0.62, 0.76, 64), new T3.MeshBasicMaterial({ color: 0xfff4e0, transparent: true, opacity: 0.9, side: T3.DoubleSide }));
+  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.03; scene.add(ring);
+  const ringCore = new T3.Mesh(new T3.RingGeometry(0.62, 0.69, 64), new T3.MeshBasicMaterial({ color: 0xffd23f, transparent: true, opacity: 0.7, side: T3.DoubleSide }));
+  ringCore.rotation.x = -Math.PI / 2; ringCore.position.y = 0.025; scene.add(ringCore);
+  // ribbon trail
+  const TRN = 22;
+  const trGeo = new T3.BufferGeometry();
+  trGeo.setAttribute("position", new T3.BufferAttribute(new Float32Array(TRN * 2 * 3), 3));
+  trGeo.setAttribute("color", new T3.BufferAttribute(new Float32Array(TRN * 2 * 3), 3));
+  const trIdx = []; for (let i = 0; i < TRN - 1; i++) { const a = i * 2; trIdx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  trGeo.setIndex(trIdx);
+  const trail = new T3.Mesh(trGeo, new T3.MeshBasicMaterial({ vertexColors: true, transparent: true, blending: T3.AdditiveBlending, depthWrite: false, side: T3.DoubleSide }));
+  trail.frustumCulled = false; scene.add(trail);
+  const trailPts = [];
+  const trailCol = new T3.Color();
+  // particles with soft round sprites
+  const PMAX = 260;
+  const dotTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"); const g = x.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(0.55, "rgba(255,255,255,.9)"); g.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); return new T3.CanvasTexture(c); })();
+  const pGeo = new T3.BufferGeometry();
+  pGeo.setAttribute("position", new T3.BufferAttribute(new Float32Array(PMAX * 3), 3));
+  pGeo.setAttribute("color", new T3.BufferAttribute(new Float32Array(PMAX * 3), 3));
+  const pts = new T3.Points(pGeo, new T3.PointsMaterial({ size: 0.2, map: dotTex, vertexColors: true, transparent: true, depthWrite: false }));
+  pts.frustumCulled = false; scene.add(pts);
+  const parts = [];
+  function burst(pos, n, cols, spread = 3) {
+    if (reduce) n = Math.ceil(n / 3);
+    for (let i = 0; i < n && parts.length < PMAX; i++) {
+      const c = new T3.Color(cols[i % cols.length]);
+      parts.push({ x: pos.x, y: pos.y, z: pos.z, vx: (Math.random() - 0.5) * spread, vy: Math.random() * spread, vz: (Math.random() - 0.5) * spread, life: 1, c });
+    }
+  }
+
+  // ---------- game state ----------
+  const G = window.__fcm = {
+    mode: "menu", now: 0, players: [], flight: null, ts: 1, slowT: 0,
+    rally: 0, maxRally: 0, score: 0, mult: 1, perfStreak: 0, perfects: 0, moves: 0, selfCount: 0, lives: 3,
+    call: null, required: -1, shake: 0, camPunch: 0, dropPos: null,
+  };
+
+  function seat(i, n) {
+    const a = Math.PI / 2 + (i / n) * TAU + Math.PI / n;   // nobody stands right in front of the camera
+    return { x: Math.cos(a) * R, z: Math.sin(a) * R };
+  }
+  function layout(snap) {
+    const n = G.players.length;
+    G.players.forEach((pl, i) => { const s = seat(i, n); pl.tx = s.x; pl.tz = s.z; if (snap) { pl.x = s.x; pl.z = s.z; pl.face = Math.atan2(-s.x, -s.z); } });
+  }
+  function setPlayers(n) {
+    for (const pl of G.players) scene.remove(pl.root);
+    G.players = PEOPLE.slice(0, n).map(makePerson);
+    layout(true);
+  }
+
+  // ---------- audio ----------
+  let ac = null;
+  function tone(semi, dur = 0.16, type = "triangle", vol = 0.13) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const f = 392 * Math.pow(2, semi / 12);
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, ac.currentTime);
+      g.gain.setValueAtTime(vol, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + dur);
+      o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + dur);
+    } catch {}
+  }
+  const whoosh = () => tone(-12, 0.3, "sawtooth", 0.04);
+  const buzz = (ms) => { try { navigator.vibrate && navigator.vibrate(ms); } catch {} };
+
+  // ---------- difficulty: forgiving start, slow ramp ----------
+  const hard = () => (mode2 === "target" ? 1.2 : 1);
+  const flightBase = () => Math.max(1.0, 1.7 - G.rally * 0.011 * hard());
+  const windowGood = () => Math.max(0.15, 0.28 - G.rally * 0.0018 * hard());
+  const windowPerfect = () => Math.max(0.06, windowGood() * 0.38);
+  const TRICK_WINDOW = 0.8;   // acrobatic moves need slightly cleaner timing
+
+  // ---------- flight: a shuttlecock arc that rises fast and floats down ----------
+  function contactOf(pl) {
+    const dx = -pl.tx, dz = -pl.tz, l = Math.hypot(dx, dz) || 1;
+    return new T3.Vector3(pl.tx + dx / l * 0.95, CH, pl.tz + dz / l * 0.8);
+  }
+  function launch(from, to, kind, delay = 0) {
+    const a = G.players[from], b = G.players[to];
+    const A = contactOf(a), B = contactOf(b);
+    const d = A.distanceTo(B);
+    let T = flightBase() * (0.82 + 0.3 * d / (2 * R));
+    let peak = 2.2 + 1.3 * d / (2 * R);
+    if (kind === "self") { T = flightBase() * 0.9; peak = 2.1; }
+    if (kind === "makas" || kind === "kasirga") { T *= 0.92; peak *= 0.85; }
+    if (kind === "rovasata") { peak *= 1.3; }
+    let curve = 0;
+    if (G.rally >= 32 && kind !== "self") curve = (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random() * 0.8) * Math.min(1, (G.rally - 30) / 40);
+    const P0 = G.flight ? flightPos(G.flight, G.now).p : A.clone();
+    G.flight = { from, to, tIn: G.now, t0: G.now + delay, T, peak, curve, kind, A, B, P0 };
+  }
+  function flightPos(f, t) {
+    if (t < f.t0) {
+      const k = Math.min(1, Math.max(0, (t - f.tIn) / Math.max(0.001, f.t0 - f.tIn)));
+      const e = k * k * (3 - 2 * k);
+      return { p: new T3.Vector3().lerpVectors(f.P0, f.A, e), u: 0 };
+    }
+    const u = (t - f.t0) / f.T;
+    const uu = Math.min(1, Math.max(0, u));
+    const h = 1 - Math.pow(1 - uu, 1.45);                // horizontal: quick away, slow arrival
+    const p = new T3.Vector3().lerpVectors(f.A, f.B, h);
+    if (f.curve) {
+      const side = new T3.Vector3(-(f.B.z - f.A.z), 0, f.B.x - f.A.x).normalize();
+      p.addScaledVector(side, f.curve * 4 * h * (1 - h));
+    }
+    p.y = f.A.y + (f.B.y - f.A.y) * uu + f.peak * Math.sin(Math.PI * Math.pow(uu, 0.72));
+    if (u > 1) { const k = u - 1; p.y = Math.max(0.12, f.B.y - k * f.T * 3.2); }
+    return { p, u };
+  }
+
+  // ---------- input ----------
+  // Tap a friend to pass to them. Swipe for a trick: up Rövaşata, right Kasırga, left Makas, down juggle.
+  // The timing is the moment the finger touches the screen.
+  const touches = new Set();
+  let gesture = null;
+  cv.addEventListener("pointerdown", (e) => {
+    if (G.mode !== "play") return;
+    e.preventDefault();
+    try { cv.setPointerCapture(e.pointerId); } catch {}
+    touches.add(e.pointerId);
+    if (touches.size >= 2 && gesture && !gesture.resolved) { gesture.resolved = true; act({ kind: "rovasata", at: gesture.t0 }); return; }
+    gesture = { id: e.pointerId, x0: e.clientX, y0: e.clientY, t0: G.now, wall0: performance.now(), resolved: false };
+  });
+  cv.addEventListener("pointermove", (e) => {
+    const g = gesture;
+    if (!g || g.id !== e.pointerId || g.resolved) return;
+    const dx = e.clientX - g.x0, dy = e.clientY - g.y0;
+    if (Math.hypot(dx, dy) < 28) return;
+    g.resolved = true;
+    let kind;
+    if (Math.abs(dy) > Math.abs(dx)) kind = dy < 0 ? "rovasata" : "self";
+    else kind = dx > 0 ? "kasirga" : "makas";
+    act({ kind, at: g.t0 });
+  });
+  const release = (e) => {
+    touches.delete(e.pointerId);
+    const g = gesture;
+    if (!g || g.id !== e.pointerId || g.resolved) return;
+    g.resolved = true;
+    act({ kind: "pass", to: hitTest(g.x0, g.y0), at: g.t0 });
+  };
+  cv.addEventListener("pointerup", release);
+  cv.addEventListener("pointercancel", (e) => { touches.delete(e.pointerId); if (gesture && gesture.id === e.pointerId) gesture.resolved = true; });
+  window.addEventListener("keydown", (e) => {
+    if (G.mode !== "play") {
+      if ((e.code === "Space" || e.code === "Enter") && (G.mode === "menu" || G.mode === "over")) { e.preventDefault(); startGame(); }
+      return;
+    }
+    const tricks = { ArrowUp: "rovasata", ArrowDown: "self", ArrowLeft: "makas", ArrowRight: "kasirga" };
+    if (e.code in tricks) { e.preventDefault(); act({ kind: tricks[e.code], at: G.now }); }
+    if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); act({ kind: "pass", to: mode2 === "target" ? G.required : -1, at: G.now }); }
+    const m = /^Digit([1-8])$/.exec(e.code);
+    if (m) act({ kind: "pass", to: Math.min(G.players.length - 1, +m[1] - 1), at: G.now });
+  });
+
+  const tmpV = new T3.Vector3();
+  function project(x, y, z) {
+    tmpV.set(x, y, z).project(camera);
+    const r = cv.getBoundingClientRect();
+    return { x: (tmpV.x + 1) / 2 * r.width, y: (1 - tmpV.y) / 2 * r.height };
+  }
+  G.screenOf = (i) => { const pl = G.players[i]; return project(pl.tx, 2.0, pl.tz); };
+  // the friend whose body is closest to the touch; -1 when nobody is near (free mode picks for you)
+  function hitTest(x, y) {
+    const recv = G.flight ? G.flight.to : -1;
+    let best = -1, bd = 1e9;
+    G.players.forEach((pl, i) => {
+      if (i === recv) return;
+      const a = project(pl.x, 0.8, pl.z), b = project(pl.x, 3.6, pl.z);
+      const vx = b.x - a.x, vy = b.y - a.y, l2 = vx * vx + vy * vy || 1;
+      const k = Math.max(0, Math.min(1, ((x - a.x) * vx + (y - a.y) * vy) / l2));
+      const d = Math.hypot(x - (a.x + vx * k), y - (a.y + vy * k));
+      if (d < bd) { bd = d; best = i; }
+    });
+    if (mode2 === "free" && bd > 90) return -1;
+    return best;
+  }
+  const opposite = (i) => { const n = G.players.length; return (i + Math.round(n / 2)) % n; };
+  function autoTarget(recv) {
+    if (mode2 === "target") return G.required;
+    if (G.call && G.call.who !== recv) return G.call.who;
+    const n = G.players.length;
+    let to; do { to = Math.floor(Math.random() * n); } while (to === recv);
+    return to;
+  }
+
+  // ---------- moves ----------
+  // Keyframed clips. Keys hold joint angles (radians); missing channels start from neutral.
+  // thigh/arm x: negative = forward/up. knee: positive bends. elbow: negative bends. *z: outward. px: negative = lean back.
+  const CLIPS = {
+    vole: { dur: 0.55, hit: 0.07, keys: [
+      { t: 0, t1x: 0.5, k1: 1.0, sy: 0.3, a0z: 0.5, a1z: 0.3, a0x: 0.2 },
+      { t: 0.07, t1x: -1.25, k1: 0.2, sx: -0.12, sy: -0.25, a0z: 0.9, a1z: 0.6, a0x: -0.5, hx: 0.15 },
+      { t: 0.2, t1x: -1.5, k1: 0.1, sx: -0.18, sy: -0.35, a0z: 0.8, a1z: 0.7 },
+      { t: 0.42, t1x: -0.3, k1: 0.5, sy: 0, a0z: 0.3, a1z: 0.2 },
+    ] },
+    yanvole: { dur: 0.6, hit: 0.07, keys: [
+      { t: 0, t1z: 0.3, t1x: 0.2, k1: 1.0, pz: 0.1 },
+      { t: 0.07, t1z: 1.2, t1x: -0.5, k1: 0.15, pz: -0.36, sz: 0.25, a0z: 1.4, a1z: 0.6 },
+      { t: 0.24, t1z: 1.3, t1x: -0.6, k1: 0.1, pz: -0.4, sz: 0.3, a0z: 1.5, a1z: 0.6 },
+      { t: 0.45, t1z: 0.3, t1x: -0.1, k1: 0.4, pz: -0.05, sz: 0, a0z: 0.4 },
+    ] },
+    diz: { dur: 0.5, hit: 0.08, keys: [
+      { t: 0, t1x: -0.2, k1: 0.5 },
+      { t: 0.08, t1x: -1.75, k1: 2.0, air: 0.05, a0z: 0.9, a1z: 0.9, a0x: -0.3, a1x: -0.3, hx: 0.4 },
+      { t: 0.24, t1x: -1.55, k1: 1.9, a0z: 0.8, a1z: 0.8, hx: 0.2 },
+      { t: 0.45, t1x: -0.2, k1: 0.4, a0z: 0.2, a1z: 0.2 },
+    ] },
+    topuk: { dur: 0.62, hit: 0.1, face: "o", keys: [
+      { t: 0, sy: 0.1 },
+      { t: 0.1, t1x: 0.35, k1: 2.2, t1z: -0.15, sy: 0.75, hy: 1.0, hx: 0.25, sx: 0.25, a0z: 1.1, a1z: 1.0, a1x: 0.6 },
+      { t: 0.3, t1x: 0.3, k1: 2.1, sy: 0.7, hy: 0.9, sx: 0.2, a0z: 1.0, a1z: 0.9 },
+      { t: 0.55, t1x: 0, k1: 0.3, sy: 0, hy: 0, sx: 0, a0z: 0.2, a1z: 0.2 },
+    ] },
+    omuz: { dur: 0.6, hit: 0.1, keys: [
+      { t: 0, t0x: -0.3, k0: 0.7, t1x: -0.3, k1: 0.7 },
+      { t: 0.1, air: 0.28, gnd: 0, sz: -0.5, hy: 0.6, a1z: 1.7, a1x: -0.4, a0z: 0.7, t0x: -0.2, k0: 0.4, t1x: -0.3, k1: 0.6 },
+      { t: 0.3, air: 0.04, gnd: 1, sz: -0.25, hy: 0.3, a1z: 0.9 },
+      { t: 0.55, sz: 0, hy: 0, a1z: 0.2 },
+    ] },
+    makas: { dur: 0.9, hit: 0.24, slow: true, face: "o", keys: [
+      { t: 0, t0x: -0.45, k0: 1.0, t1x: -0.45, k1: 1.0, a0x: 0.7, a1x: 0.7, sx: 0.3 },
+      { t: 0.11, air: 0.6, gnd: 0, t0x: -1.5, k0: 0.3, t1x: 0.2, k1: 0.6, px: -0.45, a0x: -1.6, a1x: -1.6, sx: 0 },
+      { t: 0.24, air: 0.85, gnd: 0, t0x: 0.4, k0: 0.5, t1x: -1.85, k1: 0.05, px: -0.75, pz: 0.25, a0z: 1.5, a1z: 1.5, a0x: -0.3, a1x: -0.3, hx: -0.3 },
+      { t: 0.4, air: 0.55, gnd: 0, t0x: 0.1, k0: 0.4, t1x: -1.2, k1: 0.3, px: -0.5, pz: 0.1, a0z: 1.3, a1z: 1.3 },
+      { t: 0.58, air: 0, gnd: 1, t0x: -0.5, k0: 1.1, t1x: -0.5, k1: 1.1, px: 0, pz: 0, sx: 0.35, a0z: 0.9, a1z: 0.9, a0x: 0, a1x: 0, hx: 0 },
+      { t: 0.88, t0x: -0.05, k0: 0.1, t1x: -0.05, k1: 0.1, sx: 0.05, a0z: 0.2, a1z: 0.2 },
+    ] },
+    kasirga: { dur: 0.95, hit: 0.28, slow: true, face: "o", keys: [
+      { t: 0, t0x: -0.4, k0: 0.9, t1x: -0.4, k1: 0.9, sy: 0.6, a0z: 0.3, a1z: 0.3, a0x: 0.5 },
+      { t: 0.13, air: 0.55, gnd: 0, py: -2.3, t0x: -1.2, k0: 1.5, t1x: -0.3, k1: 1.2, a0z: 0.2, a1z: 0.2, e0: -1.8, e1: -1.8, sy: 0 },
+      { t: 0.28, air: 0.9, gnd: 0, py: -4.5, t1x: -1.45, t1z: 0.9, k1: 0.1, t0x: -0.6, k0: 1.6, pz: -0.3, a0z: 1.6, a1z: 1.6, e0: 0, e1: 0 },
+      { t: 0.43, air: 0.5, gnd: 0, py: -5.8, t1x: -0.6, t1z: 0.3, k1: 0.4, t0x: -0.3, k0: 0.9, pz: -0.1, a0z: 1.2, a1z: 1.2 },
+      { t: 0.6, air: 0, gnd: 1, py: -TAU, t0x: -0.5, k0: 1.1, t1x: -0.5, k1: 1.1, t1z: 0, sx: 0.3, a0z: 0.8, a1z: 0.8, pz: 0 },
+      { t: 0.92, py: -TAU, t0x: -0.05, k0: 0.1, t1x: -0.05, k1: 0.1, sx: 0.05, a0z: 0.2, a1z: 0.2 },
+    ] },
+    rovasata: { dur: 1.1, hit: 0.3, slow: true, face: "o", keys: [
+      { t: 0, t0x: -0.5, k0: 1.2, t1x: -0.5, k1: 1.2, sx: 0.35, a0x: 0.8, a1x: 0.8 },
+      { t: 0.12, air: 1.0, gnd: 0, px: -0.9, t0x: -1.5, k0: 0.4, t1x: 0.1, k1: 0.5, a0x: -2.6, a1x: -2.6, sx: 0, hx: -0.4 },
+      { t: 0.3, air: 1.55, gnd: 0, px: -2.2, t0x: 0.5, k0: 0.9, t1x: -1.9, k1: 0.05, a0x: -1.2, a1x: -1.2, a0z: 1.2, a1z: 1.2, hx: -0.2 },
+      { t: 0.48, air: 1.6, gnd: 0, px: -3.6, t0x: -0.6, k0: 1.6, t1x: -0.8, k1: 1.5, a0z: 0.6, a1z: 0.6, a0x: -0.5, a1x: -0.5 },
+      { t: 0.68, air: 0.85, gnd: 0, px: -5.2, t0x: -1.0, k0: 1.8, t1x: -1.0, k1: 1.8, a0z: 0.9, a1z: 0.9 },
+      { t: 0.84, air: 0, gnd: 1, px: -TAU, t0x: -0.6, k0: 1.3, t1x: -0.6, k1: 1.3, sx: 0.4, a0z: 1.0, a1z: 1.0, a0x: -0.6, a1x: -0.6, hx: 0 },
+      { t: 1.08, px: -TAU, t0x: -0.05, k0: 0.1, t1x: -0.05, k1: 0.1, sx: 0.05, a0z: 0.15, a1z: 0.15, a0x: 0, a1x: 0 },
+    ] },
+    cheer: { dur: 0.95, face: "o", keys: [
+      { t: 0.14, air: 0.38, gnd: 0, a0z: 2.6, a1z: 2.6, a0x: -0.3, a1x: -0.3, t0x: -0.4, k0: 0.8, t1x: -0.4, k1: 0.8 },
+      { t: 0.3, air: 0, gnd: 1, a0z: 2.5, a1z: 2.5, t0x: -0.3, k0: 0.6, t1x: -0.3, k1: 0.6 },
+      { t: 0.48, air: 0.32, gnd: 0, a0z: 2.7, a1z: 2.7, t0x: -0.4, k0: 0.8, t1x: -0.4, k1: 0.8 },
+      { t: 0.64, air: 0, gnd: 1, a0z: 2.4, a1z: 2.4, t0x: -0.1, k0: 0.2, t1x: -0.1, k1: 0.2 },
+    ] },
+    sad: { dur: 1.2, face: "o", keys: [
+      { t: 0.25, sx: 0.45, hx: 0.5, a0x: -0.4, a1x: -0.4, e0: -1.2, e1: -1.2, t0x: -0.4, k0: 0.9, t1x: -0.4, k1: 0.9 },
+      { t: 0.95, sx: 0.4, hx: 0.45, a0x: -0.4, a1x: -0.4, e0: -1.2, e1: -1.2, t0x: -0.4, k0: 0.9, t1x: -0.4, k1: 0.9 },
+    ] },
+    groan: { dur: 1.1, face: "o", keys: [
+      { t: 0.18, a0z: 2.3, a1z: 2.3, e0: -2.2, e1: -2.2, a0x: -0.5, a1x: -0.5, hx: -0.25, sx: -0.15 },
+      { t: 0.85, a0z: 2.2, a1z: 2.2, e0: -2.2, e1: -2.2, a0x: -0.5, a1x: -0.5, hx: -0.2, sx: -0.1 },
+    ] },
+  };
+  // pre-build per-channel tracks with Hermite tangents for smooth, continuous motion
+  for (const c of Object.values(CLIPS)) {
+    c.tracks = {};
+    for (const ch of CHANNELS) {
+      const ks = c.keys.filter((k) => ch in k).map((k) => [k.t, k[ch]]);
+      if (!ks.length) continue;
+      if (ks[0][0] > 0) ks.unshift([0, ch === "gnd" ? 1 : 0]);
+      const m = ks.map((k, i) => {
+        if (i === 0 || i === ks.length - 1) return 0;
+        return (ks[i + 1][1] - ks[i - 1][1]) / (ks[i + 1][0] - ks[i - 1][0]);
+      });
+      c.tracks[ch] = { ks, m };
+    }
+  }
+  function sampleTrack(tr, t) {
+    const { ks, m } = tr;
+    if (t <= ks[0][0]) return ks[0][1];
+    const n = ks.length - 1;
+    if (t >= ks[n][0]) return ks[n][1];
+    let i = 0; while (t > ks[i + 1][0]) i++;
+    const [t0, v0] = ks[i], [t1, v1] = ks[i + 1], h = t1 - t0, s = (t - t0) / h;
+    const s2 = s * s, s3 = s2 * s;
+    return (2 * s3 - 3 * s2 + 1) * v0 + (s3 - 2 * s2 + s) * h * m[i] + (-2 * s3 + 3 * s2) * v1 + (s3 - s2) * h * m[i + 1];
+  }
+  const sstep = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+  const wrapPi = (a) => { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Math.PI; };
+  function play(pl, name) { pl.clip = { c: CLIPS[name], name, t0: G.now }; }
+
+  const ballLocal = new T3.Vector3();
+  function basePose(pl, i, t, walking) {
+    const b = neutral();
+    const breathe = Math.sin(t * 2.4 + i * 1.7), sway = Math.sin(t * 1.2 + i);
+    b.sx = 0.03 * breathe; b.pz = 0.025 * sway; b.sy = 0.04 * sway;
+    b.t0x = -0.04; b.t1x = -0.04; b.t0z = 0.07; b.t1z = 0.07; b.k0 = 0.1; b.k1 = 0.1;
+    b.a0z = 0.14 + 0.03 * breathe; b.a1z = 0.14 + 0.03 * breathe; b.e0 = -0.3; b.e1 = -0.3; b.a0x = 0.05; b.a1x = 0.05;
+    if (walking) {
+      const w = Math.sin(t * 11), c = Math.cos(t * 11);
+      b.t0x = w * 0.55; b.t1x = -w * 0.55; b.k0 = Math.max(0, c) * 0.9 + 0.1; b.k1 = Math.max(0, -c) * 0.9 + 0.1;
+      b.a0x = -w * 0.5; b.a1x = w * 0.5; b.e0 = -0.7; b.e1 = -0.7; b.air = Math.abs(w) * 0.05; b.sx = 0.1;
+    }
+    const f = G.flight;
+    if (f && G.mode !== "over") {
+      // eyes and head follow the FLIX
+      const fp = flightPos(f, t).p;
+      ballLocal.copy(fp); pl.root.worldToLocal(ballLocal);
+      b.hy = Math.max(-1.1, Math.min(1.1, Math.atan2(ballLocal.x, ballLocal.z)));
+      b.hx = Math.max(-0.7, Math.min(0.45, -Math.atan2(ballLocal.y - 2.2, Math.hypot(ballLocal.x, ballLocal.z))));
+      // the receiver bends, opens the arms and loads the kicking leg as the FLIX floats down
+      if (f.to === i && G.mode !== "drop" && t >= f.t0) {
+        const k = sstep(0.75, 0.05, f.t0 + f.T - t);
+        b.t0x += -0.35 * k; b.k0 += 0.7 * k;
+        b.t1x += 0.15 * k; b.k1 += 1.05 * k;
+        b.sx += 0.18 * k; b.a0z += 0.55 * k; b.a1z += 0.45 * k; b.e0 += -0.5 * k; b.e1 += -0.4 * k;
+        b.sy += 0.18 * k;
+      }
+    }
+    if (G.call && G.call.who === i && G.mode === "play") {
+      b.a1z = 2.6 + Math.sin(t * 13) * 0.3; b.e1 = -0.3 + Math.sin(t * 13 + 1) * 0.3; b.air = Math.abs(Math.sin(t * 7)) * 0.1; b.gnd = 0.6;
+    }
+    return b;
+  }
+  function animate(pl, i, t, dt) {
+    // walk toward the seat
+    const dx = pl.tx - pl.x, dz = pl.tz - pl.z, dist = Math.hypot(dx, dz);
+    const walking = dist > 0.06;
+    const step = Math.min(dist, dt * 2.6);
+    if (dist > 0) { pl.x += dx / dist * step; pl.z += dz / dist * step; }
+    pl.root.position.set(pl.x, 0, pl.z);
+    // turn toward the FLIX (or the centre)
+    let lx = 0, lz = 0;
+    if (G.flight && G.mode !== "over") { const fp = flightPos(G.flight, t).p; lx = fp.x; lz = fp.z; }
+    if (walking) { lx = pl.tx + dx * 3; lz = pl.tz + dz * 3; }
+    const want = Math.atan2(lx - pl.x, lz - pl.z);
+    pl.face += wrapPi(want - pl.face) * Math.min(1, dt * 7);
+    pl.root.rotation.y = pl.face;
+
+    // pose = base pose blended with the active clip, then lightly smoothed
+    const base = basePose(pl, i, t, walking);
+    let target = base, w = 0, cl = pl.clip;
+    if (cl) {
+      const tau = t - cl.t0;
+      if (tau >= cl.c.dur) { pl.clip = cl = null; }
+      else {
+        w = sstep(0, 0.05, tau) * (1 - sstep(cl.c.dur - 0.2, cl.c.dur, tau));
+        target = {};
+        for (const ch of CHANNELS) {
+          const tr = cl.c.tracks[ch];
+          if (!tr) { target[ch] = base[ch]; continue; }
+          const v = sampleTrack(tr, tau);
+          target[ch] = LINEAR[ch] ? base[ch] + (v - base[ch]) * w : base[ch] + wrapPi(v - base[ch]) * w;
+        }
+      }
+    }
+    const cur = pl.cur, k = 1 - Math.exp(-dt * 28);
+    for (const ch of CHANNELS) cur[ch] += (LINEAR[ch] ? target[ch] - cur[ch] : wrapPi(target[ch] - cur[ch])) * k;
+
+    // keep the standing foot on the ground
+    const ext = (tx, tz, kn) => (L1 * Math.cos(tx) + L2 * Math.cos(tx + kn)) * Math.cos(tz);
+    const reach = Math.max(ext(cur.t0x, cur.t0z, cur.k0), ext(cur.t1x, cur.t1z, cur.k1));
+    const groundLift = reach - (L1 + L2);
+    pl.hips.position.y = HIP_H + groundLift * Math.min(1, Math.max(0, cur.gnd)) + cur.air;
+    pl.hips.rotation.set(cur.px, cur.py, cur.pz);
+    pl.spine.rotation.set(cur.sx, cur.sy, cur.sz);
+    pl.head.rotation.set(cur.hx, cur.hy, 0);
+    const L = pl.legs;
+    L[0].thigh.rotation.set(cur.t0x, 0, -cur.t0z); L[0].knee.rotation.x = cur.k0; L[0].foot.rotation.x = -(cur.t0x + cur.k0) * 0.6;
+    L[1].thigh.rotation.set(cur.t1x, 0, cur.t1z); L[1].knee.rotation.x = cur.k1; L[1].foot.rotation.x = -(cur.t1x + cur.k1) * 0.6;
+    const A = pl.arms;
+    A[0].sh.rotation.set(cur.a0x, 0, -cur.a0z); A[0].el.rotation.x = cur.e0;
+    A[1].sh.rotation.set(cur.a1x, 0, cur.a1z); A[1].el.rotation.x = cur.e1;
+    // face: blink, and an open mouth for tricks and drops
+    const blink = t > pl.blinkAt && t < pl.blinkAt + 0.12;
+    if (t > pl.blinkAt + 0.12) pl.blinkAt = t + 2 + Math.random() * 3;
+    pl.eyes.forEach((e) => { e.scale.y = blink ? 0.12 : 1; });
+    const o = !!(cl && cl.c.face === "o");
+    pl.mouthO.visible = o; pl.smile.visible = !o;
+
+    // bubble, target marker
+    if (G.call && G.call.who === i && G.mode === "play") {
+      if (pl.bubbleLeft !== G.call.left) { pl.bubble.material.map = labelTexture("Bana! " + G.call.left, "#ffd23f", "#10262b"); pl.bubble.material.needsUpdate = true; pl.bubbleLeft = G.call.left; }
+      pl.bubble.visible = true; pl.bubble.position.y = 3.2 + Math.sin(t * 6) * 0.05;
+    } else pl.bubble.visible = false;
+    pl.halo.visible = pl.marker.visible;
+    if (pl.marker.visible) { pl.marker.position.y = 3.3 + Math.sin(t * 5) * 0.1; pl.marker.rotation.y = t * 3; pl.halo.scale.setScalar(1 + Math.sin(t * 6) * 0.08); }
+  }
+
+  // ---------- acting on a kick ----------
+  const TRICKS = {
+    makas: { label: "Makas!", bonus: 25 },
+    kasirga: { label: "Kasırga!", bonus: 30 },
+    rovasata: { label: "Rövaşata!", bonus: 40 },
+  };
+  function act(cmd) {
+    const f = G.flight;
+    if (!f || G.mode !== "play" || G.now < f.t0) return;
+    const kind = cmd.kind, trick = TRICKS[kind];
+    const win = windowGood() * (trick ? TRICK_WINDOW : 1);
+    const dt = cmd.at - (f.t0 + f.T);
+    if (dt < -win) return;          // too early: ignored, try again
+    if (dt > win) return;           // too late: the drop check handles it
+    const recv = f.to, rp = G.players[recv];
+    const perfect = Math.abs(dt) <= windowPerfect();
+    let gained = 0, label = null, to = recv;
+
+    if (kind === "self") {
+      G.selfCount++;
+      if (G.selfCount > 3) return drop("En fazla 3 kez sektirebilirsin!");
+      const names = ["Diz", "Topuk", "Omuz"], clips = ["diz", "topuk", "omuz"];
+      label = names[G.selfCount - 1]; gained = 5 * G.selfCount;
+      play(rp, clips[G.selfCount - 1]);
+      launch(recv, recv, "self", CLIPS[clips[G.selfCount - 1]].hit);
+    } else {
+      to = trick ? autoTarget(recv) : (cmd.to >= 0 ? cmd.to : autoTarget(recv));
+      if (to === recv || to < 0) to = opposite(recv);
+      if (mode2 === "target" && to !== G.required) return drop("Yanlış kişi! Hedef: " + G.players[G.required].p.name);
+      G.selfCount = 0;
+      const d = Math.hypot(G.players[to].tx - rp.tx, G.players[to].tz - rp.tz);
+      gained = 10 + (d > R * 1.5 ? 5 : 0) + (mode2 === "target" ? 5 : 0);
+      let clipName = Math.random() < 0.5 ? "vole" : "yanvole";
+      if (trick) {
+        clipName = kind; gained += trick.bonus; label = trick.label; G.moves++;
+        whoosh(); G.camPunch = 1; if (!reduce) G.slowT = 0.55;
+      }
+      play(rp, clipName);
+      if (G.call && G.call.who === to) {
+        gained += 30; floatText("Bana! +30", G.players[to], "#ffd23f");
+        G.players[to].bubble.visible = false; G.call = null;
+        play(G.players[to], "cheer");
+      }
+      G.rally++; G.maxRally = Math.max(G.maxRally, G.rally);
+      const el = $("rally"); el.textContent = G.rally; el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+      launch(recv, to, kind === "pass" ? "pass" : kind, CLIPS[clipName].hit);
+      if (G.call) { G.call.left--; if (G.call.left <= 0) { G.players[G.call.who].bubble.visible = false; G.call = null; } }
+      maybeCall(); maybeJoin(); pickRequired(to);
+    }
+    if (perfect) {
+      G.perfects++; G.perfStreak++;
+      if (G.perfStreak % 5 === 0 && G.mult < 4) { G.mult++; banner("Ateşlendin!", "Çarpan x" + G.mult); G.players.forEach((pl, i) => { if (i !== recv && i !== to) play(pl, "cheer"); }); }
+      gained *= 2;
+    } else G.perfStreak = 0;
+    gained *= G.mult;
+    G.score += gained;
+    $("score").textContent = G.score; $("mult").textContent = G.mult; $("multChip").classList.toggle("fire", G.mult > 1);
+    if (label && kind !== "self") showMove(label);
+    floatText((perfect ? "Mükemmel! " : "") + (label && kind === "self" ? label + " " : "") + "+" + gained, rp, perfect ? "#ffd23f" : "#fff4e0");
+    tone(rp.p.note + (perfect ? 12 : 0), 0.2, "triangle", perfect ? 0.16 : 0.12);
+    buzz(perfect ? 18 : 8);
+    const cp = contactOf(rp);
+    burst(cp, perfect ? 26 : 12, perfect ? [0xffd23f, 0xff7a00, 0xfff4e0] : [0xfff4e0, 0x2ec27e]);
+    if (perfect) G.shake = 0.08;
+    updateHint();
+  }
+
+  function pickRequired(holder) {
+    if (mode2 !== "target") return;
+    const n = G.players.length;
+    let r; do { r = Math.floor(Math.random() * n); } while (r === holder);
+    G.required = r;
+    G.players.forEach((pl, i) => { pl.marker.visible = i === r; });
+    const pl = G.players[r];
+    $("tName").textContent = pl.p.name; $("tDot").style.background = "#" + pl.p.shirt.toString(16).padStart(6, "0");
+    const t = $("target"); t.hidden = false; t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash");
+  }
+  function maybeCall() {
+    if (mode2 !== "free" || G.call || G.rally < 6 || Math.random() > 0.28) return;
+    const cands = G.players.map((_, i) => i).filter((i) => i !== G.flight.to && i !== G.flight.from);
+    if (!cands.length) return;
+    const who = cands[Math.floor(Math.random() * cands.length)];
+    G.call = { who, left: 3 };
+    tone(G.players[who].p.note + 12, 0.1, "square", 0.05);
+  }
+  function maybeJoin() {
+    if (G.players.length >= PEOPLE.length || G.rally !== JOIN_AT[G.players.length - 4]) return;
+    const pl = makePerson(PEOPLE[G.players.length]);
+    pl.x = 0; pl.z = 12; pl.enter = 1;
+    G.players.push(pl);
+    layout(false);
+    banner(pl.p.name + " çembere katıldı!", G.players.length + " kişi");
+    tone(19, 0.25, "sine", 0.1);
+  }
+
+  function drop(reason) {
+    G.lives--; renderLives();
+    G.mode = "drop"; G.shake = 0.25; G.mult = 1; G.perfStreak = 0; G.selfCount = 0; G.slowT = 0;
+    $("mult").textContent = 1; $("multChip").classList.remove("fire");
+    if (G.call) { G.players[G.call.who].bubble.visible = false; G.call = null; }
+    tone(-5, 0.35, "sawtooth", 0.1); buzz([40, 40, 80]);
+    const f = G.flight, fp = flightPos(f, G.now);
+    G.dropPos = fp.p.clone(); G.dropAt = G.now;
+    burst(fp.p, 18, [0xff7a00, 0xfff4e0, 0xff5e7e]);
+    floatText(reason || "Düştü!", G.players[f.to], "#ff5e7e");
+    G.players.forEach((pl, i) => play(pl, i === f.to ? "sad" : "groan"));
+    const holder = f.to;
+    setTimeout(() => {
+      if (G.lives <= 0) return showOver();
+      G.mode = "play"; G.rally = 0; $("rally").textContent = "0";
+      serve(holder);
+    }, 1300);
+  }
+  function serve(from) {
+    const n = G.players.length;
+    let to; do { to = Math.floor(Math.random() * n); } while (to === from);
+    G.selfCount = 0; G.flight = null;
+    launch(from, to, "pass", CLIPS.vole.hit);
+    G.flight.T *= 1.25;
+    play(G.players[from], "vole");
+    tone(G.players[from].p.note, 0.16);
+    pickRequired(to);
+  }
+
+  // ---------- HUD helpers ----------
+  const floats = [];
+  function floatText(s, pl, color) {
+    const tex = labelTexture(s, null, color, 1024, 160, 88);
+    const sp = sprite(tex, 3.2, 0.5);
+    sp.position.set(pl.x * 0.7, 5.0, pl.z * 0.7); scene.add(sp);
+    floats.push({ sp, life: 1.1 });
+  }
+  function banner(t, sub) {
+    const bn = $("banner"); bn.innerHTML = t + (sub ? "<small>" + sub + "</small>" : "");
+    bn.classList.remove("show"); void bn.offsetWidth; bn.classList.add("show");
+  }
+  function showMove(t) {
+    const m = $("move"); m.textContent = t;
+    m.classList.remove("show"); void m.offsetWidth; m.classList.add("show");
+  }
+  function renderLives() {
+    const box = $("lives"); box.innerHTML = "";
+    for (let i = 0; i < 3; i++) {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.innerHTML = '<path d="M12 22 C 5 14, 6 6, 12 2 C 18 6, 19 14, 12 22 Z" fill="#ffd23f" stroke="#c94f00" stroke-width="1.6"/><path d="M12 20 V5" stroke="#fff4e0" stroke-width="1.2"/>';
+      if (i >= G.lives) svg.classList.add("lost");
+      box.appendChild(svg);
+    }
+  }
+  function updateHint() {
+    const el = $("hint");
+    if (G.rally >= 3 || best[mode2] >= 8) { el.hidden = true; return; }
+    el.hidden = false;
+    if (G.rally === 0) {
+      el.innerHTML = mode2 === "target"
+        ? "Halka kapanınca <b>sarı oklu arkadaşa dokun</b>. Yanlış kişi can götürür."
+        : "FLIX süzülürken halka kapanır. Tam o an <b>bir arkadaşa dokun</b>.";
+    } else if (G.rally === 1) el.innerHTML = "<b>Yukarı kaydır:</b> Rövaşata! <b>Sağa:</b> Kasırga, <b>sola:</b> Makas.";
+    else el.innerHTML = "<b>Aşağı kaydır:</b> kendine sektir. Diz, Topuk, Omuz.";
+  }
+
+  // ---------- camera ----------
+  let camAng = 0;
+  function updateCamera(dt) {
+    const menu = G.mode === "menu";
+    camAng += dt * (menu ? 0.12 : 0.0);
+    const base = menu ? camAng : Math.sin(G.now * 0.15) * 0.12;
+    // high three-quarter view, pulled back just far enough that the whole circle fits the screen width
+    const fit = 5.1 / (Math.tan(camera.fov * Math.PI / 360) * Math.min(camera.aspect, 1.2));
+    const elev = 0.74, d = Math.max(13, fit) * (1 - 0.12 * G.camPunch);
+    G.camPunch = Math.max(0, G.camPunch - dt * 1.2);
+    let tx = 0, tz = 0;
+    if (G.flight && !menu) { const fp = flightPos(G.flight, G.now).p; tx = fp.x * 0.06; tz = fp.z * 0.05; }
+    camera.position.set(Math.sin(base) * d * Math.cos(elev) + tx, d * Math.sin(elev), Math.cos(base) * d * Math.cos(elev) + tz);
+    if (G.shake > 0.001 && !reduce) { camera.position.x += (Math.random() - 0.5) * G.shake; camera.position.y += (Math.random() - 0.5) * G.shake; }
+    G.shake *= Math.exp(-dt * 8);
+    camera.lookAt(tx, 1.0, tz - 3.4);
+  }
+  function resize() {
+    const r = app.getBoundingClientRect();
+    renderer.setPixelRatio(pixelRatio);
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / r.height;
+    camera.fov = r.width / r.height < 0.6 ? 46 : 40;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize);
+
+  // ---------- loop ----------
+  const camDir = new T3.Vector3(), perp = new T3.Vector3(), segDir = new T3.Vector3();
+  function update(dt) {
+    // brief slow motion while a trick lands
+    if (G.slowT > 0) G.slowT -= dt;
+    G.ts += ((G.slowT > 0 ? 0.42 : 1) - G.ts) * Math.min(1, dt * 12);
+    const gdt = dt * G.ts;
+    G.now += gdt;
+    const t = G.now;
+    G.players.forEach((pl, i) => animate(pl, i, t, gdt));
+
+    // particles
+    const pos = pGeo.attributes.position.array, col = pGeo.attributes.color.array;
+    for (const p of parts) { p.x += p.vx * gdt; p.y += p.vy * gdt; p.z += p.vz * gdt; p.vy -= 9 * gdt; p.life -= gdt * 1.3; if (p.y < 0.05) { p.y = 0.05; p.vy *= -0.3; } }
+    for (let i = parts.length - 1; i >= 0; i--) if (parts[i].life <= 0) parts.splice(i, 1);
+    for (let i = 0; i < PMAX; i++) {
+      const p = parts[i];
+      if (p) { pos[i * 3] = p.x; pos[i * 3 + 1] = p.y; pos[i * 3 + 2] = p.z; col[i * 3] = p.c.r * p.life; col[i * 3 + 1] = p.c.g * p.life; col[i * 3 + 2] = p.c.b * p.life; }
+      else { pos[i * 3 + 1] = -100; }
+    }
+    pGeo.attributes.position.needsUpdate = true; pGeo.attributes.color.needsUpdate = true;
+    for (let i = floats.length - 1; i >= 0; i--) {
+      const fl = floats[i]; fl.life -= dt; fl.sp.position.y += dt * 0.9; fl.sp.material.opacity = Math.min(1, fl.life * 2);
+      if (fl.life <= 0) { scene.remove(fl.sp); fl.sp.material.map.dispose(); floats.splice(i, 1); }
+    }
+
+    // attract mode: the circle plays by itself, tricks included
+    if (G.mode === "menu") {
+      const f = G.flight;
+      if (!f || t >= f.t0 + f.T) {
+        const n = G.players.length, from = f ? f.to : 0;
+        let to; do { to = Math.floor(Math.random() * n); } while (to === from);
+        const r = Math.random();
+        const clip = r < 0.12 ? "rovasata" : r < 0.24 ? "kasirga" : r < 0.36 ? "makas" : r < 0.68 ? "vole" : "yanvole";
+        const kind = TRICKS[clip] ? clip : "pass";
+        play(G.players[from], clip);
+        launch(from, to, kind, CLIPS[clip].hit);
+        tone(G.players[from].p.note, 0.12, "triangle", 0.05);
+      }
+    }
+    if (G.mode === "play" && G.flight && t > G.flight.t0 + G.flight.T + windowGood()) {
+      const pend = gesture && !gesture.resolved && performance.now() - gesture.wall0 < 300;
+      if (!pend) drop(G.flight.kind === "self" ? "Sektirirken düştü!" : "Kaçırdın!");
+    }
+
+    // FLIX, trail and ring
+    const f = G.flight;
+    if (f) {
+      let p;
+      if (G.mode === "drop" || G.mode === "over") { p = G.dropPos.clone(); const k = Math.min(1, (t - G.dropAt) * 2); p.y = Math.max(0.12, p.y * (1 - k)); }
+      else p = flightPos(f, t).p;
+      const prev = flix.position.clone();
+      flix.position.copy(p);
+      const v = p.clone().sub(prev);
+      if (v.lengthSq() > 1e-7) {
+        const q = new T3.Quaternion().setFromUnitVectors(new T3.Vector3(0, 1, 0), v.normalize().negate());
+        flix.quaternion.slerp(q, Math.min(1, gdt * 12));
+      }
+      if (TRICKS[f.kind] && t > f.t0) flix.rotateY(gdt * 18);
+      flixShadow.position.set(p.x, 0.02, p.z);
+      const s = Math.max(0.45, 1.2 - p.y * 0.14); flixShadow.scale.setScalar(s); flixShadow.material.opacity = 0.3 * s;
+      flix.visible = true; flixShadow.visible = true;
+      trailPts.push(p.clone()); if (trailPts.length > TRN) trailPts.shift();
+      trailCol.set(TRICKS[f.kind] ? 0xffb347 : 0xfff4e0);
+      camDir.copy(camera.position).sub(p).normalize();
+      const tp = trGeo.attributes.position.array, tc = trGeo.attributes.color.array;
+      for (let i = 0; i < TRN; i++) {
+        const q = trailPts[Math.max(0, i - (TRN - trailPts.length))] || p;
+        const qn = trailPts[Math.max(0, Math.min(trailPts.length - 1, i - (TRN - trailPts.length) + 1))] || p;
+        segDir.copy(qn).sub(q); if (segDir.lengthSq() < 1e-8) segDir.set(0, 1, 0);
+        perp.crossVectors(segDir, camDir).normalize();
+        const k = i / (TRN - 1), wdt = 0.07 * k;
+        tp[i * 6] = q.x + perp.x * wdt; tp[i * 6 + 1] = q.y + perp.y * wdt; tp[i * 6 + 2] = q.z + perp.z * wdt;
+        tp[i * 6 + 3] = q.x - perp.x * wdt; tp[i * 6 + 4] = q.y - perp.y * wdt; tp[i * 6 + 5] = q.z - perp.z * wdt;
+        const a = k * k * 0.32;
+        for (const o of [0, 3]) { tc[i * 6 + o] = trailCol.r * a; tc[i * 6 + o + 1] = trailCol.g * a; tc[i * 6 + o + 2] = trailCol.b * a; }
+      }
+      trGeo.attributes.position.needsUpdate = true; trGeo.attributes.color.needsUpdate = true;
+      trail.visible = true;
+      // the ring closes on the spot under the meeting point
+      const left = f.t0 + f.T - t;
+      if (G.mode === "play" && t >= f.t0 && left < 1.1) {
+        const cp = contactOf(G.players[f.to]);
+        ring.visible = true; ringCore.visible = true;
+        ring.position.set(cp.x, 0.03, cp.z); ringCore.position.set(cp.x, 0.025, cp.z);
+        const k = Math.max(0, left / 1.1);
+        ring.scale.setScalar(1 + k * 1.8);
+        const inPerfect = Math.abs(left) <= windowPerfect();
+        ring.material.color.set(inPerfect ? 0xffd23f : 0xfff4e0);
+        ring.material.opacity = 0.5 + (1 - k) * 0.5;
+      } else { ring.visible = false; ringCore.visible = false; }
+    } else { flix.visible = false; flixShadow.visible = false; ring.visible = false; ringCore.visible = false; trail.visible = false; trailPts.length = 0; }
+
+    updateCamera(dt);
+  }
+  // drop the pixel ratio a step if a phone cannot keep up
+  let slowFrames = 0;
+  function adapt(dt) {
+    if (dt > 0.028) slowFrames++; else slowFrames = Math.max(0, slowFrames - 1);
+    if (slowFrames > 90 && pixelRatio > 1.25) { pixelRatio = Math.max(1.25, pixelRatio - 0.5); slowFrames = 0; resize(); }
+  }
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (G.paused) { requestAnimationFrame(frame); return; }
+    update(dt);
+    renderer.render(scene, camera);
+    adapt(dt);
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- flow ----------
+  function setMode(m) {
+    mode2 = m; store.set("fcm4.mode", m);
+    $("mFree").setAttribute("aria-pressed", String(m === "free"));
+    $("mTarget").setAttribute("aria-pressed", String(m === "target"));
+  }
+  function startGame() {
+    Object.assign(G, { mode: "play", rally: 0, maxRally: 0, score: 0, mult: 1, perfStreak: 0, perfects: 0, moves: 0, selfCount: 0, lives: 3, call: null, required: -1, flight: null, slowT: 0 });
+    setPlayers(4);
+    $("rally").textContent = "0"; $("score").textContent = "0"; $("mult").textContent = "1"; $("multChip").classList.remove("fire");
+    $("target").hidden = mode2 !== "target";
+    renderLives();
+    $("start").hidden = true; $("over").hidden = true; $("hud").hidden = false;
+    updateHint();
+    serve(0);
+    G.flight.T = 2.1;
+  }
+  function showOver() {
+    G.mode = "over";
+    const newBest = G.maxRally > best[mode2];
+    if (newBest) { best[mode2] = G.maxRally; store.set("fcm4.best." + mode2, G.maxRally); }
+    $("oTitle").textContent = newBest && G.maxRally > 0 ? "Yeni rekor seri!" : "FLIX düştü!";
+    $("oRally").textContent = G.maxRally;
+    $("oScore").textContent = G.score;
+    $("oPerfect").textContent = G.perfects;
+    $("oMoves").textContent = G.moves;
+    const tips = TIPS[mode2];
+    $("oTip").textContent = tips[Math.floor(Math.random() * tips.length)];
+    $("hud").hidden = true; $("over").hidden = false;
+    G.players.forEach((pl) => { pl.marker.visible = false; });
+    $("again").focus({ preventScroll: true });
+  }
+  function toMenu() {
+    G.mode = "menu"; G.flight = null; G.call = null;
+    setPlayers(6);
+    $("over").hidden = true; $("hud").hidden = true; $("start").hidden = false;
+    refreshMenu();
+  }
+  function refreshMenu() { $("bFree").textContent = best.free; $("bTarget").textContent = best.target; }
+  $("mFree").addEventListener("click", () => setMode("free"));
+  $("mTarget").addEventListener("click", () => setMode("target"));
+  $("play").addEventListener("click", startGame);
+  $("again").addEventListener("click", startGame);
+  $("menu").addEventListener("click", toMenu);
+
+  // test hooks
+  G.debug = { play: (i, n) => play(G.players[i], n), step: (dt) => { update(dt); renderer.render(scene, camera); }, tick: (dt) => update(dt) };
+  resize();
+  setMode(mode2);
+  setPlayers(6);
+  refreshMenu();
+  requestAnimationFrame(frame);
+})();
+</script>
