@@ -536,7 +536,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
 
   // ---------- difficulty: forgiving start, slow ramp ----------
   const hard = () => (mode2 === "target" ? 1.2 : 1);
-  const flightBase = () => Math.max(1.0, 1.7 - G.rally * 0.011 * hard());
+  const flightBase = () => Math.max(0.85, 1.4 - G.rally * 0.009 * hard());
   const windowGood = () => Math.max(0.15, 0.28 - G.rally * 0.0018 * hard());
   const windowPerfect = () => Math.max(0.06, windowGood() * 0.38);
   const TRICK_WINDOW = 0.8;   // acrobatic moves need slightly cleaner timing
@@ -729,6 +729,12 @@ canvas#c { display: block; width: 100%; height: 100%; }
       { t: 0.85, a0z: 2.2, a1z: 2.2, e0: -2.2, e1: -2.2, a0x: -0.5, a1x: -0.5, hx: -0.2, sx: -0.1 },
     ] },
   };
+  // play every clip faster; timings (dur, hit, key times) scale together
+  const ANIM_SPEED = 1.4;
+  for (const c of Object.values(CLIPS)) {
+    c.dur /= ANIM_SPEED; if (c.hit) c.hit /= ANIM_SPEED;
+    for (const k of c.keys) k.t /= ANIM_SPEED;
+  }
   // pre-build per-channel tracks with Hermite tangents for smooth, continuous motion
   for (const c of Object.values(CLIPS)) {
     c.tracks = {};
@@ -765,7 +771,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
     b.t0x = -0.04; b.t1x = -0.04; b.t0z = 0.07; b.t1z = 0.07; b.k0 = 0.1; b.k1 = 0.1;
     b.a0z = 0.14 + 0.03 * breathe; b.a1z = 0.14 + 0.03 * breathe; b.e0 = -0.3; b.e1 = -0.3; b.a0x = 0.05; b.a1x = 0.05;
     if (walking) {
-      const w = Math.sin(t * 11), c = Math.cos(t * 11);
+      const w = Math.sin(t * 14), c = Math.cos(t * 14);
       b.t0x = w * 0.55; b.t1x = -w * 0.55; b.k0 = Math.max(0, c) * 0.9 + 0.1; b.k1 = Math.max(0, -c) * 0.9 + 0.1;
       b.a0x = -w * 0.5; b.a1x = w * 0.5; b.e0 = -0.7; b.e1 = -0.7; b.air = Math.abs(w) * 0.05; b.sx = 0.1;
     }
@@ -794,7 +800,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
     // walk toward the seat
     const dx = pl.tx - pl.x, dz = pl.tz - pl.z, dist = Math.hypot(dx, dz);
     const walking = dist > 0.06;
-    const step = Math.min(dist, dt * 2.6);
+    const step = Math.min(dist, dt * 3.6);
     if (dist > 0) { pl.x += dx / dist * step; pl.z += dz / dist * step; }
     pl.root.position.set(pl.x, 0, pl.z);
     // turn toward the FLIX (or the centre)
@@ -802,7 +808,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
     if (G.flight && G.mode !== "over") { const fp = flightPos(G.flight, t).p; lx = fp.x; lz = fp.z; }
     if (walking) { lx = pl.tx + dx * 3; lz = pl.tz + dz * 3; }
     const want = Math.atan2(lx - pl.x, lz - pl.z);
-    pl.face += wrapPi(want - pl.face) * Math.min(1, dt * 7);
+    pl.face += wrapPi(want - pl.face) * (1 - Math.exp(-dt * 10));
     pl.root.rotation.y = pl.face;
 
     // pose = base pose blended with the active clip, then lightly smoothed
@@ -812,7 +818,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
       const tau = t - cl.t0;
       if (tau >= cl.c.dur) { pl.clip = cl = null; }
       else {
-        w = sstep(0, 0.05, tau) * (1 - sstep(cl.c.dur - 0.2, cl.c.dur, tau));
+        w = sstep(0, 0.06, tau) * (1 - sstep(cl.c.dur * 0.72, cl.c.dur, tau));
         target = {};
         for (const ch of CHANNELS) {
           const tr = cl.c.tracks[ch];
@@ -822,7 +828,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
         }
       }
     }
-    const cur = pl.cur, k = 1 - Math.exp(-dt * 28);
+    const cur = pl.cur, k = 1 - Math.exp(-dt * 22);
     for (const ch of CHANNELS) cur[ch] += (LINEAR[ch] ? target[ch] - cur[ch] : wrapPi(target[ch] - cur[ch])) * k;
 
     // keep the standing foot on the ground
@@ -890,7 +896,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
       let clipName = Math.random() < 0.5 ? "vole" : "yanvole";
       if (trick) {
         clipName = kind; gained += trick.bonus; label = trick.label; G.moves++;
-        whoosh(); G.camPunch = 1; if (!reduce) G.slowT = 0.55;
+        whoosh(); G.camPunch = 1; if (!reduce) G.slowT = 0.3;
       }
       play(rp, clipName);
       if (G.call && G.call.who === to) {
@@ -966,7 +972,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
       if (G.lives <= 0) return showOver();
       G.mode = "play"; G.rally = 0; $("rally").textContent = "0";
       serve(holder);
-    }, 1300);
+    }, 1000);
   }
   function serve(from) {
     const n = G.players.length;
@@ -1018,21 +1024,28 @@ canvas#c { display: block; width: 100%; height: 100%; }
   }
 
   // ---------- camera ----------
+  // Low, side-on broadcast angle: the camera sits behind one edge of the circle at about 30 degrees,
+  // drifts after the FLIX and eases (never snaps) toward its target.
   let camAng = 0;
+  const camLook = new T3.Vector3(0, 1.2, 0), camPos = new T3.Vector3(), camWant = new T3.Vector3(), lookWant = new T3.Vector3();
+  let camInit = false;
   function updateCamera(dt) {
     const menu = G.mode === "menu";
     camAng += dt * (menu ? 0.12 : 0.0);
-    const base = menu ? camAng : Math.sin(G.now * 0.15) * 0.12;
-    // high three-quarter view, pulled back just far enough that the whole circle fits the screen width
-    const fit = 5.1 / (Math.tan(camera.fov * Math.PI / 360) * Math.min(camera.aspect, 1.2));
-    const elev = 0.74, d = Math.max(13, fit) * (1 - 0.12 * G.camPunch);
-    G.camPunch = Math.max(0, G.camPunch - dt * 1.2);
-    let tx = 0, tz = 0;
-    if (G.flight && !menu) { const fp = flightPos(G.flight, G.now).p; tx = fp.x * 0.06; tz = fp.z * 0.05; }
-    camera.position.set(Math.sin(base) * d * Math.cos(elev) + tx, d * Math.sin(elev), Math.cos(base) * d * Math.cos(elev) + tz);
+    const base = menu ? camAng : Math.sin(G.now * 0.18) * 0.1;
+    const fit = 5.0 / (Math.tan(camera.fov * Math.PI / 360) * Math.min(camera.aspect, 1.2));
+    const elev = 0.4, d = Math.max(10.5, fit) * (1 - 0.14 * G.camPunch);
+    G.camPunch = Math.max(0, G.camPunch - dt * 1.6);
+    let tx = 0, ty = 2.3, tz = 0;
+    if (G.flight && !menu) { const fp = flightPos(G.flight, G.now).p; tx = fp.x * 0.22; ty = 2.1 + fp.y * 0.15; tz = fp.z * 0.18; }
+    lookWant.set(tx, ty, tz);
+    camWant.set(Math.sin(base) * d * Math.cos(elev) + tx * 0.6, d * Math.sin(elev), Math.cos(base) * d * Math.cos(elev) + tz * 0.6);
+    const k = camInit ? 1 - Math.exp(-dt * 4) : 1; camInit = true;
+    camLook.lerp(lookWant, k); camPos.lerp(camWant, k);
+    camera.position.copy(camPos);
     if (G.shake > 0.001 && !reduce) { camera.position.x += (Math.random() - 0.5) * G.shake; camera.position.y += (Math.random() - 0.5) * G.shake; }
     G.shake *= Math.exp(-dt * 8);
-    camera.lookAt(tx, 1.0, tz - 3.4);
+    camera.lookAt(camLook);
   }
   function resize() {
     const r = app.getBoundingClientRect();
@@ -1049,7 +1062,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
   function update(dt) {
     // brief slow motion while a trick lands
     if (G.slowT > 0) G.slowT -= dt;
-    G.ts += ((G.slowT > 0 ? 0.42 : 1) - G.ts) * Math.min(1, dt * 12);
+    G.ts += ((G.slowT > 0 ? 0.6 : 1) - G.ts) * (1 - Math.exp(-dt * 10));
     const gdt = dt * G.ts;
     G.now += gdt;
     const t = G.now;
@@ -1170,7 +1183,7 @@ canvas#c { display: block; width: 100%; height: 100%; }
     $("start").hidden = true; $("over").hidden = true; $("hud").hidden = false;
     updateHint();
     serve(0);
-    G.flight.T = 2.1;
+    G.flight.T = 1.7;
   }
   function showOver() {
     G.mode = "over";
