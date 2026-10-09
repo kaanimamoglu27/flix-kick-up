@@ -1,4 +1,4 @@
-**Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/ · **FLIX Çember:** https://kaanimamoglu27.github.io/flix-kick-up/cember/
+**Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/
 
 # FLIX Kick Up: prototip devir notu
 
