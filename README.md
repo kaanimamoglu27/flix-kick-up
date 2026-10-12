@@ -1,6 +1,6 @@
 **Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/
 
-Online yarış (rastgele rakip ve arkadaş odası) sadece claude.ai'daki oyun linkinde çalışır. GitHub Pages sürümünde diğer bütün modlar çalışır.
+Online yarış (rastgele rakip ve arkadaş odası) sadece claude.ai'daki oyun linkinde çalışır. GitHub Pages sürümünde diğer bütün modlar çalışır. Mağaza test modundadır, gerçek ödeme alınmaz.
 
 # FLIX Kick Up: prototip devir notu
 
@@ -94,6 +94,16 @@ Yan kaydırmalı engel oyunu (Flappy Bird / Jetpack Joyride tadında). Tüylü F
 ## Sürüm 10 (12 Ekim 2026): Mesafe modu
 - Yeni meydan okuma Mesafe: 30 saniyede gidebildiğin kadar uzağa git (metre, yıldızlar 60/120/170 m).
 - Geri sayım ve süreli çarpan artık ekranın sağ üst köşesinde, küçük bir kutuda. Meydan okumalar 2x2 kart olarak dizili.
+
+## Sürüm 11 (12 Ekim 2026): mağaza (test)
+- Ana ekrandaki tüy sayacına (+) dokununca Mağaza açılıyor.
+  - Başlangıç Paketi kampanyası: $2.99 (normalde $9.99). 2.500 tüy ve Kristal FLIX veriyor, tek seferlik, 48 saatlik geri sayımı var.
+  - Reklamsız: $2.99.
+  - Tüy paketleri: 500 tüy $0.99, 1.200 tüy $1.99, 3.500 tüy $4.99, 8.000 tüy $9.99, 18.000 tüy $19.99, 50.000 tüy $49.99.
+- Test sürümü: gerçek ödeme alınmıyor, onaylayınca tüyler hemen ekleniyor (`fku4.iap`). Gerçek satın alma iPhone uygulamasında App Store uygulama içi satın alma (StoreKit) ile yapılacak. Oyunda henüz reklam yok, Reklamsız sadece bayrak tutuyor.
+- Hata düzeltmeleri:
+  - Meydan okumalar artık Klasik rekorunu değiştirmiyor.
+  - Çarpan ve geri sayım kutusu tur sonu ekranında kalmıyor.
 
 ## Önerilen sonraki adım
 Expo (React Native) + react-native-skia ile iPhone'a taşıma, EAS Build ile bulutta derleme, TestFlight ile test. Yayın Onat'ın Apple geliştirici hesabından yapılacak.

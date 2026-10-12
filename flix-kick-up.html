@@ -355,6 +355,42 @@ svg { display: block; }
 .langrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 2px; font-weight: 700; }
 .seg.two { grid-template-columns: 1fr 1fr; width: 200px; margin: 0; }
 .seg button[aria-pressed="true"] { background: var(--navy); color: var(--gold); }
+/* store */
+.pill.buy { cursor: pointer; font: inherit; }
+.pill .plus { font-style: normal; font: 900 14px/1 var(--font-body); background: var(--red); color: #fff; border-radius: 50%; width: 18px; height: 18px; display: grid; place-items: center; margin-left: 2px; }
+.store { display: flex; flex-direction: column; gap: 12px; }
+.camp { position: relative; overflow: hidden; border: 3px solid var(--navy); box-shadow: 0 5px 0 var(--navy); border-radius: 20px; padding: 14px; color: #fff; background: linear-gradient(135deg, #e22511, #ff4f7b 60%, #ffc20e); display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; align-items: center; }
+.camp .tag { grid-column: 1 / -1; justify-self: start; background: var(--navy); color: var(--gold); border-radius: 999px; font: 800 10px/1 var(--font-body); letter-spacing: .08em; padding: 5px 9px; text-transform: uppercase; }
+.camp b { font: italic 900 22px/1 var(--font-display); text-transform: uppercase; }
+.camp small { font: 600 12.5px/1.3 var(--font-body); opacity: .95; }
+.camp .tm { font: 700 11.5px/1 var(--font-body); font-variant-numeric: tabular-nums; opacity: .95; }
+.camp canvas { grid-row: 2 / 5; grid-column: 2; width: 84px; height: 84px; }
+.camp .price { display: flex; align-items: baseline; gap: 8px; }
+.camp .price s { opacity: .8; font: 700 13px/1 var(--font-body); }
+.pbtn { border: 2.5px solid var(--navy); box-shadow: 0 3px 0 var(--navy); background: var(--gold); color: var(--navy); border-radius: 12px; font: italic 900 16px/1 var(--font-display); padding: 9px 14px; cursor: pointer; }
+.pbtn:disabled { background: #d8dde6; box-shadow: none; color: var(--text-2); cursor: default; }
+.noads { display: flex; align-items: center; gap: 12px; background: #fff; border: 2.5px solid var(--navy); box-shadow: 0 4px 0 var(--navy); border-radius: 18px; padding: 12px; }
+.noads .ic { flex: none; width: 46px; height: 46px; border-radius: 14px; background: var(--navy); display: grid; place-items: center; color: var(--gold); font: italic 900 13px/1 var(--font-display); }
+.noads .tx { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.noads b { font: italic 900 17px/1 var(--font-display); color: var(--navy); }
+.noads small { font: 600 12px/1.2 var(--font-body); color: var(--text-2); }
+.packs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pack { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; background: #fff; border: 2.5px solid var(--navy); box-shadow: 0 4px 0 var(--navy); border-radius: 18px; padding: 14px 8px 10px; cursor: pointer; color: var(--navy); }
+.pack:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--navy); }
+.pack canvas { width: 72px; height: 56px; }
+.pack b { font: italic 900 20px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.pack small { font: 700 11px/1 var(--font-body); color: var(--text-2); }
+.pack .bonus { font: 800 10.5px/1 var(--font-body); color: #12a05a; min-height: 11px; }
+.pack .pbtn { margin-top: 4px; width: 100%; }
+.pack .badge { position: absolute; top: -9px; left: 50%; translate: -50% 0; white-space: nowrap; background: var(--red); color: #fff; border: 2px solid var(--navy); border-radius: 999px; font: 800 9.5px/1 var(--font-body); letter-spacing: .06em; padding: 4px 8px; }
+.pack.hot { background: #fff5d6; }
+.store .fine { font: 500 11.5px/1.4 var(--font-body); color: var(--text-2); margin: 2px; }
+.store .restore { align-self: center; background: none; border: 0; color: var(--navy); font: 700 12.5px/1 var(--font-body); text-decoration: underline; cursor: pointer; padding: 6px; }
+.buybox { text-align: center; }
+.buywhat { font: 700 15px/1.3 var(--font-body); color: var(--navy); margin: 6px 0 0; }
+.buynote { font: 500 12px/1.4 var(--font-body); color: var(--text-2); margin: 4px 0 12px; }
+.toast { position: absolute; left: 50%; bottom: 90px; translate: -50% 0; background: var(--navy); color: #fff; border-radius: 999px; padding: 10px 16px; font: 700 13px/1.2 var(--font-body); z-index: 9; animation: toast 2.4s ease forwards; pointer-events: none; white-space: nowrap; }
+@keyframes toast { 0% { opacity: 0; transform: translateY(10px); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 /* rarity */
 .card .rar { font: 800 9px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; padding: 7px 9px 0; color: #6b7385; }
 .card.r-rare { background: #e2edff; } .card.r-rare .rar { color: #2e6bff; }
@@ -415,7 +451,7 @@ svg { display: block; }
   <!-- Home -->
   <div class="home" id="home">
     <div class="topbar">
-      <div class="pill"><svg viewBox="0 0 24 24" data-icon="feather"></svg><b id="hCoins">0</b></div>
+      <button class="pill buy" id="openStore" aria-label="Mağaza"><svg viewBox="0 0 24 24" data-icon="feather"></svg><b id="hCoins">0</b><i class="plus">+</i></button>
       <div class="pill plain">REKOR&nbsp;<b id="hBest">0</b></div>
       <div class="grow"></div>
       <button class="iconbtn" id="openSettings" aria-label="Ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.4"/><circle cx="10" cy="17" r="2.4"/></svg></button>
@@ -462,6 +498,7 @@ svg { display: block; }
       <div class="grid" id="gridSkin"></div>
       <div class="grid scenes" id="gridScene"></div>
       <div class="grid" id="gridPipe"></div>
+      <div class="store" id="storePanel"></div>
       <div class="howto" id="howPanel">
         <h3>NEREDEN VURURSAN ÖYLE UÇAR</h3>
         <div class="row">
@@ -487,7 +524,7 @@ svg { display: block; }
         <button class="toggle" id="tSound" aria-pressed="true"><span>Ses</span><i></i></button>
         <button class="toggle" id="tVibe" aria-pressed="true"><span>Titreşim</span><i></i></button>
         <div class="langrow"><span>Dil</span><div class="seg two" id="langSeg"><button data-lang="tr">Türkçe</button><button data-lang="en">English</button></div></div>
-        <p class="about">FLIX Kick Up, prototip sürüm 9.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>flixtoysofficial.com</p>
+        <p class="about">FLIX Kick Up, prototip sürüm 11.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>flixtoysofficial.com</p>
       </div>
     </div>
     <footer id="sheetFoot">
@@ -508,6 +545,17 @@ svg { display: block; }
           <button class="btn alt" id="quit">Menü</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Purchase confirm -->
+  <div class="modal" id="buyModal" hidden>
+    <div class="card-box buybox">
+      <div class="stamp" id="buyTitle">Satın al</div>
+      <p class="buywhat" id="buyWhat"></p>
+      <div class="big-score" id="buyPrice"></div>
+      <p class="buynote">Bu test sürümünde gerçek ödeme alınmaz.</p>
+      <div class="row2"><button class="btn alt" id="buyNo">Vazgeç</button><button class="btn" id="buyYes">Satın al</button></div>
     </div>
   </div>
 
@@ -551,7 +599,7 @@ svg { display: block; }
   let lang = "tr";
   try { lang = JSON.parse(localStorage.getItem("fku4.lang")) || "tr"; } catch {}
   if (lang !== "en") lang = "tr";
-  const EN = {"Mesafe": "Distance", "30 saniyede en uzun yolu kat et": "Fly as far as you can in 30 seconds", "Orman": "Forest", "Çöl": "Desert", "Lunapark Gecesi": "Funfair Night", "Rastgele rakip": "Random rival", "RASTGELE YARIŞ": "RANDOM RACE", "ARKADAŞINLA YARIŞ": "RACE A FRIEND", "Rakip aranıyor. Biri gelince yarış kendiliğinden başlar.": "Looking for a rival. The race starts by itself when someone joins.", "Çevrimiçi oyuncu: ": "Players online: ", "Rastgele rakiple ya da arkadaşınla yarış": "Race a random rival or a friend", "Online oynayan herkesle eşleşirsin, en uzun uçan kazanır.": "You get matched with anyone playing online, longest flight wins.", "Aramayı bırak": "Stop searching", "direk": "posts", "sn": "s", "Yıldız başına ": "Per star ", "Sıradan": "Common", "Nadir": "Rare", "Epik": "Epic", "Efsane": "Legendary", "Mitik": "Mythic", "Turuncu": "Orange", "Sarı": "Yellow", "Beyaz": "White", "Kırmızı": "Red", "Gök Mavisi": "Sky Blue", "Çimen": "Grass", "Pamuk Şeker": "Cotton Candy", "Gece Moru": "Night Purple", "Türkiye": "Türkiye", "Siyah-Beyaz": "Black-White", "Sarı-Lacivert": "Yellow-Navy", "Sarı-Kırmızı": "Yellow-Red", "Lav": "Lava", "Okyanus": "Ocean", "Buz": "Ice", "Gün Batımı": "Sunset", "Neon": "Neon", "Kristal": "Crystal", "Altın FLIX": "Golden FLIX", "Galaksi": "Galaxy", "Ateş Kuşu": "Firebird", "Ejderha": "Dragon", "Futbol Topu": "Football", "Tenis Topu": "Tennis Ball", "Basketbol Topu": "Basketball", "Plaj Topu": "Beach Ball", "Voleybol Topu": "Volleyball", "İstanbul Akşamı": "Istanbul Evening", "Mahalle Arası": "Neighbourhood", "Yaz Plajı": "Summer Beach", "Gece Maçı": "Night Match", "Kar Tatili": "Snow Holiday", "Yıldız Sahne": "Star Stage", "Kapadokya Sabahı": "Cappadocia Morning", "Boğaz": "Bosphorus", "Uzay": "Space", "Sahne Rengi": "Scene Colour", "Klasik": "Classic", "Lacivert": "Navy", "Pamuk": "Candy", "Gece": "Night", "Altın": "Gold", "Gökkuşağı": "Rainbow", "tr-TR": "en-US", "Uzun tünellerde Sol vuruşla hızlan, içeride az zaman geçir.": "In long tunnels, kick Left to speed up and spend less time inside.", "Yüksek duvarların önünde Sağ vuruş: çok yükselir ama yavaşlatır.": "Before high walls, kick Right: it climbs a lot but slows you down.", "Boşluğun tam ortasından geçersen +5 bonus alırsın.": "Fly through the exact middle of a gap for a +5 bonus.", "Orta vuruş en güvenlisi. Panik anında ortaya dokun.": "The Middle kick is the safest. When in doubt, tap the middle.", "Hareketli boşluklarda acele etme, boşluğun sana gelmesini bekle.": "On moving gaps, don't rush. Let the gap come to you.", "Helikopter yaparken FLIX yavaş düşer. Uzun bir boşlukta tut, puanları topla.": "During a Helicopter the FLIX falls slowly. Hold it in a long gap and rack up points.", "Hareketleri art arda bağla: stil çarpanı x5'e kadar çıkar.": "Chain tricks back to back: the style multiplier goes up to x5.", "Direğe çok yakın geçmek 'Sıyırdın' bonusu verir.": "Passing very close to a post gives a 'Close shave' bonus.", "Dalış çift puan verir ama hızla düşersin. Yüksekten başla.": "A Dive gives double points but you drop fast. Start high.", "Tutarken parmağını kaydırıp hareket değiştir: her geçiş +10.": "While holding, swipe to switch tricks: each switch is +10.", "İki parmakla Kelebek yap: FLIX süzülür, uzun boşluklarda puan topla.": "Use two fingers for a Butterfly: the FLIX glides, great for long gaps.", "Her 10 puan tur sonunda 1 tüy olur. Stil puanı da sayılır.": "Every 10 points becomes 1 feather at the end of a run. Style points count too.", "10 Saniye": "10 Seconds", "10 saniyede en çok direkten geç": "Pass as many posts as you can in 10 seconds", "Akrobat": "Acrobat", "Tek bir hareketi olabildiğince uzun sürdür": "Hold a single trick for as long as you can", "Tüy Avı": "Feather Hunt", "20 saniyede en çok tüy topla": "Collect as many feathers as you can in 20 seconds", "tüy": "feathers", "Bot (kolay)": "Bot (easy)", "Bot (orta)": "Bot (medium)", "Bot (zor)": "Bot (hard)", "Kartal": "Eagle", "Şimşek": "Bolt", "Zıpzıp": "Bouncy", "Oyuncu ": "Player ", "Oyuncu": "Player", "Tam ortadan +5": "Dead centre +5", "Kayan boşluklar!": "Sliding gaps!", " metre!": " metres!", "Sol": "Left", "Orta": "Middle", "Sağ": "Right", "Makas": "Scissors", "Helikopter": "Helicopter", "Geri takla": "Backflip", "Fırıldak": "Spinner", "Dalış": "Dive", "Roket": "Rocket", "Kırbaç": "Whip", "Kelebek": "Butterfly", " savuruş": " swings", " sn": " s", "Geçiş: ": "Switch: ", "Şelale": "Waterfall", "Füze": "Missile", "Uçan Halı": "Flying Carpet", "Kamçı": "Lash", "Havai Fişek": "Firework", "Paraşüt": "Parachute", "Yelpaze": "Fan", "Erken bıraktın": "Released too early", " kombosu! +40": " combo! +40", "Kombo x": "Combo x", " bitti": " ended", "Sıyırdın! +10": "Close shave! +10", "Hareketli boşluklar!": "Moving gaps!", "Yüksek duvarlar!": "High walls!", "Tüneller!": "Tunnels!", " direk!": " posts!", "Süre doldu!": "Time's up!", "Hareket yarıda kaldı": "Trick cut short", "KOMBO x": "COMBO x", "Hazır ol...": "Get ready...", ". Dokun ve başla": ". Tap to start", "3 botla yarış, en uzun uçan kazanır. Dokun ve başla": "Race 3 bots, longest flight wins. Tap to start", "Dokun ve yukarı tırman. Sol ve sağ yön verir": "Tap to climb. Left and right steer", "Kendi hayaletinle yarış. Dokun ve başla": "Race your own ghost. Tap to start", "Dokun ve başla": "Tap to start", "Sola": "Left", "Düz yukarı": "Straight up", "SAĞ": "RIGHT", "Sağa": "Right", "Hızlı atak": "Fast dash", "Dengeli": "Balanced", "Yüksek, fren": "High, brakes", "SÜRE <b>": "TIME <b>", "/3 bot uçuyor": "/3 bots flying", "YÜKSEKLİK <b>": "HEIGHT <b>", " direk": " posts", " rakip uçuyor": " rivals flying", " tüy": " feathers", " · toplam ": " · total ", "YENİ EN İYİ!": "NEW BEST!", "SÜRE DOLDU": "TIME'S UP", "DÜŞTÜN!": "YOU FELL!", " toplandı, ": " collected, ", " puandan": " from points", " yıldızdan": " from stars", " kombodan": " from combo", "YENİ REKOR!": "NEW RECORD!", "En iyi ": "Best ", "Yeni yıldız": "New star", "Sen": "You", "Bot ": "Bot ", "KAZANDIN!": "YOU WON!", ". OLDUN": ". PLACE", " sıralamadan": " from placing", "90+ sn": "90+ s", "YENİ DİKEY REKOR!": "NEW CLIMB RECORD!", "Yükseklik": "Height", " m": " m", "Dikey rekor": "Climb record", " puan": " points", "HAYALETİ GEÇTİN!": "YOU BEAT THE GHOST!", "HAYALET KAZANDI": "GHOST WINS", "Hayaletin": "Your ghost", "ODAYA DÖN": "BACK TO ROOM", "Kilit açıldı: ": "Unlocked: ", "Alabilirsin: ": "You can buy: ", "Sonraki: ": "Next: ", "Dolap": "Wardrobe", "Sahneler": "Scenes", "Borular": "Pipes", "Modlar": "Modes", "Kullanılıyor": "In use", "Senin": "Yours", "Seç": "Select", "Rekor ": "Record ", " yap": " needed", "Al · ": "Buy · ", " tüy daha": " more feathers", "Toplar": "Balls", "FLIX'ler": "FLIXes", "Şu an bunu kullanıyorsun": "You are using this", "Senin, seçmek için dokun": "Yours, tap to select", "Rekorun ": "Your record is ", " yapınca kendiliğinden açılır.": " unlocks it automatically.", "Kilitli · ": "Locked · ", " tüy, sende ": " feathers, you have ", " var": "", "Oyna": "Play", "Online yarış": "Online race", "Nasıl oynanır": "How to play", "Ayarlar": "Settings", "Yarış": "Race", "Direklerin arasından uç, rekorunu kır. Rekor: ": "Fly between the posts and beat your record. Record: ", "Dikey": "Climb", "FLIX'i yukarı sektir, sağa sola yön ver, çubuklara çarpma. Rekor: ": "Bounce the FLIX upward, steer left and right, avoid the bars. Record: ", "Botlara karşı": "Versus bots", "3 botla aynı haritada yarış, en uzun süre uçan kazanır": "Race 3 bots on the same map, longest flight wins", "Kolay": "Easy", "Zor": "Hard", "Hayaletinle yarış": "Race your ghost", "En iyi turun (": "Your best run (", " direk) aynı haritada seninle uçar": " posts) flies the same map with you", "Önce bir Klasik tur oyna, en iyi turun hayaletin olur": "Play a Classic run first, your best run becomes your ghost", "Oda kur ya da arkadaşının koduyla katıl, en uzun uçan kazanır": "Create a room or join a friend's code, longest flight wins", "Meydan okumalar": "Challenges", ". En iyi: ": ". Best: ", " · yıldız başına ": " · per star ", "Oda kodu en az 3 harf olmalı.": "Room code needs at least 3 letters.", "Odaya bağlanıyor...": "Connecting to room...", "Odaya bağlanılamadı (": "Couldn't join the room (", "). Biraz sonra tekrar dene.": "). Try again in a moment.", "hâlâ uçuyor": "still flying", "SEN DÜŞTÜN, YARIŞ SÜRÜYOR": "YOU FELL, RACE GOES ON", ", 60 birincilikten": ", 60 for first place", "Herkes aynı haritada aynı anda başlar. Rakiplerin yarı saydam görünür. En uzun süre uçan kazanır.": "Everyone starts the same map at the same time. Rivals appear see-through. Longest flight wins.", " (sen)": " (you)", "yarışta": "racing", "hazır": "ready", "bekliyor": "waiting", "Rakip bekleniyor. Arkadaşın oyunu açıp Online yarış'tan bu kodla katılsın.": "Waiting for a rival. Ask your friend to open the game and join from Online race with this code.", "Hazırım ✓ (iptal)": "Ready ✓ (cancel)", "Hazırım": "I'm ready", "Herkes hazır olunca yarış 3 saniye içinde başlar.": "When everyone is ready, the race starts in 3 seconds.", "Rakip gelince ve hazır olunca başlar.": "Starts when a rival joins and is ready.", "Odadan çık": "Leave room", "BAŞLA!": "GO!", "REKOR": "RECORD", "TÜY": "FEATHERS", "STİL": "STYLE", "SOL": "LEFT", "TUT: MAKAS": "HOLD: SCISSORS", "ORTA": "MIDDLE", "TUT: HELİKOPTER": "HOLD: HELICOPTER", "TUT: GERİ TAKLA": "HOLD: BACKFLIP", "OYNA": "PLAY", "YENİ": "NEW", "Nasıl?": "How?", "NEREDEN VURURSAN ÖYLE UÇAR": "WHERE YOU KICK DECIDES HOW IT FLIES", "Alçak ve hızlı, uzun boşluklar için": "Low and fast, for long gaps", "Düz yukarı, kontrollü": "Straight up, controlled", "Çok yüksek ama yavaşlatır": "Very high but slows you down", "Basılı tut:": "Hold:", "FLIX havada hareket yapar, stil puanı toplar. Tutarken vuramazsın, zamanında bırak!": "the FLIX does a trick in the air and earns style points. You can't kick while holding, let go in time!", "HAVADA HAREKETLER": "AIR TRICKS", "↑ Kaydır": "↑ Swipe", "Fırıldak: döner ve yükselir": "Spinner: spins and rises", "↓ Kaydır": "↓ Swipe", "Dalış: hızlı düşer, çift puan": "Dive: drops fast, double points", "→ Kaydır": "→ Swipe", "Roket: ileri fırlar": "Rocket: shoots forward", "← Kaydır": "← Swipe", "Kırbaç: kuyruk savurur": "Whip: swings the tail", "İki parmak": "Two fingers", "Kelebek: süzülür, saniye başına puan": "Butterfly: glides, points per second", "Tutarken yön değiştir": "Switch while holding", "Geçiş: hareketleri bağla, her geçiş +10": "Switch: link tricks, +10 per switch", "Kombo": "Combo", "Hareketleri 2,5 saniye içinde art arda yap, her biri +5 daha fazla verir. FLIX'in üstündeki çubuk bitmeden devam et. Fırıldak sonra Dalış (Şelale) ya da Makas sonra Roket (Füze) gibi özel ikililer +40.": "Do tricks within 2.5 seconds of each other and each one gives +5 more. Keep going before the bar above the FLIX runs out. Special pairs like Spinner then Dive (Waterfall) or Scissors then Rocket (Missile) give +40.", "TÜY VE KİLİTLER": "FEATHERS AND UNLOCKS", "Boşluklardaki altın tüyleri topla. Tur sonunda her 10 puan da 1 tüy olur. Tüylerle Dolap'tan yeni FLIX'ler ve toplar, Sahneler'den yeni arka planlar al. Bazıları sadece rekorla açılır.": "Collect the golden feathers in the gaps (each is worth 2). Every 10 points also becomes 1 feather at the end of a run. Spend feathers on new FLIXes and balls in the Wardrobe, scenes and pipe colours. Some only unlock with a record.", "Ses": "Sound", "Titreşim": "Vibration", "Dil": "Language", "Klavye: A / S / D veya ← ↑ →, P ile mola.": "Keyboard: A / S / D or ← ↑ →, P to pause.", "MOLA": "PAUSED", "DEVAM": "RESUME", "Baştan": "Restart", "Menü": "Menu", "Rekor": "Record", "Direk": "Posts", "En iyi kombo": "Best combo", "TEKRAR": "AGAIN", "FLIX Kick Up oyun alanı": "FLIX Kick Up play area", "Duraklat": "Pause", "FLIX logosu, dokun ve sektir": "FLIX logo, tap to bounce", "Geri": "Back", "SEÇİLİ": "EQUIPPED", "BAŞLA": "START", "AÇ": "OPEN", "ADIN": "YOUR NAME", "Oda kur": "Create room", "YA DA KODLA KATIL": "OR JOIN WITH A CODE", "Katıl": "Join", "ODA KODU, ARKADAŞINA SÖYLE": "ROOM CODE, TELL YOUR FRIEND", "Tek başına": "Solo", "Rekorunu kır": "Beat your record", "Direklerin arasından uç": "Fly between the posts", "Yukarı tırman": "Climb up", "Botlara ya da arkadaşına karşı": "Against bots or a friend", "Yıldız topla, yıldız başına ": "Earn stars, per star ", "En iyi: ": "Best: ", "PUAN": "POINTS", " puan, ": " points, ", " saniye!": " seconds!", "Süreli çarpan! ": "Timed multiplier! ", "FLIX Kick Up, prototip sürüm 9.": "FLIX Kick Up, prototype version 9.", "Türkçe": "Türkçe", "English": "English", "SÜRE": "TIME"};
+  const EN = {"Mağaza": "Store", "Tüy paketleri": "Feather packs", "Kampanya": "Special offer", "Başlangıç Paketi": "Starter Pack", "Tek seferlik: 2.500 tüy ve Kristal FLIX": "One time only: 2,500 feathers and the Crystal FLIX", "Bitiyor: ": "Ends in: ", "Reklamsız": "No Ads", "Reklamları ömür boyu kaldırır": "Removes ads forever", "Satın alındı": "Purchased", "Avuç": "Handful", "Kese": "Pouch", "Sandık": "Chest", "Hazine": "Treasure", "Dağ": "Mountain", "Ejderha Hazinesi": "Dragon Hoard", "EN POPÜLER": "MOST POPULAR", "EN İYİ DEĞER": "BEST VALUE", " bonus": " bonus", "Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak.": "Test build: no real payment is taken, feathers are added right away. In the App Store version payment goes through Apple.", "Satın al": "Buy", "Vazgeç": "Cancel", "Satın alımları geri yükle": "Restore purchases", "Geri yüklenecek bir şey yok (test sürümü).": "Nothing to restore (test build).", "Teşekkürler! ": "Thanks! ", "Bu test sürümünde gerçek ödeme alınmaz.": "No real payment is taken in this test build.", "Reklamlar kapandı": "Ads removed", "Kampanya bitti": "Offer ended", "Mesafe": "Distance", "30 saniyede en uzun yolu kat et": "Fly as far as you can in 30 seconds", "Orman": "Forest", "Çöl": "Desert", "Lunapark Gecesi": "Funfair Night", "Rastgele rakip": "Random rival", "RASTGELE YARIŞ": "RANDOM RACE", "ARKADAŞINLA YARIŞ": "RACE A FRIEND", "Rakip aranıyor. Biri gelince yarış kendiliğinden başlar.": "Looking for a rival. The race starts by itself when someone joins.", "Çevrimiçi oyuncu: ": "Players online: ", "Rastgele rakiple ya da arkadaşınla yarış": "Race a random rival or a friend", "Online oynayan herkesle eşleşirsin, en uzun uçan kazanır.": "You get matched with anyone playing online, longest flight wins.", "Aramayı bırak": "Stop searching", "direk": "posts", "sn": "s", "Yıldız başına ": "Per star ", "Sıradan": "Common", "Nadir": "Rare", "Epik": "Epic", "Efsane": "Legendary", "Mitik": "Mythic", "Turuncu": "Orange", "Sarı": "Yellow", "Beyaz": "White", "Kırmızı": "Red", "Gök Mavisi": "Sky Blue", "Çimen": "Grass", "Pamuk Şeker": "Cotton Candy", "Gece Moru": "Night Purple", "Türkiye": "Türkiye", "Siyah-Beyaz": "Black-White", "Sarı-Lacivert": "Yellow-Navy", "Sarı-Kırmızı": "Yellow-Red", "Lav": "Lava", "Okyanus": "Ocean", "Buz": "Ice", "Gün Batımı": "Sunset", "Neon": "Neon", "Kristal": "Crystal", "Altın FLIX": "Golden FLIX", "Galaksi": "Galaxy", "Ateş Kuşu": "Firebird", "Ejderha": "Dragon", "Futbol Topu": "Football", "Tenis Topu": "Tennis Ball", "Basketbol Topu": "Basketball", "Plaj Topu": "Beach Ball", "Voleybol Topu": "Volleyball", "İstanbul Akşamı": "Istanbul Evening", "Mahalle Arası": "Neighbourhood", "Yaz Plajı": "Summer Beach", "Gece Maçı": "Night Match", "Kar Tatili": "Snow Holiday", "Yıldız Sahne": "Star Stage", "Kapadokya Sabahı": "Cappadocia Morning", "Boğaz": "Bosphorus", "Uzay": "Space", "Sahne Rengi": "Scene Colour", "Klasik": "Classic", "Lacivert": "Navy", "Pamuk": "Candy", "Gece": "Night", "Altın": "Gold", "Gökkuşağı": "Rainbow", "tr-TR": "en-US", "Uzun tünellerde Sol vuruşla hızlan, içeride az zaman geçir.": "In long tunnels, kick Left to speed up and spend less time inside.", "Yüksek duvarların önünde Sağ vuruş: çok yükselir ama yavaşlatır.": "Before high walls, kick Right: it climbs a lot but slows you down.", "Boşluğun tam ortasından geçersen +5 bonus alırsın.": "Fly through the exact middle of a gap for a +5 bonus.", "Orta vuruş en güvenlisi. Panik anında ortaya dokun.": "The Middle kick is the safest. When in doubt, tap the middle.", "Hareketli boşluklarda acele etme, boşluğun sana gelmesini bekle.": "On moving gaps, don't rush. Let the gap come to you.", "Helikopter yaparken FLIX yavaş düşer. Uzun bir boşlukta tut, puanları topla.": "During a Helicopter the FLIX falls slowly. Hold it in a long gap and rack up points.", "Hareketleri art arda bağla: stil çarpanı x5'e kadar çıkar.": "Chain tricks back to back: the style multiplier goes up to x5.", "Direğe çok yakın geçmek 'Sıyırdın' bonusu verir.": "Passing very close to a post gives a 'Close shave' bonus.", "Dalış çift puan verir ama hızla düşersin. Yüksekten başla.": "A Dive gives double points but you drop fast. Start high.", "Tutarken parmağını kaydırıp hareket değiştir: her geçiş +10.": "While holding, swipe to switch tricks: each switch is +10.", "İki parmakla Kelebek yap: FLIX süzülür, uzun boşluklarda puan topla.": "Use two fingers for a Butterfly: the FLIX glides, great for long gaps.", "Her 10 puan tur sonunda 1 tüy olur. Stil puanı da sayılır.": "Every 10 points becomes 1 feather at the end of a run. Style points count too.", "10 Saniye": "10 Seconds", "10 saniyede en çok direkten geç": "Pass as many posts as you can in 10 seconds", "Akrobat": "Acrobat", "Tek bir hareketi olabildiğince uzun sürdür": "Hold a single trick for as long as you can", "Tüy Avı": "Feather Hunt", "20 saniyede en çok tüy topla": "Collect as many feathers as you can in 20 seconds", "tüy": "feathers", "Bot (kolay)": "Bot (easy)", "Bot (orta)": "Bot (medium)", "Bot (zor)": "Bot (hard)", "Kartal": "Eagle", "Şimşek": "Bolt", "Zıpzıp": "Bouncy", "Oyuncu ": "Player ", "Oyuncu": "Player", "Tam ortadan +5": "Dead centre +5", "Kayan boşluklar!": "Sliding gaps!", " metre!": " metres!", "Sol": "Left", "Orta": "Middle", "Sağ": "Right", "Makas": "Scissors", "Helikopter": "Helicopter", "Geri takla": "Backflip", "Fırıldak": "Spinner", "Dalış": "Dive", "Roket": "Rocket", "Kırbaç": "Whip", "Kelebek": "Butterfly", " savuruş": " swings", " sn": " s", "Geçiş: ": "Switch: ", "Şelale": "Waterfall", "Füze": "Missile", "Uçan Halı": "Flying Carpet", "Kamçı": "Lash", "Havai Fişek": "Firework", "Paraşüt": "Parachute", "Yelpaze": "Fan", "Erken bıraktın": "Released too early", " kombosu! +40": " combo! +40", "Kombo x": "Combo x", " bitti": " ended", "Sıyırdın! +10": "Close shave! +10", "Hareketli boşluklar!": "Moving gaps!", "Yüksek duvarlar!": "High walls!", "Tüneller!": "Tunnels!", " direk!": " posts!", "Süre doldu!": "Time's up!", "Hareket yarıda kaldı": "Trick cut short", "KOMBO x": "COMBO x", "Hazır ol...": "Get ready...", ". Dokun ve başla": ". Tap to start", "3 botla yarış, en uzun uçan kazanır. Dokun ve başla": "Race 3 bots, longest flight wins. Tap to start", "Dokun ve yukarı tırman. Sol ve sağ yön verir": "Tap to climb. Left and right steer", "Kendi hayaletinle yarış. Dokun ve başla": "Race your own ghost. Tap to start", "Dokun ve başla": "Tap to start", "Sola": "Left", "Düz yukarı": "Straight up", "SAĞ": "RIGHT", "Sağa": "Right", "Hızlı atak": "Fast dash", "Dengeli": "Balanced", "Yüksek, fren": "High, brakes", "SÜRE <b>": "TIME <b>", "/3 bot uçuyor": "/3 bots flying", "YÜKSEKLİK <b>": "HEIGHT <b>", " direk": " posts", " rakip uçuyor": " rivals flying", " tüy": " feathers", " · toplam ": " · total ", "YENİ EN İYİ!": "NEW BEST!", "SÜRE DOLDU": "TIME'S UP", "DÜŞTÜN!": "YOU FELL!", " toplandı, ": " collected, ", " puandan": " from points", " yıldızdan": " from stars", " kombodan": " from combo", "YENİ REKOR!": "NEW RECORD!", "En iyi ": "Best ", "Yeni yıldız": "New star", "Sen": "You", "Bot ": "Bot ", "KAZANDIN!": "YOU WON!", ". OLDUN": ". PLACE", " sıralamadan": " from placing", "90+ sn": "90+ s", "YENİ DİKEY REKOR!": "NEW CLIMB RECORD!", "Yükseklik": "Height", " m": " m", "Dikey rekor": "Climb record", " puan": " points", "HAYALETİ GEÇTİN!": "YOU BEAT THE GHOST!", "HAYALET KAZANDI": "GHOST WINS", "Hayaletin": "Your ghost", "ODAYA DÖN": "BACK TO ROOM", "Kilit açıldı: ": "Unlocked: ", "Alabilirsin: ": "You can buy: ", "Sonraki: ": "Next: ", "Dolap": "Wardrobe", "Sahneler": "Scenes", "Borular": "Pipes", "Modlar": "Modes", "Kullanılıyor": "In use", "Senin": "Yours", "Seç": "Select", "Rekor ": "Record ", " yap": " needed", "Al · ": "Buy · ", " tüy daha": " more feathers", "Toplar": "Balls", "FLIX'ler": "FLIXes", "Şu an bunu kullanıyorsun": "You are using this", "Senin, seçmek için dokun": "Yours, tap to select", "Rekorun ": "Your record is ", " yapınca kendiliğinden açılır.": " unlocks it automatically.", "Kilitli · ": "Locked · ", " tüy, sende ": " feathers, you have ", " var": "", "Oyna": "Play", "Online yarış": "Online race", "Nasıl oynanır": "How to play", "Ayarlar": "Settings", "Yarış": "Race", "Direklerin arasından uç, rekorunu kır. Rekor: ": "Fly between the posts and beat your record. Record: ", "Dikey": "Climb", "FLIX'i yukarı sektir, sağa sola yön ver, çubuklara çarpma. Rekor: ": "Bounce the FLIX upward, steer left and right, avoid the bars. Record: ", "Botlara karşı": "Versus bots", "3 botla aynı haritada yarış, en uzun süre uçan kazanır": "Race 3 bots on the same map, longest flight wins", "Kolay": "Easy", "Zor": "Hard", "Hayaletinle yarış": "Race your ghost", "En iyi turun (": "Your best run (", " direk) aynı haritada seninle uçar": " posts) flies the same map with you", "Önce bir Klasik tur oyna, en iyi turun hayaletin olur": "Play a Classic run first, your best run becomes your ghost", "Oda kur ya da arkadaşının koduyla katıl, en uzun uçan kazanır": "Create a room or join a friend's code, longest flight wins", "Meydan okumalar": "Challenges", ". En iyi: ": ". Best: ", " · yıldız başına ": " · per star ", "Oda kodu en az 3 harf olmalı.": "Room code needs at least 3 letters.", "Odaya bağlanıyor...": "Connecting to room...", "Odaya bağlanılamadı (": "Couldn't join the room (", "). Biraz sonra tekrar dene.": "). Try again in a moment.", "hâlâ uçuyor": "still flying", "SEN DÜŞTÜN, YARIŞ SÜRÜYOR": "YOU FELL, RACE GOES ON", ", 60 birincilikten": ", 60 for first place", "Herkes aynı haritada aynı anda başlar. Rakiplerin yarı saydam görünür. En uzun süre uçan kazanır.": "Everyone starts the same map at the same time. Rivals appear see-through. Longest flight wins.", " (sen)": " (you)", "yarışta": "racing", "hazır": "ready", "bekliyor": "waiting", "Rakip bekleniyor. Arkadaşın oyunu açıp Online yarış'tan bu kodla katılsın.": "Waiting for a rival. Ask your friend to open the game and join from Online race with this code.", "Hazırım ✓ (iptal)": "Ready ✓ (cancel)", "Hazırım": "I'm ready", "Herkes hazır olunca yarış 3 saniye içinde başlar.": "When everyone is ready, the race starts in 3 seconds.", "Rakip gelince ve hazır olunca başlar.": "Starts when a rival joins and is ready.", "Odadan çık": "Leave room", "BAŞLA!": "GO!", "REKOR": "RECORD", "TÜY": "FEATHERS", "STİL": "STYLE", "SOL": "LEFT", "TUT: MAKAS": "HOLD: SCISSORS", "ORTA": "MIDDLE", "TUT: HELİKOPTER": "HOLD: HELICOPTER", "TUT: GERİ TAKLA": "HOLD: BACKFLIP", "OYNA": "PLAY", "YENİ": "NEW", "Nasıl?": "How?", "NEREDEN VURURSAN ÖYLE UÇAR": "WHERE YOU KICK DECIDES HOW IT FLIES", "Alçak ve hızlı, uzun boşluklar için": "Low and fast, for long gaps", "Düz yukarı, kontrollü": "Straight up, controlled", "Çok yüksek ama yavaşlatır": "Very high but slows you down", "Basılı tut:": "Hold:", "FLIX havada hareket yapar, stil puanı toplar. Tutarken vuramazsın, zamanında bırak!": "the FLIX does a trick in the air and earns style points. You can't kick while holding, let go in time!", "HAVADA HAREKETLER": "AIR TRICKS", "↑ Kaydır": "↑ Swipe", "Fırıldak: döner ve yükselir": "Spinner: spins and rises", "↓ Kaydır": "↓ Swipe", "Dalış: hızlı düşer, çift puan": "Dive: drops fast, double points", "→ Kaydır": "→ Swipe", "Roket: ileri fırlar": "Rocket: shoots forward", "← Kaydır": "← Swipe", "Kırbaç: kuyruk savurur": "Whip: swings the tail", "İki parmak": "Two fingers", "Kelebek: süzülür, saniye başına puan": "Butterfly: glides, points per second", "Tutarken yön değiştir": "Switch while holding", "Geçiş: hareketleri bağla, her geçiş +10": "Switch: link tricks, +10 per switch", "Kombo": "Combo", "Hareketleri 2,5 saniye içinde art arda yap, her biri +5 daha fazla verir. FLIX'in üstündeki çubuk bitmeden devam et. Fırıldak sonra Dalış (Şelale) ya da Makas sonra Roket (Füze) gibi özel ikililer +40.": "Do tricks within 2.5 seconds of each other and each one gives +5 more. Keep going before the bar above the FLIX runs out. Special pairs like Spinner then Dive (Waterfall) or Scissors then Rocket (Missile) give +40.", "TÜY VE KİLİTLER": "FEATHERS AND UNLOCKS", "Boşluklardaki altın tüyleri topla. Tur sonunda her 10 puan da 1 tüy olur. Tüylerle Dolap'tan yeni FLIX'ler ve toplar, Sahneler'den yeni arka planlar al. Bazıları sadece rekorla açılır.": "Collect the golden feathers in the gaps (each is worth 2). Every 10 points also becomes 1 feather at the end of a run. Spend feathers on new FLIXes and balls in the Wardrobe, scenes and pipe colours. Some only unlock with a record.", "Ses": "Sound", "Titreşim": "Vibration", "Dil": "Language", "Klavye: A / S / D veya ← ↑ →, P ile mola.": "Keyboard: A / S / D or ← ↑ →, P to pause.", "MOLA": "PAUSED", "DEVAM": "RESUME", "Baştan": "Restart", "Menü": "Menu", "Rekor": "Record", "Direk": "Posts", "En iyi kombo": "Best combo", "TEKRAR": "AGAIN", "FLIX Kick Up oyun alanı": "FLIX Kick Up play area", "Duraklat": "Pause", "FLIX logosu, dokun ve sektir": "FLIX logo, tap to bounce", "Geri": "Back", "SEÇİLİ": "EQUIPPED", "BAŞLA": "START", "AÇ": "OPEN", "ADIN": "YOUR NAME", "Oda kur": "Create room", "YA DA KODLA KATIL": "OR JOIN WITH A CODE", "Katıl": "Join", "ODA KODU, ARKADAŞINA SÖYLE": "ROOM CODE, TELL YOUR FRIEND", "Tek başına": "Solo", "Rekorunu kır": "Beat your record", "Direklerin arasından uç": "Fly between the posts", "Yukarı tırman": "Climb up", "Botlara ya da arkadaşına karşı": "Against bots or a friend", "Yıldız topla, yıldız başına ": "Earn stars, per star ", "En iyi: ": "Best: ", "PUAN": "POINTS", " puan, ": " points, ", " saniye!": " seconds!", "Süreli çarpan! ": "Timed multiplier! ", "FLIX Kick Up, prototip sürüm 11.": "FLIX Kick Up, prototype version 11.", "Türkçe": "Türkçe", "English": "English", "SÜRE": "TIME"};
   const L = (s) => lang === "en" && EN[s] != null ? EN[s] : s;
   document.documentElement.lang = lang;
   function localize(root) {
@@ -2183,6 +2231,7 @@ svg { display: block; }
   }
   function showOver() {
     S.mode = "over";
+    $("powChip").hidden = true; $("cdown").hidden = true;
     const run = S.run, C = run.ch && CH[run.ch];
     let starBonus = 0, chNote = "";
     if (C) {
@@ -2203,7 +2252,7 @@ svg { display: block; }
     S.earnNote = S.got * 2 + L(" toplandı, ") + fromScore + L(" puandan") + (starBonus ? ", " + starBonus + L(" yıldızdan") : "") + (comboBonus ? ", " + comboBonus + L(" kombodan") : "");
     const before = new Set([...SKINS, ...SCENES].filter(isOwned).map((it) => it.id));
     coins += earned; store.set("fku2.coins", coins);
-    const isBest = run.kind !== "dikey" && S.score > best;
+    const isBest = run.kind !== "dikey" && !C && S.score > best;
     if (isBest) { best = S.score; store.set("fku3.best", best); }
     const fresh = [...SKINS, ...SCENES].filter((it) => isOwned(it) && !before.has(it.id));
     fresh.forEach((it) => owned.add(it.id)); saveOwned();
@@ -2419,17 +2468,19 @@ svg { display: block; }
     scene: { title: L("Sahneler"), panel: "gridScene", foot: true },
     pipe: { title: L("Borular"), panel: "gridPipe", foot: true },
     how: { title: L("Nasıl oynanır"), panel: "howPanel", tall: true },
+    store: { title: L("Mağaza"), panel: "storePanel", tall: true },
     set: { title: L("Ayarlar"), panel: "setPanel" },
   };
   function openSheet(kind) {
     const D = SHEETS[kind]; sheetOpen = kind;
     $("sheetTitle").textContent = D.title;
     for (const k in SHEETS) $(SHEETS[k].panel).hidden = k !== kind;
-    $("sheetFoot").hidden = !D.foot; $("sheetCoinPill").hidden = !D.foot;
+    $("sheetFoot").hidden = !D.foot; $("sheetCoinPill").hidden = !D.foot && kind !== "store";
     $("sheet").classList.toggle("tall", !!D.tall);
     $("home").hidden = true; $("sheet").hidden = false;
     if (kind === "mode") buildModes();
     if (kind === "online") renderOnline();
+    if (kind === "store") buildStore();
     if (kind === "skin" || kind === "scene" || kind === "pipe") {
       const it = byId(listOf(kind), curOf(kind));
       sel = it.id; buildGrid(kind); updateFoot(kind, it);
@@ -2517,6 +2568,80 @@ svg { display: block; }
       g.appendChild(b);
     }
   }
+
+  // ---------- store: feather packs, starter offer, no-ads (test build: no real payment) ----------
+  const iap = Object.assign({ noads: false, starter: false, campEnd: 0 }, store.get("fku4.iap", {}));
+  if (!iap.campEnd) { iap.campEnd = Date.now() + 48 * 3600 * 1000; store.set("fku4.iap", iap); }
+  const usd = (n) => "$" + n.toFixed(2);
+  const PACKS = [
+    { id: "p1", name: L("Avuç"), n: 500, usd: 0.99 },
+    { id: "p2", name: L("Kese"), n: 1200, usd: 1.99, bonus: 20 },
+    { id: "p3", name: L("Sandık"), n: 3500, usd: 4.99, bonus: 40, badge: L("EN POPÜLER") },
+    { id: "p4", name: L("Hazine"), n: 8000, usd: 9.99, bonus: 60 },
+    { id: "p5", name: L("Dağ"), n: 18000, usd: 19.99, bonus: 80 },
+    { id: "p6", name: L("Ejderha Hazinesi"), n: 50000, usd: 49.99, bonus: 100, badge: L("EN İYİ DEĞER") },
+  ];
+  function drawPile(c, k) {
+    const x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+    const n = Math.min(7, 1 + k), cx = c.width / 2;
+    for (let i = 0; i < n; i++) {
+      const a = (i - (n - 1) / 2) * 0.32, s = 1.15 - Math.abs(i - (n - 1) / 2) * 0.08;
+      x.save(); x.translate(cx + (i - (n - 1) / 2) * 9, c.height * 0.9); x.rotate(a); x.scale(s * 1.5, s * 1.5); x.translate(0, -14); featherIcon(x, 1); x.restore();
+    }
+  }
+  let buying = null, campTimer = null;
+  function askBuy(what, price, fn) {
+    buying = fn; $("buyWhat").textContent = what; $("buyPrice").textContent = price; $("buyModal").hidden = false;
+  }
+  $("buyNo").addEventListener("click", () => { buying = null; $("buyModal").hidden = true; });
+  $("buyYes").addEventListener("click", () => {
+    const fn = buying; buying = null; $("buyModal").hidden = true; if (!fn) return;
+    fn(); jingle(); buzz(30); burst(W / 2, H * 0.3, reduce ? 10 : 50, ["#ffc20e", "#e22511", "#ff4f7b", PAPER, "#2e6bff"]);
+    refreshHome(); if (sheetOpen === "store") buildStore();
+  });
+  function toast(t) { document.querySelectorAll(".toast").forEach((q) => q.remove()); const d = document.createElement("div"); d.className = "toast"; d.textContent = t; app.appendChild(d); setTimeout(() => d.remove(), 2500); }
+  const addCoins = (n) => { coins += n; store.set("fku2.coins", coins); };
+  function buildStore() {
+    const el = $("storePanel"); el.innerHTML = ""; clearInterval(campTimer);
+    const h = (t) => { const p = document.createElement("p"); p.className = "sec-h"; p.textContent = t; el.appendChild(p); };
+    const left = iap.campEnd - Date.now();
+    if (!iap.starter && left > 0) {
+      h(L("Kampanya"));
+      const c = document.createElement("div"); c.className = "camp";
+      c.innerHTML = '<span class="tag">-%70</span><b></b><canvas width="168" height="168"></canvas><small></small><span class="tm"></span><span class="price"><button class="pbtn">$2.99</button><s>$9.99</s></span>';
+      c.querySelector("b").textContent = L("Başlangıç Paketi"); c.querySelector("small").textContent = L("Tek seferlik: 2.500 tüy ve Kristal FLIX");
+      const cx = c.querySelector("canvas").getContext("2d"); drawFlix(cx, 84, 112, 0, 40, byId(SKINS, "kristal"), 0, 0.3);
+      const tm = c.querySelector(".tm");
+      const tick = () => { const ms = Math.max(0, iap.campEnd - Date.now()), hh = Math.floor(ms / 3600000), mm = Math.floor(ms / 60000) % 60, ss = Math.floor(ms / 1000) % 60; tm.textContent = L("Bitiyor: ") + hh + ":" + String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0"); if (!ms) buildStore(); };
+      tick(); campTimer = setInterval(() => { if (sheetOpen !== "store") return clearInterval(campTimer); tick(); }, 1000);
+      c.querySelector(".pbtn").addEventListener("click", () => askBuy(L("Başlangıç Paketi"), "$2.99", () => { iap.starter = true; store.set("fku4.iap", iap); addCoins(2500); owned.add("kristal"); saveOwned(); toast(L("Teşekkürler! ") + "+2.500 " + L("tüy") + " + Kristal FLIX"); }));
+      el.appendChild(c);
+    }
+    const na = document.createElement("div"); na.className = "noads";
+    na.innerHTML = '<span class="ic">AD</span><span class="tx"><b></b><small></small></span><button class="pbtn"></button>';
+    na.querySelector("b").textContent = L("Reklamsız"); na.querySelector("small").textContent = L("Reklamları ömür boyu kaldırır");
+    const nb = na.querySelector(".pbtn"); nb.textContent = iap.noads ? L("Satın alındı") : "$2.99"; nb.disabled = iap.noads;
+    nb.addEventListener("click", () => askBuy(L("Reklamsız"), "$2.99", () => { iap.noads = true; store.set("fku4.iap", iap); toast(L("Reklamlar kapandı")); }));
+    el.appendChild(na);
+    h(L("Tüy paketleri"));
+    const g = document.createElement("div"); g.className = "packs"; el.appendChild(g);
+    PACKS.forEach((pk, i) => {
+      const b = document.createElement("button"); b.className = "pack" + (pk.badge ? " hot" : "");
+      b.innerHTML = (pk.badge ? '<span class="badge"></span>' : "") + '<canvas width="144" height="112"></canvas><b></b><small></small><span class="bonus"></span><span class="pbtn"></span>';
+      if (pk.badge) b.querySelector(".badge").textContent = pk.badge;
+      drawPile(b.querySelector("canvas"), i);
+      b.querySelector("b").textContent = fmt(pk.n); b.querySelector("small").textContent = pk.name;
+      b.querySelector(".bonus").textContent = pk.bonus ? "+%" + pk.bonus + L(" bonus") : "";
+      b.querySelector(".pbtn").textContent = usd(pk.usd);
+      b.addEventListener("click", () => askBuy(fmt(pk.n) + " " + L("tüy") + " · " + pk.name, usd(pk.usd), () => { addCoins(pk.n); toast(L("Teşekkürler! ") + "+" + fmt(pk.n) + " " + L("tüy")); }));
+      g.appendChild(b);
+    });
+    const rs = document.createElement("button"); rs.className = "restore"; rs.textContent = L("Satın alımları geri yükle");
+    rs.addEventListener("click", () => toast(L("Geri yüklenecek bir şey yok (test sürümü).")));
+    el.appendChild(rs);
+    const fine = document.createElement("p"); fine.className = "fine"; fine.textContent = L("Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak."); el.appendChild(fine);
+  }
+  $("openStore").addEventListener("click", () => { beep(600, 0.05); openSheet("store"); });
 
   // ---------- online: live race in a shared room (presence only) ----------
   const net = { api: null, room: null, code: null, ready: false, lastGo: 0, status: "", unsub: null, tick: null };
