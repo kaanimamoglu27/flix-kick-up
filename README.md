@@ -86,5 +86,14 @@ Yan kaydırmalı engel oyunu (Flappy Bird / Jetpack Joyride tadında). Tüylü F
 - Süreli modlarda (10 Saniye, Tüy Avı) skorun altında büyük bir geri sayım ve süre çubuğu var. Son 3 saniye sarıya döner, sekme ve bip sesiyle saniye sayar.
 - Süreli çarpanlar: x2 (8 sn) ve x4 (5 sn) rozetleri. En erken 6. direkten sonra çıkarlar, iki rozet arasında en az 12 direk olur ve her direkte %8 şans vardır. Dörtte biri x4'tür. Meydan okumalarda çıkmazlar. Haritaya tohumla yerleştikleri için online ve bot yarışında herkes aynı rozetleri görür. Aktifken bütün puanlar çarpılır ve HUD'da kalan süre görünür.
 
+## Sürüm 9 (12 Ekim 2026): yeni sahneler, rastgele rakip, GitHub
+- Yeni sahneler: Orman (Nadir, 600), Çöl (Epik, 1.600) ve Lunapark Gecesi (Mitik, 15.000). Lunapark animasyonlu: dönme dolap dönüyor, ampuller yanıp sönüyor, havai fişekler patlıyor (`drawFunfair`).
+- Online yarışta iki yol var. Rastgele rakip: herkes aynı açık odaya ("HERKES") girer ve otomatik hazır olur, iki kişi olunca yarış kendiliğinden başlar. Arkadaşınla: eskisi gibi oda kodu ile.
+- GitHub'a yüklendi (main ve gh-pages): https://kaanimamoglu27.github.io/flix-kick-up/ . Online yarış sadece claude.ai linkinde çalışır.
+
+## Sürüm 10 (12 Ekim 2026): Mesafe modu
+- Yeni meydan okuma Mesafe: 30 saniyede gidebildiğin kadar uzağa git (metre, yıldızlar 60/120/170 m).
+- Geri sayım ve süreli çarpan artık ekranın sağ üst köşesinde, küçük bir kutuda. Meydan okumalar 2x2 kart olarak dizili.
+
 ## Önerilen sonraki adım
 Expo (React Native) + react-native-skia ile iPhone'a taşıma, EAS Build ile bulutta derleme, TestFlight ile test. Yayın Onat'ın Apple geliştirici hesabından yapılacak.
