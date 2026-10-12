@@ -1,3 +1,16 @@
+# ARKANA: Vorteks ve Kıyamet Ordusu (v19, 2026-10-12)
+
+Evrenler arası yarıklar açıldı; iskeletler, zombiler ve robotlar New York'a dökülüyor. Önceki sürüm (v18) `arkana-v18.html`.
+
+- Özgün kahraman VORTEKS: grafit zırh plakaları, kırmızı-altın detaylar, parlayan vizör ve göğüs çekirdeği, sırt iticileri, Flix çizgili uçuşan atkı, etrafında dönen Flix topu. Atışta tekme animasyonu.
+- 14 düşman türü, 3 aile. İskeletler (8 tür, darbe ile zayıf), Zombiler: Zombi (yakalarsa yavaşlatır), Sürünen Zombi, Asit Tükürgen (yerde yeşil asit gölü) — ateşe zayıf. Robotlar: Avcı Robot (nişan çizgisi + 3 lazer, zırhlı), Avcı Drone (binaların üstünden uçar), Savaş Makinesi (füze yağmuru) — şimşeğe zayıf, şimşek zırhı deler. Zayıf noktaya vuruş yeşil "!" ile gösterilir.
+- Yeni final patronu Kıyamet Lordu (pelerinli, bıçak taçlı zırhlı tiran): sıçrayıp ezer, lazer yelpazesi, füze yağmuru, asker çağırır.
+- Daha geniş şehir: geniş caddeler, 4 bölge (Midtown, Brownstone, Yıkık bölge, Park), yanan arabalar, kraterler, sokaklarda yarık portalları, gökte dev yarık.
+- 2K sinematik görüntü: gerçek zamanlı gölgeler, bloom ışıması, renk düzenleme, vinyet, piksel oranı 3'e kadar. Menüde/duraklatmada "🎬 2K / ⚡ Hızlı" düğmesi; telefon zorlanırsa çözünürlük kendiliğinden düşer.
+- Test: akıllı bot 20 dalgayı bitiriyor, daire çizen bot 15. dalgaya kadar dayanıyor.
+
+---
+
 # ARKANA: Kaptan Flix ve İskelet Ordusu (v18, 2026-10-12)
 
 Kaan'ın isteğiyle oyun New York sokaklarına taşındı. Önceki çayır sürümü (v17) `arkana-v17.html` olarak duruyor.
