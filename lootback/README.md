@@ -1,4 +1,23 @@
-# ARKANA: Mistik Büyücü (eski adı LOOTBACK)
+# ARKANA: Büyücü Pako ve Somurtkanlar (Vampire Survivors tarzı)
+
+v17 (2026-10-12): Kaan'ın isteğiyle Vampire Survivors tarzına geçildi. Rün çizmeli arena sürümü (v16) `arkana-v16.html` / GitHub'da `lootback/arkana-v16.html` olarak duruyor.
+
+## Oynanış
+- Sonsuz çiçekli çayır: ağaçlar, mantarlar, kristaller, ara ara beyaz Flix kaleleri. Harita oyuncuyla birlikte sonsuza uzanır.
+- Ekranın herhangi bir yerinde parmağını sürükle = yürü (yüzen analog). Klavyede WASD. Saldırılar tamamen otomatik, dururken de vurur.
+- Düşmanlar sevimli "Somurtkanlar"; yenilince konfetiye dönüşüp yıldız bırakır. Yıldız topla, seviye atla, 3 karttan birini seç.
+- 16 güç: 10 büyü (Sihirli Ok, Flix Topu, Dönen Yıldızlar, Ateş Topu, Şimşek, Buz Dalgası, Bumerang Şapka, Gökkuşağı Halkası, Yıldız Yağmuru, Prizma Işını) ve 6 eşya (Mıknatıs Yüzük, Rüzgar Ayakkabısı, Büyü Kitabı, Kristal Kalp, Büyüteç, Şans Yoncası). Her biri 5 seviye; en fazla 6 büyü ve 6 eşya.
+- 20 dalga, her biri 30 saniye. Her dalgada yeni düşman türü veya olay: hızlı bulutlar, yarasa sürüsü, zıpzıplar, baloncular, koca somurtkanlar, kalkanlılar, çember tuzağı.
+- Patronlar: 5 Somurtkan Kral (zıplayıp ezer), 10 Huysuz Ejderha (baloncuk yelpazesi), 15 Taş Dev (gökten taş), 20 Gölge Kral. Patron yenilince hazine sandığı 3 güç verir. 20. dalgadan sonra sonsuz devam.
+- FLIX düğmesi (sağ alt): düşman yendikçe dolar, dev Flix topu fırlatır.
+- Dikey telefonda oyun kendini yan çevirir; ters görünürse menüdeki "⟲ Ters mi? Çevir".
+
+## Test
+- Akıllı bot 20 dalgayı bitiriyor; basit daire çizen bot 11. dalgada düşüyor. Ekranda 300'e kadar düşman.
+
+---
+
+# ARKANA v16: Rün çizmeli arena (eski sürüm)
 
 v16 (2026-10-12): Kaan'ın isteğiyle oyun baştan değişti. Kargo mekaniği tamamen kalktı; artık mistik bir büyücüyle 3D arena savaş oyunu. Eski LOOTBACK (v15) `lootback-v15.html` / GitHub'da `lootback/v15.html` olarak duruyor.
 
