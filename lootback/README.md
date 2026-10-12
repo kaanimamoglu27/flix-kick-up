@@ -1,3 +1,30 @@
+# ARKANA: Mistik Büyücü (eski adı LOOTBACK)
+
+v16 (2026-10-12): Kaan'ın isteğiyle oyun baştan değişti. Kargo mekaniği tamamen kalktı; artık mistik bir büyücüyle 3D arena savaş oyunu. Eski LOOTBACK (v15) `lootback-v15.html` / GitHub'da `lootback/v15.html` olarak duruyor.
+
+## Oynanış
+- Yıldızlı gökyüzünde yüzen rün arenası. Düşmanlar portallardan dalga dalga gelir.
+- **Sol tarafta sürükle:** yürü (yüzen analog). Klavyede WASD / ok tuşları.
+- **Sağ tarafa dokun:** en yakın düşmana bedava büyü oku (Space).
+- **Sağda rün çiz** (çizerken zaman yavaşlar):
+  - Çizgi = **Ateş oku**: çizilen yöne delip geçer. 20 mana (1).
+  - Z / zikzak = **Şimşek**: düşmandan düşmana sıçrar, sersemletir. 30 mana (2).
+  - Daire = **Nova**: etrafı patlatır, iter, zırh kırar, düşman mermilerini siler. 35 mana (3).
+  - Sağ alttaki üç düğme de aynı büyüleri yapar.
+- Mana zamanla ve düşmanlardan düşen mavi kristallerle dolar. 5 can; her dalga 1 can verir.
+- Düşmanlar: İblis (koşar), Yarasa sürüsü (zikzak), Göz (uzaktan zehir topu atar), Taş Golem (zırhlı: önce nova ile zırhını kır).
+- Dalga 5: **Taş Dev** (yere vurur, turuncu halkadan kaç). Dalga 10: **Gölge Ejderha** (havadan ateş yağdırır, yaratık çağırır; yere inince altın çekirdeği parlar, 2 kat hasar alır; yarı canda öfkelenir).
+- Her dalga sonunda 3 güç kartından biri seçilir (13 güç: çoklu ok, üçlü ateş, büyük nova, zincir şimşek, mana pınarı, ejder kalbi, buz dokunuşu, ruh emici...).
+- Kombo: art arda öldürmek puanı katlar. Ejderha yenilince "Sonsuz devam" ile dalgalar sürer.
+- Dikey kalan telefonda oyun kendini yan çevirir; ters görünürse menüdeki "⟲ Ters mi? Çevir".
+
+## Test
+- Rün tanıma: titrek çizgi/eğri çizgi, Z/V/N/zikzak, tam/eksik/oval daire, dokunma: 260 denemenin hepsi doğru.
+- Kusursuz kaçan test botu 10 dalgayı 2-5 canla bitiriyor (insan için daha zor).
+
+---
+
+# LOOTBACK (eski sürüm notları)
 # LOOTBACK MVP
 
 Dosya: `index.html` (tek dosya, internet gerekmez). Spesifikasyon: Kaan'ın gönderdiği LOOTBACK_Claude_MVP.md.
