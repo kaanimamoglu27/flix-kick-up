@@ -113,3 +113,8 @@ Kaan "Kurye rotası" fikrini seçti (bkz. brainstorm.md). v8'deki ŞART eşya ve
 - Yeni bölümler: 7 Dağ yolu (kayan platformlar, asansör), 8 Kasa yığını (kasa duvarları: Kesik, Yer sarsıntısı ya da coşku ile kırılır, hafif çantayla üstünden atlanır), 9 Ana Kor'un yuvası (her şey bir arada, Ana Kor ateş tükürür), 10 Ana Kor final düellosu. Kazanınca 2. kısmın finali oynar.
 - 2. kısımda kovalayan ejderha mor (Ana Kor). Düelloda kamera tüm arenayı gösterecek kadar uzaklaşır.
 - Test: 7-9 farklı çanta dizilimleriyle botla bitirildi, 1-6 hâlâ geçiyor, düello botla kazanıldı.
+
+## v13: dönmeyen ekranda yatay oyun
+- Telefon dikey kalırsa (ör. claude.ai uygulaması ekranı döndürmüyorsa) oyun artık "telefonu çevir" ekranında takılmıyor: bütün oyun 90° döndürülüp yatay çiziliyor. Telefonu yana çevirip oynarsın.
+- Yön, telefonun eğiminden otomatik seçilir (iPhone'da ilk dokunuşta hareket izni sorulabilir). Ters görünürse ana menüde üstteki "⟲ Ters mi? Çevir" düğmesi yönü değiştirir ve hatırlar.
+- Dokunma, analog çubuk ve çanta sürükleme döndürülmüş ekranda test edildi.
