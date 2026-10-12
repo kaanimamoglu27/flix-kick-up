@@ -128,3 +128,9 @@ Kaan "Kurye rotası" fikrini seçti (bkz. brainstorm.md). v8'deki ŞART eşya ve
 - Kor arkadan gittikçe hızlanır. Geriye paket fırlatırsan yakalayıp yer: durur ve geri düşer. Balçık ve yarasalar da paketle vurulur.
 - Bu modda ateş topu yok, ateş ızgarası seyrek. Pako zamanla hızlanır.
 - Menüden "Günlük teslimat" ve "Hazine avı" kaldırıldı (kod duruyor).
+
+## v15: zorluk + funky görünüm
+- FIRLAT! artık zor: 3 can (❤). Karanlık bırakılan her ev "ŞİKAYET!" = 1 can. 3 şikayet = oyun biter. 5'li tam isabet kombosu 1 can geri verir.
+- 4. evden sonra pencerelerin kepenkleri açılıp kapanıyor. Kapalı kepenge atılan paket "TAK!" diye seker. Kapıya atmak güvenli ama kombo büyütmez.
+- Pako zamanla daha çok hızlanıyor, tuzaklar da mesafeyle sıklaşıyor. Çantada 5 paket var, kargo durağı her 4 evde bir.
+- Görünüm baştan değişti: 70'ler funky tarzı. Gün batımı gökyüzü, dönen güneş ışınları, çizgili retro güneş, dalgalı gökkuşağı tepeler, pofuduk bulutlar, dama desenli zemin, şeker renkli dans eden evler, yuvarlak düğmeler, Shrikhand ve Baloo 2 yazı tipleri.
