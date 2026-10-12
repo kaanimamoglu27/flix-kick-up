@@ -21,7 +21,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(13,10,26,.78);background-image:var(--dots);background-size:9px 9px;z-index:20;overflow:auto}
 .screen.on{display:flex}
 .card{background:var(--panel);border:3px solid #000;border-radius:2px;padding:20px 22px;max-width:640px;width:100%;box-shadow:7px 7px 0 var(--mg),-4px -4px 0 var(--cyan);transform:rotate(-.6deg)}
-h1{margin:0;font-size:clamp(44px,10vw,84px);letter-spacing:1px;font-weight:900;font-style:italic;color:var(--gold);-webkit-text-stroke:2px #000;text-shadow:5px 5px 0 var(--mg),-3px -2px 0 var(--cyan);transform:skew(-8deg)}
+h1{margin:0;font-size:clamp(44px,calc(var(--vw,1vw)*10),84px);letter-spacing:1px;font-weight:900;font-style:italic;color:var(--gold);-webkit-text-stroke:2px #000;text-shadow:5px 5px 0 var(--mg),-3px -2px 0 var(--cyan);transform:skew(-8deg)}
 h2{margin:0 0 10px;font-size:26px;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:.5px;text-shadow:3px 3px 0 var(--mg),-2px -1px 0 var(--cyan)}
 p{margin:6px 0;color:var(--muted);line-height:1.4}
 .btn{min-height:48px;min-width:48px;padding:10px 18px;border-radius:2px;border:3px solid #000;background:var(--panel2);font-weight:900;font-style:italic;font-size:16px;text-transform:uppercase;box-shadow:4px 4px 0 #000;transition:transform .05s}
@@ -99,7 +99,7 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
 #hud .btns{display:flex;gap:8px;pointer-events:auto}
 .hbtn{width:52px;height:52px;border-radius:2px;border:3px solid #000;background:var(--gold);color:#0d0a1a;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:4px 4px 0 var(--mg)}
 .hbtn canvas{width:34px;height:34px;pointer-events:none}
-#tip{position:fixed;left:50%;top:70px;transform:translateX(-50%) rotate(-1deg);background:var(--gold);color:#0d0a1a;border:3px solid #000;border-radius:0;padding:8px 14px;font-weight:900;font-style:italic;font-size:15px;z-index:11;display:none;max-width:90vw;text-align:center;pointer-events:none;box-shadow:5px 5px 0 var(--mg)}
+#tip{position:fixed;left:50%;top:70px;transform:translateX(-50%) rotate(-1deg);background:var(--gold);color:#0d0a1a;border:3px solid #000;border-radius:0;padding:8px 14px;font-weight:900;font-style:italic;font-size:15px;z-index:11;display:none;max-width:calc(var(--vw,1vw)*90);text-align:center;pointer-events:none;box-shadow:5px 5px 0 var(--mg)}
 #touch{position:fixed;left:0;right:0;bottom:0;height:0;z-index:12;display:none}
 #touch.on{display:block}
 .tb{position:absolute;bottom:14px;width:78px;height:78px;border-radius:2px;border:3px solid #000;background:rgba(0,229,255,.55);color:#0d0a1a;font-size:30px;font-weight:900;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:4px 4px 0 #000;transform:skew(-6deg)}
@@ -109,7 +109,7 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
 #tJump{right:max(18px,env(safe-area-inset-right));width:98px;height:98px;background:rgba(255,45,149,.6)}
 #tPow{right:calc(max(18px,env(safe-area-inset-right)) + 112px);bottom:30px;width:74px;height:74px;border-radius:50%;transform:none;font-size:30px;background:conic-gradient(rgba(13,10,26,.75) var(--cd,0deg),rgba(255,230,0,.85) 0)}
 #tPow.down{transform:translate(3px,3px)}#tPow.off{opacity:.35}
-#stickZone{position:fixed;left:0;bottom:0;width:46vw;height:72vh;touch-action:none}
+#stickZone{position:fixed;left:0;bottom:0;width:calc(var(--vw,1vw)*46);height:calc(var(--vh,1vh)*72);touch-action:none}
 #stickBase{position:absolute;width:124px;height:124px;margin:-62px 0 0 -62px;border-radius:50%;border:3px solid #000;background:radial-gradient(circle,rgba(0,229,255,.12),rgba(0,229,255,.32));box-shadow:4px 4px 0 #000;opacity:.55;pointer-events:none}
 #stickBase.on{opacity:1}
 #stickBase::before,#stickBase::after{content:'◀';position:absolute;top:50%;left:8px;transform:translateY(-50%);font-size:16px;color:#0d0a1a;font-weight:900}#stickBase::after{content:'▶';left:auto;right:8px}
@@ -120,7 +120,7 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
 #hHype.fever i{background:linear-gradient(90deg,var(--gold),var(--mg),var(--cyan));animation:pulse .3s infinite}
 /* story comic */
 #story{background:#0d0a1a;background-image:var(--dots);background-size:9px 9px}
-.comic{width:min(96vw,calc((100vh - 130px) * 2),980px);display:flex;flex-direction:column;gap:10px}
+.comic{width:min(calc(var(--vw,1vw)*96),calc((calc(var(--vh,1vh)*100) - 130px) * 2),980px);display:flex;flex-direction:column;gap:10px}
 .comic .cbar{display:flex;justify-content:space-between;align-items:center}
 .comic .cbar span{font-weight:900;font-style:italic;color:var(--cyan)}
 #stc{width:100%;aspect-ratio:2/1;display:block;background:#000;box-shadow:8px 8px 0 var(--mg),-4px -4px 0 var(--cyan);cursor:pointer;transform:rotate(-.4deg)}
@@ -141,6 +141,9 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
 #drop .list button{display:flex;justify-content:space-between;align-items:center;text-align:left}
 #rotate{position:fixed;inset:0;z-index:50;background:var(--bg);background-image:var(--dots);background-size:9px 9px;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:22px;font-weight:900;font-style:italic}
 #rotate.on{display:flex}
+html.rot body{position:fixed;left:0;top:0;width:var(--lw);height:var(--lh);transform-origin:0 0;transform:var(--rotT)}
+#bFlip{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:70;display:none;background:var(--panel);color:var(--ink);border:2px solid #000;font-weight:900;font-size:13px;padding:5px 10px;box-shadow:3px 3px 0 var(--mg)}
+html.rot #bFlip.show{display:block}
 #devbox{position:fixed;left:8px;bottom:8px;font:12px monospace;background:rgba(0,0,0,.6);padding:6px;z-index:60;display:none;white-space:pre;pointer-events:none}
 @media (max-height:500px){
   .card{padding:12px 14px}
@@ -156,6 +159,18 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
   #tJump{width:84px;height:84px}
   #hint{font-size:12px;padding:4px 6px}
 }
+html.rot .card{padding:12px 14px}
+html.rot h1{font-size:44px}
+html.rot #pack .top h2{font-size:16px}
+html.rot #stats{font-size:12px;gap:4px}
+html.rot #cargoList{gap:4px}
+html.rot .item{min-height:48px;padding:3px 6px}
+html.rot .item canvas{width:34px;height:34px}
+html.rot .levels .lvl{min-height:90px}
+html.rot .tb{width:66px;height:66px;bottom:10px}
+html.rot #tRight{left:calc(max(14px,env(safe-area-inset-left)) + 78px)}
+html.rot #tJump{width:84px;height:84px}
+html.rot #hint{font-size:12px;padding:4px 6px}
 /* layers: 2D backdrop, 3D world, 2D overlay (bubbles, fx) */
 #bg,#gl{position:fixed;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 #gl.hide{visibility:hidden}
@@ -182,7 +197,7 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
 /* main menu */
 .mainmenu{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:max(14px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left))}
 .mm-left{max-width:560px;display:flex;flex-direction:column;gap:8px;margin-top:4px}
-.mainmenu .logo{font-size:clamp(40px,8vw,72px)}
+.mainmenu .logo{font-size:clamp(40px,calc(var(--vw,1vw)*8),72px)}
 .tagline{color:var(--ink);font-weight:800;margin:0;text-shadow:2px 2px 0 #000}
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .mode{display:grid;grid-template-columns:52px 1fr;grid-template-rows:auto auto;align-items:center;text-align:left;border:3px solid #000;padding:8px 14px;background:var(--panel2);box-shadow:5px 5px 0 var(--cyan);transform:skew(-4deg);min-height:62px;transition:transform .08s}
@@ -199,7 +214,7 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
 .nb span{font-size:24px}
 .nb.hot{background:var(--mg);box-shadow:3px 3px 0 var(--gold)}
 /* couriers */
-.side-panel{position:absolute;left:max(14px,env(safe-area-inset-left));top:max(14px,env(safe-area-inset-top));bottom:14px;width:min(340px,44vw);display:flex;flex-direction:column;gap:8px;background:var(--panel);border:3px solid #000;padding:12px;box-shadow:6px 6px 0 var(--mg);overflow:auto}
+.side-panel{position:absolute;left:max(14px,env(safe-area-inset-left));top:max(14px,env(safe-area-inset-top));bottom:14px;width:min(340px,calc(var(--vw,1vw)*44));display:flex;flex-direction:column;gap:8px;background:var(--panel);border:3px solid #000;padding:12px;box-shadow:6px 6px 0 var(--mg);overflow:auto}
 #charList{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .cc{border:3px solid #000;background:var(--panel2);padding:8px;text-align:left;display:flex;flex-direction:column;min-height:52px}
 .cc b{font-style:italic}
@@ -223,7 +238,7 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
 /* modal + ad */
 #modal,#adov{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(13,10,26,.85);padding:16px}
 #modal.on,#adov.on{display:flex}
-.adbox{width:min(520px,92vw);background:#fff;color:#0d0a1a;border:4px solid #000;padding:16px;display:flex;flex-direction:column;gap:12px;align-items:center;box-shadow:8px 8px 0 var(--mg)}
+.adbox{width:min(520px,calc(var(--vw,1vw)*92));background:#fff;color:#0d0a1a;border:4px solid #000;padding:16px;display:flex;flex-direction:column;gap:12px;align-items:center;box-shadow:8px 8px 0 var(--mg)}
 .adtag{align-self:flex-start;background:#0d0a1a;color:#fff;font-size:12px;font-weight:900;padding:2px 8px}
 .adart{width:100%;aspect-ratio:2/1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,var(--gold),var(--gold) 14px,var(--mg) 14px,var(--mg) 28px);font-weight:900;font-style:italic;font-size:34px;-webkit-text-stroke:1px #000;color:#fff}
 .adart small{font-size:14px;-webkit-text-stroke:0;color:#0d0a1a;background:#fff;padding:2px 6px}
@@ -234,6 +249,16 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
   .mainmenu .logo{font-size:40px}.tagline{font-size:13px}
   .prod{min-height:120px;padding:8px}
 }
+html.rot .mode{min-height:44px;padding:3px 10px}
+html.rot .mode b{font-size:15px}
+html.rot .mode .mi{font-size:22px}
+html.rot .mode .small{font-size:11px}
+html.rot .modes{gap:7px}
+html.rot .nb{min-height:52px;min-width:64px}
+html.rot .nb span{font-size:20px}
+html.rot .mainmenu .logo{font-size:40px}
+html.rot .tagline{font-size:13px}
+html.rot .prod{min-height:120px;padding:8px}
 </style>
 </head>
 <body>
@@ -411,6 +436,7 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
   </div>
 </div></section>
 
+<button id="bFlip">⟲ Ters mi? Çevir</button>
 <div id="rotate">Telefonu yan çevir.<br>Oyun yatay ekranda oynanır.</div>
 <div id="ghost"><canvas width="160" height="160"></canvas></div>
 <div id="devbox"></div>
@@ -963,12 +989,12 @@ const ghost = $('ghost'), ghostCanvas = ghost.querySelector('canvas');
 function bindDraggable(el, id, fromGrid) {
   el.addEventListener('pointerdown', e => {
     e.preventDefault();
-    drag = {id, sx: e.clientX, sy: e.clientY, moved: false, pid: e.pointerId, fromGrid};
+    const P0 = lpt(e); drag = {id, sx: P0.x, sy: P0.y, moved: false, pid: e.pointerId, fromGrid};
     try { el.setPointerCapture(e.pointerId); } catch (_) {}
   });
   el.addEventListener('pointermove', e => {
     if (!drag || drag.pid !== e.pointerId) return;
-    if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 8) return;
+    const P1 = lpt(e); if (!drag.moved && Math.hypot(P1.x - drag.sx, P1.y - drag.sy) < 8) return;
     if (!drag.moved) {
       drag.moved = true; selected = id;
       const [w, h] = footprint(id, pack[id].rot);
@@ -978,7 +1004,7 @@ function bindDraggable(el, id, fromGrid) {
       ghost.style.display = 'block';
     }
     const [w, h] = footprint(id, pack[id].rot);
-    ghost.style.left = (e.clientX - w * cellSize / 2) + 'px'; ghost.style.top = (e.clientY - h * cellSize / 2) + 'px';
+    ghost.style.left = (P1.x - w * cellSize / 2) + 'px'; ghost.style.top = (P1.y - h * cellSize / 2) + 'px';
     const t = dropTarget(e); clearPreview(); if (t) previewCells(id, t[0], t[1], pack[id].rot);
   });
   const end = e => {
@@ -994,16 +1020,16 @@ function bindDraggable(el, id, fromGrid) {
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
 }
 function dropTarget(e) {
-  const r = grid.getBoundingClientRect();
+  const r = lrect(grid), P = lpt(e);
   const [w, h] = footprint(drag ? drag.id : selected, pack[drag ? drag.id : selected].rot);
-  const x = e.clientX - r.left, y = e.clientY - r.top;
+  const x = P.x - r.left, y = P.y - r.top;
   if (x < -cellSize * 0.5 || y < -cellSize * 0.5 || x > r.width + cellSize * 0.5 || y > r.height + cellSize * 0.5) return null;
   return [Math.round(x / cellSize - w / 2), Math.round(y / cellSize - h / 2)];
 }
 grid.addEventListener('pointermove', e => {
   if (drag || !selected || e.pointerType !== 'mouse') return;
-  const r = grid.getBoundingClientRect();
-  const c = Math.floor((e.clientX - r.left) / cellSize), rr2 = Math.floor((e.clientY - r.top) / cellSize);
+  const r = lrect(grid), P = lpt(e);
+  const c = Math.floor((P.x - r.left) / cellSize), rr2 = Math.floor((P.y - r.top) / cellSize);
   clearPreview(); const occ = occupancy(pack)[c + ',' + rr2];
   if (!occ || occ === selected) previewCells(selected, c, rr2, pack[selected].rot);
 });
@@ -1482,9 +1508,55 @@ function updateAnim(dt) {
    ========================================================= */
 const canvas = $('game'); let ctx = canvas.getContext('2d');
 let dpr = 1, VW = 1280, VH = 720, scale = 1;
+/* sideways mode: when the phone stays portrait (e.g. inside an app that does not rotate), turn the whole game 90° */
+let ROT = 0, rotPref = -90, rotManual = false;
+try { const v = localStorage.getItem('lb_rot'); if (v) { rotPref = +v; rotManual = true; } } catch (_) {}
+function LW() { return ROT ? innerHeight : innerWidth; }
+function LH() { return ROT ? innerWidth : innerHeight; }
+function lpt(e) { // screen point -> game (body) coordinates
+  const x = e.clientX, y = e.clientY;
+  if (ROT === 90) return {x: y, y: innerWidth - x};
+  if (ROT === -90) return {x: innerHeight - y, y: x};
+  return {x, y};
+}
+function lrect(el) { // element box in game coordinates
+  const r = el.getBoundingClientRect();
+  if (ROT === 90) return {left: r.top, top: innerWidth - r.right, width: r.height, height: r.width};
+  if (ROT === -90) return {left: innerHeight - r.bottom, top: r.left, width: r.height, height: r.width};
+  return {left: r.left, top: r.top, width: r.width, height: r.height};
+}
+function applyRotation() {
+  const want = isTouch && innerHeight > innerWidth ? rotPref : 0;
+  ROT = want; const de = document.documentElement;
+  de.classList.toggle('rot', !!ROT);
+  if (ROT) {
+    de.style.setProperty('--lw', innerHeight + 'px'); de.style.setProperty('--lh', innerWidth + 'px');
+    de.style.setProperty('--vw', innerHeight / 100 + 'px'); de.style.setProperty('--vh', innerWidth / 100 + 'px');
+    de.style.setProperty('--rotT', ROT === 90 ? `translate(${innerWidth}px,0) rotate(90deg)` : `translate(0,${innerHeight}px) rotate(-90deg)`);
+  } else for (const k of ['--lw', '--lh', '--vw', '--vh', '--rotT']) de.style.removeProperty(k);
+}
+function setRot(r, manual) {
+  if (r === rotPref) return; rotPref = r;
+  if (manual) { rotManual = true; try { localStorage.setItem('lb_rot', r); } catch (_) {} }
+  if (typeof clearInputs === 'function') clearInputs(); resize(); if (state === 'PACKING' && typeof renderPack === 'function') renderPack();
+}
+$('bFlip').onclick = () => setRot(rotPref === 90 ? -90 : 90, true);
+let gHold = 0, gSide = 0;
+function onMotion(ev) { // pick the side automatically from gravity (until the player flips by hand)
+  if (rotManual || !ev.accelerationIncludingGravity) return;
+  let gx = ev.accelerationIncludingGravity.x, gy = ev.accelerationIncludingGravity.y;
+  if (gx == null) return;
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent)) { gx = -gx; gy = -gy; }
+  const side = Math.abs(gx) > 6 && Math.abs(gy) < 5 ? (gx > 0 ? 90 : -90) : 0;
+  if (side && side === gSide) { if (++gHold === 20) setRot(side, false); } else { gSide = side; gHold = 0; }
+}
+window.addEventListener('devicemotion', onMotion);
+function askMotion() { try { if (window.DeviceMotionEvent && DeviceMotionEvent.requestPermission) DeviceMotionEvent.requestPermission().catch(() => {}); } catch (_) {} }
+setInterval(() => { const b = $('bFlip'); if (b) b.classList.toggle('show', !!ROT && (state === 'TITLE' || state === 'SPLASH')); }, 300);
 function resize() {
+  applyRotation();
   dpr = Math.min(2, window.devicePixelRatio || 1);
-  canvas.width = Math.round(innerWidth * dpr); canvas.height = Math.round(innerHeight * dpr);
+  canvas.width = Math.round(LW() * dpr); canvas.height = Math.round(LH() * dpr);
   const bgc = $('bg'); if (bgc) { bgc.width = canvas.width; bgc.height = canvas.height; }
   if (R3.on) size3D(canvas.width, canvas.height);
   // physics stays in 1280x720 reference units; the camera zooms in a bit so the porter reads on a phone
@@ -1497,7 +1569,7 @@ window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => { clearInputs(); setTimeout(resize, 100); });
 let orientBlocked = false;
 function checkOrientation() {
-  orientBlocked = isTouch && innerHeight > innerWidth;
+  orientBlocked = false;
   $('rotate').classList.toggle('on', orientBlocked);
   if (orientBlocked) clearInputs();
 }
@@ -3082,7 +3154,7 @@ $('optVib').onchange = e => { progress.vib = e.target.checked; saveProgress(); b
 function runSplash() {
   let p = 0; const bar = $('loadBar');
   const iv = setInterval(() => { p = Math.min(100, p + 7 + Math.random() * 10); bar.style.width = p + '%'; if (p >= 100) { clearInterval(iv); init3D(); resize(); $('bTap').style.visibility = 'visible'; } }, 90);
-  $('bTap').onclick = () => {
+  $('bTap').onclick = () => { askMotion();
     initAudio(); sfx('deliver'); Music.start();
     if (isTouch && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
     if (progress.firstRun) { progress.firstRun = false; saveProgress(); playStory('intro', () => setState('TITLE')); } else setState('TITLE');
@@ -3429,15 +3501,15 @@ function stickMode() { return progress.ctrl !== 'buttons'; }
 function setupStick() {
   const zone = $('stickZone'), base = $('stickBase'), knob = $('stickKnob'), R = 56;
   const place = (x, y) => { base.style.left = x + 'px'; base.style.top = y + 'px'; };
-  const reset = () => { stick.id = null; input.axis = 0; knob.style.transform = 'translate(-50%,-50%)'; base.classList.remove('on'); const r = zone.getBoundingClientRect(); place(Math.max(90, r.width * 0.32), r.height - 100); };
+  const reset = () => { stick.id = null; input.axis = 0; knob.style.transform = 'translate(-50%,-50%)'; base.classList.remove('on'); const r = lrect(zone); place(Math.max(90, r.width * 0.32), r.height - 100); };
   zone.addEventListener('pointerdown', e => {
     e.preventDefault(); initAudio(); if (state !== 'RUNNING' || stick.id !== null) return;
     try { zone.setPointerCapture(e.pointerId); } catch (_) {}
-    const r = zone.getBoundingClientRect(); stick.id = e.pointerId; stick.ox = e.clientX - r.left; stick.oy = e.clientY - r.top; place(stick.ox, stick.oy); base.classList.add('on');
+    const r = lrect(zone), P = lpt(e); stick.id = e.pointerId; stick.ox = P.x - r.left; stick.oy = P.y - r.top; place(stick.ox, stick.oy); base.classList.add('on');
   });
   zone.addEventListener('pointermove', e => {
     if (e.pointerId !== stick.id) return;
-    const r = zone.getBoundingClientRect(); let dx = e.clientX - r.left - stick.ox, dy = e.clientY - r.top - stick.oy;
+    const r = lrect(zone), P = lpt(e); let dx = P.x - r.left - stick.ox, dy = P.y - r.top - stick.oy;
     const m = Math.hypot(dx, dy); if (m > R) { dx *= R / m; dy *= R / m; }
     knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
     const ax = dx / R; input.axis = Math.abs(ax) < 0.18 ? 0 : clamp((ax - Math.sign(ax) * 0.18) / 0.72, -1, 1);
