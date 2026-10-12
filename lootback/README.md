@@ -1,3 +1,17 @@
+# ARKANA: Kaptan Flix ve İskelet Ordusu (v18, 2026-10-12)
+
+Kaan'ın isteğiyle oyun New York sokaklarına taşındı. Önceki çayır sürümü (v17) `arkana-v17.html` olarak duruyor.
+
+- Sonsuz New York: sokak ızgarası, kahverengi taş binalar, ofisler, cam kuleler, su kuleleri, sarı taksiler, sokak lambaları, parklar, fıskiyeli meydanlar, Flix reklam panoları. Binalar ve park halindeki arabalar katı; kahramanı kapatan binalar saydamlaşır.
+- Kahraman: Kaptan Flix (insan oranlarında, pelerinli, Flix renkli kostüm, göğsünde F amblemi). Yürüme/koşma/atış animasyonları.
+- Yol arkadaşı (menüde seçilir, kartlarla 5 seviye): Robo-Köpek Rex (atılıp ısırır), Flix Drone (lazer), Şifacı Mia (can doldurur, kristal toplar). Toplam 17 güç.
+- 8 iskelet türü, her biri farklı karşılık ister: İskelet, Koşucu, Hayalet (duvardan geçer, arada görünmez), Bombacı (kırmızı halka, patlaması iskeletleri de vurur), Okçu (kırmızı nişan çizgisi, oklar binalara takılır), Dev İskelet (hücum şeridi; duvara çarparsa sersemler), Kalkanlı (önden gelen mermileri bloklar), Nekromant (iskelet çağırır, iyileştirir). Yeni tür geldiği dalgada ipucu çıkar.
+- İskeletler sokak ızgarasında yol bularak gelir. Patronlar: İskelet Kral, Kemik Ejderha, Mezar Devi, Lich Kral.
+- Daha keskin görüntü: piksel oranı 2'ye kadar, anizotropik dokular.
+- Test: akıllı bot 20 dalgayı bitiriyor, daire çizen bot 12. dalgada düşüyor.
+
+---
+
 # ARKANA: Büyücü Pako ve Somurtkanlar (Vampire Survivors tarzı)
 
 v17 (2026-10-12): Kaan'ın isteğiyle Vampire Survivors tarzına geçildi. Rün çizmeli arena sürümü (v16) `arkana-v16.html` / GitHub'da `lootback/arkana-v16.html` olarak duruyor.
