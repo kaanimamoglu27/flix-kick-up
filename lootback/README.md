@@ -118,3 +118,13 @@ Kaan "Kurye rotası" fikrini seçti (bkz. brainstorm.md). v8'deki ŞART eşya ve
 - Telefon dikey kalırsa (ör. claude.ai uygulaması ekranı döndürmüyorsa) oyun artık "telefonu çevir" ekranında takılmıyor: bütün oyun 90° döndürülüp yatay çiziliyor. Telefonu yana çevirip oynarsın.
 - Yön, telefonun eğiminden otomatik seçilir (iPhone'da ilk dokunuşta hareket izni sorulabilir). Ters görünürse ana menüde üstteki "⟲ Ters mi? Çevir" düğmesi yönü değiştirir ve hatırlar.
 - Dokunma, analog çubuk ve çanta sürükleme döndürülmüş ekranda test edildi.
+
+## v14: FIRLAT! (yeni ana mod)
+- Menünün en üstünde. Pako kendi koşar; oyuncu sadece iki şey yapar:
+  - **Sola dokun:** zıpla (basılı tut, daha yüksek). Önüne çıkan basamağa Pako kendi tırmanır.
+  - **Sağda parmağını sürükle, bırak:** paket o yöne uçar. Nişan alırken zaman yavaşlar, uçuş çizgisi görünür.
+- Karanlık evlerin penceresinde hedef var. Hedefe isabet = TAM İSABET (100 × kombo, en çok x10), eve değerse 50. Iska kombo'yu bitirir. Her 3 tam isabette +1 paket.
+- Çantada 5 paket var; kargo durağı (her 5 evde bir) çantayı doldurur.
+- Kor arkadan gittikçe hızlanır. Geriye paket fırlatırsan yakalayıp yer: durur ve geri düşer. Balçık ve yarasalar da paketle vurulur.
+- Bu modda ateş topu yok, ateş ızgarası seyrek. Pako zamanla hızlanır.
+- Menüden "Günlük teslimat" ve "Hazine avı" kaldırıldı (kod duruyor).
