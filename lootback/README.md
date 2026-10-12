@@ -107,3 +107,9 @@ Kaan "Kurye rotası" fikrini seçti (bkz. brainstorm.md). v8'deki ŞART eşya ve
 - Coşku: ezme, altın ve teslimatlar barı doldurur; dolunca 6 sn hızlı, dokunduğun düşman ezilir, altın 2 kat, Kor yavaşlar.
 - Sonsuz kaçışta 25. saniyeden sonra Kor ateş topu tükürür (kırmızı halka iniş yeri).
 - Yeni modlar: Teslimat yarışı (75 sn, her teslimat +3 sn, Kor yok), Hazine avı (Kor önde kaçar, düşürdüğü hazineleri kaparsın, çanta ağırlaşır, KASA'da boşaltırsın, Kor çok uzaklaşırsa biter), Kor düellosu (boss: ateş topu, yere inip alev püskürtme, sersemleyince kafasına zıpla, 4 can; ilk zafer +50 elmas).
+
+## v12 (2026-10-12): Hikayenin 2. kısmı, Ana Kor
+- 6. bölüm bitince final, ardından 2. kısmın girişi oynar: Kor'un annesi Ana Kor, torununun "omlet yapılacağını" duyup fenerleri dağa taşır.
+- Yeni bölümler: 7 Dağ yolu (kayan platformlar, asansör), 8 Kasa yığını (kasa duvarları: Kesik, Yer sarsıntısı ya da coşku ile kırılır, hafif çantayla üstünden atlanır), 9 Ana Kor'un yuvası (her şey bir arada, Ana Kor ateş tükürür), 10 Ana Kor final düellosu. Kazanınca 2. kısmın finali oynar.
+- 2. kısımda kovalayan ejderha mor (Ana Kor). Düelloda kamera tüm arenayı gösterecek kadar uzaklaşır.
+- Test: 7-9 farklı çanta dizilimleriyle botla bitirildi, 1-6 hâlâ geçiyor, düello botla kazanıldı.

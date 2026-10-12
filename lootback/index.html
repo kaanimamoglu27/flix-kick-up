@@ -816,8 +816,8 @@ function renderLevelCards() {
     b.innerHTML = `<span class="n">Bölüm ${L.id}</span><span class="t">${L.name}</span>` +
       (locked ? '<span class="small">Kilitli: önceki bölümü teslim et</span>' :
        `<span class="s">${'★'.repeat(st)}<span style="color:#5a4352">${'★'.repeat(3 - st)}</span></span>` +
-       `<span class="small">${best ? '🏠 ' + (best.lit ?? '?') + '/' + (L.houses || []).length + ' ev · ' + best.value + ' altın' : (L.houses || []).length + ' ev karanlık'}</span>`);
-    b.onclick = () => { sfx('click'); openPacking(L); };
+       (L.mode === 'boss' ? `<span class="small">⚔ Final düellosu${st ? ' · kazandın' : ''}</span>` : '') + (L.mode === 'boss' ? '' : `<span class="small">${best ? '🏠 ' + (best.lit ?? '?') + '/' + (L.houses || []).length + ' ev · ' + best.value + ' altın' : (L.houses || []).length + ' ev karanlık'}</span>`));
+    b.onclick = () => { sfx('click'); openLevel(L); };
     box.appendChild(b);
   }
 }
@@ -1032,6 +1032,7 @@ function startRunFromSnapshot() {
     coins: (L.coins || []).map(([x, y]) => ({x, y, got: false})),
     houses: routeOf(L).map(([who, x, y]) => ({who, x, y, lit: false, missed: false, pending: false, t: 0, lineT: 0, line: ''})), throws: [], dig: 0, delivered: 0, springK: (L.springs || []).map(() => 0), springSaid: false, scarf: [0, 1, 2, 3, 4].map(i => ({x: L.start[0] - 4 - i * 6, y: L.start[1] - 32})), idleT: 0, idleSaid: false, failing: null,
     bonus: 0, combo: 0, say: null, floats: [], fx: [], glitch: 0, poseTick: -1, pose: null, dragonSaid: -10, dragonRoar: 0, eggSaid: false, camX: L.start[0] - 400, camY: L.start[1] - 430, lastDamage: 0,
+    movers: (L.movers || []).map(d => ({def: d, x: d[0], y: d[1], px: d[0], py: d[1], w: d[2]})), onMover: -1, crates: (L.crates || []).map(([x, y]) => ({x, y, alive: true, s: [x, y, CRATE, CRATE, 'crate']})),
     powCd: 0, turbo: 0, fever: 0, hype: 0, dash: 0, slam: false, airJump: false, fireballs: [], puddles: [], waves: [], loot: [], spitT: 4, dropT: 1, banked: 0, rushLeft: 75, boss: null, escaped: false
   };
   if (L.mode === 'rush' || L.mode === 'boss') sim.dragon.x = -1e7;
@@ -1039,7 +1040,7 @@ function startRunFromSnapshot() {
   if (L.mode === 'boss') bossInit();
   recomputeLoad();
   if (L.endless) { L.rng = null; while (sim.x + 2600 > L.genX) genChunk(L); }
-  updateCamera(10);
+  resize(); updateCamera(10);
   const first = sim.houses.find(h => carried().some(c => c.id === TOWN[h.who].item));
   say(L.mode === 'hunt' ? 'Kor! Hazineleri bırak!' : L.mode === 'boss' ? 'Sıra sende Kor!' : sim.stats.W >= 10 ? 'Bu çanta taş mı dolu?!' : first ? 'İlk durak: ' + TOWN[first.who].name + '!' : 'Hadi bakalım...', 1.8);
   const pw = curPower();
@@ -1063,6 +1064,7 @@ function updatePhysics(dt) {
   if (input.jumpQueued) { sim.buffer = P.jumpBufferSeconds; input.jumpQueued = false; }
   sim.buffer = Math.max(0, sim.buffer - dt);
   sim.coyote = sim.grounded ? P.coyoteSeconds : Math.max(0, sim.coyote - dt);
+  if (sim.movers.length) updateMovers();
   const vx0 = sim.vx, sdir = Math.sign(dir), mag = Math.abs(dir);
   sim.powCd = Math.max(0, sim.powCd - dt); sim.turbo = Math.max(0, sim.turbo - dt); sim.fever = Math.max(0, sim.fever - dt); sim.dash = Math.max(0, sim.dash - dt);
   if (input.powQueued) { input.powQueued = false; usePower(); }
@@ -1119,6 +1121,7 @@ function updatePhysics(dt) {
   }
   sim.vy = Math.min(sim.vy + s.gravity * dt, P.maximumFallSpeed);
   resolveCollisions(dt);
+  smashCrates(boxAt(sim.x, sim.y));
   // springs: launch power drops with the load
   const sps = sim.L.springs || [];
   for (let i = 0; i < sps.length; i++) {
@@ -1221,7 +1224,7 @@ function updateCreatures(dt, b) {
   return null;
 }
 function resolveCollisions(dt) {
-  const solids = sim.L.solids;
+  const solids = sim.crates && sim.crates.length ? sim.L.solids.concat(liveCrateSolids()) : sim.L.solids;
   // X axis
   sim.x += sim.vx * dt;
   let b = boxAt(sim.x, sim.y);
@@ -1247,6 +1250,7 @@ function resolveCollisions(dt) {
   if (sim.vy >= 0) for (const o of sim.L.oneWay) {
     if (b.r > o[0] && b.l < o[0] + o[2] && prevB <= o[1] + 0.01 && sim.y >= o[1]) { sim.y = o[1]; landed = true; b = boxAt(sim.x, sim.y); }
   }
+  if (sim.movers && sim.movers.length) { if (!landed && sim.vy >= 0 && landOnMovers(b, prevB)) landed = true; else if (landed || sim.vy < 0) sim.onMover = -1; }
   sim.wasGrounded = sim.grounded;
   if (landed) {
     sim.vy = 0;
@@ -1348,7 +1352,7 @@ function finishResults() {
     return `<div><span>${T.name} · ${ITEMS[T.item].name}</span><b style="color:${h.lit ? 'var(--green)' : 'var(--red)'}">${st}</b></div>`;
   }).join('');
   $('bRepackR').style.display = '';
-  $('bNext').style.display = ''; $('bNext').textContent = L.id < LEVELS.length ? 'Sonraki bölüm' : 'Finali izle';
+  $('bNext').style.display = ''; $('bNext').textContent = L.id === 6 ? 'Final ve 2. kısım' : L.id < LEVELS.length ? 'Sonraki bölüm' : 'Finali izle';
   setState('RESULTS');
 }
 function discardItem(id) {
@@ -1389,7 +1393,7 @@ const repack = () => {
 };
 $('bRepackP').onclick = $('bRepackF').onclick = $('bRepackR').onclick = repack;
 $('bLevelsP').onclick = $('bMenuR').onclick = () => setState('TITLE');
-$('bNext').onclick = async () => { if (progress.levelsDone % 3 === 0) await Monet.interstitial(); const n = LEVELS[sim.L.id]; if (!n) { playStory('ending', () => setState('TITLE')); return; } openPacking(n); };
+$('bNext').onclick = async () => { if (progress.levelsDone % 3 === 0) await Monet.interstitial(); afterStoryLevel(sim.L); };
 document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'RUNNING') setState('PAUSED'); });
 
 let tipTimer = 0;
@@ -1485,6 +1489,7 @@ function resize() {
   if (R3.on) size3D(canvas.width, canvas.height);
   // physics stays in 1280x720 reference units; the camera zooms in a bit so the porter reads on a phone
   scale = Math.max(canvas.height / 560, canvas.width / 1000);
+  if (typeof sim !== 'undefined' && sim && sim.L && sim.L.mode === 'boss') scale = canvas.width / 1300; // the whole arena fits on screen
   VW = canvas.width / scale; VH = canvas.height / scale;
   checkOrientation();
 }
@@ -1530,6 +1535,8 @@ function render(alpha) {
   for (const h of sim.houses) drawHouse(h);
   for (const s of L.solids) drawSolid(s);
   for (const o of L.oneWay) drawPlank(o);
+  for (const M of sim.movers) drawMover(M);
+  for (const c of sim.crates) if (c.alive) drawCrate(c);
   for (const sp of L.spikes) drawSpikes(sp);
   for (const sg of L.signs) drawSign(sg);
   (L.springs || []).forEach((sp, i) => drawSpring(sp, sim.springK[i] || 0));
@@ -1953,6 +1960,7 @@ function updateCamera(dt) {
   const L = sim.L, k = 1 - Math.exp(-dt * 5);
   const look = clamp(sim.vx * 0.5, -120, 120);
   let tx = sim.x - VW * 0.38 + look, ty = sim.y - VH * 0.6;
+  if (L.mode === 'boss') { tx = 0; ty = 600 - VH * 0.74; } // fixed arena camera
   tx = clamp(tx, L.bounds.minX, Math.max(L.bounds.minX, L.bounds.maxX - VW));
   ty = clamp(ty, L.bounds.minY, L.bounds.maxY - VH);
   sim.camX += (tx - sim.camX) * k; sim.camY += (ty - sim.camY) * k;
@@ -2226,8 +2234,9 @@ function poseHuman(H, S, t) { // S: sim-like object; drives the rig from the sam
 }
 
 /* ---------- dragon ---------- */
-function makeDragon() {
-  const R = toon(C3.red), RD = toon(0x8a0a3a), Y = toon(C3.ye);
+function makeDragon(c1, c2) {
+  c1 = c1 || C3.red; c2 = c2 || 0x8a0a3a;
+  const R = toon(c1), RD = toon(c2), Y = toon(C3.ye);
   const g = new THREE.Group(), body = new THREE.Group(); g.add(body);
   const torso = mesh(new THREE.IcosahedronGeometry(1, 1), R, 0.05); torso.scale.set(70, 34, 38); body.add(torso);
   torso.children[0].scale.set(1.06, 1.08, 1.08);
@@ -2246,7 +2255,7 @@ function makeDragon() {
   for (const z of [-1, 1]) {
     const piv = new THREE.Group(); piv.position.set(-10, 26, z * 16); body.add(piv);
     const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(-40, 0); sh.lineTo(-70, 10); sh.lineTo(-20, 120); sh.lineTo(30, 0); sh.lineTo(0, 0);
-    const wg = new THREE.ShapeGeometry(sh); const w = new THREE.Mesh(wg, new THREE.MeshToonMaterial({color: 0x8a0a3a, gradientMap: R3.grad, side: THREE.DoubleSide}));
+    const wg = new THREE.ShapeGeometry(sh); const w = new THREE.Mesh(wg, new THREE.MeshToonMaterial({color: c2, gradientMap: R3.grad, side: THREE.DoubleSide}));
     w.rotation.x = z * Math.PI / 2; piv.add(w);
     const bone = box(4, 4, 120, R, 1.5); bone.position.set(-20, 0, z * 60); piv.add(bone);
     wings.push({piv, z});
@@ -2386,8 +2395,11 @@ function build3DWorld(L) {
   if (L.exit) { W.exit = mkDepot(L.exit, 'KARGO'); g.add(W.exit); W.statics.push(W.exit); }
   W.porter = makeHuman(CHARS[progress.char] || CHARS.pako); g.add(W.porter.root);
   W.porter.scarfTail.forEach(s => g.add(s));
-  W.dragon = makeDragon(); g.add(W.dragon.g);
-  if (L.mode === 'boss') { W.boss = makeDragon(); g.add(W.boss.g); }
+  const dc = L.chapter === 2 ? [0x7a3cff, 0x2a1060] : [];
+  W.dragon = makeDragon(...dc); g.add(W.dragon.g);
+  if (L.mode === 'boss') { W.boss = makeDragon(...dc); g.add(W.boss.g); }
+  W.crates = (sim.crates || []).map(c => { const m = mkCrate(c); g.add(m); return m; });
+  W.movers = (sim.movers || []).map(M => { const m = mkMover(M); g.add(m); return m; });
   sync3DWorld();
   return W;
 }
@@ -2448,6 +2460,8 @@ function render3D(x, y, cx, cy) {
     m.sparks.forEach((s, k) => { s.visible = on === -1; s.position.set(Math.sin(t * 9 + k * 2) * 12, 14 + ((t * 40 + k * 9) % 24), 0); s.rotation.set(t * 6, t * 4, 0); });
   });
   sim.houses.forEach((h, i) => { const m = W.houses[i]; if (!m) return; m.g.visible = h.x > view0 && h.x < view1; if (m.g.visible) poseHouse(m, h); });
+  (W.crates || []).forEach((m, i) => { const c = sim.crates[i]; m.visible = !!c && c.alive && c.x > view0 && c.x < view1; });
+  (W.movers || []).forEach((m, i) => { const M = sim.movers[i]; if (M) m.position.set(M.x + M.w / 2, -M.y - 7, 0); });
   setCamera3D(cx, cy);
   R3.renderer.render(R3.scene, R3.cam);
 }
@@ -2952,14 +2966,14 @@ function drawPanelChar(ch, t) {
     sim = P0;
     try { ctx.scale(2.3, 2.3); if (mood === 'scream') ctx.translate(0, -10); drawPorter(0, 0); } finally { sim = sv; }
   } else if (who === 'nine') { ctx.scale(2.3, 2.3); drawNine(mood, f); }
-  else if (who === 'kor' || who === 'baby') {
-    const k = who === 'baby' ? 0.55 : 0.75; ctx.scale(k * f, k);
+  else if (who === 'kor' || who === 'baby' || who === 'anakor') {
+    const k = who === 'baby' ? 0.55 : who === 'anakor' ? 0.85 : 0.75; ctx.scale(k * f, k); if (who === 'anakor') ctx.filter = 'hue-rotate(290deg) saturate(1.3)';
     const sv = sim; sim = sim || {}; const d = {x: 120, y: -150 + Math.sin(t * 3) * 6};
     try { drawDragon(d, d.x + (mood === 'fire' ? 160 : 400)); } finally { sim = sv; }
   }
   ctx.restore();
 }
-function charTop(ch) { const f = ch[3] || 1; return ch[0] === 'kor' ? [ch[1] + 105 * f, 160] : ch[0] === 'baby' ? [ch[1] + 80 * f, 200] : [ch[1], ch[0] === 'nine' ? 150 : 165]; }
+function charTop(ch) { const f = ch[3] || 1; return ch[0] === 'kor' || ch[0] === 'anakor' ? [ch[1] + 105 * f, 160] : ch[0] === 'baby' ? [ch[1] + 80 * f, 200] : [ch[1], ch[0] === 'nine' ? 150 : 165]; }
 function drawStoryBg(bg, t) {
   const W = 640, H = 320;
   const pal = {night: ['#12062e', '#3a0f6b'], town: ['#3a0f6b', '#ff6a3d'], lair: ['#0d0a1a', '#2a0f4f'], fire: ['#3a0f6b', '#ff2d55'], boom: [YE, '#ff8a00']}[bg] || ['#12062e', '#3a0f6b'];
@@ -3164,6 +3178,7 @@ function shockwave(x, y, r) {
   for (const sl of sim.slimes) if (!sl.dead && Math.abs(sl.x - x) < r && Math.abs(sl.y - y) < 90) { sl.dead = 0.001; addBonus(sl.x, sl.y, 40); }
   for (const bt of sim.bats) if (!bt.dead && Math.abs(bt.x - x) < r && Math.abs(bt.y - y) < 160) { bt.dead = 0.001; bt.vy = -200; addBonus(bt.x, bt.y, 40); }
   for (const f of sim.fireballs) if (Math.abs(f.x - x) < r && Math.abs(f.y - y) < 160) f.dead = true;
+  for (const c of sim.crates) if (c.alive && Math.abs(c.x + CRATE / 2 - x) < r && Math.abs(c.y + CRATE / 2 - y) < 140) breakCrate(c);
   if (sim.boss) bossHitTest(x, y - 30, r * 0.8, 'slam');
 }
 function addBonus(x, y, n) { sim.bonus += n; floatText(x, y - 20, '+' + n, YE); addHype(10); puff(x, y, 8, 'rgba(140,200,90,'); }
@@ -3207,7 +3222,7 @@ function updateFire(dt, b) {
 // chase modes: after a while Kor starts spitting fire at the runner
 function chaseFire(dt) {
   const L = sim.L, d = sim.dragon;
-  if (!L.endless || L.mode || sim.time < 25 || d.eat > 0) return;
+  if ((!L.endless && !L.fire) || L.mode || sim.time < (L.fire ? 6 : 25) || d.eat > 0) return;
   sim.spitT -= dt;
   const gap = sim.x - d.x;
   if (sim.spitT <= 0 && gap < 700 && gap > 160) {
@@ -3331,17 +3346,19 @@ function updateBoss(dt, b) {
   return null;
 }
 function bossOver(won) {
-  const first = won && !progress.bossWins;
-  if (won) progress.bossWins = (progress.bossWins || 0) + 1;
+  const story = !!sim.L.story, first = won && (story ? !progress.stars[10] : !progress.bossWins);
+  if (won && !story) progress.bossWins = (progress.bossWins || 0) + 1;
+  if (won && story) { progress.stars[10] = 3; progress.best[10] = {value: sim.bonus, time: +sim.time.toFixed(2), lit: 0, total: 0}; progress.levelsDone = (progress.levelsDone || 0) + 1; saveProgress(); }
   const gold = Math.round(((won ? (first ? 600 : 250) : 40) + sim.bonus) * PERK.gold);
   sim.lastGold = gold; addGold(gold); if (first) addGems(50);
-  $('resTitle').textContent = won ? 'Kor yenildi!' : 'Kor kazandı...';
+  $('resTitle').textContent = won ? (story ? 'Ana Kor sakinleşti!' : 'Kor yenildi!') : (story ? 'Ana Kor kazandı...' : 'Kor kazandı...');
   $('resStars').innerHTML = won ? '★★★' : '';
   $('resValue').textContent = won ? `Süre ${fmtTime(sim.time)}` : `Kor'un canı: ${sim.boss.hp}/4`;
-  $('resSub').textContent = `+${gold} 🪙` + (first ? ' · +50 💎 ilk zafer!' : '') + ` · Toplam zafer ${progress.bossWins || 0}`;
-  $('resQuote').innerHTML = won ? '<b>Kor:</b> Tamam tamam! Hazineler sizin... Yumurtama dokunmayın ama!' : '<b>Kor:</b> HAHAHA! Biraz daha antrenman yap ufaklık!';
+  $('resSub').textContent = `+${gold} 🪙` + (first ? ' · +50 💎 ilk zafer!' : '') + (story ? '' : ` · Toplam zafer ${progress.bossWins || 0}`);
+  const who = story ? 'Ana Kor' : 'Kor';
+  $('resQuote').innerHTML = won ? (story ? '<b>Ana Kor:</b> Torunum iyi mi? ...Peki. Fenerler sizin.' : '<b>Kor:</b> Tamam tamam! Hazineler sizin... Yumurtama dokunmayın ama!') : `<b>${who}:</b> HAHAHA! Biraz daha antrenman yap ufaklık!`;
   $('resItems').innerHTML = '';
-  $('bNext').style.display = 'none'; $('bDouble').style.display = gold > 0 ? '' : 'none'; $('bDouble').disabled = false; $('bRepackR').style.display = 'none';
+  $('bNext').style.display = story && won ? '' : 'none'; $('bNext').textContent = 'Finali izle'; $('bDouble').style.display = gold > 0 ? '' : 'none'; $('bDouble').disabled = false; $('bRepackR').style.display = 'none';
   setState('RESULTS');
 }
 function rushOver() {
@@ -3442,6 +3459,122 @@ function updatePowUI() {
   btn.innerHTML = P0 ? P0.icon : '·'; btn.style.setProperty('--cd', (cd * 360) + 'deg'); btn.classList.toggle('off', !P0);
   $('hPow').textContent = P0 ? `${P0.icon} ${P0.name}${isTouch ? '' : ' (E)'}` + (sim.powCd > 0.05 && P0.cd > 0.5 ? ' ' + sim.powCd.toFixed(1).replace('.', ',') : '') : '';
   $('hHype').style.setProperty('--h', (sim.fever > 0 ? sim.fever / 6 * 100 : sim.hype) + '%'); $('hHype').classList.toggle('fever', sim.fever > 0);
+}
+
+/* =========================================================
+   v12: CHAPTER 2 (Ana Kor): moving platforms, crates, final duel
+   ========================================================= */
+// movers: [x, y, w, dx, dy, period, phase] one-way platforms that slide back and forth
+function moverPos(m, t) { const k = 0.5 - 0.5 * Math.cos(2 * Math.PI * (t + (m[6] || 0)) / m[5]); return [m[0] + m[3] * k, m[1] + m[4] * k]; }
+function updateMovers() {
+  for (let i = 0; i < sim.movers.length; i++) {
+    const M = sim.movers[i], [nx, ny] = moverPos(M.def, sim.time);
+    M.px = M.x; M.py = M.y; M.x = nx; M.y = ny;
+    if (sim.onMover === i && sim.grounded) { sim.x += M.x - M.px; sim.y = M.y; } // ride along
+  }
+}
+function landOnMovers(b, prevB) {
+  for (let i = 0; i < sim.movers.length; i++) {
+    const M = sim.movers[i];
+    if (b.r > M.x && b.l < M.x + M.w && prevB <= Math.max(M.y, M.py) + 2 && sim.y >= M.y) { sim.y = M.y; sim.onMover = i; return true; }
+  }
+  return false;
+}
+// crates: 56x56 boxes that block the road; Kesik (sword), Yer sarsıntısı (chest) or COŞKU smash them
+const CRATE = 56;
+function liveCrateSolids() { return sim.crates.filter(c => c.alive).map(c => c.s); }
+function breakCrate(c) {
+  if (!c.alive) return;
+  c.alive = false; sim.solidsCache = null;
+  const cx = c.x + CRATE / 2, cy = c.y + CRATE / 2;
+  fx(cx, cy - 30, 'KRAK!', YE); sfx('hard'); buzz(25); if (!reducedMotion) sim.shake = Math.max(sim.shake, 6);
+  for (let i = 0; i < 14; i++) sim.particles.push({x: cx + (Math.random() - 0.5) * 40, y: cy + (Math.random() - 0.5) * 40, vx: (Math.random() - 0.5) * 260, vy: -120 - Math.random() * 160, life: 0.6, col: i % 2 ? 'rgba(201,119,47,' : 'rgba(255,230,0,'});
+  sim.bonus += 20; addHype(10);
+  for (let i = 0; i < 3; i++) { const co = {x: cx - 30 + i * 30, y: cy - 30 - (i % 2) * 20, got: false}; sim.coins.push(co); }
+}
+function smashCrates(b) {
+  if (!sim.crates.length || !(sim.dash > 0 || sim.fever > 0)) return;
+  const e = 16, bb = {l: b.l - e, r: b.r + e, t: b.t - 4, b: b.b - 2};
+  for (const c of sim.crates) if (c.alive && overlaps(bb, c.s)) breakCrate(c);
+}
+function drawCrate(c) {
+  const {x, y} = c, s = CRATE;
+  poly([x, y, x + s, y, x + s, y + s, x, y + s], '#c9772f', INK, 3);
+  ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(x + 6, y + 6); ctx.lineTo(x + s - 6, y + s - 6); ctx.moveTo(x + s - 6, y + 6); ctx.lineTo(x + 6, y + s - 6); ctx.stroke();
+  ctx.strokeRect(x + 5, y + 5, s - 10, s - 10);
+}
+function drawMover(M) {
+  const {x, y, w} = M;
+  poly([x, y, x + w, y, x + w - 4, y + 14, x + 4, y + 14], CY, INK, 2.5);
+  ctx.fillStyle = MG; ctx.fillRect(x + 6, y + 10, w - 12, 3);
+}
+function mkCrate(c) {
+  const g = new THREE.Group(); g.position.set(c.x + CRATE / 2, -c.y - CRATE / 2, 0);
+  g.add(box(CRATE, CRATE, CRATE, toon(0xc9772f)));
+  for (const z of [-1, 1]) for (const r of [0.785, -0.785]) { const p = box(CRATE * 1.25, 7, 3, toon(0x6b3a12), false); p.rotation.z = r; p.position.z = z * (CRATE / 2 + 1); g.add(p); }
+  g.userData.x0 = c.x; g.userData.x1 = c.x + CRATE; return g;
+}
+function mkMover(M) {
+  const g = new THREE.Group();
+  g.add(box(M.w, 14, 80, toon(C3.cy)));
+  const s = box(M.w - 10, 3, 82, glow(C3.mg), false); s.position.y = -4; g.add(s);
+  return g;
+}
+
+/* ---------- chapter 2 levels ---------- */
+LEVELS.push(
+  {id: 7, chapter: 2, houses: [['elif', 420, 600], ['dede', 1720, 520], ['lale', 2700, 600], ['nine', 3420, 420]], name: 'Dağ yolu', available: ['chest', 'crystal', 'sword', 'potion'], parSeconds: 50,
+   bounds: {minX: -200, maxX: 3900, minY: -200, maxY: 1000}, killY: 950, start: [120, 600], exit: {x: 3600, y: 420, w: 130},
+   solids: [[-240, -500, 40, 1500], [-200, 600, 900, 400], [1100, 600, 400, 400], [1500, 520, 400, 480], [2300, 600, 710, 400], [3110, 420, 790, 580], [3900, -500, 40, 1500]],
+   oneWay: [[1440, 560, 60]], spikes: [], springs: [], flames: [],
+   movers: [[700, 600, 110, 285, 0, 3.4, 0], [1900, 520, 120, 280, 0, 3.0, 0], [3010, 600, 100, 0, -180, 3.2, 0]],
+   signs: [{x: 640, y: 600, type: 'up'}],
+   coins: [[770, 540], [830, 520], [890, 540], [2000, 470], [2100, 450], [2200, 470], [3060, 470], [3060, 410]], dragonSpeed: 148,
+   slimes: [[2480, 2640, 600], [3600, 3780, 420]], bats: [[2200, 430, 80, 25, 3]],
+   tips: [{x: 150, t: 'Ana Kor peşinde! Hareketli platformun üstünde durursan seni taşır.'},
+          {x: 2900, t: 'Asansör! Üstüne çık, seni yukarı götürür.'}]},
+  {id: 8, chapter: 2, houses: [['remzi', 300, 600], ['dede', 1000, 600], ['lale', 2420, 600], ['elif', 2900, 600], ['nine', 3400, 600]], name: 'Kasa yığını', available: ['chest', 'crystal', 'sword', 'potion', 'egg'], parSeconds: 60,
+   bounds: {minX: -200, maxX: 4000, minY: -200, maxY: 1000}, killY: 950, start: [120, 600], exit: {x: 3700, y: 600, w: 130},
+   solids: [[-240, -500, 40, 1500], [-200, 600, 1400, 400], [1400, 600, 2600, 400], [4000, -500, 40, 1500]],
+   oneWay: [[600, 520, 70], [1270, 580, 70], [1950, 520, 80], [2030, 450, 70]], spikes: [], springs: [],
+   flames: [[2700, 600, 2.2, 0]],
+   crates: [[700, 544], [700, 488], [1650, 544], [1820, 544], [2100, 544], [2100, 488], [2100, 432], [3150, 544], [3150, 488]],
+   signs: [{x: 560, y: 600, type: 'stop'}],
+   coins: [[640, 480], [1300, 540], [1990, 480], [2060, 410], [2560, 560], [3250, 560]], dragonSpeed: 152,
+   slimes: [[1450, 1600, 600], [2200, 2380, 600], [3250, 3450, 600]], bats: [[1900, 420, 70, 25, 3]],
+   tips: [{x: 150, t: 'Kasa duvarı! Kılıç üstteyse Kesik, sandık üstteyse Yer sarsıntısı ile kır. Hafif çantayla üstünden de atlarsın.'},
+          {x: 1880, t: 'Üç katlı kasa! Kır ya da tahtalardan tırman.'}]},
+  {id: 9, chapter: 2, fire: true, houses: [['elif', 350, 600], ['dede', 1500, 600], ['remzi', 1950, 440], ['lale', 2800, 600], ['nine', 3400, 430]], name: 'Ana Kor\'un yuvası', available: ['chest', 'crystal', 'sword', 'potion', 'egg'], parSeconds: 70,
+   bounds: {minX: -200, maxX: 4300, minY: -200, maxY: 1000}, killY: 950, start: [120, 600], exit: {x: 3950, y: 600, w: 130},
+   solids: [[-240, -500, 40, 1500], [-200, 600, 900, 400], [1100, 600, 500, 400], [1700, 440, 500, 560], [2200, 600, 810, 400], [3110, 430, 600, 570], [3710, 600, 590, 400], [4300, -500, 40, 1500]],
+   oneWay: [], spikes: [], springs: [[1560, 600]],
+   flames: [[2400, 600, 2.0, 0], [2560, 600, 2.0, 1.0]],
+   movers: [[700, 600, 110, 285, 0, 3.2, 0], [3010, 600, 100, 0, -170, 3.0, 0]],
+   crates: [[1300, 544], [1300, 488], [3550, 374]],
+   signs: [{x: 1500, y: 600, type: 'up'}, {x: 2280, y: 600, type: 'fire'}],
+   coins: [[770, 540], [860, 540], [1600, 420], [1640, 370], [2480, 560], [3060, 470], [3800, 560]], dragonSpeed: 156,
+   slimes: [[1800, 2100, 440], [3750, 3900, 600]], bats: [[2650, 480, 70, 20, 3], [3300, 330, 60, 20, 2.8]],
+   tips: [{x: 150, t: 'Ana Kor ateş tükürüyor! Kırmızı halkadan kaç, kılıçla topu kesebilirsin.'},
+          {x: 1420, t: 'Kasaları kır, yaya bas, yukarı uç!'}]},
+  Object.assign({}, BOSS_LEVEL, {id: 10, chapter: 2, story: true, name: 'Ana Kor', houses: [],
+    tips: [{x: 0, t: 'Ana Kor! Yere inince platforma çık, sersemleyince kafasına zıpla ya da kılıçla vur.'}]})
+);
+const BOSS_CARGO = [{id: 'sword', col: 0, row: 0, rot: true}, {id: 'crystal', col: 3, row: 2, rot: false}];
+function openLevel(L) { if (L.mode === 'boss') startDirect(L, BOSS_CARGO.map(p => Object.assign({}, p))); else openPacking(L); }
+
+STORY.ch2 = [
+  {bg: 'night', cap: 'Festivalden bir hafta sonra...', chars: [['anakor', 400, 'fire']], say: [[0, 'TORUNUMU OMLET YAPACAKLARMIŞ, ÖYLE Mİ?!']]},
+  {bg: 'town', chars: [['nine', 240, 'worried'], ['pako', 470, 'scared', -1]], say: [[0, 'Kor\'un annesi geldi! Bütün fenerleri dağa taşıdı!'], [1, 'Yine mi karanlık?!']]},
+  {bg: 'boom', cap: 'Dağ yolu: kayan platformlar, kasa yığınları, bir de Ana Kor.', chars: [['pako', 320, 'strain']], say: [[0, 'Fenerleri geri getireceğim. Ana Kor\'a da her şeyi anlatacağım!']]}
+];
+STORY.ending2 = [
+  {bg: 'night', chars: [['anakor', 230, 'calm'], ['baby', 500, 'calm', -1]], say: [[1, 'NİNE! Pako beni çantasında gezdirdi!'], [0, '...Omlet yapmadılar mı yani?']]},
+  {bg: 'town', chars: [['nine', 240, 'happy'], ['pako', 470, 'laugh', -1]], say: [[0, 'Ana Kor kasabanın bekçisi oldu!'], [1, 'LOOTBACK Kargo: artık iki ejderhalı!']]}
+];
+function afterStoryLevel(L) { // what the "next" button does after a story level
+  if (L.id === 6) { playStory('ending', () => { if (progress.seen.ch2) openLevel(LEVELS[6]); else { progress.seen.ch2 = 1; saveProgress(); playStory('ch2', () => openLevel(LEVELS[6])); } }); return; }
+  if (L.id === 10) { playStory('ending2', () => setState('TITLE')); return; }
+  const n = LEVELS[L.id]; if (n) openLevel(n); else setState('TITLE');
 }
 
 drawBagIcon($('bagIcon').getContext('2d'), 68);
