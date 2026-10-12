@@ -141,6 +141,12 @@ p{margin:6px 0;color:var(--muted);line-height:1.4}
 #drop .list button{display:flex;justify-content:space-between;align-items:center;text-align:left}
 #rotate{position:fixed;inset:0;z-index:50;background:var(--bg);background-image:var(--dots);background-size:9px 9px;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:22px;font-weight:900;font-style:italic}
 #rotate.on{display:flex}
+#flickZone{position:fixed;inset:0;z-index:9;display:none;touch-action:none}
+body.flickrun #flickZone{display:block}
+body.flickrun #touch,body.flickrun #bBag{display:none!important}
+.mode.hero{grid-column:1/-1;background:var(--gold);color:#0d0a1a;box-shadow:5px 5px 0 var(--mg),-3px -3px 0 var(--cyan)}
+.mode.hero b{font-size:22px;color:#0d0a1a;-webkit-text-stroke:0}.mode.hero .small{color:#0d0a1a;opacity:.85}
+.mode.hero .new{background:var(--mg);color:#fff;font-size:11px;font-weight:900;padding:2px 6px;margin-left:6px;border:2px solid #000;font-style:normal}
 html.rot body{position:fixed;left:0;top:0;width:var(--lw);height:var(--lh);transform-origin:0 0;transform:var(--rotT)}
 #bFlip{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:70;display:none;background:var(--panel);color:var(--ink);border:2px solid #000;font-weight:900;font-size:13px;padding:5px 10px;box-shadow:3px 3px 0 var(--mg)}
 html.rot #bFlip.show{display:block}
@@ -274,6 +280,7 @@ html.rot .prod{min-height:120px;padding:8px}
   </div>
 </div>
 <div id="tip"></div>
+<div id="flickZone"></div>
 <div id="touch">
   <div id="stickZone"><div id="stickBase"><div id="stickKnob"></div></div></div>
   <button class="tb" id="tPow" aria-label="Çanta gücü">·</button>
@@ -297,11 +304,12 @@ html.rot .prod{min-height:120px;padding:8px}
     <h1 class="logo">LOOTBACK</h1>
     <p class="tagline">Kor kasabanın hazinelerini çaldı. Kurye Pako geri getirecek!</p>
     <div class="modes">
+      <button class="mode hero" id="bFlick"><span class="mi">📦</span><b>FIRLAT!<span class="new">YENİ</span></b><span class="small" id="mFlick"></span></button>
       <button class="mode m1" id="bStory"><span class="mi">🏘</span><b>Hikaye</b><span class="small" id="mStory"></span></button>
       <button class="mode m2" id="bEndless"><span class="mi">🐉</span><b>Sonsuz kaçış</b><span class="small" id="mEndless"></span></button>
-      <button class="mode m3" id="bDaily"><span class="mi">📅</span><b>Günlük teslimat</b><span class="small" id="mDaily"></span></button>
+      <button class="mode m3" id="bDaily" style="display:none"><span class="mi">📅</span><b>Günlük teslimat</b><span class="small" id="mDaily"></span></button>
       <button class="mode m4" id="bRush"><span class="mi">⏱</span><b>Teslimat yarışı</b><span class="small" id="mRush"></span></button>
-      <button class="mode m5" id="bHunt"><span class="mi">💰</span><b>Hazine avı</b><span class="small" id="mHunt"></span></button>
+      <button class="mode m5" id="bHunt" style="display:none"><span class="mi">💰</span><b>Hazine avı</b><span class="small" id="mHunt"></span></button>
       <button class="mode m6" id="bBoss"><span class="mi">⚔</span><b>Kor düellosu</b><span class="small" id="mBoss"></span></button>
     </div>
   </div>
@@ -758,7 +766,7 @@ function sfx(kind) {
    ========================================================= */
 const input = {keys: {left: false, right: false, jump: false}, touch: {left: new Set(), right: new Set(), jump: new Set()}, jumpQueued: false, axis: 0, powQueued: false};
 const held = k => input.keys[k] || input.touch[k].size > 0;
-function inputDir() { const l = held('left'), r = held('right'), d = (r ? 1 : 0) - (l ? 1 : 0); return d || input.axis; } // keys/buttons: ±1, analog stick: -1..1
+function inputDir() { if (sim && sim.L && sim.L.flick && !sim.failing && !sim.done) return 1; const l = held('left'), r = held('right'), d = (r ? 1 : 0) - (l ? 1 : 0); return d || input.axis; } // keys/buttons: ±1, analog stick: -1..1
 function clearInputs() {
   input.keys.left = input.keys.right = input.keys.jump = false;
   for (const k in input.touch) input.touch[k].clear();
@@ -810,6 +818,7 @@ const devbox = $('devbox');
 const SCREENS = {SPLASH: 'splash', CHARS: 'chars', SHOP: 'shop', UPGRADES: 'ups', SETTINGS: 'settings', STORY: 'story', TITLE: 'title', LEVEL_SELECT: 'levels', PACKING: 'pack', PAUSED: 'paused', DROP_MENU: 'drop', FAILED: 'failed', RESULTS: 'results'};
 function setState(s) {
   state = s;
+  document.body.classList.toggle('flickrun', s === 'RUNNING' && !!(sim && sim.L && sim.L.flick)); flickAim = null;
   clearInputs();
   for (const k in SCREENS) $(SCREENS[k]).classList.toggle('on', k === s);
   const inRun = s === 'RUNNING' || s === 'PAUSED' || s === 'DROP_MENU' || s === 'FAILED';
@@ -1042,7 +1051,7 @@ window.addEventListener('resize', () => { if (state === 'PACKING') renderPack();
 let sim = null;
 function startRunFromSnapshot() {
   if (!snapshot) return;
-  const L = snapshot.level.endless ? makeEndlessLevel(snapshot.level.daily, snapshot.level.mode) : snapshot.level;
+  const L = snapshot.level.flick ? makeFlickLevel() : snapshot.level.endless ? makeEndlessLevel(snapshot.level.daily, snapshot.level.mode) : snapshot.level;
   const cargo = snapshot.placed.map(p => Object.assign({}, p, {discarded: false}));
   sfx('roar');
   sim = {
@@ -1142,7 +1151,7 @@ function updatePhysics(dt) {
   }
   // variable jump height (player jumps only)
   if (sim.playerJump) {
-    if (!held('jump') && sim.vy < -P.releaseJumpSpeed) sim.vy = -P.releaseJumpSpeed;
+    if (!held('jump') && !(sim.jumpHold > 0) && sim.vy < -P.releaseJumpSpeed) sim.vy = -P.releaseJumpSpeed;
     if (sim.vy >= 0) sim.playerJump = false;
   }
   sim.vy = Math.min(sim.vy + s.gravity * dt, P.maximumFallSpeed);
@@ -1328,6 +1337,7 @@ function showFailScreen(why) {
   $('bRetryF').style.display = $('bRepackF').style.display = sim.L.endless ? 'none' : '';
   if (sim.L.mode === 'boss') { $('bRepackF').style.display = 'none'; $('failText').textContent = 'Kor yere inince platforma çık, sersemleyince kafasına zıpla!'; }
   if (sim.L.endless) $('failText').textContent = sim.L.mode === 'hunt' ? `Kasada ${sim.banked} değerinde hazine var. Devam etmek ister misin?` : `${endlessScore()} m koştun, ${sim.houses.filter(h => h.lit).length} ev aydınlattın. Devam etmek ister misin?`;
+  if (sim.L.flick) $('failText').textContent = `${(sim.fscore || 0) + endlessScore()} puan, ${sim.hits || 0} teslimat. Devam etmek ister misin?`;
   setState('FAILED');
 }
 function revive() {
@@ -1437,6 +1447,7 @@ function updateHUD(force) {
   $('hDragon').textContent = md === 'rush' ? '' : md === 'hunt' ? '🐉 ' + Math.max(0, Math.round((sim.dragon.x - sim.x) / 40)) + ' m önde' : md === 'boss' ? '🐉 ' + '❤'.repeat(sim.boss.hp) + '♡'.repeat(4 - sim.boss.hp) : '🐉 ' + dg + ' m';
   $('hDragon').style.color = (!md && dg < 6) || (md === 'hunt' && sim.dragon.x - sim.x > 1100) ? 'var(--red)' : '';
   if (md === 'hunt' || md === 'boss') $('hValue').textContent = '🎒 ' + carried().length + (sim.bonus ? '  ★ ' + sim.bonus : '');
+  if (sim.L.flick) { $('hTime').textContent = '★ ' + ((sim.fscore || 0) + endlessScore()); $('hValue').textContent = '📦 ' + (sim.ammo ?? FLICK.ammo) + (sim.fcombo > 1 ? '  x' + sim.fcombo : ''); $('hValue').style.color = sim.ammo === 0 ? 'var(--red)' : ''; } else $('hValue').style.color = '';
   const egg = sim.stats.egg;
   $('hEgg').textContent = egg ? '🥚 ' + Math.max(0, IR.eggIntervalSeconds - sim.eggClock).toFixed(1).replace('.', ',') : '';
   $('hEgg').style.color = egg && IR.eggIntervalSeconds - sim.eggClock <= IR.eggWarningSeconds ? 'var(--gold)' : '';
@@ -1762,6 +1773,7 @@ function drawSign(sg) {
   ctx.restore();
 }
 function drawExit(ex) {
+  if (!ex) return;
   const x = ex.x, y = ex.y, w = ex.w;
   const rg = ctx.createRadialGradient(x + w / 2, y - 60, 10, x + w / 2, y - 60, 170); rg.addColorStop(0, 'rgba(0,229,255,.5)'); rg.addColorStop(1, 'rgba(0,229,255,0)');
   ctx.fillStyle = rg; ctx.fillRect(x - 120, y - 230, w + 240, 250);
@@ -2054,6 +2066,7 @@ function stepSim(dt) {
     return;
   }
   updatePhysics(dt);
+  if (sim.L.flick && !sim.failing && !sim.done) updateFlick(dt);
 }
 let pvSim = null;
 function drawPreview() {
@@ -2072,7 +2085,9 @@ function drawPreview() {
 function frame(now) {
   let el = Math.min(0.1, (now - lastT) / 1000); lastT = now;
   if (sim && state === 'RUNNING' && !orientBlocked) {
-    acc += el; let steps = 0;
+    if (sim.slowT > 0) sim.slowT -= el;
+    if (flickAim && flickAim.active && performance.now() - flickAim.t0 > 2500) flickAim.t0 = -1e9; // slow-mo lasts at most a few seconds
+    acc += el * ((flickAim && flickAim.active && flickAim.t0 > 0) || sim.slowT > 0 ? 0.3 : 1); let steps = 0;
     while (acc >= P.fixedStep && steps < 12) { stepSim(P.fixedStep); acc -= P.fixedStep; steps++; if (state !== 'RUNNING') break; }
     if (steps >= 12) acc = 0;
     updateAnim(el); updateCamera(el); updateHUD(); updatePowUI();
@@ -2767,7 +2782,14 @@ function genChunk(L) {
   const items = S.cargo.map(c => c.id).filter(id => OWNER[id]);
   // a house every few chunks, a depot after every 5 houses
   if (L.mode === 'hunt' && (L.sinceHouse >= 5 || (L.chunkN === 3))) { L.sinceHouse = 0; ground(x0, 380, y); L.depots.push([x0 + 190, y]); L.genX = x0 + 380; return; }
-  if (L.mode !== 'hunt' && L.sinceHouse >= (L.mode === 'rush' ? 1 : 2) && items.length && (L.mode === 'rush' || r() < 0.75)) {
+  if (L.flick && L.sinceHouse >= 1 && L.chunkN > 1) { // a house every other chunk, a parcel depot every 5 houses
+    L.sinceHouse = 0; ground(x0, 380, y);
+    if (L.housesN > 0 && L.housesN % 5 === 0 && !L.depotAt) { L.depotAt = L.housesN; L.depots.push([x0 + 190, y]); L.genX = x0 + 380; return; }
+    L.depotAt = 0;
+    const ws = Object.keys(TOWN), who = ws[Math.floor(r() * ws.length)], h = {who, x: x0 + 190, y, lit: false, missed: false, pending: false, t: 0, lineT: 0, line: ''};
+    L.houses.push([who, h.x, y]); S.houses.push(h); L.housesN++; L.genX = x0 + 380; return;
+  }
+  if (!L.flick && L.mode !== 'hunt' && L.sinceHouse >= (L.mode === 'rush' ? 1 : 2) && items.length && (L.mode === 'rush' || r() < 0.75)) {
     L.sinceHouse = 0; ground(x0, 380, y);
     if (L.housesN > 0 && L.housesN % (L.mode === 'rush' ? 4 : 5) === 0 && !L.depotAt) { L.depotAt = L.housesN; L.depots.push([x0 + 190, y]); L.genX = x0 + 380; return; }
     L.depotAt = 0;
@@ -2777,7 +2799,7 @@ function genChunk(L) {
   }
   L.sinceHouse++;
   const pick = r(), kinds = ['gap', 'step', 'planks', 'flame', 'spike', 'slime', 'bat', 'spring', 'flat'];
-  const w = [3, 2, 2, 1 + diff * 2, 1 + diff * 2, 2, 1 + diff, 1.5, 2 - diff];
+  const w = L.flick ? [3, 2, 1, 0.3, 0.6 + diff, 2.2, 1.6, 1.5, 1.5] : [3, 2, 2, 1 + diff * 2, 1 + diff * 2, 2, 1 + diff, 1.5, 2 - diff];
   let tot = w.reduce((a, b) => a + b, 0), acc = 0, kind = 'flat';
   for (let i = 0; i < kinds.length; i++) { acc += w[i] / tot; if (pick < acc) { kind = kinds[i]; break; } }
   switch (kind) {
@@ -2795,11 +2817,12 @@ function genChunk(L) {
 function updateEndless(dt) {
   const L = sim.L;
   while (sim.x + 2600 > L.genX) genChunk(L);
-  L.dragonSpeed = 150 + Math.min(85, sim.time * 0.9);
+  L.dragonSpeed = L.flick ? sim.stats.maxSpeed * 0.9 + Math.min(sim.stats.maxSpeed * 0.3, sim.time * 1.4) : 150 + Math.min(85, sim.time * 0.9);
   if (L.mode === 'rush') { sim.rushLeft -= dt; if (sim.rushLeft <= 0) { sim.rushLeft = 0; rushOver(); return; } }
   for (const d of L.depots) if (!d.used && sim.x > d[0]) {
     d.used = true;
     if (L.mode === 'hunt') { bankLoot(); continue; }
+    if (L.flick) { sim.ammo = FLICK.ammo; sfx('deliver'); fx(sim.x, sim.y - 110, 'PAKET DOLU!', CY); buzz(25); continue; }
     for (const c of sim.cargo) { c.discarded = false; c.delivered = false; }
     sim.potion = 100; recomputeLoad(); sfx('deliver'); fx(sim.x, sim.y - 110, 'YENİ YÜK!', CY); say('Çanta yine dolu!', 1.3); buzz(25);
   }
@@ -2812,6 +2835,7 @@ function endlessScore() { return Math.max(0, Math.round((sim.x - 120) / 40)); }
 function endlessOver() {
   if (sim.L.mode === 'rush') return rushOver();
   if (sim.L.mode === 'hunt') return huntOver();
+  if (sim.L.flick) return flickOver();
   const m = endlessScore(), lit = sim.houses.filter(h => h.lit).length;
   const gold = Math.round((lit * 30 + Math.floor(m / 10) + sim.bonus) * PERK.gold);
   const best = m > (progress.endlessBest || 0); if (best) progress.endlessBest = m;
@@ -3129,9 +3153,11 @@ function renderMenu() {
   $('mDaily').textContent = progress.daily[todayKey()] ? 'Bugün tamamlandı ✓' : `${DAILY_GOAL} ev aydınlat · +${DAILY_GEMS} 💎`;
   $('mRush').textContent = progress.rushBest ? `Rekor ${progress.rushBest} teslimat` : '75 sn, her teslimat +3 sn';
   $('mHunt').textContent = progress.huntBest ? `Rekor ${progress.huntBest} hazine` : 'Kor\'u kovala, hazineyi kap';
+  $('mFlick').textContent = progress.flickBest ? `Rekor ${progress.flickBest} puan · paketi pencereye fırlat!` : 'Pako koşar, sen paketi pencereye fırlat!';
   $('mBoss').textContent = progress.bossWins ? `${progress.bossWins} zafer` : 'İlk zafere +50 💎';
   renderWallet();
 }
+$('bFlick').onclick = () => { sfx('click'); startFlick(); };
 $('bStory').onclick = () => { sfx('click'); setState('LEVEL_SELECT'); };
 $('bEndless').onclick = () => { sfx('click'); openPacking(makeEndlessLevel(false)); };
 $('bDaily').onclick = () => { sfx('click'); openPacking(makeEndlessLevel(true)); };
@@ -3294,7 +3320,7 @@ function updateFire(dt, b) {
 // chase modes: after a while Kor starts spitting fire at the runner
 function chaseFire(dt) {
   const L = sim.L, d = sim.dragon;
-  if ((!L.endless && !L.fire) || L.mode || sim.time < (L.fire ? 6 : 25) || d.eat > 0) return;
+  if ((!L.endless && !L.fire) || L.mode || L.flick || sim.time < (L.fire ? 6 : 25) || d.eat > 0) return;
   sim.spitT -= dt;
   const gap = sim.x - d.x;
   if (sim.spitT <= 0 && gap < 700 && gap > 160) {
@@ -3464,6 +3490,7 @@ function startDirect(L, placed) { snapshot = {level: L, placed}; startRunFromSna
 /* ---------- drawing: fireballs, waves, fever aura, boss fire, loot (2D overlay, both renderers) ---------- */
 function drawModeFX(x, y) {
   const t = performance.now() / 1000;
+  if (sim.L.flick && sim.pkgs) drawFlick();
   for (const f of sim.fireballs) {
     const k = 0.6 + 0.4 * Math.sin(t * 20);
     ctx.save(); ctx.strokeStyle = `rgba(255,45,85,${k})`; ctx.lineWidth = 4; ctx.setLineDash([8, 6]);
@@ -3648,6 +3675,146 @@ function afterStoryLevel(L) { // what the "next" button does after a story level
   if (L.id === 10) { playStory('ending2', () => setState('TITLE')); return; }
   const n = LEVELS[L.id]; if (n) openLevel(n); else setState('TITLE');
 }
+
+/* =========================================================
+   v14: FIRLAT! Pako runs by himself; tap to jump, drag and release to fling parcels
+   into windows (Paperboy style). Aiming slows time. Feed Kor a parcel to hold him back.
+   ========================================================= */
+const FLICK = {ammo: 5, g: 980, ids: ['chest', 'crystal', 'sword', 'potion', 'egg']};
+let flickAim = null, flickJumpPid = null;
+function makeFlickLevel() {
+  const L = makeEndlessLevel(false);
+  return Object.assign(L, {id: 'flick', flick: true, name: 'Fırlat!',
+    tips: [{x: 150, t: 'Pako kendi koşar! Sola dokun: zıpla. Sağda parmağını sürükle, bırak: paket uçar. Pencereye at!'}]});
+}
+function startFlick() { initAudio(); startDirect(makeFlickLevel(), []); }
+function flickInit() {
+  if (sim.ammo !== undefined) return;
+  sim.ammo = FLICK.ammo; sim.pkgs = []; sim.fscore = 0; sim.fcombo = 0; sim.maxCombo = 0; sim.hits = 0; sim.perfects = 0; sim.slowT = 0; sim.nextPkg = 0;
+}
+function flickJump(hold) { input.jumpQueued = true; if (sim) sim.jumpHold = hold; }
+function flickVel(dx, dy) { // drag vector (screen px) -> launch velocity
+  const len = Math.hypot(dx, dy) || 1, pw = clamp(len * 5.5, 430, 1250);
+  return [dx / len * pw + sim.vx * 0.5, dy / len * pw];
+}
+function flickHand() { return [sim.x + sim.facing * 8, sim.y - 72]; }
+function doFlick(dx, dy) {
+  if (!sim || state !== 'RUNNING' || sim.failing || sim.done) return;
+  flickInit();
+  if (sim.ammo <= 0) { fx(sim.x, sim.y - 110, 'PAKET YOK!', MG); sfx('hard'); say('Kargo durağına yetiş!', 1.2); return; }
+  const [vx, vy] = flickVel(dx, dy), [hx, hy] = flickHand();
+  sim.ammo--; sim.pkgs.push({id: FLICK.ids[sim.nextPkg++ % FLICK.ids.length], x: hx, y: hy, vx, vy, rot: 0, t: 0});
+  sfx('jump'); sim.anim.laugh = 0.5; buzz(10);
+}
+function flickHit(p, kind, h) {
+  const L = sim.L;
+  if (kind === 'perfect' || kind === 'good') {
+    const perfect = kind === 'perfect';
+    sim.fcombo = perfect ? sim.fcombo + 1 : Math.max(1, sim.fcombo); sim.maxCombo = Math.max(sim.maxCombo, sim.fcombo);
+    const pts = (perfect ? 100 : 50) * Math.min(10, Math.max(1, sim.fcombo));
+    sim.fscore += pts; sim.hits++; if (perfect) sim.perfects++;
+    h.lit = true; h.pending = false; h.t = 0; h.line = TOWN[h.who].ok; h.lineT = 2.4; sim.delivered += Math.round(pts / 10);
+    floatText(h.x, h.y - 190, '+' + pts, YE);
+    fx(h.x, h.y - 150, perfect ? (sim.fcombo >= 3 ? 'SÜPER x' + sim.fcombo + '!' : 'TAM İSABET!') : 'TESLİM!', perfect ? YE : CY);
+    sfx('deliver'); addHype(perfect ? 30 : 18); sim.glitch = 0.3; buzz(perfect ? 40 : 20);
+    if (perfect) { sim.slowT = 0.35; if (!reducedMotion) sim.shake = Math.max(sim.shake, 8); }
+    if (perfect && sim.fcombo % 3 === 0) { sim.ammo++; floatText(sim.x, sim.y - 150, '+1 📦', CY); }
+    for (let i = 0; i < (perfect ? 26 : 14); i++) sim.particles.push({x: p.x + (Math.random() - 0.5) * 40, y: p.y, vx: (Math.random() - 0.5) * 260, vy: -140 - Math.random() * 120, life: 0.7, col: ['rgba(0,229,255,', 'rgba(255,45,149,', 'rgba(255,230,0,'][i % 3]});
+  } else if (kind === 'kor') {
+    const d = sim.dragon; d.eat = 1.3; d.x -= 260; sim.fscore += 25; sim.dragonRoar = 0;
+    floatText(d.x - 20, d.y - 70, 'NOM NOM!', YE); fx(d.x - 40, d.y - 40, 'HAM!', MG); sfx('eggpop'); addHype(10); buzz(25);
+  } else if (kind === 'enemy') { sim.fscore += 30; fx(p.x, p.y - 30, 'BONK!', CY); sfx('stomp'); addHype(8); }
+  else { // missed
+    if (sim.fcombo > 1) fx(p.x, p.y - 40, 'KOMBO BİTTİ', MG); sim.fcombo = 0; puff(p.x, p.y, 8, 'rgba(201,119,47,');
+  }
+}
+function updateFlick(dt) {
+  flickInit();
+  const L = sim.L, d = sim.dragon;
+  sim.jumpHold = Math.max(0, (sim.jumpHold || 0) - dt);
+  sim.stats.maxSpeed = 290 + Math.min(60, sim.time * 0.7); // Pako speeds up as the run goes on
+  if (sim.grounded && Math.abs(sim.vx) < 25 && sim.time > 1) flickJump(0.3); // auto-hop up a ledge we ran into
+  for (const p of sim.pkgs) {
+    if (p.dead) continue;
+    p.t += dt; p.vy += FLICK.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += dt * 9 * Math.sign(p.vx || 1);
+    let done = false;
+    for (const h of sim.houses) {
+      if (h.lit || Math.abs(h.x - p.x) > 90) continue;
+      if (p.x > h.x - 38 && p.x < h.x + 32 && p.y > h.y - 130 && p.y < h.y - 62) { flickHit(p, 'perfect', h); done = true; break; }
+      if (p.x > h.x - 66 && p.x < h.x + 66 && p.y > h.y - 62 && p.y < h.y) { flickHit(p, 'good', h); done = true; break; }
+    }
+    if (!done && !d.eat && Math.hypot(p.x - (d.x - 60), p.y - (d.y + 10)) < 80) { flickHit(p, 'kor'); done = true; }
+    if (!done) for (const sl of sim.slimes) if (!sl.dead && Math.abs(p.x - sl.x) < 30 && p.y > sl.y - 34 && p.y < sl.y + 4) { sl.dead = 0.001; puff(sl.x, sl.y, 10, 'rgba(140,200,90,'); flickHit(p, 'enemy'); done = true; break; }
+    if (!done) for (const bt of sim.bats) if (!bt.dead && Math.hypot(p.x - bt.x, p.y - bt.y) < 32) { bt.dead = 0.001; bt.vy = -120; flickHit(p, 'enemy'); done = true; break; }
+    if (!done && (p.y > L.killY || p.t > 4 || L.solids.some(s => p.x > s[0] && p.x < s[0] + s[2] && p.y > s[1] && p.y < s[1] + s[3]))) { flickHit(p, 'miss'); done = true; }
+    if (done) p.dead = true;
+  }
+  sim.pkgs = sim.pkgs.filter(p => !p.dead);
+}
+function flickArc() { // short trajectory preview for the current drag
+  if (!flickAim || !flickAim.active) return null;
+  let [vx, vy] = flickVel(flickAim.dx, flickAim.dy), [x, y] = flickHand(); const pts = [];
+  for (let i = 0; i < 14; i++) { const st = 0.035; vy += FLICK.g * st; x += vx * st; y += vy * st; pts.push([x, y]); }
+  return pts;
+}
+function drawFlick() {
+  for (const p of sim.pkgs) {
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); const [w, h] = footprint(p.id, false), k = 14 / Math.max(w, h);
+    drawItem(ctx, p.id, -w * k, -h * k, w * k * 2, h * k * 2); ctx.restore();
+  }
+  const arc = flickArc();
+  if (arc) {
+    arc.forEach(([x, y], i) => { ctx.globalAlpha = 1 - i / arc.length; ctx.fillStyle = i % 2 ? MG : WH; ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 7 - i * 0.3, 0, 7); ctx.fill(); ctx.stroke(); });
+    ctx.globalAlpha = 1;
+  }
+  // window targets on dark houses ahead
+  const t = performance.now() / 1000;
+  for (const h of sim.houses) if (!h.lit && h.x > sim.x - 100 && h.x - sim.x < 1100) {
+    const cx = h.x - 3, cy = h.y - 96, pul = 1 + Math.sin(t * 6 + h.x) * 0.08;
+    ctx.save(); ctx.globalAlpha = 0.9;
+    for (const [r, c] of [[34, MG], [23, WH], [12, MG]]) { ctx.fillStyle = c; ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, r * pul, 0, 7); ctx.fill(); ctx.stroke(); }
+    ctx.globalAlpha = 1; ctx.font = 'italic 900 13px system-ui'; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.strokeText('BURAYA!', cx, cy - 44); ctx.fillStyle = YE; ctx.fillText('BURAYA!', cx, cy - 44);
+    ctx.restore();
+  }
+}
+function flickOver() {
+  const score = sim.fscore + endlessScore(), best = score > (progress.flickBest || 0);
+  if (best) progress.flickBest = score;
+  const gold = Math.round((score / 8) * PERK.gold); sim.lastGold = gold; addGold(gold); saveProgress();
+  $('resTitle').textContent = best ? 'Yeni rekor!' : 'Kor seni yakaladı!';
+  $('resStars').innerHTML = '';
+  $('resValue').textContent = `★ ${score} puan`;
+  $('resSub').textContent = `🏠 ${sim.hits} teslimat · 🎯 ${sim.perfects} tam isabet · en iyi kombo x${sim.maxCombo} · +${gold} 🪙 · Rekor ${progress.flickBest}`;
+  $('resQuote').innerHTML = '<b>Muhtar Nine:</b> ' + (sim.perfects >= 8 ? 'Pencereden pencereye! Kasabanın keskin nişancısı!' : sim.hits >= 5 ? 'Fena değil evladım, şimdi pencereleri tuttur!' : 'Paketi pencereye at, kapıya değil!');
+  $('resItems').innerHTML = '';
+  $('bNext').style.display = 'none'; $('bDouble').style.display = gold > 0 ? '' : 'none'; $('bDouble').disabled = false; $('bRepackR').style.display = 'none';
+  setState('RESULTS');
+}
+function setupFlickZone() {
+  const z = $('flickZone');
+  z.addEventListener('pointerdown', e => {
+    e.preventDefault(); initAudio(); if (state !== 'RUNNING') return;
+    const P = lpt(e);
+    if (P.x < LW() * 0.35) { flickJump(0.12); input.touch.jump.add(e.pointerId); flickJumpPid = e.pointerId; return; }
+    if (flickAim) return;
+    try { z.setPointerCapture(e.pointerId); } catch (_) {}
+    flickAim = {pid: e.pointerId, sx: P.x, sy: P.y, dx: 0, dy: 0, active: false, t0: performance.now()};
+  });
+  z.addEventListener('pointermove', e => {
+    if (!flickAim || e.pointerId !== flickAim.pid) return;
+    const P = lpt(e); flickAim.dx = P.x - flickAim.sx; flickAim.dy = P.y - flickAim.sy;
+    if (!flickAim.active && Math.hypot(flickAim.dx, flickAim.dy) > 14) flickAim.active = true;
+  });
+  const up = e => {
+    input.touch.jump.delete(e.pointerId);
+    if (!flickAim || e.pointerId !== flickAim.pid) return;
+    const a = flickAim; flickAim = null;
+    if (e.type === 'pointercancel') return;
+    if (a.active) doFlick(a.dx, a.dy); else flickJump(0.3);
+  };
+  z.addEventListener('pointerup', up); z.addEventListener('pointercancel', up);
+}
+setupFlickZone();
 
 drawBagIcon($('bagIcon').getContext('2d'), 68);
 loadProgress();
