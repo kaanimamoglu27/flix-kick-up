@@ -1,3 +1,13 @@
+# ARKANA: Akıcı oyun ve küçük üst bilgi (v26, 2026-10-13)
+
+Önceki sürüm (v25) `arkana-v25.html`, kaynak `arkana10.html`.
+
+- Seviye/dalga, süre ve skor kutuları daha yukarıda ve daha küçük; XP çubuğu inceldi.
+- Kasma düzeltmeleri: patron ve tüm silah görünümleri oyunun başında bir kez hazırlanıyor (önceden ilk patron ve her yeni silah bir an donduruyordu). 120 Hz iPhone/iPad'de Ultra dahil her ayar 60 fps çiziyor (ısınma ve sonradan yavaşlama azalır). Ultra telefonda/tablette en fazla ~3,2 milyon piksel. Efekt katmanı daha az bellek harcıyor, parçacık ve hasar sayıları sınırlı, üst bilgi sadece değiştiğinde yenileniyor.
+- Test: tüm menüler ve modlar hatasız; bot hikayeyi yine baştan sona bitirdi.
+
+---
+
 # ARKANA: Hikaye Bölümleri, Görünür Silahlar, Kademeler (v25, 2026-10-13)
 
 Önceki sürüm (v24) `arkana-v24.html`, kaynak `arkana10.html`.
