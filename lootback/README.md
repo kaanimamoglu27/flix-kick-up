@@ -1,3 +1,14 @@
+# ARKANA: 2K 60 fps standart (v29, 2026-10-13)
+
+Önceki sürüm (v28) `arkana-v28.html`, kaynak `arkana10.html`.
+
+- Standart grafik her cihazda 🎬 2K · 60 fps (en fazla 2048x1152 kadar piksel, 120 Hz ekranlarda da 60 kare). Eski kayıtlar bir kez buna alınır.
+- Ayarlar'da ✨ 4K · 30 fps (ekranın tam çözünürlüğü, en fazla 4K piksel, sabit 30 kare) ve ⚡ Hızlı var. Otomatik ayar her modun kendi hedefine (60 ya da 30) göre çözünürlüğü ayarlıyor; elle seçim yapınca Hızlı'ya kendiliğinden geçmiyor.
+- Denge: düşman sınırı düşünce Cehennem fazla kolaylaşmıştı (bot 45. dalgaya geldi); düşman canı dalgayla artıyor, bot yine 17. dalgada ölüyor.
+- Tüm menüler ve modlar (Hikaye, Sonsuz, Patron Koşusu, Flix Avı, Cehennem) hatasız tarandı.
+
+---
+
 # ARKANA: Güçlü patronlar, akıcı açılış (v28, 2026-10-13)
 
 Önceki sürüm (v27) `arkana-v27.html`, kaynak `arkana10.html`.
