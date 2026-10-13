@@ -1,3 +1,25 @@
+# ARKANA: FLIX ve Kıyamet Ordusu (v20, 2026-10-13)
+
+Ana kahraman artık Flix maskotu. Önceki sürüm (v19) `arkana-v19.html`.
+
+- FLIX: lale başlı, zikzak taçlı, iki meşaleli, Doctor Doom tarzı pelerinli kahraman. Yüz ifadeleri (gülme, göz kırpma, bağırma, acı), kafa esneme, sallanan taç, dalgalanan pelerin, titreşen alevler.
+- Mağaza: 5 kahraman (FLIX, Vorteks, Nova, Titan, Gölge), her birine kostümler; 5 yol arkadaşı (Rex, Drone, Kedi, Kartal, Ejderha Kıvılcım) ve kostümleri; 5 harita (Alacakaranlık, Gündüz, Neon, Kar, Fırtına). Altın koşulardan ve günlük hediyeden gelir. Altın paketleri web'de demo, gerçek ödeme App Store sürümünde.
+- 4 mod: Hikaye, Sonsuz, Patron Koşusu, Flix Avı (4 dakikada 40 Flix).
+- Şehre dağılmış toplanabilir Flix figürleri (puan, altın, FLIX gücü), altın Flix, skor ve kombo çarpanı, yarık kapatma görevi.
+- Yeni düşmanlar: uçan Yarasa sürüleri, yerin altından çıkan Kazıcı Zombi, altın taçlı Elit düşmanlar (5 kat can, altın Flix düşürür).
+- Zorluk: ilk 10 seviye kahraman çok güçlü, sonra kademeli normalleşir.
+- Vuruş hissi: beyaz parlama, ezilip zıplama, kıvılcımlar, kritikte sarsıntı, büyük öldürmede anlık donma, titreşim.
+- Görüntü: "💎 Ultra" ekranın tam çözünürlüğü (4K'ya kadar), 60 fps hedefi; telefon zorlanırsa çözünürlük düşer, rahatlayınca geri çıkar.
+- App Store paketi (Capacitor) proje dosyalarında: `flix/lootback/app/`.
+- Test: akıllı bot 20 dalgayı bitiriyor, daire çizen bot 12. dalgada düşüyor.
+
+![Menü](shots/v20_1_menu.jpg)
+![Savaş](shots/v20_2_battle.jpg)
+![Mağaza](shots/v20_4_shop.jpg)
+![Flix Avı](shots/v20_6_hunt.jpg)
+
+---
+
 # ARKANA: Vorteks ve Kıyamet Ordusu (v19, 2026-10-12)
 
 Evrenler arası yarıklar açıldı; iskeletler, zombiler ve robotlar New York'a dökülüyor. Önceki sürüm (v18) `arkana-v18.html`.
