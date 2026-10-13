@@ -1,3 +1,21 @@
+# ARKANA: Hikaye Bölümleri, Görünür Silahlar, Kademeler (v25, 2026-10-13)
+
+Önceki sürüm (v24) `arkana-v24.html`, kaynak `arkana10.html`.
+
+- Hikaye modu: 50 seviye, 5 bölüm. Her seviye 20 saniye, üstte "Seviye N/50 · Patron 10". Her 10. seviyede patron sırayla gelir (İskelet Kral, Kemik Ejderha, Mezar Devi, Kıyamet Lordu, VORTEKS), patron savaşında düşmanlar da gelir. Başta giriş çizgi romanı, her patrondan sonra bölüm sonu ve sonraki bölümün çizgi romanı, VORTEKS'ten sonra final ve mod biter. Menüdeki "Hikayeyi oku" kaldırıldı.
+- Silahlar 24'e çıktı: 🗡️ Flix Kılıcı, 🚀 Omuz Roketi, 🔫 Flix Makinesi, 🔨 Dev Çekiç, ♨️ Alev Püskürtücü. 8 silah yuvası. Her seviyede yeni bir silah hediye gelir, karakterin üstüne görünür şekilde takılır.
+- 🎱 Sekme Gücü: mermi, mızrak ve fırlatılan Flix çarptıktan sonra başka düşmanlara seker.
+- Her 5 seviyede kademe: hasar +8%, can +15, hız artar; karakter büyür, renkli halka, aura, başta hale ve etrafında dönen ışık topları (10 kademe).
+- Karakter gelişimi 50. seviyede durur (MAKS).
+- Sol alttaki büyük panel kaldırıldı; 🎒 düğmesiyle isteğe bağlı açılıyor, yeni seviyede kırmızı nokta yanar.
+- Test: iPhone 17/18 (402x874, 420x912, 440x956), iPad Pro 11" ve 13" dik ve yatay, hata yok. Bot hikayeyi baştan sona bitirdi (VORTEKS'i yendi), sonsuz modda 69. dalgada öldü.
+
+![Kademe ve silahlar](shots/v25_1_kademe_silahlar.jpg)
+![Çanta paneli](shots/v25_2_canta.jpg)
+![iPhone](shots/v25_3_iphone.jpg)
+
+---
+
 # ARKANA: Flix Fırlat ve Patron Hikayeleri (v24, 2026-10-13)
 
 Önceki sürüm (v23) `arkana-v23.html`, kaynak `arkana9.html`.
