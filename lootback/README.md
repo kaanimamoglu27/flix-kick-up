@@ -1,3 +1,26 @@
+# ARKANA: FLIX ve Renksiz Şehir (v21, 2026-10-13)
+
+Hikaye modu artık çizgi roman. Önceki sürüm (v20) `arkana-v20.html`.
+
+- Çizgi roman hikaye (Marvel tarzı: kalın mürekkep, nokta tramı, sarı anlatı kutuları, konuşma balonları, KRA-KOOM yazıları): insanlar Flix yerine tabletlerle oynamaya başlar, şehir rengini kaybeder, dev ekrandan Kıyamet Lordu çıkar ve ekrana kapılanlar zombi, iskelet ve robota dönüşür. FLIX iner: "Flix ateşi sönmez!" Girişte 4 sayfa, 5., 10. ve 15. patrondan sonra birer bölüm sayfası, sonda final. Mod ekranında "📖 Hikayeyi oku".
+- Kıyamet şehri: hikaye modu gri ve kül yağan bir şehirde başlar. Her yenilen düşmanın ruhu (beyaz güvercin) serbest kalır, bazıları elinde Flix tutan insana döner. Her dalgada şehrin bir bölgesi altın bir halkayla rengine kavuşur, patronlar büyük bölgeleri açar, sonunda bütün şehir renklenir. Gökte dev kötü tablet.
+- Seviye takılması düzeldi: kristal sınırı dolunca XP kayboluyordu. Artık 25. seviyeye kadar yeni güçler, sonra sınırsız ilerleme (hasar, can, hız, güç sıklığı kartları).
+- Oyunda hiç top yok: bütün toplar Flix figürü oldu (Zıplayan Flix, FLIX gücü, Vorteks yörüngesi).
+- Kaçış yolları: arabaya yaslan veya atıl, fitili yanar ve patlar (zincirleme patlama, yol açar); kırılabilir kasa, bariyer ve tablet yığınları; 💨 Atılma düğmesi (dokunulmaz, engelleri kırar); kontrolden çıkmış taksi uyarıyla geçer, düşmanları biçer.
+- Yeni güçler: Meşale Savuruşu, Flix Mayını, Kasırga, Pelerin Zırhı (toplam 20 güç).
+- Yeni yol arkadaşları: Buz Pengueni Pıt, Tank Kaplumbağa Taş, Fener Ruhu Lumi. Yeni kostümler: FLIX Buzul, Neon, Süper Yıldız; her kahramana ve her arkadaşa birer yeni kostüm.
+- Daha keskin görüntü (keskinleştirme, daha dar parlama), her öldürmede mürekkep yıldızı, büyük düşmanlarda POW!, BAM!, ZAP! yazıları.
+- Çizgi roman arayüz: Bangers yazı tipi, siyah çerçeveli düğmeler, renkli mod panelleri. Ana ekranda zıplayıp dönen FLIX (dokununca hareket yapar), uçuşan Flix figürleri, hareket çizgileri.
+- Test: akıllı bot hikayeyi 20. dalgada kazanıyor (bütün çizgi roman sayfaları akışta açılıyor), daire çizen bot 15. dalgada düşüyor. Hata yok.
+
+![Çizgi roman](shots/v21_1_comic.jpg)
+![Dönüşüm ve FLIX](shots/v21_2_comic.jpg)
+![Menü](shots/v21_3_menu.jpg)
+![POW](shots/v21_4_pow.jpg)
+![Kıyamet şehri](shots/v21_5_doom.jpg)
+
+---
+
 # ARKANA: FLIX ve Kıyamet Ordusu (v20, 2026-10-13)
 
 Ana kahraman artık Flix maskotu. Önceki sürüm (v19) `arkana-v19.html`.
