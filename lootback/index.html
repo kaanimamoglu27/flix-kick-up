@@ -369,6 +369,7 @@ save.own = save.own || {}; save.hskin = save.hskin || {}; save.cskin = save.cski
 
 /* ---------- layout: turn the game sideways when the phone stays portrait ---------- */
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+if (isTouch && !save.qv) { save.qv = 1; if (save.q === 'ultra') save.q = 'hi'; persist(); }
 let ROT = 0, rotPref = -90, rotManual = false, LW = innerWidth, LH = innerHeight, UI = 1;
 try { const v = localStorage.getItem('arkana_rot'); if (v) { rotPref = +v; rotManual = true; } } catch (e) {}
 function layout() {
@@ -612,7 +613,7 @@ function applyQuality() {
   // shadows: only switching them on or off needs the materials rebuilt (that is what used to cause the hitches)
   const hi = save.q !== 'fast';
   if (R.shQ !== save.q) { R.shQ = save.q; R.renderer.shadowMap.enabled = hi;
-    if (R.sun) { R.sun.castShadow = hi; const ms = save.q === 'ultra' ? 2048 : 1024; if (R.sun.shadow.mapSize.x !== ms) { R.sun.shadow.mapSize.set(ms, ms); if (R.sun.shadow.map) { R.sun.shadow.map.dispose(); R.sun.shadow.map = null; } } }
+    if (R.sun) { R.sun.castShadow = hi; const ms = save.q === 'ultra' && !isTouch ? 2048 : 1024; if (R.sun.shadow.mapSize.x !== ms) { R.sun.shadow.mapSize.set(ms, ms); if (R.sun.shadow.map) { R.sun.shadow.map.dispose(); R.sun.shadow.map = null; } } }
     scene_mats_update(); }
   R.renderer.shadowMap.needsUpdate = true;
 }
@@ -2065,7 +2066,7 @@ function navigate(e) {
 }
 function spawnBoss(B) {
   const [x, z] = spawnPos(15);
-  const hp = Math.round(B.hp * (1 + Math.floor(((G.mode === 'boss' ? G.wave * 10 : G.wave) - 1) / 50) * 1.6));
+  const hp = Math.round(B.hp * (1 + Math.floor(((G.mode === 'boss' ? G.wave * 10 : G.wave) - 1) / 50) * 1.6) * (G.mode === 'story' && !G.endless ? 1.2 : 1));
   const e = {type: 'boss', boss: B, kind: B.kind, x, z, vx: 0, vz: 0, hp, max: hp, r: B.r, dmg: 18, xp: 0, fly: B.kind === 'dragon' ? 1.6 : B.kind === 'shadow' ? 0.5 : 0, spd: B.spd || (B.kind === 'tyrant' ? 2.3 : 2.1), t: 0, flash: 0, slow: 0, cd: 3, st: 'chase', stT: 0, hitCd: {}, los: true, sz: 1};
   HQSEG = 22; e.g = buildBoss(B); HQSEG = 0; charPatch(e.g, 0.35); e.g.position.set(x, 0, z); R.scene.add(e.g);
   if (B.final) { e.phase = 1; e.dmg = 26; e.spd = B.spd || 2.5; e.cd = 2; G.slowT = 1.6; G.shake = 1.2; buzz(200); }
@@ -4575,7 +4576,7 @@ const COMICS = {
   ]}],
   p30: () => [{chapter: 'Patron 3', panels: [
     {p: [0, 0, 0.64, 0, 0.61, 1, 0, 1], art: CMA.golemRise, items: [['cap', 0.02, 0.03, 0.6, 'Seviye 30. Mezarlıktan dev bir el uzandı...'], ['cap', 0.02, 0.88, 0.62, 'DEV ZOMBİ topraktan yükseliyor!'], ['sfx', 0.78, 0.2, 'GÜÜÜM!', 62, 0.1, '#d0ffb0', '#3ab83a']]},
-    {p: [0.66, 0, 1, 0, 1, 1, 0.63, 1], art: CMA.flixRain, items: [['bub', 0.4, 0.16, 0.28, 0.4, 'Taş kalpli dev, Flix yağmuruna hazır mısın?', {size: 24, maxW: 230}]]}
+    {p: [0.66, 0, 1, 0, 1, 1, 0.63, 1], art: CMA.flixRain, items: [['bub', 0.4, 0.16, 0.28, 0.4, 'Koca zombi, Flix yağmuruna hazır mısın?', {size: 24, maxW: 230}]]}
   ]}],
   c30: () => [{chapter: 'Bölüm 4', panels: [
     {p: [0, 0, 0.45, 0, 0.42, 1, 0, 1], art: CMA.rubble, items: [['cap', 0.03, 0.03, 0.8, 'Dev Zombi toz oldu!'], ['sfx', 0.5, 0.85, 'KRAAK!', 76, 0.1]]},
@@ -4859,20 +4860,22 @@ function frame(now) {
     ctrlTick(); update(dt); updateHUD();
   } else if (G.state === 'epilogue') { dt = rdt; epilogueTick(rdt); }
   if (G.comicQ && G.state === 'play' && now > G.comicAt) { const k = G.comicQ; G.comicQ = null; comicShow(k, null, 'Devam ▶'); }
+  if (R.on && G.state === 'menu' && !R.bossWarm && now > 2500) { R.bossWarm = 1; warmUp(); }
   if (R.on && G.state === 'play' && G.time > 0.25 && R.warmKey !== LOOK.hero + ':' + LOOK.hs) runWarm();
   if (R.on && !CM.on) { render(dt, rdt); renderCivilians(dt); renderEscape(now / 1000); }
   doomTick(rdt);
   // keep it smooth: if the phone struggles in 2K, lower the pixel ratio step by step
   // 60 fps governor: drop the pixel ratio a notch when frames fall under ~52, win it back when there is headroom
-  if (save.q !== 'fast' && R.on && G.state === 'play') { fpsAcc += rdt; fpsN++; if (fpsAcc > 3) { const fps = fpsN / fpsAcc; R.fps = fps; fpsAcc = fpsN = 0; govTick(fps); } }
+  if (save.q !== 'fast' && R.on && G.state === 'play') { fpsAcc += rdt; fpsN++; if (fpsAcc > 1.5) { const fps = fpsN / fpsAcc; R.fps = fps; fpsAcc = fpsN = 0; govTick(fps); } }
 }
 let fpsAcc = 0, fpsN = 0;
-const PR_STEPS = [1, 0.86, 0.74, 0.63, 0.54];
+const PR_STEPS = [1, 0.86, 0.74, 0.63, 0.54, 0.46];
 function govTick(fps) {
   const g = R.gov || (R.gov = {i: 0, low: 0, high: 0, cool: 0, cap: 0, n: 0, upN: -9}); g.n++;
   if (fps < 50) { g.low++; g.high = 0; } else if (fps > 58.5) { g.high++; g.low = 0; } else g.low = g.high = 0;
   if (g.cool > 0) { g.cool--; return; }
-  if (g.low >= 2 && g.i < PR_STEPS.length - 1) { g.i++; if (g.n - g.upN <= 3) g.cap = g.i; g.low = 0; g.cool = 2; R.prScale = PR_STEPS[g.i]; applyRes(); }
+  if (g.low >= 3 && g.i >= PR_STEPS.length - 1 && !save.autoFast) { save.autoFast = 1; save.q = 'fast'; R.prScale = 1; R.gov = null; persist(); applyQuality(); qLabel(); toast('Akıcı oynanış için ⚡ Hızlı moda geçildi (Ayarlar\'dan değiştirebilirsin)'); return; }
+  if ((g.low >= 2 || fps < 38) && g.i < PR_STEPS.length - 1) { g.i++; if (g.n - g.upN <= 3) g.cap = g.i; g.low = 0; g.cool = 2; R.prScale = PR_STEPS[g.i]; applyRes(); }
   else if (g.high >= 4 && g.i > g.cap) { g.i--; g.high = 0; g.cool = 3; g.upN = g.n; R.prScale = PR_STEPS[g.i]; applyRes(); }
 }
 function qLabel() { const s = save.q === 'ultra' ? '✨ Ultra' : save.q === 'hi' ? '🎬 2K' : '⚡ Hızlı'; $('bQ').textContent = s; $('bQ2').textContent = s; }

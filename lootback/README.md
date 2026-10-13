@@ -1,3 +1,16 @@
+# ARKANA: Güçlü patronlar, akıcı açılış (v28, 2026-10-13)
+
+Önceki sürüm (v27) `arkana-v27.html`, kaynak `arkana10.html`.
+
+- Hikaye patronlarının canı %20 arttı. Test: oynayan bir bot VORTEKS'i 37 canla yendi, diğeri 31. seviyede öldü.
+- Akıcılık: telefon ve tablette varsayılan kalite 2K (Ultra hâlâ seçilebilir, eski kayıtlar bir kez 2K'ya alınır). Otomatik ayar 1,5 saniyede bir ölçüyor, ani düşüşte hemen çözünürlüğü indiriyor, en altta da yetmezse ⚡ Hızlı moda geçiyor. Telefonda gölge haritası 1024. Patronların hazırlığı oyun başında değil menüdeyken yapılıyor (sonsuz modun başındaki donma).
+- Patron tasarımları: `shots/v28_patronlar_3d.jpg` (oyundaki 3D modeller) ve `shots/v28_patronlar_cizgi.jpg` (çizgi roman halleri).
+
+![Patronlar 3D](shots/v28_patronlar_3d.jpg)
+![Patronlar çizgi roman](shots/v28_patronlar_cizgi.jpg)
+
+---
+
 # ARKANA: 4 patronlu zor hikaye (v27, 2026-10-13)
 
 Önceki sürüm (v26) `arkana-v26.html`, kaynak `arkana10.html`.
