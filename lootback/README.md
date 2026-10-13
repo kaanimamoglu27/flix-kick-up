@@ -1,3 +1,24 @@
+# ARKANA: Cehennem ve VORTEKS (v23, 2026-10-13)
+
+Önceki sürüm (v22) `arkana-v22.html`, kaynak `arkana8.html`.
+
+- Hikaye: giriş çizgi romanı her hikaye oyununda baştan gösterilir (önceden bir kez görünce atlanıyordu). 10, 20, 30, 40 ve 50. dalgaların sonunda patron ve ardından çizgi roman bölümü. 30'da geçmişe dönüş: şehrin eski kahramanı VORTEKS'i Kıyamet Lordu dev ekranla ele geçirmiş. 40'ta Kıyamet Lordu yıkılır ve VORTEKS ortaya çıkar. 50. dalganın son patronu VORTEKS: kara zırh, kırmızı vizör, tablet kalkanı; 3 faz (yelpaze ateş, hücum, sıçrama, kalkan, takviye düşmanlar). Yenilince kurtulur: "FLIX... Gözlerimi açtın. Teşekkürler!"
+- Mağaza: yeni "💰 Paketler" sekmesi ilk sırada. Altın + elmas paketleri 0,99 $'dan başlar (Mini, Başlangıç, Kahraman, Macera, Efsane, Godlike), ayrıca 2,99 $ "Reklamsız + VIP" (oyunda şu an reklam yok; VIP günlük hediyeyi 2 katına çıkarır). Menüdeki altın ve elmas kutularına basınca paketler açılır.
+- 3 yeni harita, oynanışı değiştirir: 🌋 Lav Vadisi (yerden lav fışkırır, düşmanları da yakar), 🧊 Buz Çağı (kaygan zemin, düşmanlar yavaş, düşen buz sarkıtları dondurur), 🏚️ Deprem Şehri (ara ara deprem, düşen taşlar, çok sayıda çatlak bina).
+- Kırılabilir binalar: altında sarı-siyah şerit ve duvarında çatlak olan binalar ateş, patlama, araba patlaması, atılma (💨) ve FLIX gücüyle yıkılır; çökünce altındaki sokaktaki düşmanları ezer, kristal, hazine ve can düşürür.
+- 😈 Cehennem modu: lav denizinin ortasında yuvarlak bazalt arena, 4 mangallı sütun. Gökten ateş topları yağar, ara ara lav kenardan taşar (ortaya koş), 5 dalgada bir patron, daha güçlü düşmanlar, 3 güç kartıyla başlar, ödül 1,6 kat. Akıllı bot 8 ile 28. dalga arasında düşüyor.
+- Ayarlar (⚙️, menüde ve molada): Analog, Dokunmatik (dokunduğun yere yürür, basılı tutarsan takip eder) veya Yön tuşları (sol altta 8 yönlü tuş takımı). Ses ve grafik de burada.
+- Güneşli Gün haritasındaki parlama düzeldi (her haritanın kendi parlama ayarı var).
+- Kasma düzeltmeleri: çözünürlük ayarı artık bütün malzemeleri yeniden derlemiyor ve sık sık ileri geri değişmiyor; şehir blokları kare başına bir tane kuruluyor; patron ve yardımcı kahramanların çizimi menüdeyken hazırlanıyor (ilk patron oyunu dondurmuyordu); gölgeler artık kahramanı her yerde takip ediyor.
+
+![Cehennem](shots/v23_1_cehennem.jpg)
+![Çatlak bina](shots/v23_2_catlak_bina.jpg)
+![Lav Vadisi](shots/v23_3_lav_vadisi.jpg)
+![Ayarlar](shots/v23_4_ayarlar.jpg)
+![Paketler](shots/v23_5_paketler.jpg)
+
+---
+
 # ARKANA: FLIX Takımı (v22, 2026-10-13)
 
 Hikaye 50 bölüm oldu, kahramanlar sadece FLIX karakterleri. Önceki sürüm (v21) `arkana-v21.html`, kaynak `arkana7.html`.
