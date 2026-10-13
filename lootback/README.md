@@ -1,3 +1,25 @@
+# ARKANA: FLIX Takımı (v22, 2026-10-13)
+
+Hikaye 50 bölüm oldu, kahramanlar sadece FLIX karakterleri. Önceki sürüm (v21) `arkana-v21.html`, kaynak `arkana7.html`.
+
+- Hikaye modu 50 dalga: her 10 dalgada patron ve çizgi roman bölümü, 50. dalgada Kıyamet Lordu: Son Form ile final savaşı, sonunda çocukların yeniden Flix oynadığı mutlu final (FLIX, KICK ve FLICK birlikte sevinir).
+- Zorluk her 10 dalgada bir basamak artar (hikaye ve sonsuz). Akıllı bot hikayeyi az canla bitiriyor, daire çizen bot 6-40. dalgalar arasında düşüyor.
+- Kahramanlar: FLIX, KICK (sarı damla başlı, kırmızı pelerinli, hızlı) ve FLICK (beyaz yuvarlak kafalı, neşeli, dayanıklı). VORTEKS, NOVA, TİTAN ve GÖLGE kalktı; eski kayıtta onları alanlara KICK/FLICK verilir.
+- Her kahramana 9 kostüm, nadirlik sırası Common, Rare, Epic, Legendary, Mythic, Godlike. Mythic 1.200 💎, Godlike 6.500 💎.
+- Ekonomi: altın + elmas. Elmas patronlardan, her 10 dalgadan, hikaye finalinden ve günlük hediyeden gelir; mağazada gerçek parayla elmas ve altın paketleri (web'de demo, gerçek ödeme App Store sürümünde).
+- Hikaye modunda nadiren açık olan diğer kahramanlardan biri gökten iner, 13 saniye yardım eder ve gider.
+- Sol altta yeni 3D karakter kartı: yüz portresi, can, hasar, hız, bekleme ve aktif boost.
+- Haritaya dağılan görünüm değiştiren 5 boost: Dev FLIX (9 sn), Uçuş (7 sn), Roket Ayakkabı, Altın Yıldız (5 sn dokunulmazlık), Mini FLIX. Kısa süreli, dengeyi bozmayacak güçte.
+- Daha pürüzsüz karakter modelleri, oyuncak plastiği ışıltısı, kenar ışığı; şehir duvarlarında yüksek çözünürlüklü tuğla, pencere, perde, klima ve kir izleri.
+- Mağaza ve menüde 3D kahraman portreleri, menüde kahraman seçici.
+
+![Menü](shots/v22_1_menu.jpg)
+![Kahramanlar](shots/v22_2_heroes.jpg)
+![Kostümler](shots/v22_3_skins.jpg)
+![Yardıma gelen FLICK](shots/v22_4_ally.jpg)
+
+---
+
 # ARKANA: FLIX ve Renksiz Şehir (v21, 2026-10-13)
 
 Hikaye modu artık çizgi roman. Önceki sürüm (v20) `arkana-v20.html`.
