@@ -145,8 +145,8 @@ html.rot .title{font-size:56px}
 .shopP{position:absolute;right:10px;top:10px;bottom:10px;width:min(580px,62%);background:rgba(255,255,255,.95);border-radius:24px;padding:10px 12px 0;display:flex;flex-direction:column;box-shadow:0 8px 0 rgba(42,35,80,.25),0 16px 40px rgba(20,10,60,.35)}
 .shopH{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:0 4px}
 .shopH b{font-size:22px}
-#shopTabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 6px;flex:none;scrollbar-width:none}
-#shopTabs button{border:0;border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;background:#efeaff;white-space:nowrap;flex:none}
+#shopTabs{display:flex;flex-wrap:wrap;gap:5px;padding:8px 0 6px;flex:none}
+#shopTabs button{border:0;border-radius:999px;padding:6px 11px;font-weight:700;font-size:13px;background:#efeaff;white-space:nowrap;flex:none}
 #shopTabs button.on{background:var(--yellow);box-shadow:0 3px 0 var(--ink)}
 #shopTabs button.gt{background:linear-gradient(180deg,#ff8fc8,#ff4f9a);color:#fff}#shopTabs button.gt.on{background:var(--yellow);color:inherit}
 .wallet .pill{cursor:pointer}.wallet .pill::after{content:'+';display:inline-block;margin-left:6px;width:20px;height:20px;line-height:19px;text-align:center;border-radius:50%;background:var(--mint);font-size:15px;vertical-align:1px}
@@ -280,7 +280,7 @@ h2{font-family:Bangers,Fredoka,sans-serif;font-weight:400;letter-spacing:2px;col
   <section class="screen" id="shop">
     <div class="shopP">
       <div class="shopH"><b id="shopTitle">Kahramanlar</b><div class="wallet"><span class="coins pill">🪙 0</span><span class="gems pill">💎 0</span></div></div>
-      <div id="shopTabs"><button data-t="gold" class="gt">💰 Paketler</button><button data-t="hero">🦸 Kahraman</button><button data-t="skin">🎨 Kostüm</button><button data-t="comp">🐾 Arkadaş</button><button data-t="cskin">✨ Arkadaş kostümü</button><button data-t="map">🗺️ Harita</button></div>
+      <div id="shopTabs"><button data-t="gold" class="gt">💰 Paketler</button><button data-t="map">🗺️ Haritalar</button><button data-t="hero">🦸 Kahraman</button><button data-t="skin">🎨 Kostüm</button><button data-t="comp">🐾 Arkadaş</button><button data-t="cskin">✨ Arkadaş kostümü</button></div>
       <div id="shopGrid"></div>
     </div>
     <p class="shopHint">Kartlara dokun: üstünde dene. Düğmeye bas: satın al veya seç.</p>
@@ -369,21 +369,23 @@ save.own = save.own || {}; save.hskin = save.hskin || {}; save.cskin = save.cski
 
 /* ---------- layout: turn the game sideways when the phone stays portrait ---------- */
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
-let ROT = 0, rotPref = -90, rotManual = false, LW = innerWidth, LH = innerHeight;
+let ROT = 0, rotPref = -90, rotManual = false, LW = innerWidth, LH = innerHeight, UI = 1;
 try { const v = localStorage.getItem('arkana_rot'); if (v) { rotPref = +v; rotManual = true; } } catch (e) {}
 function layout() {
   ROT = isTouch && innerHeight > innerWidth ? rotPref : 0;
-  LW = ROT ? innerHeight : innerWidth; LH = ROT ? innerWidth : innerHeight;
-  const w = $('wrap'); w.style.width = LW + 'px'; w.style.height = LH + 'px';
-  w.style.transform = ROT === 90 ? `translate(${innerWidth}px,0) rotate(90deg)` : ROT === -90 ? `translate(0,${innerHeight}px) rotate(-90deg)` : 'none';
+  const W = ROT ? innerHeight : innerWidth, H = ROT ? innerWidth : innerHeight;
+  // tablets (iPad): the whole game is laid out at phone size and scaled up, so buttons, text and characters stay big
+  UI = isTouch ? clamp(Math.min(W, H) / 430, 1, 1.8) : 1; LW = W / UI; LH = H / UI;
+  const w = $('wrap'); w.style.width = LW + 'px'; w.style.height = LH + 'px'; const sc = UI !== 1 ? ` scale(${UI})` : '';
+  w.style.transform = (ROT === 90 ? `translate(${innerWidth}px,0) rotate(90deg)` : ROT === -90 ? `translate(0,${innerHeight}px) rotate(-90deg)` : '') + sc || 'none';
   document.documentElement.classList.toggle('rot', !!ROT);
   resizeGL();
 }
 function lpt(e) {
   const x = e.clientX, y = e.clientY;
-  if (ROT === 90) return {x: y, y: innerWidth - x};
-  if (ROT === -90) return {x: innerHeight - y, y: x};
-  return {x, y};
+  if (ROT === 90) return {x: y / UI, y: (innerWidth - x) / UI};
+  if (ROT === -90) return {x: (innerHeight - y) / UI, y: x / UI};
+  return {x: x / UI, y: y / UI};
 }
 function setRot(r, manual) {
   if (r === rotPref) return; rotPref = r;
@@ -444,6 +446,9 @@ const SFX = {
   flixPick: (g) => { [784, 1046, 1318, g ? 1568 : 0].forEach((f, i) => f && tone('triangle', f, f * 1.01, 0.12, 0.07, i * 0.05)); },
   combo: () => { [660, 880, 1100].forEach((f, i) => tone('square', f, f * 1.5, 0.08, 0.04, i * 0.04)); },
   laser: () => tone('sine', 1600, 700, 0.07, 0.03),
+  toss: () => { noise(0.07, 0.03, 2600); tone('sine', 520, 980, 0.07, 0.02); },
+  whip: () => { noise(0.05, 0.08, 5200); tone('square', 2600, 700, 0.05, 0.03); },
+  beamOn: () => tone('sawtooth', 260, 1300, 0.22, 0.025),
   heal: () => [660, 880, 1100].forEach((f, i) => tone('sine', f, f, 0.12, 0.05, i * 0.06)),
   wave: () => [659, 880].forEach((f, i) => tone('triangle', f, f, 0.14, 0.06, i * 0.1))
 };
@@ -590,8 +595,9 @@ function setupPost() {
 }
 function applyRes() {
   // Ultra = the screen's full native resolution (capped at 4K pixels), 2K = sharp but lighter, Hızlı = no post effects
-  const hi = save.q !== 'fast', dpr = window.devicePixelRatio || 1, cap4k = Math.sqrt(3840 * 2160 / Math.max(1, LW * LH));
-  const pr = save.q === 'ultra' ? Math.min(3, dpr, cap4k) * (R.prScale || 1) : hi ? Math.min(2, dpr) * (R.prScale || 1) : Math.min(1.25, dpr);
+  // the 2K mode is capped at ~2.4 million pixels so a big iPad screen costs about the same as a phone
+  const hi = save.q !== 'fast', dpr = (window.devicePixelRatio || 1) * UI, px = Math.max(1, LW * LH), cap4k = Math.sqrt(3840 * 2160 / px), cap2k = Math.sqrt(2.4e6 / px);
+  const pr = save.q === 'ultra' ? Math.min(3 * UI, dpr, cap4k) * (R.prScale || 1) : hi ? Math.min(2 * UI, dpr, cap2k) * (R.prScale || 1) : Math.min(1.25 * UI, dpr, Math.sqrt(1.2e6 / px));
   if (pr === R.pr && R.resW === LW && R.resH === LH) return; R.pr = pr; R.resW = LW; R.resH = LH;
   R.renderer.setPixelRatio(pr); R.renderer.setSize(LW, LH, false);
   if (R.post) { R.post.setPixelRatio(pr); R.post.setSize(LW, LH); if (R.bloom) R.bloom.resolution.set(LW / 2, LH / 2); if (R.grade) R.grade.uniforms.uPx.value.set(1 / (LW * pr), 1 / (LH * pr)); }
@@ -1568,6 +1574,9 @@ const MAPS = {
   neon:  {n: 'Neon Gece', ic: '🌃', price: 1800, d: 'Gece yarısı, parlayan pencereler ve neon ışıklar.', sky: ['#02020a', '#0a0a2a', '#2a0a4a', '#5a1a7a'], fog: 0x0e0a24, hemi: [0x6a7aff, 0x2a0a3a, 0.5], amb: [0x4a3aaa, 0.25], sun: [0xff4fd8, 0.6], rim: [0x2fe8ff, 0.8], ground: 0xc0c0e0, win: 1.6},
   snow:  {n: 'Karlı Kış', ic: '❄️', price: 2500, d: 'Kar yağan sessiz bir kış akşamı.', sky: ['#5a6a8a', '#8a9ab8', '#c8d4e8', '#eef2f8'], fog: 0xc8d4e4, hemi: [0xe8f0ff, 0x8a94a8, 0.8], amb: [0xdde6ff, 0.25], sun: [0xfff0e0, 0.85], rim: [0xbfe0ff, 0.4], ground: 0xf0f4ff, win: 0.8, snow: 1},
   storm: {n: 'Kıyamet Fırtınası', ic: '⛈️', price: 3500, d: 'Kızıl gök, şimşekler ve kül yağmuru.', sky: ['#1a0404', '#4a0a0a', '#a0200a', '#ff6a1a'], fog: 0x3a0e0a, hemi: [0xff8a6a, 0x2a0a0a, 0.55], amb: [0x8a2a1a, 0.25], sun: [0xff5a2a, 1.1], rim: [0xff9a4a, 0.5], ground: 0xd8b0a0, win: 1.2, ash: 1, bolt: 1},
+  candy: {n: 'Şeker Şehir', ic: '🍭', price: 2200, d: 'Pembe pamuk şeker gökyüzü, pastel sokaklar.', sky: ['#ff8fc8', '#ffb3d9', '#ffd6ea', '#fff0f6'], fog: 0xffd0e6, hemi: [0xffe0f0, 0x8a5a7a, 0.62], amb: [0xffd6ea, 0.18], sun: [0xfff0f6, 0.95], rim: [0xb0e8ff, 0.35], ground: 0xffe6f2, win: 0.5, bloom: [0.18, 0.95]},
+  synth: {n: 'Retro Dalga', ic: '🌇', price: 2800, d: '80\'ler: mor gece, pembe güneş, neon çizgiler.', sky: ['#12002a', '#3a0a6a', '#b0208a', '#ff7a3a'], fog: 0x2a0a4a, hemi: [0xb07bff, 0x2a0a3a, 0.55], amb: [0x6a2aaa, 0.25], sun: [0xff5ab0, 0.85], rim: [0x2fe8ff, 0.9], ground: 0xd0b8f0, win: 1.8, bloom: [0.55, 0.85]},
+  gold:  {n: 'Altın Saat', ic: '🌅', price: 2000, d: 'Akşamüstü altın ışık, uzun gölgeler.', sky: ['#3a2a5a', '#c86a3a', '#ffb347', '#ffe0a0'], fog: 0xd8a070, hemi: [0xffe0b0, 0x5a4030, 0.6], amb: [0xffd090, 0.18], sun: [0xffc070, 1.05], rim: [0xffe0a0, 0.4], ground: 0xf0e0d0, win: 0.6, bloom: [0.22, 0.94]},
   lava:  {n: 'Lav Vadisi', ic: '🌋', price: 4000, mod: 'lava', d: 'Oynanış: yerden lav fışkırır, sen de düşmanlar da yanarsın. Sürüyü lavın üstüne çek!', tip: 'Yerden lav fışkırıyor! Turuncu halkadan kaç, düşmanları içine çek.', sky: ['#1a0602', '#4a1206', '#a8340a', '#ff8a2a'], fog: 0x3a1408, hemi: [0xffa070, 0x2a0a04, 0.6], amb: [0x7a2a10, 0.25], sun: [0xff7a3a, 1.0], rim: [0xffa040, 0.55], ground: 0xc89080, win: 1.1, ash: 1, bloom: [0.6, 0.86]},
   ice:   {n: 'Buz Çağı', ic: '🧊', price: 4500, mod: 'ice', d: 'Oynanış: yer kaygan, kayarak durursun. Soğuk düşmanları yavaşlatır, tepeden buz sarkıtları düşer ve donduru.', tip: 'Yer buz gibi kaygan! Buz sarkıtları düşüyor, altında kalan donar.', sky: ['#3a5a8a', '#7aa0c8', '#b8d6ec', '#e0f0fa'], fog: 0xbcd6ea, hemi: [0xe0f0ff, 0x7a90b0, 0.7], amb: [0xd0e8ff, 0.18], sun: [0xe8f4ff, 0.75], rim: [0xa0d8ff, 0.5], ground: 0xeaf6ff, win: 0.5, snow: 1, bloom: [0.16, 0.97]},
   quake: {n: 'Deprem Şehri', ic: '🏚️', price: 5000, mod: 'quake', d: 'Oynanış: ara ara deprem olur, taşlar düşer, çatlak binalar çöker ve altındakileri ezer. Kırılabilir bina çok!', tip: 'Deprem bölgesi! Çatlak binaları yık, düşen taşlara dikkat.', sky: ['#2a2420', '#5a4a3a', '#9a8064', '#d8b890'], fog: 0x6a5a48, hemi: [0xf0d8b0, 0x4a3a2a, 0.6], amb: [0x8a7a6a, 0.22], sun: [0xffd8a0, 0.95], rim: [0xd8c0a0, 0.35], ground: 0xd0c0a8, win: 0.6, dust: 1, bloom: [0.3, 0.94]}
@@ -1675,7 +1684,7 @@ function shopDraw() {
   if (T === 'skin') { const H = HEROES[P.hero]; H.skins.forEach((s, i) => { const owned = i === 0 || own('hs', P.hero + ':' + i), r = rarOf(s); jobs.push({id: P.hero, si: i, a: 'hs:' + i}); html += card(Object.assign({a: 'hs:' + i, ic: thumbIc(P.hero, i, H.ic), n: s.n, d: s.d || (s.fx ? (s.fx === 'godlike' ? 'Gökkuşağı zırh, hale, ışık küreleri' : 'Parlayan zırh, ışık küreleri') : H.n + ' kostümü'), r, sel: save.hero === P.hero && heroSkin(P.hero) === i, pv: P.hs === i, bg: swatch(s)}, state(owned, save.hero === P.hero && heroSkin(P.hero) === i, s.price, s.gem))); }); }
   if (T === 'comp') for (const k in COMP) { const C = COMP[k]; html += card(Object.assign({a: 'comp:' + k, ic: C.ic, n: C.n, d: C.d[0], sel: save.comp === k, pv: P.comp === k, bg: swatch(C.skins[0], 1)}, state(C.price === 0 || own('c', k), save.comp === k, C.price))); }
   if (T === 'cskin') { const C = COMP[P.comp]; C.skins.forEach((s, i) => { const owned = i === 0 || own('cs', P.comp + ':' + i); html += card(Object.assign({a: 'cs:' + i, ic: C.ic, n: s.n, d: s.fx ? 'Parlayan gövde, ışık küreleri' : C.n + ' kostümü', r: rarOf(s, 1), sel: save.comp === P.comp && compSkin(P.comp) === i, pv: P.cs === i, bg: swatch(s, 1)}, state(owned, save.comp === P.comp && compSkin(P.comp) === i, s.price, s.gem))); }); }
-  if (T === 'map') for (const k in MAPS) { const M = MAPS[k]; html += card(Object.assign({a: 'map:' + k, ic: M.ic, n: M.n, d: M.d, sel: save.map === k, pv: P.map === k, bg: `linear-gradient(180deg,${M.sky[0]},${M.sky[2]},${M.sky[3]})`}, state(M.price === 0 || own('m', k), save.map === k, M.price))); }
+  if (T === 'map') for (const k in MAPS) { const M = MAPS[k]; if (k === 'dusk') html += `<h4 class="sect">🎨 Kozmetik haritalar: gökyüzü, ışık, hava</h4>`; if (k === 'lava') html += `<h4 class="sect">🎮 Oynanışı değiştiren haritalar</h4>`; html += card(Object.assign({a: 'map:' + k, ic: M.ic, n: M.n, d: M.d, sel: save.map === k, pv: P.map === k, bg: `linear-gradient(180deg,${M.sky[0]},${M.sky[2]},${M.sky[3]})`}, state(M.price === 0 || own('m', k), save.map === k, M.price))); }
   if (T === 'gold') { let g0 = '';
     for (const p of PACKS) { if (p.g !== g0) { g0 = p.g; html += `<h4 class="sect">${{bundle: '🎁 Paketler: altın + elmas', vip: '🚫 Reklamsız', gem: '💎 Elmas paketleri', coin: '🪙 Altın paketleri'}[p.g]}</h4>`; } const done = p.once && own('iap', p.id); html += card({a: 'iap:' + p.id, ic: p.ic, n: p.n, d: p.tag || '', deal: p.g === 'bundle' || p.g === 'vip', val: done ? '' : p.val, btn: done ? '✓ Alındı' : ((window.FlixNative && FlixNative.price && FlixNative.price(p.id)) || p.price), cls: done ? 'ok' : 'iap', bg: p.g === 'gem' ? 'linear-gradient(180deg,#e0f4ff,#6fd3ff)' : p.g === 'bundle' ? 'linear-gradient(135deg,#ffd23f 0 50%,#6fd3ff 50%)' : p.g === 'vip' ? 'linear-gradient(180deg,#3a3070,#120d2a)' : 'linear-gradient(180deg,#fff3c4,#ffd23f)'}); }
     html += `<h4 class="sect">🔁 Elmas → Altın</h4>`; SWAPS.forEach((w, i) => { html += card({a: 'ex:' + i, ic: '🔁', n: '🪙 ' + fmtN(w.coins), d: '💎 ' + w.gems + ' karşılığı', btn: '💎 ' + w.gems, cls: (save.gems || 0) >= w.gems ? 'cost gem' : 'cost gem poor', bg: 'linear-gradient(135deg,#6fd3ff 0 50%,#ffd23f 50%)'}); });
@@ -1870,7 +1879,7 @@ const BOSSES = {
   20: {kind: 'dragon', name: 'Kemik Ejderha',  hp: 2800,  r: 2.0, col: 0xb3a587},
   30: {kind: 'golem',  name: 'Mezar Devi',     hp: 6000,  r: 2.3, col: 0xa89c86},
   40: {kind: 'tyrant', name: 'Kıyamet Lordu',  hp: 10500, r: 2.4, col: 0x3a3f4c},
-  50: {kind: 'vortex', name: 'VORTEKS', sub: 'Ekranın ele geçirdiği eski kahraman!', hp: 19000, r: 2.4, col: 0x2b2638, final: true, spd: 3.1}
+  50: {kind: 'vortex', name: 'VORTEKS', sub: 'Ekranın ele geçirdiği eski kahraman!', hp: 26000, r: 2.4, col: 0x2b2638, final: true, spd: 3.1}
 };
 // a boss guards every tenth wave; endless keeps cycling them, stronger each lap
 function bossFor(n) { return n % 10 ? null : BOSSES[((n / 10 - 1) % 5 + 1) * 10]; }
@@ -1901,7 +1910,13 @@ const WEAP = {
   swipe:  {ic: '💫', n: 'Meşale Savuruşu', d: ['Önündeki düşmanlara meşale savurur', 'Alan büyür', 'Hasar +12', 'Arkaya da savurur', 'Çok hızlı, yavaşlatır']},
   mine:   {ic: '💣', n: 'Flix Mayını', d: ['Arkana patlayan Flix mayını bırakır', '+1 mayın', 'Patlama büyür', 'Hasar +25, +2 mayın', 'Daha sık bırakır']},
   tornado: {ic: '🌪️', n: 'Kasırga', d: ['Düşmanları içine çeken kasırga', 'Daha uzun sürer', 'Hasar +5', 'İki kasırga', 'Dev kasırga']},
-  beam:   {ic: '🔦', n: 'Prizma Işını', d: ['Dönen gökkuşağı ışını', 'Daha uzun', 'Hasar +4', 'Daha uzun süre', 'İki ışın']}
+  beam:   {ic: '🔦', n: 'Prizma Işını', d: ['Dönen gökkuşağı ışını', 'Daha uzun', 'Hasar +4', 'Daha uzun süre', 'İki ışın']},
+  toss:   {ic: '🤾', n: 'Flix Atışı', d: ['Elinden en yakın düşmana Flix fırlatır (her kahraman bununla başlar)', 'Daha hızlı atış, hasar +5', 'Aynı anda 2 Flix', 'Hasar +8, isabet edince etrafa sıçrar', '3 Flix, çok hızlı']},
+  laser:  {ic: '🔴', n: 'Lazer Işını', d: ['Elinden düşmanları delip geçen lazer ışını', 'Daha uzun yanar', 'Hasar +4', 'Daha uzun menzil', 'İki lazer birden']},
+  fbomb:  {ic: '🧨', n: 'Flix Bombası', d: ['Elinden kalabalığa patlayan Flix bombası atar', '+1 bomba', 'Patlama büyür', '+1 bomba', 'Bomba üçe bölünür, hasar +30']},
+  whip:   {ic: '🪢', n: 'Flix Kırbacı', d: ['Önündeki sırayı şaklatan uzun kırbaç', 'Kırbaç uzar', 'Hasar +10', 'İki yana birden şaklatır', 'Çok hızlı, sersemletir']},
+  spear:  {ic: '🔱', n: 'Kristal Mızrak', d: ['Sırayı delip geçen kristal mızrak fırlatır', '+1 mızrak', 'Hasar +12', '+1 mızrak', 'Çok hızlı atış']},
+  turret: {ic: '🗼', n: 'Flix Kulesi', d: ['Yere, düşmanlara Flix atan bir kule kurar', 'Kule daha uzun kalır', 'İkinci kule', 'Hasar +6', 'Çok hızlı atış']}
 };
 const PASV = {
   magnet: {ic: '🧲', n: 'Mıknatıs Yüzük', d: 'Kristalleri daha uzaktan çeker (+40%)'},
@@ -1928,13 +1943,14 @@ function clearWorld() {
   for (const b of G.boosts || []) R.scene.remove(b.g); G.bst = null; allyGone(); G.allyIn = 0; for (const f of G.friends || []) R.scene.remove(f.rig.g); G.friends = null;
   for (const b of R.balls || []) b.visible = false; for (const h of R.hats || []) h.visible = false; for (const r of R.rings || []) r.visible = false; for (const t of R.tels || []) t.visible = false;
   if (R.aura) R.aura.visible = false; if (R.beam) R.beam.visible = false;
+  for (const k of ['tossF', 'bombF', 'turrF', 'lasers']) for (const o of R[k] || []) o.visible = false;
 }
 function newRun(mode) {
   clearWorld(); mode = MODES[mode] ? mode : G.mode || 'story';
   Object.assign(G, {
     state: 'play', time: 0, wave: 1, waveT: 0, kills: 0, level: 1, xp: 0, xpNext: 5, hp: curHero().hp, maxHp: curHero().hp, px: 0, pz: 0, fx: 0, fz: 1, inv: 0, flix: 0,
-    enemies: [], shots: [], eshots: [], gems: [], items: [], tels: [], zaps: [], pools: [], grab: 0, paid: 0, spawnT: 1, weps: Object.assign({[curHero().start]: 1}, curHero().start2 ? {[curHero().start2]: 1} : {}), pas: {}, ws: {}, pending: mode === 'boss' ? 4 : mode === 'hell' ? 3 : 0, boss: null, endless: mode === 'endless' || mode === 'hell', mode, picks: [], score: 0, combo: 0, comboT: 0, flixGot: 0, runCoins: 0, riftO: null, riftT: 35, riftsClosed: 0, huntT: 240, bestCombo: 0,
-    dmgMul: 1, hpBonus: 0, spdBonus: 0, cdBonus: 0, barr: [], fuses: [], carFires: [], traf: null, trafT: 12, dashT: 0, dashCd: 0, mines: [], torns: [], swipeFx: null, carsBlown: 0, comicQ: null, epiT: 0, finalT: 0, bossKills: 0, paidG: 0, boosts: [], bst: null, bstT: 20, trail: [],
+    enemies: [], shots: [], eshots: [], gems: [], items: [], tels: [], zaps: [], pools: [], grab: 0, paid: 0, spawnT: 1, weps: Object.assign({toss: 1, [curHero().start]: 1}, curHero().start2 ? {[curHero().start2]: 1} : {}), pas: {}, ws: {}, pending: mode === 'boss' ? 4 : mode === 'hell' ? 3 : 0, boss: null, endless: mode === 'endless' || mode === 'hell', mode, picks: [], score: 0, combo: 0, comboT: 0, flixGot: 0, runCoins: 0, riftO: null, riftT: 35, riftsClosed: 0, huntT: 240, bestCombo: 0,
+    dmgMul: 1, hpBonus: 0, spdBonus: 0, cdBonus: 0, barr: [], fuses: [], carFires: [], traf: null, trafT: 12, dashT: 0, dashCd: 0, mines: [], torns: [], swipeFx: null, carsBlown: 0, comicQ: null, toss: [], tq: [], bombs: [], whips: [], turrets: [], throwT: 0, aimT: 0, aimA: 0, epiT: 0, finalT: 0, bossKills: 0, paidG: 0, boosts: [], bst: null, bstT: 20, trail: [],
     shake: 0, kx: 0, kz: 0, ult: null, beamOn: 0, hitstop: 0, slowT: 0, ally: null, allyIn: 0, allyCd: 2, allyId: null, compL: 1, comp: {kind: save.comp, x: 1.2, z: -1, t: 0, cd: 1, fa: 0}
   });
   G.mapMod = mode === 'hell' ? null : (MAPS[save.map] && MAPS[save.map].mod) || null; G.haz = {t: G.mapMod === 'quake' ? 12 : 5, q: 0, r: 24, fl: null}; G.ivx = G.ivz = 0; G.bldDown = 0; G.brkTip = 0;
@@ -1952,7 +1968,7 @@ function startWave(n) {
   if ((n > 1 || G.mode !== 'boss') && !CITY.arena) spawnBarricades();
   if (G.mode === 'story' && n > 1) { doomZone(G.px, G.pz, 20 + n * 0.8); doomTarget((n - 1) / STORY_LEN * 0.6); }
   const d = G.def;
-  if (d.boss) { spawnBoss(d.boss); banner(d.boss.name + '!', d.boss.sub || 'Patron geldi!', 2.4); SFX.boss(); buzz(80); }
+  if (d.boss) { spawnBoss(d.boss); banner(d.boss.name + '!', d.boss.sub || 'Patron geldi!', 2.4); SFX.boss(); buzz(80); if (G.mode === 'story' && !G.endless && COMICS['p' + n]) { G.comicQ = 'p' + n; G.comicAt = performance.now() + 500; } }
   else if (d.intro && !G.endless) { const T = ET[d.intro[0]]; banner('Dalga ' + n + ': ' + T.n, d.intro[1], 3.4); if (n > 1) SFX.wave(); }
   else { banner('Dalga ' + n, d.label, 2); if (n > 1) SFX.wave(); }
   allyRoll(n);
@@ -2249,7 +2265,7 @@ function tickWeapons(dt) {
     }
     if (id === 'flix' && s.t <= 0) {
       s.t = (L >= 5 ? 1.8 : 2.4) * C; const n = L >= 3 ? 2 : 1, bounces = 3 + (L >= 2 ? 2 : 0) + (L >= 5 ? 3 : 0), dmg = 16 + (L >= 4 ? 12 : 0);
-      for (let i = 0; i < n; i++) { const t = nearest(G.px, G.pz, 15); const a = t ? Math.atan2(t.x - G.px, t.z - G.pz) + i * 0.6 : Math.random() * TAU; shoot({k: 'ball', x: G.px, z: G.pz, vx: Math.sin(a) * 13, vz: Math.cos(a) * 13, dmg, bounces, life: 4, y: 0.5, size: 0.45, pierce: 99, col: 0xffffff}); }
+      const hp0 = handPos(); for (let i = 0; i < n; i++) { const t = nearest(G.px, G.pz, 15); const a = t ? Math.atan2(t.x - G.px, t.z - G.pz) + i * 0.6 : Math.random() * TAU; if (!i) { aimAt(G.px + Math.sin(a), G.pz + Math.cos(a), 0.3); G.throwT = 0.3; } shoot({k: 'ball', x: hp0.x, z: hp0.z, vx: Math.sin(a) * 13, vz: Math.cos(a) * 13, dmg, bounces, life: 4, y: 0.5, size: 0.45, pierce: 99, col: 0xffffff}); }
     }
     if (id === 'stars') {
       const n = 2 + (L >= 2) + (L >= 4) + (L >= 5), rad = (L >= 3 ? 3.0 : 2.3) * A, sp = L >= 5 ? 3.6 : 2.7, dmg = 9 + L * 2;
@@ -2288,7 +2304,7 @@ function tickWeapons(dt) {
       const pool = G.enemies.filter(e => !e.dead && Math.abs(e.x - G.px) < 14 && Math.abs(e.z - G.pz) < 9);
       for (let i = 0; i < n; i++) { const e = pool.length ? pool[Math.floor(Math.random() * pool.length)] : null; const x = e ? e.x + rnd(-1, 1) : G.px + rnd(-8, 8), z = e ? e.z + rnd(-1, 1) : G.pz + rnd(-6, 6); addTel(x, z, rad, 0.7 + i * 0.12, 0xffd23f, {player: true, dmg, star: true}); }
     }
-    tickPowers2(id, L, s, A, C);
+    tickPowers2(id, L, s, A, C); tickPowers3(id, L, s, A, C);
     if (id === 'beam') {
       const len = (5 + (L >= 2 ? 1.5 : 0)) * A, on = L >= 4 ? 4 : 2.8, dmg = 6 + (L >= 3 ? 4 : 0), cyc = 6 * C;
       s.c = (s.c || 0) + dt; const active = (s.c % cyc) < on; s.on = active; s.len = len; s.ang = (s.ang || 0) + dt * 2.2; s.two = L >= 5;
@@ -2486,7 +2502,7 @@ function update(dt) {
   }
   G.items = G.items.filter(i => !i.got);
   boostTick(dt); allyTick(dt);
-  tickWeapons(dt); updatePowers2(dt);
+  tickWeapons(dt); updatePowers2(dt); updatePowers3(dt);
   for (const z of G.zaps) z.t -= dt; G.zaps = G.zaps.filter(z => z.t > 0);
   G.enemies = G.enemies.filter(e => !e.dead);
   // waves
@@ -2694,7 +2710,7 @@ function showCards() {
   let opts = cardOptions(); const pick = [];
   // favour new weapons early so every level brings something fresh
   const fresh = opts.filter(o => o.lv === 1 && o.type === 'w');
-  if (fresh.length && Object.keys(G.weps).length < 4) pick.push(fresh.splice(Math.floor(Math.random() * fresh.length), 1)[0]);
+  if (fresh.length && Object.keys(G.weps).length < 5) pick.push(fresh.splice(Math.floor(Math.random() * fresh.length), 1)[0]);
   opts = opts.filter(o => !pick.includes(o));
   while (pick.length < 3 && opts.length) pick.push(opts.splice(Math.floor(Math.random() * opts.length), 1)[0]);
   // when the build is full (or past level 25) the cards keep coming as endless power-ups
@@ -2821,7 +2837,7 @@ function render(dt, rdt) {
   const t = performance.now() / 1000, H = R.hero;
   // hero
   H.g.position.set(G.px || 0, 0, G.pz || 0); boostPose(H, t, rdt); skinFxTick(H, t); skinFxTick(R.comps[LOOK.comp], t);
-  if (G.state !== 'menu') { const fa = Math.atan2(G.fx || 0, G.fz || 1); let cur = H.g.rotation.y, da = fa - cur; while (da > Math.PI) da -= TAU; while (da < -Math.PI) da += TAU; H.g.rotation.y = cur + da * Math.min(1, rdt * 12); }
+  if (G.state !== 'menu') { const aim = G.aimT > 0 && G.state === 'play', fa = aim ? G.aimA : Math.atan2(G.fx || 0, G.fz || 1); let cur = H.g.rotation.y, da = fa - cur; while (da > Math.PI) da -= TAU; while (da < -Math.PI) da += TAU; H.g.rotation.y = cur + da * Math.min(1, rdt * (aim ? 22 : 12)); }
   const run = G.moving && G.state === 'play', ph = t * 10.5, s1 = Math.sin(ph);
   if (run) {
     H.legs[0].hip.rotation.x = s1 * 0.75; H.legs[1].hip.rotation.x = -s1 * 0.75;
@@ -2842,7 +2858,9 @@ function render(dt, rdt) {
   for (let c = 0; c < 2; c++) H.scarf[c].forEach((sg, i) => { sg.rotation.x = (i ? 0.1 : (run ? 1.0 : 0.18)) + Math.sin(t * (run ? 12 : 2.6) - i * 0.9 + c * 1.7) * (run ? 0.22 : 0.07); sg.rotation.z = (c ? 1 : -1) * 0.05 * i; });
   const oa = t * 2.3; H.orb.position.set(Math.cos(oa) * 0.72, 1.2 + Math.sin(t * 3.1) * 0.12, Math.sin(oa) * 0.72); H.ball.rotation.y += rdt * 5; H.ball.rotation.x += rdt * 2;
   H.halo.material.opacity = (cast ? 0.6 : 0.3) + Math.sin(t * 4) * 0.08; H.core.scale.copy(H.coreS).multiplyScalar(1 + Math.sin(t * 5) * 0.12);
-  if (H.kind === 'flix') { if (cast) { H.arms[1].sh.rotation.set(-1.7, 0, -0.2); H.arms[1].el.rotation.x = -0.1; H.arms[0].sh.rotation.set(-0.9, 0, 0.5); } animFlix(H, t, rdt, run, cast); } else if (H.pal) animPal(H, t, rdt, run, cast);
+  const thr = G.throwT > 0 && G.state === 'play';
+  if (H.kind === 'flix') { if (cast) { H.arms[1].sh.rotation.set(-1.7, 0, -0.2); H.arms[1].el.rotation.x = -0.1; H.arms[0].sh.rotation.set(-0.9, 0, 0.5); } if (thr) throwPose(H); animFlix(H, t, rdt, run, cast || thr); } else if (H.pal) { animPal(H, t, rdt, run, cast); if (thr) throwPose(H); } else if (thr) throwPose(H);
+  if (H.arms[1] && H.arms[1].hand) { H.g.updateMatrixWorld(true); H.arms[1].hand.getWorldPosition(R.hv || (R.hv = new THREE.Vector3())); R.handP = {x: R.hv.x, y: R.hv.y, z: R.hv.z}; }
   allyRender(t, rdt); friendsRender(t, rdt);
   H.g.visible = !(G.inv > 0 && Math.floor(G.inv * 16) % 2 && G.state === 'play');
   if (G.state === 'dying' || G.state === 'over') { H.body.rotation.x = -Math.min(1.45, (G.dieT || 2) * 1.6); H.body.position.y = 0; }
@@ -2997,6 +3015,7 @@ function render(dt, rdt) {
   for (const s of G.shots) {
     if (s.k === 'ball' || s.k === 'ult') { const b = R.balls[bi++]; if (!b) continue; b.visible = true; b.position.set(s.x, s.k === 'ult' ? s.size : 0.55 + Math.abs(Math.sin(s.life * 8)) * 0.6, s.z); b.scale.setScalar(s.size * (s.k === 'ult' ? 1 : 1.25)); b.rotation.set(s.k === 'ult' ? 0 : Math.sin(s.life * 8) * 0.5, s.k === 'ult' ? Math.atan2(s.vx, s.vz) : b.rotation.y + rdt * 14, 0); continue; }
     if (s.k === 'hat') { const h = R.hats[hi++]; if (!h) continue; h.visible = true; h.position.set(s.x, 1.1, s.z); h.rotation.set(0.25, s.spin, 0); continue; }
+    if (s.k === 'spear') continue;
     orb(s.x, s.y, s.z, s.size, s.col, s.k === 'fire' ? 2.2 : 2);
   }
   for (; bi < R.balls.length; bi++) R.balls[bi].visible = false; for (; hi < R.hats.length; hi++) R.hats[hi].visible = false;
@@ -3181,7 +3200,7 @@ function mapTick(dt) {
 // hell runs ahead of the story: a gentle first minute, then it outpaces it fast (wave 12 plays like story 18, wave 30 like 42)
 function hellWave(n) { return n + 2 + Math.floor(n / 3); }
 function hellDef(d, n) {
-  d.hpMul *= 1.15; d.g = Math.ceil(d.g * 1.1); d.iv *= 0.95; d.intro = null;
+  d.hpMul *= 1.3; d.g = Math.ceil(d.g * 1.15); d.iv *= 0.95; d.intro = null;
   if (n % 5 === 0) { const B = BOSSES[[10, 20, 30, 40, 50][(n / 5 - 1) % 5]], lap = Math.floor((n / 5 - 1) / 5); d.boss = Object.assign({}, B, {hp: Math.round(B.hp * (0.75 + n * 0.02) * (1 + lap * 0.8)), sub: '😈 Cehennem patronu!'}); d.label = ''; }
   else { d.boss = null; d.label = d.label || 'Cehennem dalgası'; }
 }
@@ -3625,6 +3644,7 @@ function renderEscape(t) {
   for (; ti < R.torns.length; ti++) R.torns[ti].visible = false;
   const sw = G.swipeFx; R.swipe.visible = !!(sw && sw.t < 0.22);
   if (sw && sw.t < 0.22) { const k = sw.t / 0.22; R.swipe.position.set(G.px, 0.9, G.pz); R.swipe.scale.setScalar(sw.r * (0.6 + k * 0.5)); R.swipe.rotation.z = sw.a - Math.PI / 2 + (k - 0.5) * 1.2 * sw.dir; R.swipe.material.opacity = 0.9 * (1 - k); }
+  renderPowers3(t);
 }
 // the new powers: torch swipe, Flix mines, tornado
 function tickPowers2(id, L, s, A, C) {
@@ -3663,6 +3683,119 @@ function updatePowers2(dt) {
     for (let i = 0; i < 2; i++) { const a = Math.random() * TAU, rr2 = rnd(0.4, 1.6) * tn.size, y = rnd(0.2, 3.8) * tn.size; FX.parts.push({x: tn.x + Math.cos(a) * rr2, y, z: tn.z + Math.sin(a) * rr2, vx: -Math.sin(a) * 7, vy: 1.5, vz: Math.cos(a) * 7, life: 0.35, max: 0.35, sz: rnd(2, 4), col: Math.random() < 0.5 ? '200,220,240' : '120,110,100', ember: true, sq: true}); }
   }
   G.torns = G.torns.filter(t => t.t < t.life);
+}
+// ---- v24 powers: everything thrown leaves the hero's hand ----
+const FLIXC = [0xe22511, 0xffc20e, 0x3ee6b5, 0x7b5cff, 0xff6fb5, 0x3a8dff];
+function handPos() { const h = R.handP; return h && G.state !== 'menu' && Math.hypot(h.x - G.px, h.z - G.pz) < 2 ? h : {x: G.px, y: 1.6, z: G.pz}; }
+function aimAt(x, z, dur) { G.aimA = Math.atan2(x - G.px, z - G.pz); G.aimT = Math.max(G.aimT || 0, dur || 0.3); }
+function throwAt(x, z, kind, o) { aimAt(x, z, 0.32); G.throwT = 0.3; G.tq.push(Object.assign({d: 0.1, kind, x, z}, o)); }
+function throwPose(H) {
+  const k = clamp(1 - G.throwT / 0.3, 0, 1), a = H.arms[1]; if (!a) return;
+  // wind up over the shoulder, then whip the arm forward
+  const x = k < 0.33 ? -0.6 - (k / 0.33) * 2.3 : -2.9 + ((k - 0.33) / 0.67) * 2.5;
+  a.sh.rotation.set(x, 0, -0.3); a.el.rotation.x = k < 0.33 ? -1.3 : -0.25;
+}
+function bestCluster(r) { // a random enemy near the hero that has the most friends around it
+  let best = null, bn = -1; const pool = G.enemies.filter(e => !e.dead && !e.under && Math.abs(e.x - G.px) < r && Math.abs(e.z - G.pz) < r);
+  for (let i = 0; i < Math.min(6, pool.length); i++) { const e = pool[Math.floor(Math.random() * pool.length)]; let n = 0; query(e.x, e.z, 2.4, () => n++); if (n > bn) { bn = n; best = e; } }
+  return best;
+}
+function tickPowers3(id, L, s, A, C) {
+  if (id === 'toss' && s.t <= 0) {
+    s.t = (L >= 5 ? 0.5 : L >= 2 ? 0.75 : 0.95) * C; const n = 1 + (L >= 3) + (L >= 5), dmg = 10 + (L >= 2 ? 4 : 0) + (L >= 4 ? 7 : 0), used = new Set();
+    for (let i = 0; i < n; i++) { const t = nearest(G.px, G.pz, 13, used); if (!t) break; used.add(t); throwAt(t.x, t.z, 'toss', {tg: t, dmg, splash: L >= 4, d: 0.1 + i * 0.07}); }
+  }
+  if (id === 'laser') {
+    const dur = L >= 2 ? 1.5 : 1.0, len = (11 + (L >= 4 ? 4 : 0)) * A, dmg = 7 + (L >= 3 ? 4 : 0);
+    s.b = s.b || []; s.len = len;
+    if (s.t <= 0) { const t = nearest(G.px, G.pz, len); if (t) { s.t = (L >= 5 ? 2.6 : 3.2) * C; s.on = dur; s.tick = 0; s.b = [{tg: t, a: Math.atan2(t.x - G.px, t.z - G.pz)}]; if (L >= 5) { const t2 = nearest(G.px, G.pz, len, new Set([t])); if (t2) s.b.push({tg: t2, a: Math.atan2(t2.x - G.px, t2.z - G.pz)}); } SFX.beamOn(); } else s.t = 0.3; }
+    if (s.on > 0) { const dt = G.lastDt || 0.016; s.on -= dt; s.tick -= dt; G.castT = Math.max(G.castT, 0.06);
+      for (const b of s.b) { if (!b.tg || b.tg.dead) b.tg = nearest(G.px, G.pz, len); if (b.tg) { let da = Math.atan2(b.tg.x - G.px, b.tg.z - G.pz) - b.a; da = Math.atan2(Math.sin(da), Math.cos(da)); b.a += clamp(da, -3.2 * dt, 3.2 * dt); } }
+      aimAt(G.px + Math.sin(s.b[0].a), G.pz + Math.cos(s.b[0].a), 0.1);
+      if (s.tick <= 0) { s.tick = 0.1; for (const b of s.b) { const ca = Math.sin(b.a), sa = Math.cos(b.a); let end = len;
+          for (let d = 1; d < len; d += 0.7) if (solidPt(G.px + ca * d, G.pz + sa * d)) { end = d; bldDamage(G.px + ca * (d + 0.4), G.pz + sa * (d + 0.4), dmg * 1.5); break; }
+          b.end = end; for (const e of G.enemies) { if (e.dead) continue; const dx = e.x - G.px, dz = e.z - G.pz, along = dx * ca + dz * sa; if (along < 0 || along > end + e.r) continue; if (Math.abs(dx * sa - dz * ca) < 0.45 + e.r) hit(e, dmg, '255,90,90', 0.6, dx, dz); } } } }
+  }
+  if (id === 'fbomb' && s.t <= 0) {
+    s.t = (L >= 5 ? 2.2 : 2.7) * C; const n = 1 + (L >= 2) + (L >= 4), r = (2.4 + (L >= 3 ? 0.8 : 0)) * A, dmg = 42 + (L >= 5 ? 30 : 0);
+    for (let i = 0; i < n; i++) { const t = bestCluster(12); if (!t) break; throwAt(t.x + rnd(-1, 1), t.z + rnd(-1, 1), 'bomb', {r, dmg, split: L >= 5, d: 0.1 + i * 0.12}); }
+  }
+  if (id === 'whip' && s.t <= 0) {
+    s.t = (L >= 5 ? 0.8 : 1.25) * C; const len = (4.2 + (L >= 2 ? 1.2 : 0)) * A, dmg = 20 + (L >= 3 ? 10 : 0);
+    const t = nearest(G.px, G.pz, len + 1.5), a = t ? Math.atan2(t.x - G.px, t.z - G.pz) : Math.atan2(G.fx, G.fz);
+    G.whipSide = -(G.whipSide || 1);
+    for (const aa of L >= 4 ? [a, a + Math.PI] : [a]) { const ca = Math.sin(aa), sa = Math.cos(aa);
+      query(G.px + ca * len / 2, G.pz + sa * len / 2, len / 2 + 1, e => { const dx = e.x - G.px, dz = e.z - G.pz, along = dx * ca + dz * sa; if (along < -0.3 || along > len + e.r) return; const bend = Math.sin(Math.min(1, along / len) * Math.PI) * 0.9 * G.whipSide; if (Math.abs(dx * sa - dz * ca - bend) < 0.8 + e.r) { hit(e, dmg, '255,194,14', 7, dx, dz); if (L >= 5 && e.type !== 'boss' && Math.random() < 0.3) { e.st = 'stun'; e.stT = 0.8; } } });
+      bldDamage(G.px + ca * len, G.pz + sa * len, dmg); G.whips.push({a: aa, len, t: 0, side: G.whipSide}); }
+    aimAt(G.px + Math.sin(a), G.pz + Math.cos(a), 0.3); G.throwT = 0.3; SFX.whip();
+  }
+  if (id === 'spear' && s.t <= 0) {
+    s.t = (L >= 5 ? 0.85 : 1.4) * C; const n = 1 + (L >= 2) + (L >= 4), dmg = 26 + (L >= 3 ? 12 : 0);
+    const t = nearest(G.px, G.pz, 15); const a = t ? Math.atan2(t.x - G.px, t.z - G.pz) : Math.atan2(G.fx, G.fz);
+    throwAt(G.px + Math.sin(a) * 5, G.pz + Math.cos(a) * 5, 'spear', {a, n, dmg});
+  }
+  if (id === 'turret' && s.t <= 0) {
+    s.t = 3 * C; const max = L >= 3 ? 2 : 1;
+    if (G.turrets.length < max) { for (let k = 0; k < 8; k++) { const a = Math.random() * TAU, x = G.px + Math.cos(a) * 2.2, z = G.pz + Math.sin(a) * 2.2; if (!solidPt(x, z)) { G.turrets.push({x, z, t: 0, life: L >= 2 ? 13 : 9, cd: 0.6, rate: L >= 5 ? 0.38 : 0.6, dmg: 10 + (L >= 4 ? 6 : 0), fa: 0, kick: 0}); confetti(x, 0.5, z, 10, 0.8); SFX.card(); break; } } }
+  }
+}
+function tossFrom(p, tg, x, z, dmg, splash, col) {
+  const d = Math.hypot(x - p.x, z - p.z); G.toss.push({x0: p.x, y0: p.y, z0: p.z, x: p.x, y: p.y, z: p.z, tx: x, tz: z, tg, t: 0, dur: clamp(d / 17, 0.22, 0.75), arc: 0.6 + d * 0.07, dmg, splash, col: col == null ? Math.floor(Math.random() * 6) : col, spin: rnd(0, 6)});
+}
+function updatePowers3(dt) {
+  G.lastDt = dt; G.throwT = Math.max(0, G.throwT - dt); G.aimT = Math.max(0, G.aimT - dt);
+  // throws wait for the arm to come over the shoulder
+  for (const q of G.tq) { q.d -= dt; if (q.d > 0) continue; q.done = true; const p = handPos();
+    if (q.kind === 'toss') { const tg = q.tg && !q.tg.dead ? q.tg : null; tossFrom(p, tg, tg ? tg.x : q.x, tg ? tg.z : q.z, q.dmg, q.splash); SFX.toss(); }
+    else if (q.kind === 'bomb') { const d = Math.hypot(q.x - p.x, q.z - p.z), dur = clamp(d / 11, 0.45, 0.9); G.bombs.push({x0: p.x, y0: p.y, z0: p.z, x: p.x, y: p.y, z: p.z, tx: q.x, tz: q.z, t: 0, dur, r: q.r, dmg: q.dmg, split: q.split}); addTel(q.x, q.z, q.r, dur, 0xff6a3a, {dmg: 0}); SFX.toss(); }
+    else if (q.kind === 'spear') { for (let i = 0; i < q.n; i++) { const a = q.a + (i - (q.n - 1) / 2) * 0.16; shoot({k: 'spear', x: p.x, z: p.z, vx: Math.sin(a) * 24, vz: Math.cos(a) * 24, dmg: q.dmg, life: 0.8, pierce: 999, size: 0.55, y: 1.35, col: 0x9fe8ff, hc: '159,232,255'}); } SFX.toss(); }
+  }
+  G.tq = G.tq.filter(q => !q.done);
+  for (const f of G.toss) { f.t += dt; if (f.tg && !f.tg.dead) { f.tx = f.tg.x; f.tz = f.tg.z; }
+    const k = Math.min(1, f.t / f.dur); f.x = f.x0 + (f.tx - f.x0) * k; f.z = f.z0 + (f.tz - f.z0) * k; f.y = f.y0 + (0.8 - f.y0) * k + f.arc * 4 * k * (1 - k); f.spin += dt * 16; if (Math.random() < 0.6) sparkle(f.x, f.y, f.z, '255,210,63', 1);
+    if (k >= 1) { f.done = true; let e = f.tg && !f.tg.dead && Math.hypot(f.tg.x - f.x, f.tg.z - f.z) < f.tg.r + 1 ? f.tg : null;
+      if (!e) query(f.x, f.z, 1.1, o => { if (!e) e = o; });
+      if (e) { hit(e, f.dmg, '226,37,17', 4, e.x - G.px, e.z - G.pz, true); confetti(f.x, 1, f.z, 4, 0.6); }
+      if (f.splash) query(f.x, f.z, 1.6, o => { if (o !== e) hit(o, f.dmg * 0.5, '226,37,17', 2, o.x - f.x, o.z - f.z); });
+      if (!e && solidPt(f.x, f.z)) bldDamage(f.x, f.z, f.dmg); } }
+  G.toss = G.toss.filter(f => !f.done);
+  for (const b of G.bombs) { b.t += dt; const k = Math.min(1, b.t / b.dur); b.x = b.x0 + (b.tx - b.x0) * k; b.z = b.z0 + (b.tz - b.z0) * k; b.y = b.y0 + (0.4 - b.y0) * k + 3.2 * 4 * k * (1 - k);
+    if (k >= 1) { b.done = true; boom(b.x, b.z, b.r, b.dmg); G.shake = Math.max(G.shake, 0.3); confetti(b.x, 0.6, b.z, 14, 1.2);
+      if (b.split) for (let i = 0; i < 3; i++) { const a = i * TAU / 3 + rnd(0, 1), x = b.x + Math.cos(a) * b.r, z = b.z + Math.sin(a) * b.r; addTel(x, z, b.r * 0.6, 0.35 + i * 0.08, 0xffd23f, {player: true, dmg: b.dmg * 0.6}); } } }
+  G.bombs = G.bombs.filter(b => !b.done);
+  for (const w of G.whips) w.t += dt; G.whips = G.whips.filter(w => w.t < 0.3);
+  for (const tr of G.turrets) { tr.t += dt; tr.cd -= dt; tr.kick = Math.max(0, tr.kick - dt * 4);
+    if (tr.cd <= 0) { const e = nearest(tr.x, tr.z, 10); if (e) { tr.cd = tr.rate; tr.fa = Math.atan2(e.x - tr.x, e.z - tr.z); tr.kick = 1; tossFrom({x: tr.x, y: 2.1, z: tr.z}, e, e.x, e.z, tr.dmg, false); } else tr.cd = 0.2; } }
+  G.turrets = G.turrets.filter(tr => tr.t < tr.life);
+}
+function renderPowers3(t) {
+  if (!R.tossF) {
+    R.tossF = []; for (let i = 0; i < 24; i++) { const m = makeFlixFig(FLIXC[i % 6]); m.visible = false; R.scene.add(m); R.tossF.push(m); }
+    R.bombF = []; for (let i = 0; i < 6; i++) { const m = makeFlixFig(0x2a2a3a); const f = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 8), addGlow(0xffa040, 0.95)); f.position.y = 0.75; m.add(f); m.userData.f = f; m.visible = false; R.scene.add(m); R.bombF.push(m); }
+    R.turrF = []; for (let i = 0; i < 2; i++) { const g = new THREE.Group(); const b = mesh(new THREE.CylinderGeometry(0.55, 0.75, 1.3, 16), toon(0x0a2a5e)); b.position.y = 0.65; g.add(b); const r = mesh(new THREE.TorusGeometry(0.62, 0.1, 8, 20), toon(0xffc20e)); r.rotation.x = Math.PI / 2; r.position.y = 1.3; g.add(r); const top = makeFlixFig(0xe22511); top.scale.setScalar(0.7); top.position.y = 2.0; g.add(top); g.userData.top = top; g.visible = false; R.scene.add(g); R.turrF.push(g); }
+    R.lasers = []; for (let i = 0; i < 2; i++) { const g = new THREE.Group(); const core = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 1).translate(0, 0, 0.5), addGlow(0xffffff, 1)); const out = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.42, 1).translate(0, 0, 0.5), addGlow(0xff2a3a, 0.5)); const tip = new THREE.Mesh(new THREE.SphereGeometry(0.45, 12, 10), addGlow(0xff6a6a, 0.7)); g.add(core, out, tip); g.userData = {core, out, tip}; g.visible = false; R.scene.add(g); R.lasers.push(g); }
+    R.whipSeg = inst(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshLambertMaterial({color: 0xffffff, emissive: 0x3a2000}), 64, true);
+    R.spear = inst(new THREE.ConeGeometry(0.16, 1.6, 6).rotateX(Math.PI / 2), new THREE.MeshPhongMaterial({color: 0xbff4ff, emissive: 0x2a8ac0, shininess: 120}), 40);
+  }
+  const play = G.state !== 'menu';
+  let i = 0; for (const f of play ? G.toss : []) { const m = R.tossF[i++]; if (!m) break; m.visible = true; m.position.set(f.x, f.y, f.z); m.scale.setScalar(0.68); m.rotation.set(f.spin, f.spin * 0.6, 0); }
+  // a Flix shows up in the hand while the arm winds up
+  if (play && G.tq.length && G.tq.some(q => q.kind === 'toss') && R.handP && i < R.tossF.length) { const m = R.tossF[i++], h = R.handP; m.visible = true; m.position.set(h.x, h.y, h.z); m.scale.setScalar(0.34); m.rotation.set(0, t * 4, 0); }
+  for (; i < R.tossF.length; i++) R.tossF[i].visible = false;
+  i = 0; for (const b of play ? G.bombs : []) { const m = R.bombF[i++]; if (!m) break; m.visible = true; m.position.set(b.x, b.y, b.z); m.scale.setScalar(0.5); m.rotation.set(b.t * 9, b.t * 5, 0); m.userData.f.scale.setScalar(0.7 + Math.random() * 0.6); }
+  for (; i < R.bombF.length; i++) R.bombF[i].visible = false;
+  i = 0; for (const tr of play ? G.turrets : []) { const g = R.turrF[i++]; if (!g) break; g.visible = true; const sp = Math.min(1, tr.t * 4, (tr.life - tr.t) * 3); g.position.set(tr.x, 0, tr.z); g.scale.setScalar(sp); g.userData.top.rotation.y = tr.fa; g.userData.top.position.y = 2.0 + tr.kick * 0.25 + Math.sin(t * 4) * 0.06; }
+  for (; i < R.turrF.length; i++) R.turrF[i].visible = false;
+  const ls = G.ws && G.ws.laser, h = R.handP || {x: G.px, y: 1.5, z: G.pz};
+  R.lasers.forEach((g, j) => { const b = play && ls && ls.on > 0 && ls.b && ls.b[j]; g.visible = !!b; if (!b) return; const L = b.end || ls.len, ex = G.px + Math.sin(b.a) * L, ez = G.pz + Math.cos(b.a) * L, dx = ex - h.x, dy = 1.0 - h.y, dz = ez - h.z, d = Math.hypot(dx, dy, dz);
+    g.position.set(h.x, h.y, h.z); g.rotation.set(-Math.asin(dy / d), Math.atan2(dx, dz), 0, 'YXZ'); const fl = 1 + Math.sin(t * 60) * 0.15; g.userData.core.scale.set(fl, fl, d); g.userData.out.scale.set(fl, fl, d); g.userData.tip.position.set(0, 0, d); g.userData.tip.scale.setScalar(0.8 + Math.random() * 0.5); if (Math.random() < 0.5) sparkle(ex, 1, ez, '255,90,90', 1); });
+  let n = 0; for (const w of play ? G.whips : []) { const p = R.handP || {x: G.px, y: 1.4, z: G.pz}, k = w.t / 0.3, ext = Math.min(1, w.t / 0.1), ca = Math.sin(w.a), sa = Math.cos(w.a);
+    for (let s = 0; s < 32 && n < 64; s++) { const u = s / 31, along = u * w.len * ext, bend = Math.sin(u * Math.PI) * 0.9 * w.side * (1 - k * 0.6) + Math.sin(u * 9 - w.t * 40) * 0.12 * u, x = p.x + ca * along + sa * bend, z = p.z + sa * along - ca * bend, y = p.y + (1.0 - p.y) * u + Math.sin(u * Math.PI) * 0.3;
+      const sz = (1.7 - u * 0.9) * (1 - k * 0.5); setInst(R.whipSeg, n, x, y, z, sz, sz, sz); R.whipSeg.setColorAt(n, COL.setHex(u > 0.9 ? 0xfff36b : u < 0.12 ? 0x0a2a5e : 0xe22511)); n++; }
+    if (w.t > 0.08 && w.t - (G.lastDt || 0.016) <= 0.08) { const tx = p.x + ca * w.len, tz = p.z + sa * w.len; sparkle(tx, 1, tz, '255,243,107', 6); } }
+  R.whipSeg.count = n; R.whipSeg.instanceMatrix.needsUpdate = true; if (R.whipSeg.instanceColor) R.whipSeg.instanceColor.needsUpdate = true;
+  n = 0; for (const s of play ? G.shots : []) { if (s.k !== 'spear' || n >= 40) continue; setInst(R.spear, n++, s.x, s.y, s.z, 1, 1, 1, Math.atan2(s.vx, s.vz)); }
+  R.spear.count = n; R.spear.instanceMatrix.needsUpdate = true;
 }
 // lane warning for the runaway taxi, drawn on the 2D layer
 function drawEscape(x) {
@@ -3906,6 +4039,42 @@ function cmVortex(c, x, y, s, t, o) { // VORTEKS, the city's old armoured hero; 
   c.strokeStyle = INK; c.lineWidth = 15; c.stroke(); c.strokeStyle = VI; c.lineWidth = 8; c.shadowColor = VI; c.shadowBlur = 18 + Math.sin(t * 8) * 6; c.stroke(); c.shadowBlur = 0;
   c.restore();
 }
+function cmKing(c, x, y, s, t) { // the Skeleton King: cape, crown and sceptre; y = feet
+  c.save(); c.translate(x, y); c.scale(s, s); cmPoly(c, [-34, -146, 34, -146, 78, 0, -78, 0]); cmFill(c, '#5a1a7a', 5); cmDots(c, -78, -146, 156, 146, 'rgba(0,0,0,.5)', 0.4, 7); c.restore();
+  cmSkel(c, x, y, s, t, {eye: '#ff3a3a'});
+  c.save(); c.translate(x, y); c.scale(s, s);
+  cmPoly(c, [-27, -168, -32, -200, -16, -184, 0, -208, 16, -184, 32, -200, 27, -168]); cmFill(c, '#ffc20e', 4);
+  for (const k of [-14, 0, 14]) { cmEll(c, k, -177, 4, 4); c.fillStyle = '#e22511'; c.fill(); }
+  cmLimb(c, [70, -112, 84, 0], 6, '#c9a03a'); cmEll(c, 69, -124, 13, 13); c.fillStyle = '#3aa6ff'; c.shadowColor = '#4fd2ff'; c.shadowBlur = 18; c.fill(); c.shadowBlur = 0; c.strokeStyle = INK; c.lineWidth = 3; c.stroke();
+  c.restore();
+}
+function cmDragon(c, x, y, s, t) { // the Bone Dragon flying, body centre at x, y
+  c.save(); c.translate(x, y); c.scale(s, s); const bone = '#efe6cf', fl = Math.sin(t * 5) * 30;
+  for (const k of [-1, 1]) {
+    c.beginPath(); c.moveTo(k * 30, -20); c.lineTo(k * 230, -150 - fl); c.lineTo(k * 262, -40 - fl * 0.5); c.lineTo(k * 205, 0); c.lineTo(k * 160, -28); c.lineTo(k * 112, 30); c.closePath(); cmFill(c, 'rgba(90,40,120,.88)', 4);
+    cmLimb(c, [k * 30, -20, k * 230, -150 - fl], 10, bone); cmLimb(c, [k * 125, -82 - fl * 0.5, k * 262, -40 - fl * 0.5], 7, bone); cmLimb(c, [k * 125, -82 - fl * 0.5, k * 160, -28], 6, bone);
+  }
+  cmLimb(c, [0, 40, -40, 120, 20, 190, -10, 240], 10, bone);
+  cmEll(c, 0, 10, 60, 70); cmFill(c, '#2a1a3a', 4);
+  for (let i = 0; i < 5; i++) { c.beginPath(); c.ellipse(0, -30 + i * 18, 58 - i * 6, 10, 0, 0, Math.PI); c.strokeStyle = INK; c.lineWidth = 11; c.stroke(); c.strokeStyle = bone; c.lineWidth = 5; c.stroke(); }
+  cmLimb(c, [0, -50, 20, -110, 0, -150], 14, bone);
+  for (const k of [-1, 1]) { c.beginPath(); c.moveTo(-28 + k * 10, -198); c.quadraticCurveTo(-70 + k * 10, -250, -95 + k * 14, -242); c.quadraticCurveTo(-60, -225, -18 + k * 10, -192); c.closePath(); cmFill(c, '#d8ccb0', 3); }
+  c.beginPath(); c.moveTo(-50, -150); c.quadraticCurveTo(-40, -210, 10, -215); c.quadraticCurveTo(60, -210, 92, -170); c.lineTo(82, -140); c.quadraticCurveTo(20, -130, -50, -150); c.closePath(); cmFill(c, bone, 5);
+  for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(12 + i * 18, -141); c.lineTo(18 + i * 18, -124); c.lineTo(24 + i * 18, -141); c.closePath(); cmFill(c, '#fff', 2.5); }
+  cmEll(c, -4, -180, 14, 11); c.fillStyle = '#7dff6a'; c.shadowColor = '#7dff6a'; c.shadowBlur = 20; c.fill(); c.shadowBlur = 0;
+  c.restore();
+}
+function cmGolem(c, x, y, s, t) { // the Grave Giant, a pile of tombstones; y = feet
+  c.save(); c.translate(x, y); c.scale(s, s); const st = '#8a8478', dk = '#5a554c', gl = '#6aff8a';
+  for (const k of [-1, 1]) { c.beginPath(); c.rect(k * 42 - 28, -112, 56, 112); cmFill(c, dk, 5); }
+  for (const k of [-1, 1]) { cmLimb(c, [k * 100, -262, k * 168, -200, k * 182, -120], 40, dk); cmRR(c, k * 182 - 36, -132, 72, 92, 30); cmFill(c, '#a8a294', 5); c.beginPath(); c.moveTo(k * 182, -116); c.lineTo(k * 182, -70); c.moveTo(k * 166, -100); c.lineTo(k * 198, -100); c.strokeStyle = INK; c.lineWidth = 5; c.stroke(); }
+  cmRR(c, -112, -292, 224, 192, 30); cmFill(c, st, 6); cmDots(c, 20, -292, 92, 192, 'rgba(0,0,0,.5)', 0.4, 7);
+  c.strokeStyle = gl; c.lineWidth = 5; c.shadowColor = gl; c.shadowBlur = 16 + Math.sin(t * 6) * 6; c.beginPath(); c.moveTo(-60, -272); c.lineTo(-30, -222); c.lineTo(-52, -182); c.lineTo(-10, -132); c.moveTo(52, -262); c.lineTo(30, -202); c.lineTo(62, -152); c.stroke(); c.shadowBlur = 0;
+  c.beginPath(); c.moveTo(-62, -282); c.lineTo(-62, -360); c.arc(0, -360, 62, Math.PI, 0); c.lineTo(62, -282); c.closePath(); cmFill(c, '#a8a294', 6);
+  for (const k of [-1, 1]) { cmEll(c, k * 22, -342, 13, 9); c.fillStyle = gl; c.shadowColor = gl; c.shadowBlur = 20; c.fill(); c.shadowBlur = 0; }
+  c.beginPath(); c.moveTo(-30, -306); c.lineTo(30, -306); c.strokeStyle = INK; c.lineWidth = 6; c.stroke();
+  c.restore();
+}
 function cmSoul(c, x, y, s, t) { // a freed spirit: glowing dove
   c.save(); c.translate(x, y); c.scale(s, s); const f = Math.sin(t * 12 + x) * 0.6;
   c.shadowColor = '#bff4ff'; c.shadowBlur = 24; c.fillStyle = '#ffffff'; c.strokeStyle = '#3a6a8a'; c.lineWidth = 3;
@@ -3940,6 +4109,67 @@ function cmBubble(c, txt, x, y, tx, ty, o) { // speech bubble centred at x,y wit
 
 /* ---- panel art ---- */
 const CMA = {
+  kingRise(c, w, h, t) {
+    cmSky(c, w, h, '#3a1a5a', '#0a0414'); cmSpeed(c, w, h, w * 0.5, h * 0.4, 60, 'rgba(200,80,255,.25)', 201, 0.1);
+    cmCity(c, w, h * 0.8, 203, {cols: ['#2a2230', '#1e1824', '#33283a'], hMin: h * 0.15, hMax: h * 0.4, win: '#ff4a5a', lit: 0.2, bw: w / 10});
+    c.beginPath(); c.rect(-5, h * 0.86, w + 10, h); cmFill(c, '#2a2530', 5);
+    for (let i = 0; i < 7; i++) { const r = cmRand(i + 211); cmTablet(c, w * (0.36 + r() * 0.28), h * (0.93 - i * 0.035), w * 0.16, h * 0.08, (r() - 0.5) * 0.5, 18, (q, sw, sh) => { q.fillStyle = '#3aa6ff'; q.fillRect(0, 0, sw, sh); }); }
+    cmKing(c, w * 0.5, h * 0.72, h / 560, t);
+    for (let i = 0; i < 2; i++) cmPerson(c, w * (0.12 + i * 0.76), h * 1.0, h / 620, {pose: 'hunch', tablet: 1, zombie: 1, shirt: ['#5a6e8c', '#8c3b3b'][i], pants: '#2f3a52', flip: i}, t);
+  },
+  kingClose(c, w, h, t) {
+    cmSky(c, w, h, '#c81e14', '#3a0408'); cmSpeed(c, w, h, w * 0.5, h * 0.4, 80, 'rgba(255,200,80,.3)', 205, 0.1); cmDots(c, 0, 0, w, h, '#000', 0.3, 8);
+    cmKing(c, w * 0.46, h * 1.12, h / 250, t);
+  },
+  kidsFree(c, w, h, t) {
+    cmSky(c, w, h, '#ffd23f', '#ff8a3a'); cmSpeed(c, w, h, w * 0.5, h * 0.4, 50, 'rgba(255,255,255,.35)', 221, 0.12);
+    c.beginPath(); c.rect(-5, h * 0.8, w + 10, h); cmFill(c, '#6fdc6f', 5); cmDots(c, 0, h * 0.8, w, h, '#2a8a3a', 0.3, 8);
+    const s = h / 440; cmFlix(c, w * 0.28, h * 0.97, h / 640, {pose: 'cheer'}, t);
+    cmPerson(c, w * 0.66, h * 0.98, s * 0.95, {pose: 'throw', shirt: '#3a8dff', kid: 1, hair: '#111', skin: '#c88a5a', flip: 1}, t);
+    cmPerson(c, w * 0.86, h * 0.98, s * 0.9, {pose: 'cheer', shirt: '#ff5a6e', kid: 1, hair: '#c86a2a', toy: '#3ee6b5', flip: 1}, t);
+    ['#e22511', '#ffc20e', '#3ee6b5', '#7b5cff'].forEach((col, i) => { const k = ((t * 0.5 + i * 0.25) % 1), x = w * (0.62 - k * 0.3), y = h * (0.55 - Math.sin(k * Math.PI) * 0.3); cmFlixToy(c, x, y, h / 1000, col, t * 4 + i); });
+    for (let i = 0; i < 3; i++) cmSoul(c, w * (0.15 + i * 0.3), h * (0.14 + 0.04 * Math.sin(t * 2 + i)), 0.5, t + i);
+  },
+  flixRain(c, w, h, t) {
+    cmSky(c, w, h, '#ffd23f', '#e22511'); cmSpeed(c, w, h, w * 0.26, h * 0.6, 80, 'rgba(255,255,255,.5)', 241, 0.15); cmDots(c, 0, 0, w, h, '#a01010', 0.3, 9);
+    c.beginPath(); c.rect(-5, h * 0.86, w + 10, h); cmFill(c, '#3a3d45', 5);
+    cmFlix(c, w * 0.24, h * 0.95, h / 600, {pose: 'fight', shout: 1}, t);
+    c.save(); c.setLineDash([10, 12]); c.strokeStyle = INK; c.lineWidth = 3; c.beginPath(); c.moveTo(w * 0.3, h * 0.5); c.quadraticCurveTo(w * 0.52, h * 0.12, w * 0.76, h * 0.55); c.stroke(); c.restore();
+    for (let i = 0; i < 4; i++) { const k = i / 4 + ((t * 0.6) % 0.25), x = w * (0.3 + k * 0.46), y = h * (0.5 - Math.sin(k * Math.PI) * 0.36); cmFlixToy(c, x, y + h * 0.05, h / 900, ['#e22511', '#ffc20e', '#3ee6b5', '#7b5cff'][i], t * 6 + i); }
+    cmSkel(c, w * 0.8, h * 0.97, h / 300, t, {flip: 1}); cmBurst(c, w * 0.78, h * 0.5, h * 0.08, h * 0.17, 12, '#fff36b', 243);
+    cmSkel(c, w * 0.95, h * 0.95, h / 380, t, {flip: 1});
+  },
+  dragonRise(c, w, h, t) {
+    cmSky(c, w, h, '#1a0a2a', '#4a1a3a'); cmEll(c, w * 0.8, h * 0.2, h * 0.12, h * 0.12); cmFill(c, '#e8f0c8', 4);
+    cmCity(c, w, h * 0.95, 251, {cols: ['#2a2230', '#3a2a3a', '#2e2438'], hMin: h * 0.2, hMax: h * 0.5, win: '#ffd8a0', lit: 0.3, bw: w / 11});
+    c.save(); c.globalAlpha = 0.75; c.beginPath(); c.moveTo(w * 0.38, h * 0.32); c.lineTo(w * 0.2, h); c.lineTo(w * 0.45, h); c.closePath(); const g = c.createLinearGradient(0, h * 0.3, 0, h); g.addColorStop(0, '#d0ffb0'); g.addColorStop(1, 'rgba(60,255,90,.2)'); c.fillStyle = g; c.fill(); c.restore();
+    cmDragon(c, w * 0.52, h * 0.55, h / 560, t);
+  },
+  parkFree(c, w, h, t) {
+    cmSky(c, w, h, '#6fd3ff', '#d8f6ff'); cmCity(c, w, h * 0.66, 261, {cols: ['#ff8a7a', '#ffb36b', '#c08aff', '#7bc8ff'], hMin: h * 0.1, hMax: h * 0.3, win: '#fff6c8', bw: w / 14});
+    c.beginPath(); c.rect(-5, h * 0.64, w + 10, h); cmFill(c, '#6fdc6f', 5); cmDots(c, 0, h * 0.64, w, h, '#2a8a3a', 0.3, 8);
+    for (const tx of [0.07, 0.93]) { cmLimb(c, [w * tx, h * 0.9, w * tx, h * 0.5], 16, '#7a4a2a'); cmEll(c, w * tx, h * 0.45, h * 0.13, h * 0.11); cmFill(c, '#4ab84a', 4); }
+    const s = h / 460; cmPerson(c, w * 0.2, h * 0.97, s, {pose: 'throw', shirt: '#ff5a6e', hair: '#2a1a0a', kid: 1}, t);
+    cmFlix(c, w * 0.48, h * 0.97, h / 640, {pose: 'wave'}, t);
+    cmPerson(c, w * 0.74, h * 0.98, s * 0.95, {pose: 'cheer', shirt: '#ffd23f', skin: '#8a5a3a', hair: '#111', toy: '#7b5cff', flip: 1}, t);
+    cmFlixToy(c, w * 0.32, h * (0.38 - Math.abs(Math.sin(t * 2)) * 0.12), h / 900, '#ffc20e', t * 4);
+    for (let i = 0; i < 4; i++) cmSoul(c, w * (0.15 + i * 0.22), h * (0.14 + 0.04 * Math.sin(t * 2 + i)), 0.5, t + i);
+  },
+  golemRise(c, w, h, t) {
+    cmSky(c, w, h, '#2a3a2a', '#0a140a'); cmSpeed(c, w, h, w * 0.5, h * 0.7, 60, 'rgba(120,255,140,.2)', 271, 0.1);
+    cmGolem(c, w * 0.5, h * 1.12 - Math.min(1, (t % 6) / 2) * h * 0.08, h / 470, t);
+    c.beginPath(); c.rect(-5, h * 0.84, w + 10, h); cmFill(c, '#3a3328', 5);
+    for (let i = 0; i < 9; i++) { const r = cmRand(i + 281), x = w * (0.08 + i * 0.11), y = h * 0.86; c.beginPath(); c.moveTo(x - 18, y); c.lineTo(x - 18, y - 40); c.arc(x, y - 40, 18, Math.PI, 0); c.lineTo(x + 18, y); c.closePath(); c.save(); c.translate(x, y); c.rotate((r() - 0.5) * 0.4); c.translate(-x, -y); cmFill(c, '#8a8478', 3); c.restore(); }
+    c.beginPath(); c.moveTo(w * 0.2, h); c.lineTo(w * 0.35, h * 0.88); c.lineTo(w * 0.5, h * 0.92); c.lineTo(w * 0.66, h * 0.86); c.lineTo(w * 0.8, h); c.strokeStyle = '#6aff8a'; c.lineWidth = 5; c.stroke();
+  },
+  vortexDuel(c, w, h, t) {
+    cmSky(c, w, h, '#1a0a2a', '#6a1a3a'); cmBolt(c, w * 0.5, 0, h * 0.55, 291, '#e0b0ff'); cmBolt(c, w * 0.1, 0, h * 0.4, 293);
+    cmCity(c, w, h * 0.86, 295, {cols: ['#2a2230', '#1e1824', '#33283a'], hMin: h * 0.1, hMax: h * 0.3, win: '#ff4a5a', lit: 0.25, bw: w / 12});
+    c.beginPath(); c.rect(-5, h * 0.82, w + 10, h); cmFill(c, '#4a4e58', 5);
+    cmFlix(c, w * 0.26, h * 0.84, h / 560, {pose: 'fight', shout: 1}, t);
+    cmVortex(c, w * 0.74, h * 0.84, h / 400, t, {dark: 1, pose: 'fight'});
+    cmBurst(c, w * 0.49, h * 0.5, h * 0.06, h * 0.14, 10, '#fff36b', 297);
+  },
   vortexPast(c, w, h, t) { // VORTEKS in his good days, guarding the bright city
     cmSky(c, w, h, '#5fc8ff', '#fff2c0'); cmSpeed(c, w, h, w * 0.55, h * 0.45, 40, 'rgba(255,255,255,.4)', 101, 0.2);
     cmCity(c, w, h * 0.8, 103, {cols: ['#ff8a7a', '#ffb36b', '#7bc8ff', '#c08aff'], hMin: h * 0.2, hMax: h * 0.45, win: '#fff6c8', bw: w / 10});
@@ -4177,13 +4407,30 @@ const COMICS = {
       {p: [0.52, 0, 1, 0, 1, 1, 0.5, 1], art: CMA.zones, items: [['cap', 0.05, 0.03, 0.62, 'Her ruh şehre renk taşır. Her dalgada bir bölge aydınlanır.'], ['cap', 0.04, 0.8, 0.5, '50 dalga. 5 patron. Şehri geri al!'], ['sfx', 0.5, 0.2, 'BAŞLA!', 78, 0.12, '#fff36b', '#ffc20e']]}
     ]}
   ],
+  p10: () => [{chapter: 'Patron 1', panels: [
+    {p: [0, 0, 0.6, 0, 0.57, 1, 0, 1], art: CMA.kingRise, items: [['cap', 0.02, 0.03, 0.62, 'Dalga 10. Tabletlerden bir taht yükseldi...'], ['cap', 0.02, 0.86, 0.7, 'Ekran ordusunun ilk komutanı: İSKELET KRAL!'], ['sfx', 0.5, 0.42, 'TAK TAK TAK', 46, -0.1, '#e0b0ff', '#8a2aff']]},
+    {p: [0.62, 0, 1, 0, 1, 1, 0.59, 1], art: CMA.kingClose, items: [['bub', 0.5, 0.2, 0.4, 0.5, 'Oyuncakların bitti, küçük! Bu mahalle ekranımın!', {villain: 1, shout: 1, size: 28, maxW: 240}], ['cap', 0.06, 0.84, 0.86, 'Tacını düşür, mahalleyi kurtar!']]}
+  ]}],
   c10: () => [{chapter: 'Bölüm 2', panels: [
     {p: [0, 0, 0.6, 0, 0.57, 1, 0, 1], art: CMA.wakeStreet, items: [['cap', 0.02, 0.03, 0.55, 'İskelet Kral düştü! İlk mahalle uyandı.'], ['bub', 0.3, 0.44, 0.2, 0.68, 'Renkler geri geliyor!', {size: 28}]]},
     {p: [0.62, 0, 1, 0, 1, 1, 0.59, 1], art: CMA.lordAngry, items: [['bub', 0.5, 0.3, 0.5, 0.42, 'Bu daha başlangıç, küçük çiçek!', {villain: 1, shout: 1, size: 30, maxW: 230}], ['cap', 0.06, 0.03, 0.62, 'Öfkeli Lord, Kemik Ejderha\'yı uyandırdı...']]}
+  ]}, {panels: [
+    {p: [0, 0, 0.52, 0, 0.49, 1, 0, 1], art: CMA.kidsFree, items: [['cap', 0.03, 0.03, 0.8, 'Kurtulan çocuklar Flix\'lerini geri aldı...'], ['bub', 0.72, 0.36, 0.66, 0.6, 'Al FLIX, bunları fırlat!', {size: 28, maxW: 220}], ['sfx', 0.4, 0.5, 'FLİK!', 60, -0.1]]},
+    {p: [0.54, 0, 1, 0, 1, 1, 0.51, 1], art: CMA.flixRain, items: [['cap', 0.05, 0.03, 0.62, 'Artık FLIX elinden Flix fırlatıyor. Her atış bir iskeleti dağıtır!'], ['sfx', 0.72, 0.36, 'POW!', 80, 0.12]]}
+  ]}],
+  p20: () => [{chapter: 'Patron 2', panels: [
+    {p: [0, 0, 0.64, 0, 0.61, 1, 0, 1], art: CMA.dragonRise, items: [['cap', 0.02, 0.03, 0.6, 'Dalga 20. Ay karardı, gökten yeşil ateş yağıyor...'], ['cap', 0.02, 0.86, 0.6, 'KEMİK EJDERHA şehrin üstünde!'], ['sfx', 0.24, 0.28, 'GRAAAH!', 70, -0.12, '#d0ffb0', '#3ab83a']]},
+    {p: [0.66, 0, 1, 0, 1, 1, 0.63, 1], art: CMA.resolve, items: [['bub', 0.5, 0.18, 0.5, 0.42, 'Kanatlarını Flix\'lerle kıracağım!', {size: 26, maxW: 220}]]}
   ]}],
   c20: () => [{chapter: 'Bölüm 3', panels: [
     {p: [0, 0, 0.55, 0, 0.52, 1, 0, 1], art: CMA.dragonDown, items: [['cap', 0.02, 0.03, 0.6, 'Kemik Ejderha yenildi! Renkler sokak sokak yayılıyor.'], ['bub', 0.72, 0.2, 0.5, 0.32, 'Sıradaki gelsin!', {size: 28}]]},
-    {p: [0.57, 0, 1, 0, 1, 1, 0.54, 1], art: CMA.playAgain, items: [['bub', 0.62, 0.34, 0.66, 0.56, 'Oyun zamanı!', {size: 30}], ['cap', 0.04, 0.03, 0.6, 'Ama yerin altından bir gümbürtü geliyor...'], ['sfx', 0.32, 0.66, 'GÜM! GÜM!', 52, -0.1, '#ffb0b0', '#c81e14']]}
+    {p: [0.57, 0, 1, 0, 1, 1, 0.54, 1], art: CMA.parkFree, items: [['cap', 0.04, 0.03, 0.6, 'Park yeniden çocuklarla doldu. Herkes FLIX\'le Flix atıyor!'], ['bub', 0.3, 0.3, 0.24, 0.52, 'Bir daha!', {size: 28}]]}
+  ]}, {panels: [
+    {p: [0, 0, 1, 0, 1, 1, 0, 1], art: CMA.playAgain, items: [['bub', 0.62, 0.34, 0.66, 0.56, 'Oyun zamanı!', {size: 30}], ['cap', 0.02, 0.04, 0.4, 'Ama yerin altından bir gümbürtü geliyor... Mezarlık uyanıyor.'], ['sfx', 0.32, 0.66, 'GÜM! GÜM!', 60, -0.1, '#ffb0b0', '#c81e14']]}
+  ]}],
+  p30: () => [{chapter: 'Patron 3', panels: [
+    {p: [0, 0, 0.64, 0, 0.61, 1, 0, 1], art: CMA.golemRise, items: [['cap', 0.02, 0.03, 0.6, 'Dalga 30. Mezar taşları birbirine yapıştı...'], ['cap', 0.02, 0.88, 0.62, 'MEZAR DEVİ topraktan yükseliyor!'], ['sfx', 0.78, 0.2, 'GÜÜÜM!', 62, 0.1, '#d0ffb0', '#3ab83a']]},
+    {p: [0.66, 0, 1, 0, 1, 1, 0.63, 1], art: CMA.flixRain, items: [['bub', 0.4, 0.16, 0.28, 0.4, 'Taş kalpli dev, Flix yağmuruna hazır mısın?', {size: 24, maxW: 230}]]}
   ]}],
   c30: () => [{chapter: 'Bölüm 4', panels: [
     {p: [0, 0, 0.45, 0, 0.42, 1, 0, 1], art: CMA.rubble, items: [['cap', 0.03, 0.03, 0.8, 'Mezar Devi toz oldu!'], ['sfx', 0.5, 0.85, 'KRAAK!', 76, 0.1]]},
@@ -4191,6 +4438,13 @@ const COMICS = {
   ]}, {panels: [
     {p: [0, 0, 0.5, 0, 0.47, 1, 0, 1], art: CMA.vortexPast, items: [['cap', 0.03, 0.03, 0.6, 'Yıllar önce şehrin bir kahramanı daha vardı: VORTEKS!'], ['bub', 0.3, 0.46, 0.18, 0.7, 'VORTEKS! VORTEKS!', {size: 26, maxW: 200}], ['sfx', 0.78, 0.24, 'ŞIMM!', 64, 0.12, '#fff36b', '#ffc20e']]},
     {p: [0.5, 0, 1, 0, 1, 1, 0.47, 1], art: CMA.vortexFall, items: [['cap', 0.08, 0.03, 0.6, 'Ama Kıyamet Lordu ona dev bir ekran uzattı...'], ['bub', 0.72, 0.74, 0.64, 0.6, 'Bir oyun daha, VORTEKS...', {villain: 1, size: 26, maxW: 220}], ['cap', 0.08, 0.86, 0.5, '...ve VORTEKS bir daha dönmedi.']]}
+  ]}],
+  p40: () => [{chapter: 'Patron 4', panels: [
+    {p: [0, 0, 0.66, 0, 0.63, 1, 0, 1], art: CMA.lordMerge, items: [['cap', 0.02, 0.03, 0.62, 'Dalga 40. Kıyamet Lordu bütün ekranları kendine bağladı!'], ['bub', 0.78, 0.2, 0.62, 0.42, 'Gel bakalım, minik kahraman!', {villain: 1, shout: 1, size: 28, maxW: 240}]]},
+    {p: [0.68, 0, 1, 0, 1, 1, 0.65, 1], art: CMA.flixRain, items: [['bub', 0.4, 0.16, 0.28, 0.4, 'Bu şehir oyuncakların!', {size: 26, maxW: 200}], ['cap', 0.05, 0.86, 0.9, 'Ekranını parçala!']]}
+  ]}],
+  p50: () => [{chapter: 'Son patron', panels: [
+    {p: [0, 0, 1, 0, 1, 1, 0, 1], art: CMA.vortexDuel, items: [['cap', 0.012, 0.04, 0.34, 'Dalga 50. Çatıda iki kahraman karşı karşıya...'], ['bub', 0.82, 0.16, 0.76, 0.34, 'Ekranı asla bırakmam!', {villain: 1, shout: 1, size: 30, maxW: 260}], ['bub', 0.2, 0.2, 0.24, 0.42, 'Seni geri getireceğim, VORTEKS!', {size: 28, maxW: 260}], ['sfx', 0.49, 0.72, 'SON DÖVÜŞ!', 70, -0.06]]}
   ]}],
   c40: () => [{chapter: 'Bölüm 5', panels: [
     {p: [0, 0, 0.46, 0, 0.43, 1, 0, 1], art: CMA.shatter, items: [['cap', 0.03, 0.03, 0.8, 'Kıyamet Lordu yıkıldı!'], ['cap', 0.03, 0.84, 0.8, 'Ama ekranın içinden biri daha çıkıyor...'], ['sfx', 0.5, 0.42, 'KRAŞŞ!', 80, -0.1]]},
@@ -4210,7 +4464,7 @@ COMICS.finale = () => [...COMICS.end(), ...COMICS.epilogue()];
 function cmEase(k) { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); }
 function cmPageDur(pg) { let n = 0; for (const p of pg.panels) n += 0.55 + p.items.length * 0.22; return n + 0.2; }
 function cmDraw() {
-  const cv = CM.cv, c = CM.ctx, el = $('comic'), dpr = Math.min(2, window.devicePixelRatio || 1), cw = el.clientWidth, ch = el.clientHeight;
+  const cv = CM.cv, c = CM.ctx, el = $('comic'), dpr = Math.min(2.4, (window.devicePixelRatio || 1) * UI), cw = el.clientWidth, ch = el.clientHeight;
   if (cv.width !== Math.round(cw * dpr) || cv.height !== Math.round(ch * dpr)) { cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr); }
   const k = cv.height / CM.VH, VW = CM.VW = Math.max(1100, cv.width / k), VH = CM.VH; c.setTransform(k, 0, 0, k, 0, 0); c.globalAlpha = 1;
   c.fillStyle = '#f2e6c9'; c.fillRect(0, 0, VW, VH); cmDots(c, 0, 0, VW, VH, '#d8c49a', 0.6, 9);
@@ -4245,7 +4499,7 @@ function cmFrame(now) {
   try { cmDraw(); } catch (err) { console.error(err); comicClose(); }
 }
 function comicShow(key, cb, go) {
-  const pages = key === 'all' ? [].concat(...['intro', 'c10', 'c20', 'c30', 'c40', 'finale'].filter(k => k === 'intro' || (save.comics || {})[k]).map(k => COMICS[k]())) : COMICS[key]();
+  const pages = key === 'all' ? [].concat(...['intro', 'p10', 'c10', 'p20', 'c20', 'p30', 'c30', 'p40', 'c40', 'p50', 'finale'].filter(k => k === 'intro' || (save.comics || {})[k]).map(k => COMICS[k]())) : COMICS[key]();
   save.comics = save.comics || {}; save.comics[key] = 1; persist();
   Object.assign(CM, {pages, pi: 0, t: 0, tt: 0, cb, go, on: true, last: performance.now()});
   if (G.state === 'play') G.state = 'comic'; stick.id = null; input.mx = input.mz = 0; $('stickBase').classList.remove('on');
@@ -4508,7 +4762,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) pause
 setInterval(() => $('bFlip').classList.toggle('show', !!ROT && G.state === 'menu'), 300);
 window.addEventListener('resize', layout);
 function resizeGL() {
-  const c = $('fx'), d = Math.min(2, window.devicePixelRatio || 1); c.width = LW * d; c.height = LH * d; FX.d = d;
+  const c = $('fx'), d = Math.min(2.4, (window.devicePixelRatio || 1) * UI); c.width = LW * d; c.height = LH * d; FX.d = d;
   if (!R.on) return; R.cam.aspect = LW / LH; R.cam.updateProjectionMatrix(); applyQuality();
 }
 

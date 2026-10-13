@@ -1,3 +1,22 @@
+# ARKANA: Flix Fırlat ve Patron Hikayeleri (v24, 2026-10-13)
+
+Önceki sürüm (v23) `arkana-v23.html`, kaynak `arkana9.html`.
+
+- Hikaye: her patrondan önce bir tanıtım sayfası (İskelet Kral, Kemik Ejderha, Mezar Devi, Kıyamet Lordu, VORTEKS), patron yenilince bölüm sayfaları. 10 ve 20'den sonraki bölümler 2 sayfaya çıktı (kurtulan çocuklar Flix'lerini FLIX'e verir, park yeniden dolar). Menüdeki "Hikaye" tüm sayfaları sırayla oynatır.
+- Elden Flix fırlatma: her kahraman, her modda, kolunu savurup elinden renkli Flix fırlatır (🤾 Flix Atışı, kartlarla 5. seviyeye kadar güçlenir). Zıplayan Flix de artık elden atılıyor, kahraman attığı yöne döner.
+- 5 yeni silah: 🔴 Lazer Işını (elden, delip geçer), 🧨 Flix Bombası (elden kalabalığa, 5. seviyede üçe bölünür), 🪢 Flix Kırbacı (önündeki sırayı şaklatır), 🔱 Kristal Mızrak (sırayı deler), 🗼 Flix Kulesi (yere kurulur, Flix atar).
+- Mağaza: sekmeler iki satıra sığıyor, 🗺️ Haritalar ikinci sırada (önceden ekranın dışında kalıyordu). Kozmetik ve oynanış haritaları ayrı başlıkta. 3 yeni kozmetik harita: 🍭 Şeker Şehir, 🌇 Retro Dalga, 🌅 Altın Saat.
+- iPad: oyun telefon boyutunda kurulup büyütülüyor, düğmeler ve yazılar artık küçük kalmıyor. 2K modu en fazla ~2,4 milyon piksel çiziyor (büyük iPad ekranı telefon kadar yük). iPhone SE'den 16 Pro Max'e ve iPad mini'den iPad Pro 13"e, yatay ve dik ekranda test edildi, hata yok.
+- Denge: VORTEKS'in canı 26.000, Cehennem dalgaları biraz daha sert (yeni silahlar oyunu kolaylaştırmıştı).
+
+![Silahlar](shots/v24_1_silahlar.jpg)
+![Patron tanıtımı](shots/v24_2_patron_hikaye.jpg)
+![Flix fırlat](shots/v24_3_flix_firlat.jpg)
+![Haritalar](shots/v24_4_haritalar.jpg)
+![iPad](shots/v24_5_ipad.jpg)
+
+---
+
 # ARKANA: Cehennem ve VORTEKS (v23, 2026-10-13)
 
 Önceki sürüm (v22) `arkana-v22.html`, kaynak `arkana8.html`.
