@@ -40,10 +40,10 @@ button{font-family:inherit;color:var(--ink);cursor:pointer}
 .note{margin:0;font-weight:600;font-size:15px}
 #hud{position:absolute;inset:0;display:none;pointer-events:none;z-index:10}
 #hud.on{display:block}
-#xpBar{position:absolute;left:62px;right:12px;top:5px;height:16px;border-radius:999px;background:#fff;box-shadow:0 3px 0 var(--ink);overflow:hidden}
+#xpBar{position:absolute;left:62px;right:calc(100% - 62px - 26%);top:7px;height:18px;border-radius:999px;background:#fff;box-shadow:0 3px 0 var(--ink);overflow:hidden}
 #xpBar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--sky),var(--purple));border-radius:999px;transition:width .15s}
 #xpBar b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink)}
-#topInfo{position:absolute;left:0;right:0;top:25px;display:flex;justify-content:center;gap:5px}
+#topInfo{position:absolute;left:calc(26% + 70px);right:10px;top:7px;display:flex;justify-content:flex-start;gap:4px;flex-wrap:nowrap;overflow:hidden}#tSoul{display:none!important}
 #tSoul{color:#0d6b8a}#tSoul.bump{animation:sbump .25s}@keyframes sbump{50%{transform:scale(1.18);background:#d8f6ff}}
 #topInfo span{background:rgba(255,255,255,.88);padding:0 8px;border-radius:999px;font-weight:700;font-size:11.5px;line-height:17px;box-shadow:0 3px 0 rgba(42,35,80,.25)}
 #bPause{position:absolute;left:10px;top:6px;width:44px;height:44px;border-radius:50%;border:0;background:#fff;font-weight:700;font-size:16px;box-shadow:0 4px 0 var(--ink);pointer-events:auto}
@@ -303,7 +303,7 @@ h2{font-family:Bangers,Fredoka,sans-serif;font-weight:400;letter-spacing:2px;col
         <div><span class="e">🏙️</span><b>Şehri kullan</b>Binalar okları durdurur, dev iskeleti duvara çarptır.</div>
         <div><span class="e">🌷</span><b>FLIX gücü</b>Daire dolunca bas: dev Flix figürü her şeyi süpürür!</div>
       </div>
-      <p class="note" style="margin:10px 0">Kristal topla, seviye atla, 20 güçten seç. 💨 ile atıl, arabaları patlatıp yol aç. 50 dalga: her 10 dalgada bir patron gelir ve zorluk artar. 50. dalgada final savaşı!</p>
+      <p class="note" style="margin:10px 0">Kristal topla, seviye atla, 20 güçten seç. 💨 ile atıl, arabaları patlatıp yol aç. Hikayede 40 seviye: her 10 seviyede bir patron gelir ve zorluk artar. 40. seviyede VORTEKS ile final savaşı!</p>
       <button class="btn main" id="bHowOk">Hadi başlayalım!</button>
     </div>
   </section>
@@ -406,18 +406,21 @@ function askMotion() { try { if (window.DeviceMotionEvent && DeviceMotionEvent.r
 /* ---------- audio (soft, toy-like) ---------- */
 let AC = null, lastPick = 0, lastPop = 0, lastHit = 0;
 function initAudio() { if (AC) return; try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+// at most ~12 sounds at once: big fights fired hundreds of oscillators a second and made iPhones stutter
+const VOX = []; function voiceOk(end) { const n = AC.currentTime; while (VOX.length && VOX[0] < n) VOX.shift(); if (VOX.length >= 12) return false; VOX.push(end); VOX.sort((a, b) => a - b); return true; }
 function tone(type, f1, f2, dur, vol, delay) {
-  if (!save.sound || !AC) return;
+  if (!save.sound || !AC) return; if (!voiceOk(AC.currentTime + (delay || 0) + dur)) return;
   if (AC.state === 'suspended') AC.resume();
   const t = AC.currentTime + (delay || 0), o = AC.createOscillator(), g = AC.createGain();
   o.type = type; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), t + dur);
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
   o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + 0.02);
 }
+const NZB = {};
 function noise(dur, vol, f) {
-  if (!save.sound || !AC) return;
-  const n = AC.createBuffer(1, Math.floor(AC.sampleRate * dur), AC.sampleRate), d = n.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+  if (!save.sound || !AC) return; if (!voiceOk(AC.currentTime + dur)) return;
+  const key = Math.round(dur * 100); let n = NZB[key];
+  if (!n) { n = NZB[key] = AC.createBuffer(1, Math.floor(AC.sampleRate * dur), AC.sampleRate); const d = n.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
   const s = AC.createBufferSource(), g = AC.createGain(), bq = AC.createBiquadFilter(); bq.type = 'lowpass'; bq.frequency.value = f || 1200;
   s.buffer = n; g.gain.value = vol; s.connect(bq); bq.connect(g); g.connect(AC.destination); s.start();
 }
@@ -434,7 +437,7 @@ const SFX = {
   boss: () => { [196, 165, 131].forEach((f, i) => tone('sawtooth', f, f * 0.98, 0.25, 0.05, i * 0.18)); },
   flix: () => { tone('square', 200, 900, 0.3, 0.07); [784, 988, 1175].forEach((f, i) => tone('triangle', f, f, 0.18, 0.07, 0.2 + i * 0.08)); },
   win: () => [523, 659, 784, 659, 784, 1046].forEach((f, i) => tone('triangle', f, f, 0.2, 0.08, i * 0.12)),
-  block: () => tone('square', 1800, 1200, 0.06, 0.03),
+  block: () => { const n = performance.now(); if (n - (SFX.bT || 0) < 90) return; SFX.bT = n; tone('square', 1800, 1200, 0.06, 0.03); },
   bow: () => tone('triangle', 900, 300, 0.12, 0.05),
   necro: () => tone('sawtooth', 220, 110, 0.4, 0.04),
   fuse: () => noise(0.5, 0.04, 6000),
@@ -530,7 +533,8 @@ const D = typeof THREE !== 'undefined' ? new THREE.Object3D() : null; if (D) D.r
 function setInst(m, i, x, y, z, sx, sy, sz, ry, rx, rz) { D.position.set(x, y, z); D.rotation.set(rx || 0, ry || 0, rz || 0); D.scale.set(sx, sy, sz); D.updateMatrix(); m.setMatrixAt(i, D.matrix); }
 function inst(geo, mat, n, colors) { const m = new THREE.InstancedMesh(geo, mat, n); m.frustumCulled = false; if (colors) { const c = new THREE.Color(1, 1, 1); for (let i = 0; i < n; i++) m.setColorAt(i, c); } m.count = 0; R.scene.add(m); return m; }
 function canvasTex(w, h, draw, rep) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = R.aniso || 4; if (rep) t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; }
-const MAXE = 420;
+const MAXE = 420; // hard cap; the live cap below is lower on phones so big hordes do not choke the GPU
+const ECAP = () => (isTouch ? 170 : 240) + (G.mode === 'hell' ? 30 : 0);
 function initGL() {
   try {
     R.renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: true, powerPreference: 'high-performance'});
@@ -1881,16 +1885,16 @@ const INTRO = {
   16: ['mech', 'Füze yağmuru! Yerdeki turuncu halkalardan çık.'],
   17: ['necro', 'Yeni iskelet çağırır ve iyileştirir. Önce onu indir!']
 };
-const STORY_LEN = 50;
+const STORY_LEN = 40;
 const BOSSES = {
   10: {kind: 'king',   name: 'İskelet Kral',   hp: 1100,  r: 2.0, col: 0xc4b89c},
   20: {kind: 'dragon', name: 'Kemik Ejderha',  hp: 2800,  r: 2.0, col: 0xb3a587},
-  30: {kind: 'golem',  name: 'Mezar Devi',     hp: 6000,  r: 2.3, col: 0xa89c86},
+  30: {kind: 'golem',  name: 'Dev Zombi',      hp: 6000,  r: 2.3, col: 0x86a06a},
   40: {kind: 'tyrant', name: 'Kıyamet Lordu',  hp: 10500, r: 2.4, col: 0x3a3f4c},
   50: {kind: 'vortex', name: 'VORTEKS', sub: 'Ekranın ele geçirdiği eski kahraman!', hp: 26000, r: 2.4, col: 0x2b2638, final: true, spd: 3.1}
 };
 // a boss guards every tenth wave; endless keeps cycling them, stronger each lap
-function bossFor(n) { return n % 10 ? null : BOSSES[((n / 10 - 1) % 5 + 1) * 10]; }
+function bossFor(n) { if (n % 10) return null; if (G.mode === 'story' && !G.endless && n <= STORY_LEN) return BOSSES[n === STORY_LEN ? 50 : n]; return BOSSES[((n / 10 - 1) % 5 + 1) * 10]; }
 // the difficulty climbs a clear step every 10 waves (story and endless alike)
 function tierOf(n) { return Math.floor((n - 1) / 10); }
 function waveDef(n) {
@@ -2017,8 +2021,8 @@ function spawnPos(rad) {
   const sx = Math.round(G.px / P) * P; return [sx + rnd(-4, 4), G.pz + (Math.random() < 0.5 ? -1 : 1) * rnd(19, 24)];
 }
 function addEnemy(type, x, z, rise) {
-  if (G.enemies.length >= MAXE - 2) return null;
-  const T = ET[type], hp = Math.round(T.hp * G.def.hpMul);
+  if (G.enemies.length >= Math.min(MAXE - 2, type === 'boss' ? MAXE : ECAP())) return null;
+  const T = ET[type], hp = Math.round(T.hp * G.def.hpMul * (G.mode === 'story' && !G.endless ? 1 + Math.max(0, G.wave - 8) * 0.05 : 1) * (G.mode === 'endless' || G.endless ? 1 + Math.max(0, G.wave - 15) * 0.05 : 1));
   const e = {type, x, z, vx: 0, vz: 0, hp, max: hp, r: T.r, spd: T.spd * rnd(0.9, 1.1) * (1 + (G.def.tier || 0) * 0.04) * (G.mapMod === 'ice' ? 0.82 : 1), dmg: T.dmg, xp: T.xp, fly: T.fly || 0, sz: T.size, t: rnd(0, 6), flash: 0, slow: 0, cd: rnd(1.5, 3), hitCd: {}, navT: 0, tx: G.px, tz: G.pz, los: false, fa: 0, rise: rise === false ? 0 : 0.7, st: 'walk', stT: 0, ph: rnd(0, 4)};
   if (type === 'necro') e.cd = rnd(2, 4);
   if (type === 'burrower') { e.under = true; e.rise = 0; }
@@ -2195,7 +2199,7 @@ function hit(e, dmg, col, kb, kx, kz, proj) {
   if (FX.parts.length < 480) { const c = col || '255,255,255'; for (let i = 0; i < (crit ? 6 : 2); i++) { const a = Math.random() * TAU, sp = rnd(4, 9); FX.parts.push({x: e.x, y: (e.fly || 0) + 1.1 * (e.sz || 1), z: e.z, vx: Math.cos(a) * sp, vy: rnd(1, 5), vz: Math.sin(a) * sp, life: 0.22, max: 0.22, col: c, sz: crit ? 5 : 3.5}); } }
   if (crit) { G.shake = Math.max(G.shake, 0.14); buzz(10); }
   if (kb && e.type !== 'boss' && e.type !== 'brute' && !blocked) { const l = Math.hypot(kx, kz) || 1; e.vx += kx / l * kb; e.vz += kz / l * kb; }
-  if (FX.nums.length < 50 || crit || blocked) FX.nums.push({x: e.x, y: (e.fly || 0) + (e.sz || 1) * 2 + 0.4, z: e.z, t: 0.7, t0: 0.7, txt: blocked ? 'BLOK' : weak ? d + '!' : String(d), col: blocked ? '200,205,220' : weak ? '150,255,120' : crit ? '255,210,63' : col || '255,255,255', big: crit || weak});
+  if (FX.nums.length < (isTouch ? 26 : 45) || (crit && FX.nums.length < 40) || (blocked && FX.nums.length < 20)) FX.nums.push({x: e.x, y: (e.fly || 0) + (e.sz || 1) * 2 + 0.4, z: e.z, t: 0.7, t0: 0.7, txt: blocked ? 'BLOK' : weak ? d + '!' : String(d), col: blocked ? '200,205,220' : weak ? '150,255,120' : crit ? '255,210,63' : col || '255,255,255', big: crit || weak});
   if (blocked) SFX.block(); else SFX.hit();
   if (e.hp <= 0) pop(e);
 }
@@ -2226,7 +2230,7 @@ function drawKO(x, rdt) {
 function pop(e) {
   koFx(e); e.dead = true; G.kills++; freeSoul(e); G.flix = Math.min(100, G.flix + (e.type === 'boss' ? 30 : 0.9));
   G.combo++; G.comboT = 2.5; G.bestCombo = Math.max(G.bestCombo || 0, G.combo); G.comboBump = 0.5; addScore(e.type === 'boss' ? 5000 : (e.xp || 1) * 10 + (e.elite ? 400 : 0), e.x, e.z, e.type === 'boss' || e.elite);
-  if (G.combo % 25 === 0) { banner('', ['Harika!', 'Muhteşem!', 'Durdurulamaz!', 'EFSANE!'][Math.min(3, G.combo / 25 - 1)] + ' x' + G.combo, 1); SFX.combo(); buzz(30); }
+  if ([25, 50, 100, 200, 400, 800, 1500, 3000, 6000].includes(G.combo)) { banner('', ['Harika!', 'Muhteşem!', 'Durdurulamaz!', 'EFSANE!'][Math.min(3, G.combo / 25 - 1)] + ' x' + G.combo, 1); SFX.combo(); buzz(30); }
   if (e.type === 'boss' || e.type === 'brute' || e.type === 'mech' || e.elite) { G.hitstop = Math.max(G.hitstop, e.type === 'boss' ? 0.18 : 0.06); G.shake = Math.max(G.shake, 0.45); buzz(e.type === 'boss' ? 120 : 35); ringFx(e.x, e.z, 3, 0xffffff, 0.3); }
   bones(e.x, (e.fly || 0) + 1, e.z, e.type === 'boss' ? 90 : e.type === 'brute' || e.type === 'mech' ? 22 : 10, e.type === 'boss' ? 2 : e.sz || 1, e.type === 'ghost', e.type === 'boss' ? (e.kind === 'tyrant' ? 'rb' : 'sk') : ET[e.type].fam);
   if (e.type === 'boss') { bossDown(e); return; }
@@ -2247,14 +2251,14 @@ function bossDown(e) {
   R.scene.remove(e.g); G.boss = null; doomZone(e.x, e.z, 50); G.slowT = 1.4; G.shake = 1; SFX.win(); buzz(150);
   for (let i = 0; i < 14; i++) dropGem(e.x + rnd(-3, 3), e.z + rnd(-3, 3), 10);
   dropItem('chest', e.x, e.z);
-  if (G.mode === 'story' && !G.endless && [10, 20, 30, 40].includes(G.wave)) { G.comicQ = 'c' + G.wave + '+p' + (G.wave + 10); G.comicAt = performance.now() + 1900; }
+  if (G.mode === 'story' && !G.endless && [10, 20, 30].includes(G.wave)) { G.comicQ = G.wave === 30 ? 'c30+v40+p50' : 'c' + G.wave + '+p' + (G.wave + 10); G.comicAt = performance.now() + 1900; }
   if (e.boss.final && !G.endless) G.finalT = 3;
   banner('Harika!', e.boss.name + ' dağıldı! Sandığı al.', 2.2);
 }
 function hurt(dmg, src) {
   if (G.inv > 0 || G.state !== 'play' || (G.bst && G.bst.k === 'star')) return;
   const wv = G.mode === 'boss' ? G.wave * 10 : G.mode === 'hell' ? hellWave(G.wave) : G.wave; dmg *= Math.min(1, 0.55 + wv * 0.075) * (1 + tierOf(wv) * 0.2 + Math.max(0, wv - 9) * 0.018); // early waves forgive more, every 10 waves bite harder
-  dmg *= (1 - 0.07 * (G.pas.armor || 0)) * (G.mode === 'hell' ? 1.15 : 1); G.hp -= dmg; G.inv = 0.5; G.shake = Math.max(G.shake, 0.35);
+  const sty = G.mode === 'story' && !G.endless; dmg *= (1 - 0.07 * (G.pas.armor || 0)) * (G.mode === 'hell' ? 1.15 : 1) * (sty ? 1.1 + G.wave * 0.008 : 1); G.hp -= dmg; G.inv = sty && G.wave > 8 ? 0.4 : 0.5; G.shake = Math.max(G.shake, 0.35);
   SFX.hurt(); buzz(40); $('flash').style.opacity = 1; setTimeout(() => $('flash').style.opacity = 0, 140);
   if (src) { const l = Math.hypot(G.px - src.x, G.pz - src.z) || 1; G.kx = (G.px - src.x) / l * 6; G.kz = (G.pz - src.z) / l * 6; }
   if (G.hp <= 0) { G.hp = 0; G.state = 'dying'; G.dieT = 0; G.slowT = 1.2; banner('', curHero().n + ' yere düştü...', 1.4); }
@@ -3096,7 +3100,7 @@ function drawFX(rdt, dt) {
   x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, LW, LH);
   drawWeather(x, rdt);
   if (G.state === 'menu') return;
-  if (FX.parts.length > 560) FX.parts.splice(0, FX.parts.length - 560);
+  { const pm = isTouch ? 320 : 560; if (FX.parts.length > pm) FX.parts.splice(0, FX.parts.length - pm); }
   if (FX.nums.length > 70) FX.nums.splice(0, FX.nums.length - 70);
   let pc = '';
   for (const p of FX.parts) {
@@ -3315,7 +3319,7 @@ function buildHell() {
 
 /* ---------- modes, collectible Flix figures, rifts, score and combo ---------- */
 const MODES = {
-  story:   {n: 'Hikaye', ic: '📖', d: '5 bölüm, 50 seviye. Her 10 seviyede patron ve çizgi roman, finalde VORTEKS.'},
+  story:   {n: 'Hikaye', ic: '📖', d: '4 bölüm, 40 seviye. Patronlar: İskelet Kral, Kemik Ejderha, Dev Zombi ve finalde VORTEKS.'},
   endless: {n: 'Sonsuz', ic: '♾️', d: 'Bitmeyen dalgalar, gittikçe zorlaşır. Ne kadar dayanırsın?'},
   boss:    {n: 'Patron Koşusu', ic: '👑', d: '5 patron arka arkaya, sonuncusu VORTEKS. 4 güç kartıyla başla.'},
   hunt:    {n: 'Flix Avı', ic: '🔥', d: '4 dakikada şehre dağılmış 40 Flix figürünü topla!'},
@@ -3425,9 +3429,9 @@ function setT(id, v) { if (_hc[id] !== v) { _hc[id] = v; $(id).textContent = v; 
 function setS(id, k, v) { const key = id + k; if (_hc[key] !== v) { _hc[key] = v; if (k === 'width') $(id).style.width = v; else $(id).style.setProperty(k, v); } }
 function updateHUD() {
   setS('xpFill', 'width', Math.round(G.xp / G.xpNext * 200) / 2 + '%');
-  setT('xpTxt', '⚡ Güç ' + G.level + (G.level >= 50 ? ' · MAKS' : '') + (G.tier ? ' · ⭐ Kademe ' + G.tier : '') + (G.level < 50 ? ' (5 seviyede bir güçlenir)'.slice(0, G.level < 5 ? 99 : 0) : ''));
+  setT('xpTxt', '⚡ ' + G.level + (G.level >= 50 ? ' MAKS' : '') + (G.tier ? ' · ⭐' + G.tier : ''));
   setT('tTime', '⏱ ' + fmt(G.time));
-  setT('tWave', G.mode === 'hunt' ? `🔥 ${G.flixGot}/${HUNT_GOAL} · ${fmt(G.huntT)}` : G.mode === 'boss' ? 'Patron ' + G.wave : G.mode === 'story' && !G.endless ? `Seviye ${G.wave}/${STORY_LEN} · 👑 ${G.wave % 10 ? 'Patron ' + Math.ceil(G.wave / 10) * 10 : 'PATRON!'}` : (G.mode === 'hell' ? '😈 ' : '') + 'Dalga ' + G.wave + (G.wave > 10 ? ' · ☠️' + (tierOf(G.wave) + 1) : ''));
+  setT('tWave', G.mode === 'hunt' ? `🔥 ${G.flixGot}/${HUNT_GOAL} · ${fmt(G.huntT)}` : G.mode === 'boss' ? 'Patron ' + G.wave : G.mode === 'story' && !G.endless ? `Sv ${G.wave}/${STORY_LEN} · 👑${G.wave % 10 ? Math.ceil(G.wave / 10) * 10 : '!'}` : (G.mode === 'hell' ? '😈 ' : '') + 'Dalga ' + G.wave + (G.wave > 10 ? ' · ☠️' + (tierOf(G.wave) + 1) : ''));
   setT('tScore', '⭐ ' + fmtN(G.score));
   setT('tKills', '💀 ' + G.kills);
   if (DOOM.on) setT('tSoul', `🕊️ ${fmtN(DOOM.freed)} · %${DOOM.satT >= 1 ? 100 : Math.round((G.wave - 1) / STORY_LEN * 100)} renk`);
@@ -4545,11 +4549,11 @@ const COMICS = {
     ]},
     {panels: [
       {p: [0, 0, 0.5, 0, 0.48, 1, 0, 1], art: CMA.rescue, items: [['cap', 0.03, 0.03, 0.62, 'Görevin: düşmanları yen, içlerindeki ruhları serbest bırak!'], ['sfx', 0.52, 0.62, 'POW!', 90, -0.15], ['bub', 0.78, 0.44, 0.84, 0.66, 'Teşekkürler FLIX!', {size: 28}]]},
-      {p: [0.52, 0, 1, 0, 1, 1, 0.5, 1], art: CMA.zones, items: [['cap', 0.05, 0.03, 0.62, 'Her ruh şehre renk taşır. Her dalgada bir bölge aydınlanır.'], ['cap', 0.04, 0.8, 0.5, '50 dalga. 5 patron. Şehri geri al!'], ['sfx', 0.5, 0.2, 'BAŞLA!', 78, 0.12, '#fff36b', '#ffc20e']]}
+      {p: [0.52, 0, 1, 0, 1, 1, 0.5, 1], art: CMA.zones, items: [['cap', 0.05, 0.03, 0.62, 'Her ruh şehre renk taşır. Her seviyede bir bölge aydınlanır.'], ['cap', 0.04, 0.8, 0.5, '40 seviye. 4 patron. Şehri geri al!'], ['sfx', 0.5, 0.2, 'BAŞLA!', 78, 0.12, '#fff36b', '#ffc20e']]}
     ]}
   ],
   p10: () => [{chapter: 'Patron 1', panels: [
-    {p: [0, 0, 0.6, 0, 0.57, 1, 0, 1], art: CMA.kingRise, items: [['cap', 0.02, 0.03, 0.62, 'Dalga 10. Tabletlerden bir taht yükseldi...'], ['cap', 0.02, 0.86, 0.7, 'Ekran ordusunun ilk komutanı: İSKELET KRAL!'], ['sfx', 0.5, 0.42, 'TAK TAK TAK', 46, -0.1, '#e0b0ff', '#8a2aff']]},
+    {p: [0, 0, 0.6, 0, 0.57, 1, 0, 1], art: CMA.kingRise, items: [['cap', 0.02, 0.03, 0.62, 'Seviye 10. Tabletlerden bir taht yükseldi...'], ['cap', 0.02, 0.86, 0.7, 'Ekran ordusunun ilk komutanı: İSKELET KRAL!'], ['sfx', 0.5, 0.42, 'TAK TAK TAK', 46, -0.1, '#e0b0ff', '#8a2aff']]},
     {p: [0.62, 0, 1, 0, 1, 1, 0.59, 1], art: CMA.kingClose, items: [['bub', 0.5, 0.2, 0.4, 0.5, 'Oyuncakların bitti, küçük! Bu mahalle ekranımın!', {villain: 1, shout: 1, size: 28, maxW: 240}], ['cap', 0.06, 0.84, 0.86, 'Tacını düşür, mahalleyi kurtar!']]}
   ]}],
   c10: () => [{chapter: 'Bölüm 2', panels: [
@@ -4560,7 +4564,7 @@ const COMICS = {
     {p: [0.54, 0, 1, 0, 1, 1, 0.51, 1], art: CMA.flixRain, items: [['cap', 0.05, 0.03, 0.62, 'Artık FLIX elinden Flix fırlatıyor. Her atış bir iskeleti dağıtır!'], ['sfx', 0.72, 0.36, 'POW!', 80, 0.12]]}
   ]}],
   p20: () => [{chapter: 'Patron 2', panels: [
-    {p: [0, 0, 0.64, 0, 0.61, 1, 0, 1], art: CMA.dragonRise, items: [['cap', 0.02, 0.03, 0.6, 'Dalga 20. Ay karardı, gökten yeşil ateş yağıyor...'], ['cap', 0.02, 0.86, 0.6, 'KEMİK EJDERHA şehrin üstünde!'], ['sfx', 0.24, 0.28, 'GRAAAH!', 70, -0.12, '#d0ffb0', '#3ab83a']]},
+    {p: [0, 0, 0.64, 0, 0.61, 1, 0, 1], art: CMA.dragonRise, items: [['cap', 0.02, 0.03, 0.6, 'Seviye 20. Ay karardı, gökten yeşil ateş yağıyor...'], ['cap', 0.02, 0.86, 0.6, 'KEMİK EJDERHA şehrin üstünde!'], ['sfx', 0.24, 0.28, 'GRAAAH!', 70, -0.12, '#d0ffb0', '#3ab83a']]},
     {p: [0.66, 0, 1, 0, 1, 1, 0.63, 1], art: CMA.resolve, items: [['bub', 0.5, 0.18, 0.5, 0.42, 'Kanatlarını Flix\'lerle kıracağım!', {size: 26, maxW: 220}]]}
   ]}],
   c20: () => [{chapter: 'Bölüm 3', panels: [
@@ -4570,29 +4574,30 @@ const COMICS = {
     {p: [0, 0, 1, 0, 1, 1, 0, 1], art: CMA.playAgain, items: [['bub', 0.62, 0.34, 0.66, 0.56, 'Oyun zamanı!', {size: 30}], ['cap', 0.02, 0.04, 0.4, 'Ama yerin altından bir gümbürtü geliyor... Mezarlık uyanıyor.'], ['sfx', 0.32, 0.66, 'GÜM! GÜM!', 60, -0.1, '#ffb0b0', '#c81e14']]}
   ]}],
   p30: () => [{chapter: 'Patron 3', panels: [
-    {p: [0, 0, 0.64, 0, 0.61, 1, 0, 1], art: CMA.golemRise, items: [['cap', 0.02, 0.03, 0.6, 'Dalga 30. Mezar taşları birbirine yapıştı...'], ['cap', 0.02, 0.88, 0.62, 'MEZAR DEVİ topraktan yükseliyor!'], ['sfx', 0.78, 0.2, 'GÜÜÜM!', 62, 0.1, '#d0ffb0', '#3ab83a']]},
+    {p: [0, 0, 0.64, 0, 0.61, 1, 0, 1], art: CMA.golemRise, items: [['cap', 0.02, 0.03, 0.6, 'Seviye 30. Mezarlıktan dev bir el uzandı...'], ['cap', 0.02, 0.88, 0.62, 'DEV ZOMBİ topraktan yükseliyor!'], ['sfx', 0.78, 0.2, 'GÜÜÜM!', 62, 0.1, '#d0ffb0', '#3ab83a']]},
     {p: [0.66, 0, 1, 0, 1, 1, 0.63, 1], art: CMA.flixRain, items: [['bub', 0.4, 0.16, 0.28, 0.4, 'Taş kalpli dev, Flix yağmuruna hazır mısın?', {size: 24, maxW: 230}]]}
   ]}],
   c30: () => [{chapter: 'Bölüm 4', panels: [
-    {p: [0, 0, 0.45, 0, 0.42, 1, 0, 1], art: CMA.rubble, items: [['cap', 0.03, 0.03, 0.8, 'Mezar Devi toz oldu!'], ['sfx', 0.5, 0.85, 'KRAAK!', 76, 0.1]]},
-    {p: [0.47, 0, 1, 0, 1, 1, 0.44, 1], art: CMA.lordRise, items: [['bub', 0.72, 0.12, 0.6, 0.3, 'Seni ekranıma hapsedeceğim!', {villain: 1, shout: 1, size: 32, maxW: 280}], ['bub', 0.3, 0.6, 0.16, 0.74, 'Oyun bitmedi!', {size: 28}], ['cap', 0.04, 0.03, 0.4, 'Kıyamet Lordu bizzat geliyor...']]}
+    {p: [0, 0, 0.45, 0, 0.42, 1, 0, 1], art: CMA.rubble, items: [['cap', 0.03, 0.03, 0.8, 'Dev Zombi toz oldu!'], ['sfx', 0.5, 0.85, 'KRAAK!', 76, 0.1]]},
+    {p: [0.47, 0, 1, 0, 1, 1, 0.44, 1], art: CMA.lordRise, items: [['bub', 0.72, 0.12, 0.6, 0.3, 'Seni ekranıma hapsedeceğim!', {villain: 1, shout: 1, size: 32, maxW: 280}], ['bub', 0.3, 0.6, 0.16, 0.74, 'Oyun bitmedi!', {size: 28}], ['cap', 0.04, 0.03, 0.4, 'Kıyamet Lordu en güçlü askerini gönderiyor...']]}
   ]}, {panels: [
     {p: [0, 0, 0.5, 0, 0.47, 1, 0, 1], art: CMA.vortexPast, items: [['cap', 0.03, 0.03, 0.6, 'Yıllar önce şehrin bir kahramanı daha vardı: VORTEKS!'], ['bub', 0.3, 0.46, 0.18, 0.7, 'VORTEKS! VORTEKS!', {size: 26, maxW: 200}], ['sfx', 0.78, 0.24, 'ŞIMM!', 64, 0.12, '#fff36b', '#ffc20e']]},
     {p: [0.5, 0, 1, 0, 1, 1, 0.47, 1], art: CMA.vortexFall, items: [['cap', 0.08, 0.03, 0.6, 'Ama Kıyamet Lordu ona dev bir ekran uzattı...'], ['bub', 0.72, 0.74, 0.64, 0.6, 'Bir oyun daha, VORTEKS...', {villain: 1, size: 26, maxW: 220}], ['cap', 0.08, 0.86, 0.5, '...ve VORTEKS bir daha dönmedi.']]}
   ]}],
   p40: () => [{chapter: 'Patron 4', panels: [
-    {p: [0, 0, 0.66, 0, 0.63, 1, 0, 1], art: CMA.lordMerge, items: [['cap', 0.02, 0.03, 0.62, 'Dalga 40. Kıyamet Lordu bütün ekranları kendine bağladı!'], ['bub', 0.78, 0.2, 0.62, 0.42, 'Gel bakalım, minik kahraman!', {villain: 1, shout: 1, size: 28, maxW: 240}]]},
+    {p: [0, 0, 0.66, 0, 0.63, 1, 0, 1], art: CMA.lordMerge, items: [['cap', 0.02, 0.03, 0.62, 'Seviye 40. Kıyamet Lordu bütün ekranları kendine bağladı!'], ['bub', 0.78, 0.2, 0.62, 0.42, 'Gel bakalım, minik kahraman!', {villain: 1, shout: 1, size: 28, maxW: 240}]]},
     {p: [0.68, 0, 1, 0, 1, 1, 0.65, 1], art: CMA.flixRain, items: [['bub', 0.4, 0.16, 0.28, 0.4, 'Bu şehir oyuncakların!', {size: 26, maxW: 200}], ['cap', 0.05, 0.86, 0.9, 'Ekranını parçala!']]}
   ]}],
   p50: () => [{chapter: 'Son patron', panels: [
-    {p: [0, 0, 1, 0, 1, 1, 0, 1], art: CMA.vortexDuel, items: [['cap', 0.012, 0.04, 0.34, 'Dalga 50. Çatıda iki kahraman karşı karşıya...'], ['bub', 0.82, 0.16, 0.76, 0.34, 'Ekranı asla bırakmam!', {villain: 1, shout: 1, size: 30, maxW: 260}], ['bub', 0.2, 0.2, 0.24, 0.42, 'Seni geri getireceğim, VORTEKS!', {size: 28, maxW: 260}], ['sfx', 0.49, 0.72, 'SON DÖVÜŞ!', 70, -0.06]]}
+    {p: [0, 0, 1, 0, 1, 1, 0, 1], art: CMA.vortexDuel, items: [['cap', 0.012, 0.04, 0.34, 'Seviye 40. Çatıda iki kahraman karşı karşıya...'], ['bub', 0.82, 0.16, 0.76, 0.34, 'Ekranı asla bırakmam!', {villain: 1, shout: 1, size: 30, maxW: 260}], ['bub', 0.2, 0.2, 0.24, 0.42, 'Seni geri getireceğim, VORTEKS!', {size: 28, maxW: 260}], ['sfx', 0.49, 0.72, 'SON DÖVÜŞ!', 70, -0.06]]}
   ]}],
   c40: () => [{chapter: 'Bölüm 5', panels: [
     {p: [0, 0, 0.46, 0, 0.43, 1, 0, 1], art: CMA.shatter, items: [['cap', 0.03, 0.03, 0.8, 'Kıyamet Lordu yıkıldı!'], ['cap', 0.03, 0.84, 0.8, 'Ama ekranın içinden biri daha çıkıyor...'], ['sfx', 0.5, 0.42, 'KRAŞŞ!', 80, -0.1]]},
     {p: [0.48, 0, 1, 0, 1, 1, 0.45, 1], art: CMA.vortexRise, items: [['bub', 0.62, 0.12, 0.58, 0.3, 'Ben VORTEKS! Bu şehir artık ekranın!', {villain: 1, shout: 1, size: 28, maxW: 260}], ['bub', 0.2, 0.6, 0.14, 0.76, 'VORTEKS?!', {size: 26}], ['sfx', 0.84, 0.82, 'VZZZMM!', 58, -0.12, '#e0b0ff', '#8a2aff']]}
   ]}, {panels: [
-    {p: [0, 0, 1, 0, 1, 1, 0, 1], art: CMA.resolve, items: [['cap', 0.02, 0.04, 0.42, 'Son 10 dalga. VORTEKS\'i yen ve onu ekranın elinden kurtar!'], ['bub', 0.66, 0.2, 0.54, 0.42, 'Seni de kurtaracağım, VORTEKS!', {size: 30, maxW: 300}]]}
+    {p: [0, 0, 1, 0, 1, 1, 0, 1], art: CMA.resolve, items: [['cap', 0.02, 0.04, 0.42, 'Son 10 seviye. VORTEKS\'i yen ve onu ekranın elinden kurtar!'], ['bub', 0.66, 0.2, 0.54, 0.42, 'Seni de kurtaracağım, VORTEKS!', {size: 30, maxW: 300}]]}
   ]}],
+  v40: () => { const a = COMICS.c40(); a[0].chapter = 'Son bölüm'; a[0].panels = [Object.assign({}, a[0].panels[1], {p: [0, 0, 1, 0, 1, 1, 0, 1]})]; return a; },
   end: () => [{chapter: 'Final', panels: [
     {p: [0, 0, 1, 0, 1, 0.5, 0, 0.54], art: CMA.vortexFree, items: [['cap', 0.012, 0.05, 0.4, 'VORTEKS yenildi! Kara zırh çatladı, dev ekran paramparça oldu.'], ['bub', 0.86, 0.14, 0.7, 0.3, 'FLIX... Gözlerimi açtın. Teşekkürler!', {size: 24, maxW: 250}], ['sfx', 0.44, 0.24, 'KRAŞŞŞ!', 90, -0.1]]},
     {p: [0, 0.57, 1, 0.53, 1, 1, 0, 1], art: CMA.happyEnd, items: [['cap', 0.012, 0.06, 0.34, 'New York rengine kavuştu. Herkes dışarıda, yeniden Flix oynuyor!'], ['bub', 0.33, 0.3, 0.24, 0.6, 'Yaşasın FLIX!', {size: 30}], ['sfx', 0.62, 0.22, 'YAŞASIN!', 70, 0.08, '#fff36b', '#ffc20e']]}

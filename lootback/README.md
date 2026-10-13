@@ -1,3 +1,17 @@
+# ARKANA: 4 patronlu zor hikaye (v27, 2026-10-13)
+
+Önceki sürüm (v26) `arkana-v26.html`, kaynak `arkana10.html`.
+
+- Hikaye 40 seviye, 4 patron: İskelet Kral (10), Kemik Ejderha (20), Dev Zombi (30), VORTEKS (40). 30'dan sonraki çizgi roman VORTEKS'in hikayesini anlatıp finale bağlanıyor.
+- Hikaye daha zor: düşmanlar seviyeyle daha çok can kazanıyor, daha sert ve daha sık vuruyor. Test: sabit duran bot 8. seviyede öldü; oynayan iki bottan biri VORTEKS'te öldü, biri finali gördü.
+- Kasma: ekrandaki düşman sayısı telefonda en fazla 170 (önceden 420), aynı anda en fazla 12 ses (büyük kavgalarda yüzlerce ses açılıyordu), patlama sesleri her seferinde yeniden üretilmiyor, efekt parçacıkları ve hasar sayıları azaltıldı, "EFSANE x..." yazısı sadece büyük kombolarda.
+- Üst bilgi tek satır: güç çubuğu solda, süre · Sv 12/40 · 👑20 · ölüm · skor yanında. "renk" kutusu kaldırıldı.
+
+![Üst bilgi](shots/v27_1_ust_bilgi.jpg)
+![Hikaye](shots/v27_2_hikaye.jpg)
+
+---
+
 # ARKANA: Akıcı oyun ve küçük üst bilgi (v26, 2026-10-13)
 
 Önceki sürüm (v25) `arkana-v25.html`, kaynak `arkana10.html`.
