@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#e22511">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>FLIX Kick Up</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -409,7 +417,15 @@ svg { display: block; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; }
 }
+/* v12: keep the HUD clear of the notch / Dynamic Island; tall result cards scroll on small phones */
+.hud-top { padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+.pausebtn, .hud-side { top: calc(12px + env(safe-area-inset-top, 0px)); }
+.modal { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+.card-box { max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.moderow:disabled { opacity: .55; }
 </style>
+</head>
+<body>
 
 <div id="app">
   <canvas id="c" aria-label="FLIX Kick Up oyun alanı"></canvas>
@@ -524,7 +540,7 @@ svg { display: block; }
         <button class="toggle" id="tSound" aria-pressed="true"><span>Ses</span><i></i></button>
         <button class="toggle" id="tVibe" aria-pressed="true"><span>Titreşim</span><i></i></button>
         <div class="langrow"><span>Dil</span><div class="seg two" id="langSeg"><button data-lang="tr">Türkçe</button><button data-lang="en">English</button></div></div>
-        <p class="about">FLIX Kick Up, prototip sürüm 11.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>flixtoysofficial.com</p>
+        <p class="about">FLIX Kick Up, sürüm 1.0.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>flixtoysofficial.com</p>
       </div>
     </div>
     <footer id="sheetFoot">
@@ -600,6 +616,9 @@ svg { display: block; }
   try { lang = JSON.parse(localStorage.getItem("fku4.lang")) || "tr"; } catch {}
   if (lang !== "en") lang = "tr";
   const EN = {"Mağaza": "Store", "Tüy paketleri": "Feather packs", "Kampanya": "Special offer", "Başlangıç Paketi": "Starter Pack", "Tek seferlik: 2.500 tüy ve Kristal FLIX": "One time only: 2,500 feathers and the Crystal FLIX", "Bitiyor: ": "Ends in: ", "Reklamsız": "No Ads", "Reklamları ömür boyu kaldırır": "Removes ads forever", "Satın alındı": "Purchased", "Avuç": "Handful", "Kese": "Pouch", "Sandık": "Chest", "Hazine": "Treasure", "Dağ": "Mountain", "Ejderha Hazinesi": "Dragon Hoard", "EN POPÜLER": "MOST POPULAR", "EN İYİ DEĞER": "BEST VALUE", " bonus": " bonus", "Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak.": "Test build: no real payment is taken, feathers are added right away. In the App Store version payment goes through Apple.", "Satın al": "Buy", "Vazgeç": "Cancel", "Satın alımları geri yükle": "Restore purchases", "Geri yüklenecek bir şey yok (test sürümü).": "Nothing to restore (test build).", "Teşekkürler! ": "Thanks! ", "Bu test sürümünde gerçek ödeme alınmaz.": "No real payment is taken in this test build.", "Reklamlar kapandı": "Ads removed", "Kampanya bitti": "Offer ended", "Mesafe": "Distance", "30 saniyede en uzun yolu kat et": "Fly as far as you can in 30 seconds", "Orman": "Forest", "Çöl": "Desert", "Lunapark Gecesi": "Funfair Night", "Rastgele rakip": "Random rival", "RASTGELE YARIŞ": "RANDOM RACE", "ARKADAŞINLA YARIŞ": "RACE A FRIEND", "Rakip aranıyor. Biri gelince yarış kendiliğinden başlar.": "Looking for a rival. The race starts by itself when someone joins.", "Çevrimiçi oyuncu: ": "Players online: ", "Rastgele rakiple ya da arkadaşınla yarış": "Race a random rival or a friend", "Online oynayan herkesle eşleşirsin, en uzun uçan kazanır.": "You get matched with anyone playing online, longest flight wins.", "Aramayı bırak": "Stop searching", "direk": "posts", "sn": "s", "Yıldız başına ": "Per star ", "Sıradan": "Common", "Nadir": "Rare", "Epik": "Epic", "Efsane": "Legendary", "Mitik": "Mythic", "Turuncu": "Orange", "Sarı": "Yellow", "Beyaz": "White", "Kırmızı": "Red", "Gök Mavisi": "Sky Blue", "Çimen": "Grass", "Pamuk Şeker": "Cotton Candy", "Gece Moru": "Night Purple", "Türkiye": "Türkiye", "Siyah-Beyaz": "Black-White", "Sarı-Lacivert": "Yellow-Navy", "Sarı-Kırmızı": "Yellow-Red", "Lav": "Lava", "Okyanus": "Ocean", "Buz": "Ice", "Gün Batımı": "Sunset", "Neon": "Neon", "Kristal": "Crystal", "Altın FLIX": "Golden FLIX", "Galaksi": "Galaxy", "Ateş Kuşu": "Firebird", "Ejderha": "Dragon", "Futbol Topu": "Football", "Tenis Topu": "Tennis Ball", "Basketbol Topu": "Basketball", "Plaj Topu": "Beach Ball", "Voleybol Topu": "Volleyball", "İstanbul Akşamı": "Istanbul Evening", "Mahalle Arası": "Neighbourhood", "Yaz Plajı": "Summer Beach", "Gece Maçı": "Night Match", "Kar Tatili": "Snow Holiday", "Yıldız Sahne": "Star Stage", "Kapadokya Sabahı": "Cappadocia Morning", "Boğaz": "Bosphorus", "Uzay": "Space", "Sahne Rengi": "Scene Colour", "Klasik": "Classic", "Lacivert": "Navy", "Pamuk": "Candy", "Gece": "Night", "Altın": "Gold", "Gökkuşağı": "Rainbow", "tr-TR": "en-US", "Uzun tünellerde Sol vuruşla hızlan, içeride az zaman geçir.": "In long tunnels, kick Left to speed up and spend less time inside.", "Yüksek duvarların önünde Sağ vuruş: çok yükselir ama yavaşlatır.": "Before high walls, kick Right: it climbs a lot but slows you down.", "Boşluğun tam ortasından geçersen +5 bonus alırsın.": "Fly through the exact middle of a gap for a +5 bonus.", "Orta vuruş en güvenlisi. Panik anında ortaya dokun.": "The Middle kick is the safest. When in doubt, tap the middle.", "Hareketli boşluklarda acele etme, boşluğun sana gelmesini bekle.": "On moving gaps, don't rush. Let the gap come to you.", "Helikopter yaparken FLIX yavaş düşer. Uzun bir boşlukta tut, puanları topla.": "During a Helicopter the FLIX falls slowly. Hold it in a long gap and rack up points.", "Hareketleri art arda bağla: stil çarpanı x5'e kadar çıkar.": "Chain tricks back to back: the style multiplier goes up to x5.", "Direğe çok yakın geçmek 'Sıyırdın' bonusu verir.": "Passing very close to a post gives a 'Close shave' bonus.", "Dalış çift puan verir ama hızla düşersin. Yüksekten başla.": "A Dive gives double points but you drop fast. Start high.", "Tutarken parmağını kaydırıp hareket değiştir: her geçiş +10.": "While holding, swipe to switch tricks: each switch is +10.", "İki parmakla Kelebek yap: FLIX süzülür, uzun boşluklarda puan topla.": "Use two fingers for a Butterfly: the FLIX glides, great for long gaps.", "Her 10 puan tur sonunda 1 tüy olur. Stil puanı da sayılır.": "Every 10 points becomes 1 feather at the end of a run. Style points count too.", "10 Saniye": "10 Seconds", "10 saniyede en çok direkten geç": "Pass as many posts as you can in 10 seconds", "Akrobat": "Acrobat", "Tek bir hareketi olabildiğince uzun sürdür": "Hold a single trick for as long as you can", "Tüy Avı": "Feather Hunt", "20 saniyede en çok tüy topla": "Collect as many feathers as you can in 20 seconds", "tüy": "feathers", "Bot (kolay)": "Bot (easy)", "Bot (orta)": "Bot (medium)", "Bot (zor)": "Bot (hard)", "Kartal": "Eagle", "Şimşek": "Bolt", "Zıpzıp": "Bouncy", "Oyuncu ": "Player ", "Oyuncu": "Player", "Tam ortadan +5": "Dead centre +5", "Kayan boşluklar!": "Sliding gaps!", " metre!": " metres!", "Sol": "Left", "Orta": "Middle", "Sağ": "Right", "Makas": "Scissors", "Helikopter": "Helicopter", "Geri takla": "Backflip", "Fırıldak": "Spinner", "Dalış": "Dive", "Roket": "Rocket", "Kırbaç": "Whip", "Kelebek": "Butterfly", " savuruş": " swings", " sn": " s", "Geçiş: ": "Switch: ", "Şelale": "Waterfall", "Füze": "Missile", "Uçan Halı": "Flying Carpet", "Kamçı": "Lash", "Havai Fişek": "Firework", "Paraşüt": "Parachute", "Yelpaze": "Fan", "Erken bıraktın": "Released too early", " kombosu! +40": " combo! +40", "Kombo x": "Combo x", " bitti": " ended", "Sıyırdın! +10": "Close shave! +10", "Hareketli boşluklar!": "Moving gaps!", "Yüksek duvarlar!": "High walls!", "Tüneller!": "Tunnels!", " direk!": " posts!", "Süre doldu!": "Time's up!", "Hareket yarıda kaldı": "Trick cut short", "KOMBO x": "COMBO x", "Hazır ol...": "Get ready...", ". Dokun ve başla": ". Tap to start", "3 botla yarış, en uzun uçan kazanır. Dokun ve başla": "Race 3 bots, longest flight wins. Tap to start", "Dokun ve yukarı tırman. Sol ve sağ yön verir": "Tap to climb. Left and right steer", "Kendi hayaletinle yarış. Dokun ve başla": "Race your own ghost. Tap to start", "Dokun ve başla": "Tap to start", "Sola": "Left", "Düz yukarı": "Straight up", "SAĞ": "RIGHT", "Sağa": "Right", "Hızlı atak": "Fast dash", "Dengeli": "Balanced", "Yüksek, fren": "High, brakes", "SÜRE <b>": "TIME <b>", "/3 bot uçuyor": "/3 bots flying", "YÜKSEKLİK <b>": "HEIGHT <b>", " direk": " posts", " rakip uçuyor": " rivals flying", " tüy": " feathers", " · toplam ": " · total ", "YENİ EN İYİ!": "NEW BEST!", "SÜRE DOLDU": "TIME'S UP", "DÜŞTÜN!": "YOU FELL!", " toplandı, ": " collected, ", " puandan": " from points", " yıldızdan": " from stars", " kombodan": " from combo", "YENİ REKOR!": "NEW RECORD!", "En iyi ": "Best ", "Yeni yıldız": "New star", "Sen": "You", "Bot ": "Bot ", "KAZANDIN!": "YOU WON!", ". OLDUN": ". PLACE", " sıralamadan": " from placing", "90+ sn": "90+ s", "YENİ DİKEY REKOR!": "NEW CLIMB RECORD!", "Yükseklik": "Height", " m": " m", "Dikey rekor": "Climb record", " puan": " points", "HAYALETİ GEÇTİN!": "YOU BEAT THE GHOST!", "HAYALET KAZANDI": "GHOST WINS", "Hayaletin": "Your ghost", "ODAYA DÖN": "BACK TO ROOM", "Kilit açıldı: ": "Unlocked: ", "Alabilirsin: ": "You can buy: ", "Sonraki: ": "Next: ", "Dolap": "Wardrobe", "Sahneler": "Scenes", "Borular": "Pipes", "Modlar": "Modes", "Kullanılıyor": "In use", "Senin": "Yours", "Seç": "Select", "Rekor ": "Record ", " yap": " needed", "Al · ": "Buy · ", " tüy daha": " more feathers", "Toplar": "Balls", "FLIX'ler": "FLIXes", "Şu an bunu kullanıyorsun": "You are using this", "Senin, seçmek için dokun": "Yours, tap to select", "Rekorun ": "Your record is ", " yapınca kendiliğinden açılır.": " unlocks it automatically.", "Kilitli · ": "Locked · ", " tüy, sende ": " feathers, you have ", " var": "", "Oyna": "Play", "Online yarış": "Online race", "Nasıl oynanır": "How to play", "Ayarlar": "Settings", "Yarış": "Race", "Direklerin arasından uç, rekorunu kır. Rekor: ": "Fly between the posts and beat your record. Record: ", "Dikey": "Climb", "FLIX'i yukarı sektir, sağa sola yön ver, çubuklara çarpma. Rekor: ": "Bounce the FLIX upward, steer left and right, avoid the bars. Record: ", "Botlara karşı": "Versus bots", "3 botla aynı haritada yarış, en uzun süre uçan kazanır": "Race 3 bots on the same map, longest flight wins", "Kolay": "Easy", "Zor": "Hard", "Hayaletinle yarış": "Race your ghost", "En iyi turun (": "Your best run (", " direk) aynı haritada seninle uçar": " posts) flies the same map with you", "Önce bir Klasik tur oyna, en iyi turun hayaletin olur": "Play a Classic run first, your best run becomes your ghost", "Oda kur ya da arkadaşının koduyla katıl, en uzun uçan kazanır": "Create a room or join a friend's code, longest flight wins", "Meydan okumalar": "Challenges", ". En iyi: ": ". Best: ", " · yıldız başına ": " · per star ", "Oda kodu en az 3 harf olmalı.": "Room code needs at least 3 letters.", "Odaya bağlanıyor...": "Connecting to room...", "Odaya bağlanılamadı (": "Couldn't join the room (", "). Biraz sonra tekrar dene.": "). Try again in a moment.", "hâlâ uçuyor": "still flying", "SEN DÜŞTÜN, YARIŞ SÜRÜYOR": "YOU FELL, RACE GOES ON", ", 60 birincilikten": ", 60 for first place", "Herkes aynı haritada aynı anda başlar. Rakiplerin yarı saydam görünür. En uzun süre uçan kazanır.": "Everyone starts the same map at the same time. Rivals appear see-through. Longest flight wins.", " (sen)": " (you)", "yarışta": "racing", "hazır": "ready", "bekliyor": "waiting", "Rakip bekleniyor. Arkadaşın oyunu açıp Online yarış'tan bu kodla katılsın.": "Waiting for a rival. Ask your friend to open the game and join from Online race with this code.", "Hazırım ✓ (iptal)": "Ready ✓ (cancel)", "Hazırım": "I'm ready", "Herkes hazır olunca yarış 3 saniye içinde başlar.": "When everyone is ready, the race starts in 3 seconds.", "Rakip gelince ve hazır olunca başlar.": "Starts when a rival joins and is ready.", "Odadan çık": "Leave room", "BAŞLA!": "GO!", "REKOR": "RECORD", "TÜY": "FEATHERS", "STİL": "STYLE", "SOL": "LEFT", "TUT: MAKAS": "HOLD: SCISSORS", "ORTA": "MIDDLE", "TUT: HELİKOPTER": "HOLD: HELICOPTER", "TUT: GERİ TAKLA": "HOLD: BACKFLIP", "OYNA": "PLAY", "YENİ": "NEW", "Nasıl?": "How?", "NEREDEN VURURSAN ÖYLE UÇAR": "WHERE YOU KICK DECIDES HOW IT FLIES", "Alçak ve hızlı, uzun boşluklar için": "Low and fast, for long gaps", "Düz yukarı, kontrollü": "Straight up, controlled", "Çok yüksek ama yavaşlatır": "Very high but slows you down", "Basılı tut:": "Hold:", "FLIX havada hareket yapar, stil puanı toplar. Tutarken vuramazsın, zamanında bırak!": "the FLIX does a trick in the air and earns style points. You can't kick while holding, let go in time!", "HAVADA HAREKETLER": "AIR TRICKS", "↑ Kaydır": "↑ Swipe", "Fırıldak: döner ve yükselir": "Spinner: spins and rises", "↓ Kaydır": "↓ Swipe", "Dalış: hızlı düşer, çift puan": "Dive: drops fast, double points", "→ Kaydır": "→ Swipe", "Roket: ileri fırlar": "Rocket: shoots forward", "← Kaydır": "← Swipe", "Kırbaç: kuyruk savurur": "Whip: swings the tail", "İki parmak": "Two fingers", "Kelebek: süzülür, saniye başına puan": "Butterfly: glides, points per second", "Tutarken yön değiştir": "Switch while holding", "Geçiş: hareketleri bağla, her geçiş +10": "Switch: link tricks, +10 per switch", "Kombo": "Combo", "Hareketleri 2,5 saniye içinde art arda yap, her biri +5 daha fazla verir. FLIX'in üstündeki çubuk bitmeden devam et. Fırıldak sonra Dalış (Şelale) ya da Makas sonra Roket (Füze) gibi özel ikililer +40.": "Do tricks within 2.5 seconds of each other and each one gives +5 more. Keep going before the bar above the FLIX runs out. Special pairs like Spinner then Dive (Waterfall) or Scissors then Rocket (Missile) give +40.", "TÜY VE KİLİTLER": "FEATHERS AND UNLOCKS", "Boşluklardaki altın tüyleri topla. Tur sonunda her 10 puan da 1 tüy olur. Tüylerle Dolap'tan yeni FLIX'ler ve toplar, Sahneler'den yeni arka planlar al. Bazıları sadece rekorla açılır.": "Collect the golden feathers in the gaps (each is worth 2). Every 10 points also becomes 1 feather at the end of a run. Spend feathers on new FLIXes and balls in the Wardrobe, scenes and pipe colours. Some only unlock with a record.", "Ses": "Sound", "Titreşim": "Vibration", "Dil": "Language", "Klavye: A / S / D veya ← ↑ →, P ile mola.": "Keyboard: A / S / D or ← ↑ →, P to pause.", "MOLA": "PAUSED", "DEVAM": "RESUME", "Baştan": "Restart", "Menü": "Menu", "Rekor": "Record", "Direk": "Posts", "En iyi kombo": "Best combo", "TEKRAR": "AGAIN", "FLIX Kick Up oyun alanı": "FLIX Kick Up play area", "Duraklat": "Pause", "FLIX logosu, dokun ve sektir": "FLIX logo, tap to bounce", "Geri": "Back", "SEÇİLİ": "EQUIPPED", "BAŞLA": "START", "AÇ": "OPEN", "ADIN": "YOUR NAME", "Oda kur": "Create room", "YA DA KODLA KATIL": "OR JOIN WITH A CODE", "Katıl": "Join", "ODA KODU, ARKADAŞINA SÖYLE": "ROOM CODE, TELL YOUR FRIEND", "Tek başına": "Solo", "Rekorunu kır": "Beat your record", "Direklerin arasından uç": "Fly between the posts", "Yukarı tırman": "Climb up", "Botlara ya da arkadaşına karşı": "Against bots or a friend", "Yıldız topla, yıldız başına ": "Earn stars, per star ", "En iyi: ": "Best: ", "PUAN": "POINTS", " puan, ": " points, ", " saniye!": " seconds!", "Süreli çarpan! ": "Timed multiplier! ", "FLIX Kick Up, prototip sürüm 11.": "FLIX Kick Up, prototype version 11.", "Türkçe": "Türkçe", "English": "English", "SÜRE": "TIME"};
+  Object.assign(EN, { "Yakında": "Soon", "Online yarış yakında geliyor": "Online racing is coming soon", "Satın alma tamamlanmadı.": "Purchase not completed.", "Ödemeler Apple hesabın üzerinden yapılır.": "Payments are made through your Apple account.", "Satın alımlar geri yüklendi.": "Purchases restored.", "FLIX Kick Up, sürüm 1.0.": "FLIX Kick Up, version 1.0.", "TEK SEFER": "ONE TIME" });
+  // inside the iPhone app (Capacitor) real purchases and haptics go through native-bridge.js
+  const NATIVE_APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   const L = (s) => lang === "en" && EN[s] != null ? EN[s] : s;
   document.documentElement.lang = lang;
   function localize(root) {
@@ -1232,6 +1251,7 @@ svg { display: block; }
   const BALLOONS = Array.from({ length: 6 }, (_, i) => { const r = rng(i * 13 + 5); const c = [["#ff4f7b", "#ffc928"], ["#2e6bff", "#fff4e2"], ["#12a594", "#ffc928"], ["#e22511", "#fff4e2"], ["#9b5cff", "#ff4f7b"], ["#ffc928", "#d94f3d"]][i]; return { x: i / 6 + r() * 0.1, y: 0.12 + r() * 0.4, s: 0.6 + r() * 0.6, p: r() * 6, c }; });
 
   let layerCache = {};
+  const thumbCache = new Map();
   const layersFor = (id) => layerCache[id] || (layerCache[id] = ART[id].layers());
   let dotPattern = null;
   function makeDots() {
@@ -1337,9 +1357,9 @@ svg { display: block; }
     layerCache = {};
     if (!dotPattern) makeDots();
   }
-  window.addEventListener("resize", () => { resize(); thumbsDirty = true; });
+  window.addEventListener("resize", () => { resize(); thumbCache.clear(); thumbsDirty = true; });
   resize();
-  try { document.fonts && document.fonts.ready.then(() => { layerCache = {}; thumbsDirty = true; }); } catch {}
+  try { document.fonts && document.fonts.ready.then(() => { layerCache = {}; thumbCache.clear(); thumbsDirty = true; }); } catch {}
 
   // ---------- audio ----------
   let ac = null;
@@ -1347,6 +1367,7 @@ svg { display: block; }
     if (!settings.sound) return;
     try {
       ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state !== "running" && !document.hidden) ac.resume();
       const o = ac.createOscillator(), g = ac.createGain();
       o.type = type; o.frequency.setValueAtTime(freq, ac.currentTime);
       o.frequency.exponentialRampToValueAtTime(freq * slide, ac.currentTime + dur);
@@ -1355,7 +1376,7 @@ svg { display: block; }
       o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + dur);
     } catch {}
   }
-  const buzz = (ms) => { if (!settings.vibe) return; try { navigator.vibrate && navigator.vibrate(ms); } catch {} };
+  const buzz = (ms) => { if (!settings.vibe) return; try { if (window.FlixNative && FlixNative.haptic) FlixNative.haptic(Array.isArray(ms) ? Math.max(...ms) : ms); else if (navigator.vibrate) navigator.vibrate(ms); } catch {} };
   const jingle = () => { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.14, "square", 0.07, 1), i * 90)); };
 
   // ---------- FLIX sprite ----------
@@ -2221,7 +2242,7 @@ svg { display: block; }
     if (S.mode !== "paused") return;
     S.mode = S.resumeMode || "play"; $("pause").hidden = true;
   }
-  document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) { pauseGame(); try { ac && ac.suspend(); } catch {} } else { try { ac && settings.sound && ac.resume(); } catch {} } });
   S.run = { kind: "classic" }; S.rt = 0; S.spawned = 0;
 
   const purchasable = () => [...SKINS.map((it) => ["skin", it]), ...SCENES.map((it) => ["scene", it]), ...PIPES.map((it) => ["pipe", it])].filter(([, it]) => !isOwned(it) && it.price != null);
@@ -2291,7 +2312,7 @@ svg { display: block; }
       netDead(); onlineRank();
     }
     $("again").textContent = run.kind === "online" ? L("ODAYA DÖN") : L("TEKRAR");
-    $("oBest").textContent = best; $("oGates").textContent = S.gates; $("oStyle").textContent = "x" + (S.bestCombo || 0);
+    $("oBest").textContent = run.kind === "dikey" ? vbest : best; $("oGates").textContent = S.gates; $("oStyle").textContent = "x" + (S.bestCombo || 0);
     paintEarn();
     const un = $("oUnlocked");
     un.hidden = !fresh.length;
@@ -2342,7 +2363,7 @@ svg { display: block; }
     refreshHome();
   }
   function refreshHome() {
-    $("hBest").textContent = best; $("hCoins").textContent = coins; $("sCoins").textContent = coins;
+    $("hBest").textContent = best; $("hCoins").textContent = fmt(coins); $("sCoins").textContent = fmt(coins);
     const can = (list) => list.some((it) => !isOwned(it) && it.price != null && it.price <= coins);
     $("dotSkin").hidden = !can(SKINS); $("dotScene").hidden = !can(SCENES); $("dotPipe").hidden = !can(PIPES);
     S.menuY = sheetOpen ? 0.2 : 0.5;
@@ -2384,10 +2405,16 @@ svg { display: block; }
       b.className = "card r-" + it.rar + (isOwned(it) ? "" : " locked") + (st.cheap ? " cheap" : "");
       b.setAttribute("aria-pressed", String(sel === it.id));
       b.setAttribute("aria-label", it.name);
-      const c = document.createElement("canvas");
-      if (kind === "skin") { c.width = 120; c.height = 120; const x = c.getContext("2d"); drawFlix(x, 60, it.ball ? 60 : 58, it.ball ? 0.3 : 0, it.ball ? 34 : 27, it, 0, 0.3); }
-      else if (kind === "pipe") { c.width = 120; c.height = 120; drawPipeThumb(c, it); }
-      else { c.width = 192; c.height = 120; drawSceneThumb(c, it.id); }
+      const key = kind + "|" + it.id + "|" + (kind === "scene" ? curSkin().id : kind === "pipe" ? curScene().id : "");
+      let src = thumbCache.get(key);
+      if (!src) {
+        src = document.createElement("canvas");
+        if (kind === "skin") { src.width = 120; src.height = 120; const x = src.getContext("2d"); drawFlix(x, 60, it.ball ? 60 : 58, it.ball ? 0.3 : 0, it.ball ? 34 : 27, it, 0, 0.3); }
+        else if (kind === "pipe") { src.width = 120; src.height = 120; drawPipeThumb(src, it); }
+        else { src.width = 192; src.height = 120; drawSceneThumb(src, it.id); }
+        thumbCache.set(key, src);
+      }
+      const c = document.createElement("canvas"); c.width = src.width; c.height = src.height; c.getContext("2d").drawImage(src, 0, 0);
       b.appendChild(c);
       b.insertAdjacentHTML("beforeend", '<span class="rar">' + RAR[it.rar].n + '</span><span class="nm"></span><span class="st"></span>');
       b.querySelector(".nm").textContent = it.name;
@@ -2555,7 +2582,8 @@ svg { display: block; }
       seg.appendChild(sb);
     }
     bot.appendChild(seg); race.appendChild(bot);
-    race.appendChild(modeRow(ICONS.online, L("Online yarış"), L("Rastgele rakiple ya da arkadaşınla yarış"), '<span class="go">AÇ</span>', () => openSheet("online")));
+    if (NATIVE_APP) race.appendChild(modeRow(ICONS.online, L("Online yarış"), L("Online yarış yakında geliyor"), '<span class="go">' + L("Yakında") + '</span>', null, true));
+    else race.appendChild(modeRow(ICONS.online, L("Online yarış"), L("Rastgele rakiple ya da arkadaşınla yarış"), '<span class="go">AÇ</span>', () => openSheet("online")));
 
     const ch = sec("s-ch", L("Meydan okumalar"), L("Yıldız başına ") + STAR_REWARD + L(" tüy"));
     const g = document.createElement("div"); g.className = "chgrid"; ch.appendChild(g);
@@ -2574,12 +2602,12 @@ svg { display: block; }
   if (!iap.campEnd) { iap.campEnd = Date.now() + 48 * 3600 * 1000; store.set("fku4.iap", iap); }
   const usd = (n) => "$" + n.toFixed(2);
   const PACKS = [
-    { id: "p1", name: L("Avuç"), n: 500, usd: 0.99 },
-    { id: "p2", name: L("Kese"), n: 1200, usd: 1.99, bonus: 20 },
-    { id: "p3", name: L("Sandık"), n: 3500, usd: 4.99, bonus: 40, badge: L("EN POPÜLER") },
-    { id: "p4", name: L("Hazine"), n: 8000, usd: 9.99, bonus: 60 },
-    { id: "p5", name: L("Dağ"), n: 18000, usd: 19.99, bonus: 80 },
-    { id: "p6", name: L("Ejderha Hazinesi"), n: 50000, usd: 49.99, bonus: 100, badge: L("EN İYİ DEĞER") },
+    { id: "p1", pid: "kickup_feathers_500", name: L("Avuç"), n: 500, usd: 0.99 },
+    { id: "p2", pid: "kickup_feathers_1200", name: L("Kese"), n: 1200, usd: 1.99, bonus: 20 },
+    { id: "p3", pid: "kickup_feathers_3500", name: L("Sandık"), n: 3500, usd: 4.99, bonus: 40, badge: L("EN POPÜLER") },
+    { id: "p4", pid: "kickup_feathers_8000", name: L("Hazine"), n: 8000, usd: 9.99, bonus: 60 },
+    { id: "p5", pid: "kickup_feathers_18000", name: L("Dağ"), n: 18000, usd: 19.99, bonus: 80 },
+    { id: "p6", pid: "kickup_feathers_50000", name: L("Ejderha Hazinesi"), n: 50000, usd: 49.99, bonus: 100, badge: L("EN İYİ DEĞER") },
   ];
   function drawPile(c, k) {
     const x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
@@ -2594,11 +2622,20 @@ svg { display: block; }
     buying = fn; $("buyWhat").textContent = what; $("buyPrice").textContent = price; $("buyModal").hidden = false;
   }
   $("buyNo").addEventListener("click", () => { buying = null; $("buyModal").hidden = true; });
-  $("buyYes").addEventListener("click", () => {
-    const fn = buying; buying = null; $("buyModal").hidden = true; if (!fn) return;
+  function bought(fn) {
     fn(); jingle(); buzz(30); burst(W / 2, H * 0.3, reduce ? 10 : 50, ["#ffc20e", "#e22511", "#ff4f7b", PAPER, "#2e6bff"]);
     refreshHome(); if (sheetOpen === "store") buildStore();
+  }
+  $("buyYes").addEventListener("click", () => {
+    const fn = buying; buying = null; $("buyModal").hidden = true; if (fn) bought(fn);
   });
+  // App Store product ids (must match App Store Connect); the web build shows a demo confirm instead
+  const priceOf = (pid, n) => (window.FlixNative && FlixNative.price && FlixNative.price(pid)) || usd(n);
+  function pay(pid, what, n, fn) {
+    if (window.FlixNative && FlixNative.buy) { FlixNative.buy(pid).then((ok) => { if (ok) bought(fn); else toast(L("Satın alma tamamlanmadı.")); }, () => toast(L("Satın alma tamamlanmadı."))); return; }
+    askBuy(what, usd(n), fn);
+  }
+  const grantStarter = () => { if (!iap.starter) addCoins(2500); iap.starter = true; store.set("fku4.iap", iap); owned.add("kristal"); saveOwned(); };
   function toast(t) { document.querySelectorAll(".toast").forEach((q) => q.remove()); const d = document.createElement("div"); d.className = "toast"; d.textContent = t; app.appendChild(d); setTimeout(() => d.remove(), 2500); }
   const addCoins = (n) => { coins += n; store.set("fku2.coins", coins); };
   function buildStore() {
@@ -2608,13 +2645,14 @@ svg { display: block; }
     if (!iap.starter && left > 0) {
       h(L("Kampanya"));
       const c = document.createElement("div"); c.className = "camp";
-      c.innerHTML = '<span class="tag">-%70</span><b></b><canvas width="168" height="168"></canvas><small></small><span class="tm"></span><span class="price"><button class="pbtn">$2.99</button><s>$9.99</s></span>';
+      c.innerHTML = '<span class="tag">' + (NATIVE_APP ? L("TEK SEFER") : "-%70") + '</span><b></b><canvas width="168" height="168"></canvas><small></small><span class="tm"></span><span class="price"><button class="pbtn"></button>' + (NATIVE_APP ? "" : "<s>$9.99</s>") + "</span>";
+      c.querySelector(".pbtn").textContent = priceOf("kickup_starter", 2.99);
       c.querySelector("b").textContent = L("Başlangıç Paketi"); c.querySelector("small").textContent = L("Tek seferlik: 2.500 tüy ve Kristal FLIX");
       const cx = c.querySelector("canvas").getContext("2d"); drawFlix(cx, 84, 112, 0, 40, byId(SKINS, "kristal"), 0, 0.3);
       const tm = c.querySelector(".tm");
       const tick = () => { const ms = Math.max(0, iap.campEnd - Date.now()), hh = Math.floor(ms / 3600000), mm = Math.floor(ms / 60000) % 60, ss = Math.floor(ms / 1000) % 60; tm.textContent = L("Bitiyor: ") + hh + ":" + String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0"); if (!ms) buildStore(); };
       tick(); campTimer = setInterval(() => { if (sheetOpen !== "store") return clearInterval(campTimer); tick(); }, 1000);
-      c.querySelector(".pbtn").addEventListener("click", () => askBuy(L("Başlangıç Paketi"), "$2.99", () => { iap.starter = true; store.set("fku4.iap", iap); addCoins(2500); owned.add("kristal"); saveOwned(); toast(L("Teşekkürler! ") + "+2.500 " + L("tüy") + " + Kristal FLIX"); }));
+      c.querySelector(".pbtn").addEventListener("click", () => pay("kickup_starter", L("Başlangıç Paketi"), 2.99, () => { grantStarter(); toast(L("Teşekkürler! ") + "+2.500 " + L("tüy") + " + Kristal FLIX"); }));
       el.appendChild(c);
     }
     const na = document.createElement("div"); na.className = "noads";
@@ -2622,7 +2660,7 @@ svg { display: block; }
     na.querySelector("b").textContent = L("Reklamsız"); na.querySelector("small").textContent = L("Reklamları ömür boyu kaldırır");
     const nb = na.querySelector(".pbtn"); nb.textContent = iap.noads ? L("Satın alındı") : "$2.99"; nb.disabled = iap.noads;
     nb.addEventListener("click", () => askBuy(L("Reklamsız"), "$2.99", () => { iap.noads = true; store.set("fku4.iap", iap); toast(L("Reklamlar kapandı")); }));
-    el.appendChild(na);
+    if (!NATIVE_APP) el.appendChild(na);   // the game has no ads, so the app does not sell ad removal
     h(L("Tüy paketleri"));
     const g = document.createElement("div"); g.className = "packs"; el.appendChild(g);
     PACKS.forEach((pk, i) => {
@@ -2632,14 +2670,17 @@ svg { display: block; }
       drawPile(b.querySelector("canvas"), i);
       b.querySelector("b").textContent = fmt(pk.n); b.querySelector("small").textContent = pk.name;
       b.querySelector(".bonus").textContent = pk.bonus ? "+%" + pk.bonus + L(" bonus") : "";
-      b.querySelector(".pbtn").textContent = usd(pk.usd);
-      b.addEventListener("click", () => askBuy(fmt(pk.n) + " " + L("tüy") + " · " + pk.name, usd(pk.usd), () => { addCoins(pk.n); toast(L("Teşekkürler! ") + "+" + fmt(pk.n) + " " + L("tüy")); }));
+      b.querySelector(".pbtn").textContent = priceOf(pk.pid, pk.usd);
+      b.addEventListener("click", () => pay(pk.pid, fmt(pk.n) + " " + L("tüy") + " · " + pk.name, pk.usd, () => { addCoins(pk.n); toast(L("Teşekkürler! ") + "+" + fmt(pk.n) + " " + L("tüy")); }));
       g.appendChild(b);
     });
     const rs = document.createElement("button"); rs.className = "restore"; rs.textContent = L("Satın alımları geri yükle");
-    rs.addEventListener("click", () => toast(L("Geri yüklenecek bir şey yok (test sürümü).")));
+    rs.addEventListener("click", () => {
+      if (!(window.FlixNative && FlixNative.restore)) return toast(L("Geri yüklenecek bir şey yok (test sürümü)."));
+      FlixNative.restore().then((ids) => { if ((ids || []).includes("kickup_starter")) grantStarter(); toast(L("Satın alımlar geri yüklendi.")); refreshHome(); buildStore(); }, () => toast(L("Satın alma tamamlanmadı.")));
+    });
     el.appendChild(rs);
-    const fine = document.createElement("p"); fine.className = "fine"; fine.textContent = L("Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak."); el.appendChild(fine);
+    const fine = document.createElement("p"); fine.className = "fine"; fine.textContent = window.FlixNative ? L("Ödemeler Apple hesabın üzerinden yapılır.") : L("Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak."); el.appendChild(fine);
   }
   $("openStore").addEventListener("click", () => { beep(600, 0.05); openSheet("store"); });
 
@@ -2752,7 +2793,7 @@ svg { display: block; }
   }
 
   // ---------- loop: fixed-step simulation, interpolated drawing ----------
-  let last = performance.now(), acc = 0;
+  let last = performance.now(), acc = 0, lastDraw = 0;
   function frame(now) {
     acc += Math.min(0.1, (now - last) / 1000); last = now;
     let n = 0;
@@ -2771,11 +2812,14 @@ svg { display: block; }
       if ($("readyText").textContent !== txt) { $("readyText").textContent = txt; beep(left > 0 ? 520 : 880, 0.1, "triangle", 0.1, 1); }
       if (left <= 0) { S.mode = "play"; S.vy = -0.6 * U; $("ready").hidden = true; }
     }
-    if (S.run && S.run.kind === "online" && net.room && (S.mode === "play" || S.mode === "ready")) net.room.presence({ x: Math.round(S.x / U * 1000), y: Math.round(S.y / U * 1000), a: Math.round(S.ang * 100), g: S.gates, sc: S.score });
+    if (S.run && S.run.kind === "online" && net.room && (S.mode === "play" || S.mode === "ready") && now - (net.lastPos || 0) > 90 && (net.lastPos = now)) net.room.presence({ x: Math.round(S.x / U * 1000), y: Math.round(S.y / U * 1000), a: Math.round(S.ang * 100), g: S.gates, sc: S.score });
     if (S.mode === "play" || S.mode === "ready") updateRaceHud();
-    drawScene(S.mode === "paused" ? 1 : alpha);
+    const idle = (S.mode === "paused" || S.mode === "over") && !S.parts.length && !S.texts.length;
+    if (!idle || now - lastDraw > 66) { lastDraw = now; drawScene(S.mode === "paused" ? 1 : alpha); }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 })();
 </script>
+</body>
+</html>
