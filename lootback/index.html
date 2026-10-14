@@ -4863,7 +4863,8 @@ function frame(now) {
   if (G.comicQ && G.state === 'play' && now > G.comicAt) { const k = G.comicQ; G.comicQ = null; comicShow(k, null, 'Devam ▶'); }
   if (R.on && G.state === 'menu' && !R.bossWarm && now > 2500) { R.bossWarm = 1; warmUp(); }
   if (R.on && G.state === 'play' && G.time > 0.25 && R.warmKey !== LOOK.hero + ':' + LOOK.hs) runWarm();
-  if (R.on && !CM.on) { render(dt, rdt); renderCivilians(dt); renderEscape(now / 1000); }
+  const still = G.state === 'paused' || G.state === 'cards' || G.state === 'over';
+  if (R.on && !CM.on && (!still || now - (R.stillT || 0) > 100)) { R.stillT = now; render(dt, rdt); renderCivilians(dt); renderEscape(now / 1000); }
   doomTick(rdt);
   // keep it smooth: if the phone struggles in 2K, lower the pixel ratio step by step
   // 60 fps governor: drop the pixel ratio a notch when frames fall under ~52, win it back when there is headroom
@@ -4929,7 +4930,7 @@ applyCtrl();
 const toggleSound = () => { save.sound = !save.sound; persist(); updateMenu(); };
 for (const w of document.querySelectorAll('#menu .wallet .pill')) w.onclick = () => shopOpen('gold');
 $('bSound').onclick = toggleSound; $('bSound2').onclick = toggleSound; $('bQ').onclick = toggleQ; $('bQ2').onclick = toggleQ; qLabel();
-document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { pause(); try { if (AC && AC.state === 'running') AC.suspend(); } catch (e) {} } });
 setInterval(() => $('bFlip').classList.toggle('show', !!ROT && G.state === 'menu'), 300);
 window.addEventListener('resize', layout);
 function resizeGL() {

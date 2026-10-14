@@ -1,3 +1,13 @@
+# ARKANA: Yüklemeye hazır (v30, 2026-10-14)
+
+Önceki sürüm (v29) `arkana-v29.html`, kaynak `arkana10.html`.
+
+- Optimizasyon: duraklatma, kart ve oyun sonu ekranlarında sahne saniyede 10 kez çiziliyor (pil ve ısınma). Uygulama arka plana geçince oyun duruyor ve ses kapanıyor.
+- App Store paketi (`app/`): oyun yeni sürümle yeniden üretildi ve internetsiz çalıştığı test edildi; 6 yeni 2796x1290 ekran görüntüsü; mağaza metinleri 5 mod, 4 patron, 24 silah ve 11 haritaya göre güncellendi.
+- Tüm menüler ve modlar hatasız tarandı.
+
+---
+
 # ARKANA: 2K 60 fps standart (v29, 2026-10-13)
 
 Önceki sürüm (v28) `arkana-v28.html`, kaynak `arkana10.html`.
