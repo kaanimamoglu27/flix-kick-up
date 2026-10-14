@@ -423,6 +423,8 @@ svg { display: block; }
 .modal { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
 .card-box { max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .moderow:disabled { opacity: .55; }
+.hflix { flex: 1; align-self: stretch; position: relative; min-height: 90px; pointer-events: auto; cursor: pointer; touch-action: none; }
+.hflix canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 </style>
 </head>
 <body>
@@ -477,7 +479,7 @@ svg { display: block; }
       <span class="tape">KICK UP</span>
     </div>
     <p class="slogan">Kick it, Flick it, Flix it!</p>
-    <div class="grow"></div>
+    <div class="hflix" id="hflix"><canvas id="hf" aria-label="FLIX, dokun ve sektir"></canvas></div>
     <div class="home-actions">
       <button class="btn big" id="play">OYNA</button>
       <div class="tiles">
@@ -540,7 +542,7 @@ svg { display: block; }
         <button class="toggle" id="tSound" aria-pressed="true"><span>Ses</span><i></i></button>
         <button class="toggle" id="tVibe" aria-pressed="true"><span>Titreşim</span><i></i></button>
         <div class="langrow"><span>Dil</span><div class="seg two" id="langSeg"><button data-lang="tr">Türkçe</button><button data-lang="en">English</button></div></div>
-        <p class="about">FLIX Kick Up, sürüm 1.0.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>flixtoysofficial.com</p>
+        <p class="about">FLIX Kick Up, sürüm 1.1.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>flixtoysofficial.com</p>
       </div>
     </div>
     <footer id="sheetFoot">
@@ -616,7 +618,7 @@ svg { display: block; }
   try { lang = JSON.parse(localStorage.getItem("fku4.lang")) || "tr"; } catch {}
   if (lang !== "en") lang = "tr";
   const EN = {"Mağaza": "Store", "Tüy paketleri": "Feather packs", "Kampanya": "Special offer", "Başlangıç Paketi": "Starter Pack", "Tek seferlik: 2.500 tüy ve Kristal FLIX": "One time only: 2,500 feathers and the Crystal FLIX", "Bitiyor: ": "Ends in: ", "Reklamsız": "No Ads", "Reklamları ömür boyu kaldırır": "Removes ads forever", "Satın alındı": "Purchased", "Avuç": "Handful", "Kese": "Pouch", "Sandık": "Chest", "Hazine": "Treasure", "Dağ": "Mountain", "Ejderha Hazinesi": "Dragon Hoard", "EN POPÜLER": "MOST POPULAR", "EN İYİ DEĞER": "BEST VALUE", " bonus": " bonus", "Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak.": "Test build: no real payment is taken, feathers are added right away. In the App Store version payment goes through Apple.", "Satın al": "Buy", "Vazgeç": "Cancel", "Satın alımları geri yükle": "Restore purchases", "Geri yüklenecek bir şey yok (test sürümü).": "Nothing to restore (test build).", "Teşekkürler! ": "Thanks! ", "Bu test sürümünde gerçek ödeme alınmaz.": "No real payment is taken in this test build.", "Reklamlar kapandı": "Ads removed", "Kampanya bitti": "Offer ended", "Mesafe": "Distance", "30 saniyede en uzun yolu kat et": "Fly as far as you can in 30 seconds", "Orman": "Forest", "Çöl": "Desert", "Lunapark Gecesi": "Funfair Night", "Rastgele rakip": "Random rival", "RASTGELE YARIŞ": "RANDOM RACE", "ARKADAŞINLA YARIŞ": "RACE A FRIEND", "Rakip aranıyor. Biri gelince yarış kendiliğinden başlar.": "Looking for a rival. The race starts by itself when someone joins.", "Çevrimiçi oyuncu: ": "Players online: ", "Rastgele rakiple ya da arkadaşınla yarış": "Race a random rival or a friend", "Online oynayan herkesle eşleşirsin, en uzun uçan kazanır.": "You get matched with anyone playing online, longest flight wins.", "Aramayı bırak": "Stop searching", "direk": "posts", "sn": "s", "Yıldız başına ": "Per star ", "Sıradan": "Common", "Nadir": "Rare", "Epik": "Epic", "Efsane": "Legendary", "Mitik": "Mythic", "Turuncu": "Orange", "Sarı": "Yellow", "Beyaz": "White", "Kırmızı": "Red", "Gök Mavisi": "Sky Blue", "Çimen": "Grass", "Pamuk Şeker": "Cotton Candy", "Gece Moru": "Night Purple", "Türkiye": "Türkiye", "Siyah-Beyaz": "Black-White", "Sarı-Lacivert": "Yellow-Navy", "Sarı-Kırmızı": "Yellow-Red", "Lav": "Lava", "Okyanus": "Ocean", "Buz": "Ice", "Gün Batımı": "Sunset", "Neon": "Neon", "Kristal": "Crystal", "Altın FLIX": "Golden FLIX", "Galaksi": "Galaxy", "Ateş Kuşu": "Firebird", "Ejderha": "Dragon", "Futbol Topu": "Football", "Tenis Topu": "Tennis Ball", "Basketbol Topu": "Basketball", "Plaj Topu": "Beach Ball", "Voleybol Topu": "Volleyball", "İstanbul Akşamı": "Istanbul Evening", "Mahalle Arası": "Neighbourhood", "Yaz Plajı": "Summer Beach", "Gece Maçı": "Night Match", "Kar Tatili": "Snow Holiday", "Yıldız Sahne": "Star Stage", "Kapadokya Sabahı": "Cappadocia Morning", "Boğaz": "Bosphorus", "Uzay": "Space", "Sahne Rengi": "Scene Colour", "Klasik": "Classic", "Lacivert": "Navy", "Pamuk": "Candy", "Gece": "Night", "Altın": "Gold", "Gökkuşağı": "Rainbow", "tr-TR": "en-US", "Uzun tünellerde Sol vuruşla hızlan, içeride az zaman geçir.": "In long tunnels, kick Left to speed up and spend less time inside.", "Yüksek duvarların önünde Sağ vuruş: çok yükselir ama yavaşlatır.": "Before high walls, kick Right: it climbs a lot but slows you down.", "Boşluğun tam ortasından geçersen +5 bonus alırsın.": "Fly through the exact middle of a gap for a +5 bonus.", "Orta vuruş en güvenlisi. Panik anında ortaya dokun.": "The Middle kick is the safest. When in doubt, tap the middle.", "Hareketli boşluklarda acele etme, boşluğun sana gelmesini bekle.": "On moving gaps, don't rush. Let the gap come to you.", "Helikopter yaparken FLIX yavaş düşer. Uzun bir boşlukta tut, puanları topla.": "During a Helicopter the FLIX falls slowly. Hold it in a long gap and rack up points.", "Hareketleri art arda bağla: stil çarpanı x5'e kadar çıkar.": "Chain tricks back to back: the style multiplier goes up to x5.", "Direğe çok yakın geçmek 'Sıyırdın' bonusu verir.": "Passing very close to a post gives a 'Close shave' bonus.", "Dalış çift puan verir ama hızla düşersin. Yüksekten başla.": "A Dive gives double points but you drop fast. Start high.", "Tutarken parmağını kaydırıp hareket değiştir: her geçiş +10.": "While holding, swipe to switch tricks: each switch is +10.", "İki parmakla Kelebek yap: FLIX süzülür, uzun boşluklarda puan topla.": "Use two fingers for a Butterfly: the FLIX glides, great for long gaps.", "Her 10 puan tur sonunda 1 tüy olur. Stil puanı da sayılır.": "Every 10 points becomes 1 feather at the end of a run. Style points count too.", "10 Saniye": "10 Seconds", "10 saniyede en çok direkten geç": "Pass as many posts as you can in 10 seconds", "Akrobat": "Acrobat", "Tek bir hareketi olabildiğince uzun sürdür": "Hold a single trick for as long as you can", "Tüy Avı": "Feather Hunt", "20 saniyede en çok tüy topla": "Collect as many feathers as you can in 20 seconds", "tüy": "feathers", "Bot (kolay)": "Bot (easy)", "Bot (orta)": "Bot (medium)", "Bot (zor)": "Bot (hard)", "Kartal": "Eagle", "Şimşek": "Bolt", "Zıpzıp": "Bouncy", "Oyuncu ": "Player ", "Oyuncu": "Player", "Tam ortadan +5": "Dead centre +5", "Kayan boşluklar!": "Sliding gaps!", " metre!": " metres!", "Sol": "Left", "Orta": "Middle", "Sağ": "Right", "Makas": "Scissors", "Helikopter": "Helicopter", "Geri takla": "Backflip", "Fırıldak": "Spinner", "Dalış": "Dive", "Roket": "Rocket", "Kırbaç": "Whip", "Kelebek": "Butterfly", " savuruş": " swings", " sn": " s", "Geçiş: ": "Switch: ", "Şelale": "Waterfall", "Füze": "Missile", "Uçan Halı": "Flying Carpet", "Kamçı": "Lash", "Havai Fişek": "Firework", "Paraşüt": "Parachute", "Yelpaze": "Fan", "Erken bıraktın": "Released too early", " kombosu! +40": " combo! +40", "Kombo x": "Combo x", " bitti": " ended", "Sıyırdın! +10": "Close shave! +10", "Hareketli boşluklar!": "Moving gaps!", "Yüksek duvarlar!": "High walls!", "Tüneller!": "Tunnels!", " direk!": " posts!", "Süre doldu!": "Time's up!", "Hareket yarıda kaldı": "Trick cut short", "KOMBO x": "COMBO x", "Hazır ol...": "Get ready...", ". Dokun ve başla": ". Tap to start", "3 botla yarış, en uzun uçan kazanır. Dokun ve başla": "Race 3 bots, longest flight wins. Tap to start", "Dokun ve yukarı tırman. Sol ve sağ yön verir": "Tap to climb. Left and right steer", "Kendi hayaletinle yarış. Dokun ve başla": "Race your own ghost. Tap to start", "Dokun ve başla": "Tap to start", "Sola": "Left", "Düz yukarı": "Straight up", "SAĞ": "RIGHT", "Sağa": "Right", "Hızlı atak": "Fast dash", "Dengeli": "Balanced", "Yüksek, fren": "High, brakes", "SÜRE <b>": "TIME <b>", "/3 bot uçuyor": "/3 bots flying", "YÜKSEKLİK <b>": "HEIGHT <b>", " direk": " posts", " rakip uçuyor": " rivals flying", " tüy": " feathers", " · toplam ": " · total ", "YENİ EN İYİ!": "NEW BEST!", "SÜRE DOLDU": "TIME'S UP", "DÜŞTÜN!": "YOU FELL!", " toplandı, ": " collected, ", " puandan": " from points", " yıldızdan": " from stars", " kombodan": " from combo", "YENİ REKOR!": "NEW RECORD!", "En iyi ": "Best ", "Yeni yıldız": "New star", "Sen": "You", "Bot ": "Bot ", "KAZANDIN!": "YOU WON!", ". OLDUN": ". PLACE", " sıralamadan": " from placing", "90+ sn": "90+ s", "YENİ DİKEY REKOR!": "NEW CLIMB RECORD!", "Yükseklik": "Height", " m": " m", "Dikey rekor": "Climb record", " puan": " points", "HAYALETİ GEÇTİN!": "YOU BEAT THE GHOST!", "HAYALET KAZANDI": "GHOST WINS", "Hayaletin": "Your ghost", "ODAYA DÖN": "BACK TO ROOM", "Kilit açıldı: ": "Unlocked: ", "Alabilirsin: ": "You can buy: ", "Sonraki: ": "Next: ", "Dolap": "Wardrobe", "Sahneler": "Scenes", "Borular": "Pipes", "Modlar": "Modes", "Kullanılıyor": "In use", "Senin": "Yours", "Seç": "Select", "Rekor ": "Record ", " yap": " needed", "Al · ": "Buy · ", " tüy daha": " more feathers", "Toplar": "Balls", "FLIX'ler": "FLIXes", "Şu an bunu kullanıyorsun": "You are using this", "Senin, seçmek için dokun": "Yours, tap to select", "Rekorun ": "Your record is ", " yapınca kendiliğinden açılır.": " unlocks it automatically.", "Kilitli · ": "Locked · ", " tüy, sende ": " feathers, you have ", " var": "", "Oyna": "Play", "Online yarış": "Online race", "Nasıl oynanır": "How to play", "Ayarlar": "Settings", "Yarış": "Race", "Direklerin arasından uç, rekorunu kır. Rekor: ": "Fly between the posts and beat your record. Record: ", "Dikey": "Climb", "FLIX'i yukarı sektir, sağa sola yön ver, çubuklara çarpma. Rekor: ": "Bounce the FLIX upward, steer left and right, avoid the bars. Record: ", "Botlara karşı": "Versus bots", "3 botla aynı haritada yarış, en uzun süre uçan kazanır": "Race 3 bots on the same map, longest flight wins", "Kolay": "Easy", "Zor": "Hard", "Hayaletinle yarış": "Race your ghost", "En iyi turun (": "Your best run (", " direk) aynı haritada seninle uçar": " posts) flies the same map with you", "Önce bir Klasik tur oyna, en iyi turun hayaletin olur": "Play a Classic run first, your best run becomes your ghost", "Oda kur ya da arkadaşının koduyla katıl, en uzun uçan kazanır": "Create a room or join a friend's code, longest flight wins", "Meydan okumalar": "Challenges", ". En iyi: ": ". Best: ", " · yıldız başına ": " · per star ", "Oda kodu en az 3 harf olmalı.": "Room code needs at least 3 letters.", "Odaya bağlanıyor...": "Connecting to room...", "Odaya bağlanılamadı (": "Couldn't join the room (", "). Biraz sonra tekrar dene.": "). Try again in a moment.", "hâlâ uçuyor": "still flying", "SEN DÜŞTÜN, YARIŞ SÜRÜYOR": "YOU FELL, RACE GOES ON", ", 60 birincilikten": ", 60 for first place", "Herkes aynı haritada aynı anda başlar. Rakiplerin yarı saydam görünür. En uzun süre uçan kazanır.": "Everyone starts the same map at the same time. Rivals appear see-through. Longest flight wins.", " (sen)": " (you)", "yarışta": "racing", "hazır": "ready", "bekliyor": "waiting", "Rakip bekleniyor. Arkadaşın oyunu açıp Online yarış'tan bu kodla katılsın.": "Waiting for a rival. Ask your friend to open the game and join from Online race with this code.", "Hazırım ✓ (iptal)": "Ready ✓ (cancel)", "Hazırım": "I'm ready", "Herkes hazır olunca yarış 3 saniye içinde başlar.": "When everyone is ready, the race starts in 3 seconds.", "Rakip gelince ve hazır olunca başlar.": "Starts when a rival joins and is ready.", "Odadan çık": "Leave room", "BAŞLA!": "GO!", "REKOR": "RECORD", "TÜY": "FEATHERS", "STİL": "STYLE", "SOL": "LEFT", "TUT: MAKAS": "HOLD: SCISSORS", "ORTA": "MIDDLE", "TUT: HELİKOPTER": "HOLD: HELICOPTER", "TUT: GERİ TAKLA": "HOLD: BACKFLIP", "OYNA": "PLAY", "YENİ": "NEW", "Nasıl?": "How?", "NEREDEN VURURSAN ÖYLE UÇAR": "WHERE YOU KICK DECIDES HOW IT FLIES", "Alçak ve hızlı, uzun boşluklar için": "Low and fast, for long gaps", "Düz yukarı, kontrollü": "Straight up, controlled", "Çok yüksek ama yavaşlatır": "Very high but slows you down", "Basılı tut:": "Hold:", "FLIX havada hareket yapar, stil puanı toplar. Tutarken vuramazsın, zamanında bırak!": "the FLIX does a trick in the air and earns style points. You can't kick while holding, let go in time!", "HAVADA HAREKETLER": "AIR TRICKS", "↑ Kaydır": "↑ Swipe", "Fırıldak: döner ve yükselir": "Spinner: spins and rises", "↓ Kaydır": "↓ Swipe", "Dalış: hızlı düşer, çift puan": "Dive: drops fast, double points", "→ Kaydır": "→ Swipe", "Roket: ileri fırlar": "Rocket: shoots forward", "← Kaydır": "← Swipe", "Kırbaç: kuyruk savurur": "Whip: swings the tail", "İki parmak": "Two fingers", "Kelebek: süzülür, saniye başına puan": "Butterfly: glides, points per second", "Tutarken yön değiştir": "Switch while holding", "Geçiş: hareketleri bağla, her geçiş +10": "Switch: link tricks, +10 per switch", "Kombo": "Combo", "Hareketleri 2,5 saniye içinde art arda yap, her biri +5 daha fazla verir. FLIX'in üstündeki çubuk bitmeden devam et. Fırıldak sonra Dalış (Şelale) ya da Makas sonra Roket (Füze) gibi özel ikililer +40.": "Do tricks within 2.5 seconds of each other and each one gives +5 more. Keep going before the bar above the FLIX runs out. Special pairs like Spinner then Dive (Waterfall) or Scissors then Rocket (Missile) give +40.", "TÜY VE KİLİTLER": "FEATHERS AND UNLOCKS", "Boşluklardaki altın tüyleri topla. Tur sonunda her 10 puan da 1 tüy olur. Tüylerle Dolap'tan yeni FLIX'ler ve toplar, Sahneler'den yeni arka planlar al. Bazıları sadece rekorla açılır.": "Collect the golden feathers in the gaps (each is worth 2). Every 10 points also becomes 1 feather at the end of a run. Spend feathers on new FLIXes and balls in the Wardrobe, scenes and pipe colours. Some only unlock with a record.", "Ses": "Sound", "Titreşim": "Vibration", "Dil": "Language", "Klavye: A / S / D veya ← ↑ →, P ile mola.": "Keyboard: A / S / D or ← ↑ →, P to pause.", "MOLA": "PAUSED", "DEVAM": "RESUME", "Baştan": "Restart", "Menü": "Menu", "Rekor": "Record", "Direk": "Posts", "En iyi kombo": "Best combo", "TEKRAR": "AGAIN", "FLIX Kick Up oyun alanı": "FLIX Kick Up play area", "Duraklat": "Pause", "FLIX logosu, dokun ve sektir": "FLIX logo, tap to bounce", "Geri": "Back", "SEÇİLİ": "EQUIPPED", "BAŞLA": "START", "AÇ": "OPEN", "ADIN": "YOUR NAME", "Oda kur": "Create room", "YA DA KODLA KATIL": "OR JOIN WITH A CODE", "Katıl": "Join", "ODA KODU, ARKADAŞINA SÖYLE": "ROOM CODE, TELL YOUR FRIEND", "Tek başına": "Solo", "Rekorunu kır": "Beat your record", "Direklerin arasından uç": "Fly between the posts", "Yukarı tırman": "Climb up", "Botlara ya da arkadaşına karşı": "Against bots or a friend", "Yıldız topla, yıldız başına ": "Earn stars, per star ", "En iyi: ": "Best: ", "PUAN": "POINTS", " puan, ": " points, ", " saniye!": " seconds!", "Süreli çarpan! ": "Timed multiplier! ", "FLIX Kick Up, prototip sürüm 11.": "FLIX Kick Up, prototype version 11.", "Türkçe": "Türkçe", "English": "English", "SÜRE": "TIME"};
-  Object.assign(EN, { "Yakında": "Soon", "Online yarış yakında geliyor": "Online racing is coming soon", "Satın alma tamamlanmadı.": "Purchase not completed.", "Ödemeler Apple hesabın üzerinden yapılır.": "Payments are made through your Apple account.", "Satın alımlar geri yüklendi.": "Purchases restored.", "FLIX Kick Up, sürüm 1.0.": "FLIX Kick Up, version 1.0.", "TEK SEFER": "ONE TIME" });
+  Object.assign(EN, { "Ankara Ayazı": "Ankara Frost", "Yakında": "Soon", "Online yarış yakında geliyor": "Online racing is coming soon", "Satın alma tamamlanmadı.": "Purchase not completed.", "Ödemeler Apple hesabın üzerinden yapılır.": "Payments are made through your Apple account.", "Satın alımlar geri yüklendi.": "Purchases restored.", "FLIX Kick Up, sürüm 1.1.": "FLIX Kick Up, version 1.1.", "TEK SEFER": "ONE TIME" });
   // inside the iPhone app (Capacitor) real purchases and haptics go through native-bridge.js
   const NATIVE_APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   const L = (s) => lang === "en" && EN[s] != null ? EN[s] : s;
@@ -679,6 +681,7 @@ svg { display: block; }
     { id: "istanbul", name: L("İstanbul Akşamı"), price: 0, rar: "common" },
     { id: "mahalle", name: L("Mahalle Arası"), price: 300, rar: "common" },
     { id: "plajsahne", name: L("Yaz Plajı"), price: 350, rar: "common" },
+    { id: "ankara", name: L("Ankara Ayazı"), price: 250, rar: "common" },
     { id: "stad", name: L("Gece Maçı"), price: 700, rar: "rare" },
     { id: "kar", name: L("Kar Tatili"), price: 800, rar: "rare" },
     { id: "yildiz", name: L("Yıldız Sahne"), best: 500, rar: "epic" },
@@ -813,11 +816,22 @@ svg { display: block; }
       sky: [[0, "#3b1b6e"], [0.58, "#ff5e7e"], [0.85, "#ffb347"]],
       sun: { x: 0.68, y: 0.6, r: 0.11, c: "#ffd86b", ring: "255,216,107" },
       layers: () => [
-        tile(H * 0.34, 7, (x, tw, h, r) => mosques(x, tw, h, r, "#8a4a9e", 0.35)),
-        tile(H * 0.24, 31, (x, tw, h, r) => mosques(x, tw, h, r, "#4a1f66", 0.25)),
+        tile(H * 0.34, 7, (x, tw, h, r) => istanbulFar(x, tw, h, r, "#8a4a9e")),
+        tile(H * 0.24, 31, (x, tw, h, r) => istanbulNear(x, tw, h, r, "#4a1f66")),
       ],
       ground: { fill: "#2a1240", edge: "#e22511", mark: "rgba(255,106,19,.35)", kind: "chevron" },
       post: ["#fff4e2", "#e22511", "#ffc928"],
+    },
+    ankara: {
+      sky: [[0, "#0a1830"], [0.55, "#1f4372"], [0.92, "#9fc6ea"]],
+      sun: { x: 0.8, y: 0.18, r: 0.05, c: "#eef6ff", ring: "200,225,255" },
+      stars: true, frost: true,
+      layers: () => [
+        tile(H * 0.36, 61, (x, tw, h, r) => ankaraFar(x, tw, h, r, "#2c4a78")),
+        tile(H * 0.22, 67, (x, tw, h, r) => ankaraNear(x, tw, h, r, "#152a4c")),
+      ],
+      ground: { fill: "#34445e", edge: "#dfeefa", mark: "rgba(223,238,250,.4)", kind: "dash" },
+      post: ["#eaf4ff", "#e30a17", "#ffc928"],
     },
     mahalle: {
       sky: [[0, "#5fc0ff"], [0.6, "#a8e2ff"], [0.9, "#fff1c9"]],
@@ -1224,6 +1238,122 @@ svg { display: block; }
       c.globalAlpha = 1;
     }
   }
+  // İstanbul skyline: the 15 Temmuz (Bosphorus) Bridge, Levent towers and the Asian hills far away;
+  // one mosque, Galata Tower, Maiden's Tower and old houses near. Lit windows for the evening.
+  function istanbulFar(x, tw, h, r, col) {
+    x.fillStyle = col;
+    // Asian-side hills along the whole tile
+    x.beginPath(); x.moveTo(0, h);
+    for (let px = 0; px <= tw; px += 30) x.lineTo(px, h * (0.8 - 0.07 * Math.sin(px / tw * Math.PI * 4) - 0.04 * Math.sin(px / tw * Math.PI * 9)));
+    x.lineTo(tw, h); x.fill();
+    // suspension bridge
+    const b0 = tw * 0.02, b1 = tw * 0.56, deck = h * 0.7, t1 = b0 + (b1 - b0) * 0.2, t2 = b0 + (b1 - b0) * 0.8, top = h * 0.12;
+    x.fillRect(b0, deck, b1 - b0, 5);
+    for (const tx of [t1, t2]) { x.fillRect(tx - 6, top, 4, h); x.fillRect(tx + 2, top, 4, h); x.fillRect(tx - 6, top + h * 0.06, 12, 3); x.fillRect(tx - 6, deck - 8, 12, 3); }
+    x.strokeStyle = col; x.lineWidth = 2.5;
+    const cab = (u) => (1 - u) * (1 - u) * top + 2 * u * (1 - u) * (deck + 10) + u * u * top;
+    x.beginPath(); x.moveTo(b0, deck); x.quadraticCurveTo((b0 + t1) / 2, deck - 10, t1, top);
+    x.quadraticCurveTo((t1 + t2) / 2, deck + 10, t2, top); x.quadraticCurveTo((t2 + b1) / 2, deck - 10, b1, deck); x.stroke();
+    for (let k = t1 + 10; k < t2 - 4; k += 10) { const cy = cab((k - t1) / (t2 - t1)); x.fillRect(k, cy, 1.2, deck - cy); }
+    x.fillStyle = "rgba(255,216,107,.85)"; for (let k = b0 + 6; k < b1; k += 14) x.fillRect(k, deck - 3, 3, 3);
+    // Levent towers
+    x.fillStyle = col; let px = b1 + tw * 0.06;
+    const tower = (w, th, kind) => {
+      if (kind === 0) { x.fillRect(px, h - th, w, th); x.beginPath(); x.moveTo(px, h - th); x.lineTo(px + w / 2, h - th - 16); x.lineTo(px + w, h - th); x.fill(); }
+      else if (kind === 1) { x.beginPath(); x.moveTo(px, h); x.lineTo(px + w * 0.15, h - th); x.lineTo(px + w * 0.85, h - th); x.lineTo(px + w, h); x.fill(); x.fillRect(px + w / 2 - 1, h - th - 22, 2, 22); }
+      else { x.fillRect(px, h - th, w, th); x.fillRect(px + w * 0.25, h - th - 10, w * 0.5, 10); }
+      x.fillStyle = "rgba(255,216,107,.55)"; for (let yy = h - th + 8; yy < h - 6; yy += 9) if (r() < 0.55) x.fillRect(px + 4 + r() * (w - 10), yy, 3, 3);
+      x.fillStyle = col; px += w + 6 + r() * 10;
+    };
+    tower(26, h * 0.62, 0); tower(32, h * 0.82, 1); tower(22, h * 0.5, 2); tower(28, h * 0.7, 0); tower(20, h * 0.44, 2);
+  }
+  function istanbulNear(x, tw, h, r, col) {
+    const lit = (x0, y0, w, hh) => { x.fillStyle = "rgba(255,216,107,.8)"; for (let yy = y0 + 6; yy < y0 + hh - 6; yy += 10) for (let xx = x0 + 5; xx < x0 + w - 6; xx += 10) if (r() < 0.4) x.fillRect(xx, yy, 4, 5); x.fillStyle = col; };
+    const houses = (from, to) => { let px = from; while (px < to - 20) { const w = Math.min(to - px, 22 + r() * 26), bh = h * (0.18 + r() * 0.22); x.fillRect(px, h - bh, w, bh); x.beginPath(); x.moveTo(px - 2, h - bh); x.lineTo(px + w / 2, h - bh - 8); x.lineTo(px + w + 2, h - bh); x.fill(); lit(px, h - bh, w, bh); px += w + 3; } };
+    x.fillStyle = col;
+    // the one mosque: central dome, half domes, four minarets
+    const mx = tw * 0.1, mw = Math.min(150, tw * 0.16), base = h * 0.72, dr = mw * 0.3;
+    x.fillRect(mx, base, mw, h - base);
+    x.beginPath(); x.arc(mx + mw / 2, base, dr, Math.PI, 0); x.fill();
+    for (const s of [-1, 1]) { x.beginPath(); x.arc(mx + mw / 2 + s * dr * 1.15, base + 2, dr * 0.55, Math.PI, 0); x.fill(); x.beginPath(); x.arc(mx + mw / 2 + s * dr * 2, base + 6, dr * 0.32, Math.PI, 0); x.fill(); }
+    x.fillRect(mx + mw / 2 - 1.5, base - dr - 12, 3, 12);
+    for (const [fx, hh] of [[-0.06, 0.98], [0.1, 0.84], [0.84, 0.84], [1.0, 0.98]]) {
+      const ux = mx + mw * fx, top = h * (1 - hh);
+      x.fillRect(ux, top, 5, h - top); x.beginPath(); x.moveTo(ux - 1, top); x.lineTo(ux + 2.5, top - 16); x.lineTo(ux + 6, top); x.fill();
+      x.fillRect(ux - 2, top + (h - top) * 0.25, 9, 2.5); x.fillRect(ux - 2, top + (h - top) * 0.5, 9, 2.5);
+    }
+    lit(mx + 6, base + 4, mw - 12, h - base - 4);
+    houses(mx + mw + 14, tw * 0.42);
+    // Galata Tower
+    const gx = tw * 0.44, gw = 26, gt = h * 0.22;
+    x.fillRect(gx, gt, gw, h - gt); x.fillRect(gx - 3, gt + 2, gw + 6, 6);
+    x.beginPath(); x.moveTo(gx - 3, gt + 2); x.lineTo(gx + gw / 2, gt - 26); x.lineTo(gx + gw + 3, gt + 2); x.fill();
+    x.fillStyle = "rgba(255,216,107,.9)"; for (let k = 0; k < 4; k++) x.fillRect(gx + 3 + k * 6, gt + 12, 3, 6); x.fillStyle = col;
+    houses(gx + gw + 8, tw * 0.66);
+    // shore, Maiden's Tower on its rock
+    x.fillRect(tw * 0.66, h - 6, tw * 0.34, 6);
+    const kx = tw * 0.8, kb = h - 6;
+    x.beginPath(); x.ellipse(kx, kb, 34, 10, 0, Math.PI, 0); x.fill();
+    x.fillRect(kx - 22, kb - 26, 44, 20);
+    x.fillRect(kx - 6, kb - 56, 12, 32); x.beginPath(); x.moveTo(kx - 8, kb - 56); x.lineTo(kx, kb - 72); x.lineTo(kx + 8, kb - 56); x.fill();
+    x.fillStyle = "rgba(255,216,107,.95)"; x.fillRect(kx - 2, kb - 50, 4, 5); x.fillRect(kx - 15, kb - 20, 4, 5); x.fillRect(kx + 11, kb - 20, 4, 5); x.fillStyle = col;
+    houses(tw * 0.88, tw);
+  }
+  // Ankara on a frosty night: the castle on its hill and Atakule far away; Anıtkabir with its colonnade and flag near
+  function trFlag(x, fx, fy, fw) {
+    const fh = fw * 0.66;
+    x.fillStyle = "#e30a17"; x.fillRect(fx, fy, fw, fh);
+    x.fillStyle = "#ffffff"; x.beginPath(); x.arc(fx + fw * 0.36, fy + fh / 2, fh * 0.25, 0, Math.PI * 2); x.fill();
+    x.fillStyle = "#e30a17"; x.beginPath(); x.arc(fx + fw * 0.41, fy + fh / 2, fh * 0.2, 0, Math.PI * 2); x.fill();
+    x.fillStyle = "#ffffff"; x.save(); x.translate(fx + fw * 0.6, fy + fh / 2); x.beginPath();
+    for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? fh * 0.05 : fh * 0.12; x.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+    x.fill(); x.restore();
+  }
+  function ankaraFar(x, tw, h, r, col) {
+    x.fillStyle = col;
+    // castle hill with walls and towers
+    const c0 = tw * 0.04, c1 = tw * 0.4, crest = h * 0.42;
+    x.beginPath(); x.moveTo(c0 - 40, h); x.quadraticCurveTo((c0 + c1) / 2, crest - 30, c1 + 40, h); x.fill();
+    const wallTop = crest - 4;
+    x.fillRect(c0 + (c1 - c0) * 0.18, wallTop, (c1 - c0) * 0.64, h - wallTop);
+    for (let k = 0; k <= 6; k++) { const tx = c0 + (c1 - c0) * (0.16 + k * 0.11), th = 16 + (k % 2) * 10; x.fillRect(tx, wallTop - th, 14, th + 4); for (let m = 0; m < 3; m++) x.fillRect(tx + m * 5, wallTop - th - 4, 3, 4); }
+    trFlag(x, c0 + (c1 - c0) * 0.5 + 1, wallTop - 58, 22); x.fillStyle = col; x.fillRect(c0 + (c1 - c0) * 0.5 - 1, wallTop - 58, 2, 36);
+    // town lights on the slope
+    x.fillStyle = "rgba(255,226,150,.7)"; for (let k = 0; k < 40; k++) { const u = r(), px = c0 + (c1 - c0) * u; const y0 = h - (h - crest) * Math.sin(u * Math.PI) * 0.7; x.fillRect(px, y0 + r() * (h - y0), 2, 2); }
+    x.fillStyle = col;
+    // apartment blocks
+    let px = c1 + 30;
+    while (px < tw * 0.68) { const w = 30 + r() * 26, bh = h * (0.25 + r() * 0.25); x.fillRect(px, h - bh, w, bh); x.fillStyle = "rgba(255,226,150,.55)"; for (let yy = h - bh + 6; yy < h - 4; yy += 8) for (let xx = px + 4; xx < px + w - 4; xx += 7) if (r() < 0.35) x.fillRect(xx, yy, 3, 3); x.fillStyle = col; px += w + 5; }
+    // Atakule: shaft and saucer top
+    const ax = tw * 0.78, at = h * 0.14;
+    x.fillRect(ax - 7, at + 24, 14, h - at);
+    x.beginPath(); x.ellipse(ax, at + 22, 26, 7, 0, 0, Math.PI * 2); x.fill();
+    x.beginPath(); x.arc(ax, at + 18, 18, Math.PI, 0); x.fill();
+    x.fillRect(ax - 1, at - 8, 2, 14);
+    x.fillStyle = "rgba(255,226,150,.9)"; for (let k = -2; k <= 2; k++) x.fillRect(ax + k * 8 - 1.5, at + 20, 3, 3); x.fillStyle = col;
+    px = tw * 0.84; while (px < tw - 10) { const w = 24 + r() * 20, bh = h * (0.18 + r() * 0.2); x.fillRect(px, h - bh, w, bh); px += w + 6; }
+  }
+  function ankaraNear(x, tw, h, r, col) {
+    x.fillStyle = col;
+    // Anıtkabir: stepped base, colonnade, flat roof, flagpole
+    const a0 = tw * 0.08, aw = Math.min(220, tw * 0.26), base = h * 0.78, roof = h * 0.36;
+    x.fillRect(a0 - 30, base, aw + 60, h - base); x.fillRect(a0 - 16, base - 6, aw + 32, 7);
+    x.fillRect(a0, roof, aw, 9); x.fillRect(a0 + 6, roof - 8, aw - 12, 9);
+    const cols = Math.max(8, Math.round(aw / 13));
+    for (let k = 0; k < cols; k++) x.fillRect(a0 + 4 + k * (aw - 12) / (cols - 1), roof + 9, 5, base - roof - 9);
+    x.fillStyle = "rgba(255,226,150,.35)"; x.fillRect(a0 + 10, roof + 12, aw - 20, base - roof - 14); x.fillStyle = col;
+    for (let k = 0; k < cols; k++) x.fillRect(a0 + 4 + k * (aw - 12) / (cols - 1), roof + 9, 5, base - roof - 9);
+    const fp = a0 + aw + 40; x.fillRect(fp, h * 0.04, 3, h); trFlag(x, fp + 3, h * 0.04, 30); x.fillStyle = col;
+    // frosty trees and low buildings
+    let px = fp + 30;
+    while (px < tw - 20) {
+      if (r() < 0.4) { const tr = 10 + r() * 8; x.beginPath(); x.moveTo(px, h); x.lineTo(px + tr, h - tr * 3.2); x.lineTo(px + tr * 2, h); x.fill(); x.fillStyle = "rgba(230,242,255,.8)"; x.beginPath(); x.moveTo(px + tr * 0.55, h - tr * 1.8); x.lineTo(px + tr, h - tr * 3.2); x.lineTo(px + tr * 1.45, h - tr * 1.8); x.fill(); x.fillStyle = col; px += tr * 2 + 6; continue; }
+      const w = 30 + r() * 30, bh = h * (0.2 + r() * 0.3); x.fillRect(px, h - bh, w, bh);
+      x.fillStyle = "rgba(230,242,255,.85)"; x.fillRect(px - 2, h - bh - 3, w + 4, 3);
+      x.fillStyle = "rgba(255,226,150,.6)"; for (let yy = h - bh + 6; yy < h - 6; yy += 9) for (let xx = px + 4; xx < px + w - 5; xx += 8) if (r() < 0.35) x.fillRect(xx, yy, 3, 4);
+      x.fillStyle = col; px += w + 6 + r() * 10;
+    }
+  }
   function mosques(x, tw, h, r, color, domeBias) {
     x.fillStyle = color; let px = 0;
     while (px < tw) {
@@ -1301,6 +1431,11 @@ svg { display: block; }
       c.fillStyle = INK; for (let k = -18; k < 20; k += 7) c.fillRect(k, -7, 4, 4);
       c.fillStyle = "#ffc928"; c.fillRect(-4, -20, 8, 10); c.strokeRect(-4, -20, 8, 10); c.fillStyle = INK; c.fillRect(-4, -20, 8, 3);
       c.restore();
+    }
+    if (A.frost) {
+      c.fillStyle = "rgba(225,240,255,.85)";
+      for (const f of STARS) { const fx = (((f.x * W * 1.4 - cam * 0.25) % (W * 1.4)) + W * 1.4) % (W * 1.4) - W * 0.2, fy = (f.y * groundY * 1.5 + t * (8 + f.s * 4)) % groundY; c.globalAlpha = 0.25 + 0.35 * Math.abs(Math.sin(t * 1.5 + f.p)); c.fillRect(fx, fy, 1.6, 1.6); }
+      c.globalAlpha = 1;
     }
     if (A.snow) {
       c.fillStyle = "rgba(255,255,255,.9)"; const sw = W * 1.2;
@@ -2183,6 +2318,8 @@ svg { display: block; }
       gh: run.kind === "ghost" ? ghost : null,
       obs: [], feathers: [], nextObsX: U * 0.75, parts: [], texts: [], trail: [], shake: 0,
     });
+    // vertical starts on the floor right away, so a very quick first tap cannot launch it from the horizontal start spot into the first bar
+    if (run.kind === "dikey") Object.assign(S, { x: W / 2, y: groundY - R() * 0.7, ang: 0, camX: 0 });
     S.px = S.x; S.py = S.y; S.pang = S.ang; S.pcam = S.camX;
     const C = run.ch && CH[run.ch];
     $("readyText").textContent = run.goAt ? L("Hazır ol...") : C ? C.desc + L(". Dokun ve başla") : run.kind === "bot" ? L("3 botla yarış, en uzun uçan kazanır. Dokun ve başla") : run.kind === "dikey" ? L("Dokun ve yukarı tırman. Sol ve sağ yön verir") : run.kind === "ghost" ? L("Kendi hayaletinle yarış. Dokun ve başla") : L("Dokun ve başla");
@@ -2792,10 +2929,48 @@ svg { display: block; }
     const lb = document.createElement("button"); lb.className = "btn alt"; lb.textContent = L("Odadan çık"); lb.addEventListener("click", netLeave); el.appendChild(lb);
   }
 
+  // ---------- home FLIX: your equipped FLIX or ball keeps kicking itself up; tap to kick it higher ----------
+  const hf = $("hf"), hfx = hf.getContext("2d");
+  const HF = { w: 0, h: 0, y: -1, vy: 0, ang: 0, av: 0, sq: 0, sqv: 0, t: 0, parts: [] };
+  const hfR = () => Math.max(20, Math.min(50, HF.h * 0.24, HF.w * 0.13));
+  function hfKick(tap) {
+    HF.vy = -Math.sqrt(2 * 2.6 * HF.h * HF.h * (tap ? 0.62 : 0.26 + Math.random() * 0.08));
+    HF.av += (Math.random() < 0.5 ? -1 : 1) * (tap ? 15 : 4 + Math.random() * 6); HF.sqv = -6;
+    const sk = byId(SKINS, skinId), r = hfR();
+    for (let i = 0; i < (reduce ? 3 : tap ? 14 : 6); i++) { const a = Math.PI + Math.random() * Math.PI, v = 60 + Math.random() * 140; HF.parts.push({ x: HF.w / 2, y: HF.y + r * 0.8, vx: Math.cos(a) * v, vy: Math.sin(a) * v, s: 1.6 + Math.random() * 2.4, c: sk.f[i % sk.f.length], life: 1 }); }
+    if (tap) { beep(560, 0.08, "triangle", 0.12); buzz(8); }
+  }
+  hf.addEventListener("pointerdown", (e) => { e.preventDefault(); hfKick(true); });
+  function drawHomeFlix(dt) {
+    if ($("home").hidden || document.hidden) return;
+    const rc = hf.getBoundingClientRect();
+    if (Math.abs(rc.width - HF.w) > 0.5 || Math.abs(rc.height - HF.h) > 0.5) { HF.w = rc.width; HF.h = rc.height; hf.width = Math.max(1, Math.round(rc.width * DPR)); hf.height = Math.max(1, Math.round(rc.height * DPR)); HF.y = -1; }
+    if (HF.h < 40) return;
+    const r = hfR(), floor = HF.h - r * 1.05 - 8;
+    if (HF.y < 0) { HF.y = floor; hfKick(false); }
+    HF.t += dt;
+    HF.vy += 2.6 * HF.h * dt; HF.y += HF.vy * dt;
+    if (HF.y < r) { HF.y = r; HF.vy = Math.max(0, HF.vy); }
+    if (HF.y >= floor && HF.vy > 0) { HF.y = floor; hfKick(false); }
+    const target = Math.round(HF.ang / (Math.PI * 2)) * Math.PI * 2;
+    HF.av += ((target - HF.ang) * 18 - HF.av * 2.2) * dt; HF.ang += HF.av * dt;
+    HF.sqv += (-320 * HF.sq - 16 * HF.sqv) * dt; HF.sq += HF.sqv * dt;
+    hfx.setTransform(DPR, 0, 0, DPR, 0, 0); hfx.clearRect(0, 0, HF.w, HF.h);
+    const lift = Math.min(1, (floor - HF.y) / (HF.h * 0.6));
+    hfx.fillStyle = "rgba(2,39,83," + (0.28 - lift * 0.16).toFixed(3) + ")";
+    hfx.beginPath(); hfx.ellipse(HF.w / 2, floor + r * 1.02, r * (1.1 - lift * 0.45), r * 0.22, 0, 0, Math.PI * 2); hfx.fill();
+    HF.parts = HF.parts.filter((p) => p.life > 0);
+    for (const p of HF.parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 420 * dt; p.life -= dt * 1.8; hfx.globalAlpha = Math.max(0, p.life); hfx.fillStyle = p.c; hfx.fillRect(p.x - p.s, p.y - p.s, p.s * 2, p.s * 2); }
+    hfx.globalAlpha = 1;
+    drawFlix(hfx, HF.w / 2, HF.y, HF.ang, r, byId(SKINS, skinId), HF.sq, HF.t, 0.6);
+  }
+
   // ---------- loop: fixed-step simulation, interpolated drawing ----------
   let last = performance.now(), acc = 0, lastDraw = 0;
   function frame(now) {
+    const fdt = Math.min(0.05, Math.max(0, (now - last) / 1000));
     acc += Math.min(0.1, (now - last) / 1000); last = now;
+    drawHomeFlix(fdt);
     let n = 0;
     while (acc >= STEP && n < 60) { step(STEP); acc -= STEP; n++; }
     S.parts = S.parts.filter((p) => p.life > 0);
