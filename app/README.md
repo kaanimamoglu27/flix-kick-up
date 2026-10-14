@@ -57,7 +57,7 @@ FLIX'i havada tut! Ekrana dokunarak tüylü FLIX'i sektir, direklerin arasından
 • Tek parmakla oyna: ekranın solu hızlı atak, ortası dengeli, sağı yüksek vuruş.
 • Basılı tut, kaydır, iki parmak kullan: Makas, Helikopter, Geri takla, Fırıldak, Dalış, Roket, Kırbaç ve Kelebek.
 • Hareketleri art arda bağla, kombo yap, Şelale ve Füze gibi özel ikilileri yakala.
-• Klasik ve Dikey mod, 3 bota karşı yarış ve 4 meydan okuma: 10 Saniye, Akrobat, Mesafe, Tüy Avı.
+• Klasik ve Dikey mod, 3 bota karşı yarış ve 4 meydan okuma: 20 Saniye, Akrobat, Mesafe, Tüy Avı.
 • 22 FLIX ve 5 top, Sıradandan Mitik'e: Kristal, Galaksi, Ateş Kuşu, Ejderha FLIX.
 • 12 sahne: İstanbul Akşamı, Boğaz, Kapadokya, Gece Maçı, Kar Tatili, Uzay ve animasyonlu Lunapark Gecesi.
 • 11 boru rengi, süreli x2 ve x4 puan rozetleri.
@@ -74,7 +74,7 @@ Keep FLIX in the air! Tap to kick the feathered FLIX, fly it through the gaps be
 • One-thumb play: the left of the screen kicks low and fast, the middle steady, the right high.
 • Hold, swipe or use two fingers for tricks: Scissors, Helicopter, Backflip, Spinner, Dive, Rocket, Whip and Butterfly.
 • Chain tricks into combos and land special pairs like Waterfall and Missile.
-• Classic and Vertical modes, a race against 3 bots and 4 challenges: 10 Seconds, Acrobat, Distance, Feather Hunt.
+• Classic and Vertical modes, a race against 3 bots and 4 challenges: 20 Seconds, Acrobat, Distance, Feather Hunt.
 • 22 FLIX and 5 balls from Common to Mythic: Crystal, Galaxy, Firebird, Dragon FLIX.
 • 12 scenes: Istanbul Evening, the Bosphorus, Cappadocia, Night Match, Snow Holiday, Space and the animated Funfair Night.
 • 11 pipe colours, timed x2 and x4 score badges.
