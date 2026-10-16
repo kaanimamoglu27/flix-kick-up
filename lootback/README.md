@@ -1,3 +1,212 @@
+# ARKANA: Son güncelleme ve App Store paketi (v31, 2026-10-16)
+
+Önceki sürüm (v30) `arkana-v30.html`, kaynak `arkana10.html`.
+
+- Sonsuz mod: her 10 dalgada düşman canı ve hasarı %10 artar, 50. dalgadan sonra sabit kalır (51+ dalgalar 41-50 döngüsünü tekrarlar). Sabit duran oyuncu artık 5-7. dalgada ölüyor.
+- Ayarlar > Zorluk: Kolay, Orta, Zor, Çok Zor (tüm modlarda).
+- Deprem Şehri: deprem sırasında yer yarılır. Önce turuncu parlayan çizgi uyarır, sonra yarık açılır, üstündekine hasar verir, binaları kırar.
+- Ölünce bir kez "Reklam izle, devam et" (tam can, 3 sn koruma). İkinci ölümde reklam yok. VIP'te reklamsız. Uygulamada AdMob ödüllü reklam, web'de 5 saniyelik Flix kartı.
+- Akıcılık: seviye atlama ve duraklatma ekranlarındaki arka plan bulanıklığı kaldırıldı (iPhone'da her açılışta takılmanın sebebi). Kalabalık sahnede çizilen üçgen sayısı %25 azaldı (düşman göz, kol, bacak detayı), telefonda kalabalıkta gölgeler 3 karede bir yenileniyor, parlama efekti yarım çözünürlükte, parçacıklar daha ucuz çiziliyor.
+- App Store: iPhone ve iPad için Türkçe ve İngilizce 8'er yazılı renkli görsel (`app/store/screenshots/`), mağaza metinleri (`app/store/MAGAZA_METINLERI.md`), AdMob kurulumu ve gizlilik bölümü güncellendi.
+
+---
+
+# ARKANA: Yüklemeye hazır (v30, 2026-10-14)
+
+Önceki sürüm (v29) `arkana-v29.html`, kaynak `arkana10.html`.
+
+- Optimizasyon: duraklatma, kart ve oyun sonu ekranlarında sahne saniyede 10 kez çiziliyor (pil ve ısınma). Uygulama arka plana geçince oyun duruyor ve ses kapanıyor.
+- App Store paketi (`app/`): oyun yeni sürümle yeniden üretildi ve internetsiz çalıştığı test edildi; 6 yeni 2796x1290 ekran görüntüsü; mağaza metinleri 5 mod, 4 patron, 24 silah ve 11 haritaya göre güncellendi.
+- Tüm menüler ve modlar hatasız tarandı.
+
+---
+
+# ARKANA: 2K 60 fps standart (v29, 2026-10-13)
+
+Önceki sürüm (v28) `arkana-v28.html`, kaynak `arkana10.html`.
+
+- Standart grafik her cihazda 🎬 2K · 60 fps (en fazla 2048x1152 kadar piksel, 120 Hz ekranlarda da 60 kare). Eski kayıtlar bir kez buna alınır.
+- Ayarlar'da ✨ 4K · 30 fps (ekranın tam çözünürlüğü, en fazla 4K piksel, sabit 30 kare) ve ⚡ Hızlı var. Otomatik ayar her modun kendi hedefine (60 ya da 30) göre çözünürlüğü ayarlıyor; elle seçim yapınca Hızlı'ya kendiliğinden geçmiyor.
+- Denge: düşman sınırı düşünce Cehennem fazla kolaylaşmıştı (bot 45. dalgaya geldi); düşman canı dalgayla artıyor, bot yine 17. dalgada ölüyor.
+- Tüm menüler ve modlar (Hikaye, Sonsuz, Patron Koşusu, Flix Avı, Cehennem) hatasız tarandı.
+
+---
+
+# ARKANA: Güçlü patronlar, akıcı açılış (v28, 2026-10-13)
+
+Önceki sürüm (v27) `arkana-v27.html`, kaynak `arkana10.html`.
+
+- Hikaye patronlarının canı %20 arttı. Test: oynayan bir bot VORTEKS'i 37 canla yendi, diğeri 31. seviyede öldü.
+- Akıcılık: telefon ve tablette varsayılan kalite 2K (Ultra hâlâ seçilebilir, eski kayıtlar bir kez 2K'ya alınır). Otomatik ayar 1,5 saniyede bir ölçüyor, ani düşüşte hemen çözünürlüğü indiriyor, en altta da yetmezse ⚡ Hızlı moda geçiyor. Telefonda gölge haritası 1024. Patronların hazırlığı oyun başında değil menüdeyken yapılıyor (sonsuz modun başındaki donma).
+- Patron tasarımları: `shots/v28_patronlar_3d.jpg` (oyundaki 3D modeller) ve `shots/v28_patronlar_cizgi.jpg` (çizgi roman halleri).
+
+![Patronlar 3D](shots/v28_patronlar_3d.jpg)
+![Patronlar çizgi roman](shots/v28_patronlar_cizgi.jpg)
+
+---
+
+# ARKANA: 4 patronlu zor hikaye (v27, 2026-10-13)
+
+Önceki sürüm (v26) `arkana-v26.html`, kaynak `arkana10.html`.
+
+- Hikaye 40 seviye, 4 patron: İskelet Kral (10), Kemik Ejderha (20), Dev Zombi (30), VORTEKS (40). 30'dan sonraki çizgi roman VORTEKS'in hikayesini anlatıp finale bağlanıyor.
+- Hikaye daha zor: düşmanlar seviyeyle daha çok can kazanıyor, daha sert ve daha sık vuruyor. Test: sabit duran bot 8. seviyede öldü; oynayan iki bottan biri VORTEKS'te öldü, biri finali gördü.
+- Kasma: ekrandaki düşman sayısı telefonda en fazla 170 (önceden 420), aynı anda en fazla 12 ses (büyük kavgalarda yüzlerce ses açılıyordu), patlama sesleri her seferinde yeniden üretilmiyor, efekt parçacıkları ve hasar sayıları azaltıldı, "EFSANE x..." yazısı sadece büyük kombolarda.
+- Üst bilgi tek satır: güç çubuğu solda, süre · Sv 12/40 · 👑20 · ölüm · skor yanında. "renk" kutusu kaldırıldı.
+
+![Üst bilgi](shots/v27_1_ust_bilgi.jpg)
+![Hikaye](shots/v27_2_hikaye.jpg)
+
+---
+
+# ARKANA: Akıcı oyun ve küçük üst bilgi (v26, 2026-10-13)
+
+Önceki sürüm (v25) `arkana-v25.html`, kaynak `arkana10.html`.
+
+- Seviye/dalga, süre ve skor kutuları daha yukarıda ve daha küçük; XP çubuğu inceldi.
+- Kasma düzeltmeleri: patron ve tüm silah görünümleri oyunun başında bir kez hazırlanıyor (önceden ilk patron ve her yeni silah bir an donduruyordu). 120 Hz iPhone/iPad'de Ultra dahil her ayar 60 fps çiziyor (ısınma ve sonradan yavaşlama azalır). Ultra telefonda/tablette en fazla ~3,2 milyon piksel. Efekt katmanı daha az bellek harcıyor, parçacık ve hasar sayıları sınırlı, üst bilgi sadece değiştiğinde yenileniyor.
+- Test: tüm menüler ve modlar hatasız; bot hikayeyi yine baştan sona bitirdi.
+
+---
+
+# ARKANA: Hikaye Bölümleri, Görünür Silahlar, Kademeler (v25, 2026-10-13)
+
+Önceki sürüm (v24) `arkana-v24.html`, kaynak `arkana10.html`.
+
+- Hikaye modu: 50 seviye, 5 bölüm. Her seviye 20 saniye, üstte "Seviye N/50 · Patron 10". Her 10. seviyede patron sırayla gelir (İskelet Kral, Kemik Ejderha, Mezar Devi, Kıyamet Lordu, VORTEKS), patron savaşında düşmanlar da gelir. Başta giriş çizgi romanı, her patrondan sonra bölüm sonu ve sonraki bölümün çizgi romanı, VORTEKS'ten sonra final ve mod biter. Menüdeki "Hikayeyi oku" kaldırıldı.
+- Silahlar 24'e çıktı: 🗡️ Flix Kılıcı, 🚀 Omuz Roketi, 🔫 Flix Makinesi, 🔨 Dev Çekiç, ♨️ Alev Püskürtücü. 8 silah yuvası. Her seviyede yeni bir silah hediye gelir, karakterin üstüne görünür şekilde takılır.
+- 🎱 Sekme Gücü: mermi, mızrak ve fırlatılan Flix çarptıktan sonra başka düşmanlara seker.
+- Her 5 seviyede kademe: hasar +8%, can +15, hız artar; karakter büyür, renkli halka, aura, başta hale ve etrafında dönen ışık topları (10 kademe).
+- Karakter gelişimi 50. seviyede durur (MAKS).
+- Sol alttaki büyük panel kaldırıldı; 🎒 düğmesiyle isteğe bağlı açılıyor, yeni seviyede kırmızı nokta yanar.
+- Test: iPhone 17/18 (402x874, 420x912, 440x956), iPad Pro 11" ve 13" dik ve yatay, hata yok. Bot hikayeyi baştan sona bitirdi (VORTEKS'i yendi), sonsuz modda 69. dalgada öldü.
+
+![Kademe ve silahlar](shots/v25_1_kademe_silahlar.jpg)
+![Çanta paneli](shots/v25_2_canta.jpg)
+![iPhone](shots/v25_3_iphone.jpg)
+
+---
+
+# ARKANA: Flix Fırlat ve Patron Hikayeleri (v24, 2026-10-13)
+
+Önceki sürüm (v23) `arkana-v23.html`, kaynak `arkana9.html`.
+
+- Hikaye: her patrondan önce bir tanıtım sayfası (İskelet Kral, Kemik Ejderha, Mezar Devi, Kıyamet Lordu, VORTEKS), patron yenilince bölüm sayfaları. 10 ve 20'den sonraki bölümler 2 sayfaya çıktı (kurtulan çocuklar Flix'lerini FLIX'e verir, park yeniden dolar). Menüdeki "Hikaye" tüm sayfaları sırayla oynatır.
+- Elden Flix fırlatma: her kahraman, her modda, kolunu savurup elinden renkli Flix fırlatır (🤾 Flix Atışı, kartlarla 5. seviyeye kadar güçlenir). Zıplayan Flix de artık elden atılıyor, kahraman attığı yöne döner.
+- 5 yeni silah: 🔴 Lazer Işını (elden, delip geçer), 🧨 Flix Bombası (elden kalabalığa, 5. seviyede üçe bölünür), 🪢 Flix Kırbacı (önündeki sırayı şaklatır), 🔱 Kristal Mızrak (sırayı deler), 🗼 Flix Kulesi (yere kurulur, Flix atar).
+- Mağaza: sekmeler iki satıra sığıyor, 🗺️ Haritalar ikinci sırada (önceden ekranın dışında kalıyordu). Kozmetik ve oynanış haritaları ayrı başlıkta. 3 yeni kozmetik harita: 🍭 Şeker Şehir, 🌇 Retro Dalga, 🌅 Altın Saat.
+- iPad: oyun telefon boyutunda kurulup büyütülüyor, düğmeler ve yazılar artık küçük kalmıyor. 2K modu en fazla ~2,4 milyon piksel çiziyor (büyük iPad ekranı telefon kadar yük). iPhone SE'den 16 Pro Max'e ve iPad mini'den iPad Pro 13"e, yatay ve dik ekranda test edildi, hata yok.
+- Denge: VORTEKS'in canı 26.000, Cehennem dalgaları biraz daha sert (yeni silahlar oyunu kolaylaştırmıştı).
+
+![Silahlar](shots/v24_1_silahlar.jpg)
+![Patron tanıtımı](shots/v24_2_patron_hikaye.jpg)
+![Flix fırlat](shots/v24_3_flix_firlat.jpg)
+![Haritalar](shots/v24_4_haritalar.jpg)
+![iPad](shots/v24_5_ipad.jpg)
+
+---
+
+# ARKANA: Cehennem ve VORTEKS (v23, 2026-10-13)
+
+Önceki sürüm (v22) `arkana-v22.html`, kaynak `arkana8.html`.
+
+- Hikaye: giriş çizgi romanı her hikaye oyununda baştan gösterilir (önceden bir kez görünce atlanıyordu). 10, 20, 30, 40 ve 50. dalgaların sonunda patron ve ardından çizgi roman bölümü. 30'da geçmişe dönüş: şehrin eski kahramanı VORTEKS'i Kıyamet Lordu dev ekranla ele geçirmiş. 40'ta Kıyamet Lordu yıkılır ve VORTEKS ortaya çıkar. 50. dalganın son patronu VORTEKS: kara zırh, kırmızı vizör, tablet kalkanı; 3 faz (yelpaze ateş, hücum, sıçrama, kalkan, takviye düşmanlar). Yenilince kurtulur: "FLIX... Gözlerimi açtın. Teşekkürler!"
+- Mağaza: yeni "💰 Paketler" sekmesi ilk sırada. Altın + elmas paketleri 0,99 $'dan başlar (Mini, Başlangıç, Kahraman, Macera, Efsane, Godlike), ayrıca 2,99 $ "Reklamsız + VIP" (oyunda şu an reklam yok; VIP günlük hediyeyi 2 katına çıkarır). Menüdeki altın ve elmas kutularına basınca paketler açılır.
+- 3 yeni harita, oynanışı değiştirir: 🌋 Lav Vadisi (yerden lav fışkırır, düşmanları da yakar), 🧊 Buz Çağı (kaygan zemin, düşmanlar yavaş, düşen buz sarkıtları dondurur), 🏚️ Deprem Şehri (ara ara deprem, düşen taşlar, çok sayıda çatlak bina).
+- Kırılabilir binalar: altında sarı-siyah şerit ve duvarında çatlak olan binalar ateş, patlama, araba patlaması, atılma (💨) ve FLIX gücüyle yıkılır; çökünce altındaki sokaktaki düşmanları ezer, kristal, hazine ve can düşürür.
+- 😈 Cehennem modu: lav denizinin ortasında yuvarlak bazalt arena, 4 mangallı sütun. Gökten ateş topları yağar, ara ara lav kenardan taşar (ortaya koş), 5 dalgada bir patron, daha güçlü düşmanlar, 3 güç kartıyla başlar, ödül 1,6 kat. Akıllı bot 8 ile 28. dalga arasında düşüyor.
+- Ayarlar (⚙️, menüde ve molada): Analog, Dokunmatik (dokunduğun yere yürür, basılı tutarsan takip eder) veya Yön tuşları (sol altta 8 yönlü tuş takımı). Ses ve grafik de burada.
+- Güneşli Gün haritasındaki parlama düzeldi (her haritanın kendi parlama ayarı var).
+- Kasma düzeltmeleri: çözünürlük ayarı artık bütün malzemeleri yeniden derlemiyor ve sık sık ileri geri değişmiyor; şehir blokları kare başına bir tane kuruluyor; patron ve yardımcı kahramanların çizimi menüdeyken hazırlanıyor (ilk patron oyunu dondurmuyordu); gölgeler artık kahramanı her yerde takip ediyor.
+
+![Cehennem](shots/v23_1_cehennem.jpg)
+![Çatlak bina](shots/v23_2_catlak_bina.jpg)
+![Lav Vadisi](shots/v23_3_lav_vadisi.jpg)
+![Ayarlar](shots/v23_4_ayarlar.jpg)
+![Paketler](shots/v23_5_paketler.jpg)
+
+---
+
+# ARKANA: FLIX Takımı (v22, 2026-10-13)
+
+Hikaye 50 bölüm oldu, kahramanlar sadece FLIX karakterleri. Önceki sürüm (v21) `arkana-v21.html`, kaynak `arkana7.html`.
+
+- Hikaye modu 50 dalga: her 10 dalgada patron ve çizgi roman bölümü, 50. dalgada Kıyamet Lordu: Son Form ile final savaşı, sonunda çocukların yeniden Flix oynadığı mutlu final (FLIX, KICK ve FLICK birlikte sevinir).
+- Zorluk her 10 dalgada bir basamak artar (hikaye ve sonsuz). Akıllı bot hikayeyi az canla bitiriyor, daire çizen bot 6-40. dalgalar arasında düşüyor.
+- Kahramanlar: FLIX, KICK (sarı damla başlı, kırmızı pelerinli, hızlı) ve FLICK (beyaz yuvarlak kafalı, neşeli, dayanıklı). VORTEKS, NOVA, TİTAN ve GÖLGE kalktı; eski kayıtta onları alanlara KICK/FLICK verilir.
+- Her kahramana 9 kostüm, nadirlik sırası Common, Rare, Epic, Legendary, Mythic, Godlike. Mythic 1.200 💎, Godlike 6.500 💎.
+- Ekonomi: altın + elmas. Elmas patronlardan, her 10 dalgadan, hikaye finalinden ve günlük hediyeden gelir; mağazada gerçek parayla elmas ve altın paketleri (web'de demo, gerçek ödeme App Store sürümünde).
+- Hikaye modunda nadiren açık olan diğer kahramanlardan biri gökten iner, 13 saniye yardım eder ve gider.
+- Sol altta yeni 3D karakter kartı: yüz portresi, can, hasar, hız, bekleme ve aktif boost.
+- Haritaya dağılan görünüm değiştiren 5 boost: Dev FLIX (9 sn), Uçuş (7 sn), Roket Ayakkabı, Altın Yıldız (5 sn dokunulmazlık), Mini FLIX. Kısa süreli, dengeyi bozmayacak güçte.
+- Daha pürüzsüz karakter modelleri, oyuncak plastiği ışıltısı, kenar ışığı; şehir duvarlarında yüksek çözünürlüklü tuğla, pencere, perde, klima ve kir izleri.
+- Mağaza ve menüde 3D kahraman portreleri, menüde kahraman seçici.
+
+![Menü](shots/v22_1_menu.jpg)
+![Kahramanlar](shots/v22_2_heroes.jpg)
+![Kostümler](shots/v22_3_skins.jpg)
+![Yardıma gelen FLICK](shots/v22_4_ally.jpg)
+
+---
+
+# ARKANA: FLIX ve Renksiz Şehir (v21, 2026-10-13)
+
+Hikaye modu artık çizgi roman. Önceki sürüm (v20) `arkana-v20.html`.
+
+- Çizgi roman hikaye (Marvel tarzı: kalın mürekkep, nokta tramı, sarı anlatı kutuları, konuşma balonları, KRA-KOOM yazıları): insanlar Flix yerine tabletlerle oynamaya başlar, şehir rengini kaybeder, dev ekrandan Kıyamet Lordu çıkar ve ekrana kapılanlar zombi, iskelet ve robota dönüşür. FLIX iner: "Flix ateşi sönmez!" Girişte 4 sayfa, 5., 10. ve 15. patrondan sonra birer bölüm sayfası, sonda final. Mod ekranında "📖 Hikayeyi oku".
+- Kıyamet şehri: hikaye modu gri ve kül yağan bir şehirde başlar. Her yenilen düşmanın ruhu (beyaz güvercin) serbest kalır, bazıları elinde Flix tutan insana döner. Her dalgada şehrin bir bölgesi altın bir halkayla rengine kavuşur, patronlar büyük bölgeleri açar, sonunda bütün şehir renklenir. Gökte dev kötü tablet.
+- Seviye takılması düzeldi: kristal sınırı dolunca XP kayboluyordu. Artık 25. seviyeye kadar yeni güçler, sonra sınırsız ilerleme (hasar, can, hız, güç sıklığı kartları).
+- Oyunda hiç top yok: bütün toplar Flix figürü oldu (Zıplayan Flix, FLIX gücü, Vorteks yörüngesi).
+- Kaçış yolları: arabaya yaslan veya atıl, fitili yanar ve patlar (zincirleme patlama, yol açar); kırılabilir kasa, bariyer ve tablet yığınları; 💨 Atılma düğmesi (dokunulmaz, engelleri kırar); kontrolden çıkmış taksi uyarıyla geçer, düşmanları biçer.
+- Yeni güçler: Meşale Savuruşu, Flix Mayını, Kasırga, Pelerin Zırhı (toplam 20 güç).
+- Yeni yol arkadaşları: Buz Pengueni Pıt, Tank Kaplumbağa Taş, Fener Ruhu Lumi. Yeni kostümler: FLIX Buzul, Neon, Süper Yıldız; her kahramana ve her arkadaşa birer yeni kostüm.
+- Daha keskin görüntü (keskinleştirme, daha dar parlama), her öldürmede mürekkep yıldızı, büyük düşmanlarda POW!, BAM!, ZAP! yazıları.
+- Çizgi roman arayüz: Bangers yazı tipi, siyah çerçeveli düğmeler, renkli mod panelleri. Ana ekranda zıplayıp dönen FLIX (dokununca hareket yapar), uçuşan Flix figürleri, hareket çizgileri.
+- Test: akıllı bot hikayeyi 20. dalgada kazanıyor (bütün çizgi roman sayfaları akışta açılıyor), daire çizen bot 15. dalgada düşüyor. Hata yok.
+
+![Çizgi roman](shots/v21_1_comic.jpg)
+![Dönüşüm ve FLIX](shots/v21_2_comic.jpg)
+![Menü](shots/v21_3_menu.jpg)
+![POW](shots/v21_4_pow.jpg)
+![Kıyamet şehri](shots/v21_5_doom.jpg)
+
+---
+
+# ARKANA: FLIX ve Kıyamet Ordusu (v20, 2026-10-13)
+
+Ana kahraman artık Flix maskotu. Önceki sürüm (v19) `arkana-v19.html`.
+
+- FLIX: lale başlı, zikzak taçlı, iki meşaleli, Doctor Doom tarzı pelerinli kahraman. Yüz ifadeleri (gülme, göz kırpma, bağırma, acı), kafa esneme, sallanan taç, dalgalanan pelerin, titreşen alevler.
+- Mağaza: 5 kahraman (FLIX, Vorteks, Nova, Titan, Gölge), her birine kostümler; 5 yol arkadaşı (Rex, Drone, Kedi, Kartal, Ejderha Kıvılcım) ve kostümleri; 5 harita (Alacakaranlık, Gündüz, Neon, Kar, Fırtına). Altın koşulardan ve günlük hediyeden gelir. Altın paketleri web'de demo, gerçek ödeme App Store sürümünde.
+- 4 mod: Hikaye, Sonsuz, Patron Koşusu, Flix Avı (4 dakikada 40 Flix).
+- Şehre dağılmış toplanabilir Flix figürleri (puan, altın, FLIX gücü), altın Flix, skor ve kombo çarpanı, yarık kapatma görevi.
+- Yeni düşmanlar: uçan Yarasa sürüleri, yerin altından çıkan Kazıcı Zombi, altın taçlı Elit düşmanlar (5 kat can, altın Flix düşürür).
+- Zorluk: ilk 10 seviye kahraman çok güçlü, sonra kademeli normalleşir.
+- Vuruş hissi: beyaz parlama, ezilip zıplama, kıvılcımlar, kritikte sarsıntı, büyük öldürmede anlık donma, titreşim.
+- Görüntü: "💎 Ultra" ekranın tam çözünürlüğü (4K'ya kadar), 60 fps hedefi; telefon zorlanırsa çözünürlük düşer, rahatlayınca geri çıkar.
+- App Store paketi (Capacitor) proje dosyalarında: `flix/lootback/app/`.
+- Test: akıllı bot 20 dalgayı bitiriyor, daire çizen bot 12. dalgada düşüyor.
+
+![Menü](shots/v20_1_menu.jpg)
+![Savaş](shots/v20_2_battle.jpg)
+![Mağaza](shots/v20_4_shop.jpg)
+![Flix Avı](shots/v20_6_hunt.jpg)
+
+---
+
+# ARKANA: Vorteks ve Kıyamet Ordusu (v19, 2026-10-12)
+
+Evrenler arası yarıklar açıldı; iskeletler, zombiler ve robotlar New York'a dökülüyor. Önceki sürüm (v18) `arkana-v18.html`.
+
+- Özgün kahraman VORTEKS: grafit zırh plakaları, kırmızı-altın detaylar, parlayan vizör ve göğüs çekirdeği, sırt iticileri, Flix çizgili uçuşan atkı, etrafında dönen Flix topu. Atışta tekme animasyonu.
+- 14 düşman türü, 3 aile. İskeletler (8 tür, darbe ile zayıf), Zombiler: Zombi (yakalarsa yavaşlatır), Sürünen Zombi, Asit Tükürgen (yerde yeşil asit gölü) — ateşe zayıf. Robotlar: Avcı Robot (nişan çizgisi + 3 lazer, zırhlı), Avcı Drone (binaların üstünden uçar), Savaş Makinesi (füze yağmuru) — şimşeğe zayıf, şimşek zırhı deler. Zayıf noktaya vuruş yeşil "!" ile gösterilir.
+- Yeni final patronu Kıyamet Lordu (pelerinli, bıçak taçlı zırhlı tiran): sıçrayıp ezer, lazer yelpazesi, füze yağmuru, asker çağırır.
+- Daha geniş şehir: geniş caddeler, 4 bölge (Midtown, Brownstone, Yıkık bölge, Park), yanan arabalar, kraterler, sokaklarda yarık portalları, gökte dev yarık.
+- 2K sinematik görüntü: gerçek zamanlı gölgeler, bloom ışıması, renk düzenleme, vinyet, piksel oranı 3'e kadar. Menüde/duraklatmada "🎬 2K / ⚡ Hızlı" düğmesi; telefon zorlanırsa çözünürlük kendiliğinden düşer.
+- Test: akıllı bot 20 dalgayı bitiriyor, daire çizen bot 15. dalgaya kadar dayanıyor.
+
+---
+
 # ARKANA: Kaptan Flix ve İskelet Ordusu (v18, 2026-10-12)
 
 Kaan'ın isteğiyle oyun New York sokaklarına taşındı. Önceki çayır sürümü (v17) `arkana-v17.html` olarak duruyor.
