@@ -1,3 +1,16 @@
+# ARKANA: Son güncelleme ve App Store paketi (v31, 2026-10-16)
+
+Önceki sürüm (v30) `arkana-v30.html`, kaynak `arkana10.html`.
+
+- Sonsuz mod: her 10 dalgada düşman canı ve hasarı %10 artar, 50. dalgadan sonra sabit kalır (51+ dalgalar 41-50 döngüsünü tekrarlar). Sabit duran oyuncu artık 5-7. dalgada ölüyor.
+- Ayarlar > Zorluk: Kolay, Orta, Zor, Çok Zor (tüm modlarda).
+- Deprem Şehri: deprem sırasında yer yarılır. Önce turuncu parlayan çizgi uyarır, sonra yarık açılır, üstündekine hasar verir, binaları kırar.
+- Ölünce bir kez "Reklam izle, devam et" (tam can, 3 sn koruma). İkinci ölümde reklam yok. VIP'te reklamsız. Uygulamada AdMob ödüllü reklam, web'de 5 saniyelik Flix kartı.
+- Akıcılık: seviye atlama ve duraklatma ekranlarındaki arka plan bulanıklığı kaldırıldı (iPhone'da her açılışta takılmanın sebebi). Kalabalık sahnede çizilen üçgen sayısı %25 azaldı (düşman göz, kol, bacak detayı), telefonda kalabalıkta gölgeler 3 karede bir yenileniyor, parlama efekti yarım çözünürlükte, parçacıklar daha ucuz çiziliyor.
+- App Store: iPhone ve iPad için Türkçe ve İngilizce 8'er yazılı renkli görsel (`app/store/screenshots/`), mağaza metinleri (`app/store/MAGAZA_METINLERI.md`), AdMob kurulumu ve gizlilik bölümü güncellendi.
+
+---
+
 # ARKANA: Yüklemeye hazır (v30, 2026-10-14)
 
 Önceki sürüm (v29) `arkana-v29.html`, kaynak `arkana10.html`.

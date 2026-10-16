@@ -26,7 +26,7 @@ html,body{margin:0;height:100%;background:#40386e;color:var(--ink);font-family:"
 button{font-family:inherit;color:var(--ink);cursor:pointer}
 .screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:14px;z-index:20;text-align:center}
 .screen.on{display:flex}
-.dim{background:rgba(60,40,140,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.dim{background:rgba(34,22,82,.66)}#adBox{background:#120d14;z-index:40}.adCard{display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;font-weight:700}.adCard small{letter-spacing:3px;opacity:.6}.adLogo{font-family:Bangers,Fredoka,sans-serif;font-size:96px;color:#e22511;background:#ffd23f;padding:0 34px;border-radius:24px;border:5px solid #fff;transform:rotate(-4deg);animation:wob 1.2s infinite}.adCard i{font-style:normal;width:46px;height:46px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;margin-top:8px}
 .panel{background:var(--card);border-radius:28px;padding:16px 20px;box-shadow:0 10px 0 rgba(42,35,80,.18),0 18px 40px rgba(42,35,80,.25);max-width:min(860px,96%)}
 .title{font-size:clamp(50px,9vw,96px);font-weight:700;margin:0;line-height:.95;color:#fff;letter-spacing:2px;text-shadow:0 5px 0 var(--flixr),0 9px 0 var(--flixn),0 14px 26px rgba(0,0,0,.45);animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-6px) rotate(-1deg)}}
@@ -317,7 +317,7 @@ h2{font-family:Bangers,Fredoka,sans-serif;font-weight:400;letter-spacing:2px;col
         <button data-c="touch"><i>👆</i><b>Dokunmatik</b><span>Dokunduğun yere yürür, basılı tutarsan parmağını takip eder</span></button>
         <button data-c="pad"><i>✛</i><b>Yön tuşları</b><span>Sol altta ok tuşları, ikisine birden basınca çapraz gider</span></button>
       </div>
-      <div class="row" style="margin-top:10px"><button class="btn small" id="bSound">🔊 Ses açık</button><button class="btn small" id="bQ">🎬 2K · 60 fps</button></div>
+      <div class="row" style="margin-top:10px"><button class="btn small" id="bSound">🔊 Ses açık</button><button class="btn small" id="bQ">🎬 2K · 60 fps</button><button class="btn small" id="bDiff">🎚️ Zorluk: Orta</button></div>
       <div class="row" style="margin-top:10px"><button class="btn main" id="bSetOk">Tamam</button></div>
     </div>
   </section>
@@ -338,6 +338,15 @@ h2{font-family:Bangers,Fredoka,sans-serif;font-weight:400;letter-spacing:2px;col
   </section>
 
   <section class="screen" id="epi"><div class="epiBox"><b>Güzel günler geri döndü!</b><span>Çocuklar yine sokakta, elleri Flix dolu. Teşekkürler FLIX takımı!</span></div><button class="btn main" id="bEpi">Devam ▶</button></section>
+  <section class="screen dim" id="revive">
+    <div class="panel revP">
+      <h2>Bir şans daha!</h2>
+      <p class="note" id="revNote" style="margin:6px 0 10px">Kısa bir reklam izle, kahramanın tam canla geri dönsün. Her oyunda sadece bir kez.</p>
+      <div class="row"><button class="btn main" id="bRevAd">📺 Reklam izle, devam et</button></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" id="bRevNo">Hayır, bitir <span id="revT">8</span></button></div>
+    </div>
+  </section>
+  <section class="screen" id="adBox"><div class="adCard"><small>REKLAM</small><div class="adLogo">FLIX</div><b>Kick it, Flick it, Flix it!</b><span>Gerçek Flix oyuncakları: flixtoysofficial.com</span><i id="adT">5</i></div></section>
   <section class="screen dim" id="over">
     <div class="panel">
       <h2 id="overTitle">Düştün!</h2>
@@ -467,8 +476,8 @@ const MATS = {};
 let HQSEG = 0;
 if (typeof THREE !== 'undefined') {
   const S0 = THREE.SphereGeometry, C0 = THREE.CylinderGeometry, K0 = THREE.ConeGeometry;
-  THREE.SphereGeometry = function (r, w, h, ...a) { if (HQSEG && (w || 8) >= 7) { w = Math.max(w || 8, HQSEG); h = Math.max(h || 6, Math.round(HQSEG * 0.7)); } return new S0(r, w, h, ...a); };
-  THREE.CylinderGeometry = function (rt, rb, h, rs, ...a) { if (HQSEG && (rs || 8) >= 7) rs = Math.max(rs || 8, HQSEG); return new C0(rt, rb, h, rs, ...a); };
+  THREE.SphereGeometry = function (r, w, h, ...a) { if (HQSEG && (w || 8) >= 7 && (HQSEG > 14 || r >= 0.12)) { w = Math.max(w || 8, HQSEG); h = Math.max(h || 6, Math.round(HQSEG * 0.7)); } return new S0(r, w, h, ...a); };
+  THREE.CylinderGeometry = function (rt, rb, h, rs, ...a) { if (HQSEG && (rs || 8) >= 7 && (HQSEG > 14 || Math.max(rt, rb) >= 0.07)) rs = Math.max(rs || 8, HQSEG); return new C0(rt, rb, h, rs, ...a); };
   THREE.ConeGeometry = function (r, h, rs, ...a) { if (HQSEG && (rs || 8) >= 7) rs = Math.max(rs || 8, HQSEG); return new K0(r, h, rs, ...a); };
 }
 // character surface shader: fine vinyl grain, cloth weave, brushed metal or mottled skin, plus a toy-plastic highlight and a soft rim light
@@ -595,6 +604,8 @@ function setupPost() {
     const c = new THREE.EffectComposer(R.renderer, rt);
     c.addPass(new THREE.RenderPass(R.scene, R.cam));
     R.bloom = new THREE.UnrealBloomPass(new THREE.Vector2(256, 256), 0.55, 0.22, 0.9); c.addPass(R.bloom);
+    // phones: the glow is soft anyway, so its blur chain runs at half the usual size (a quarter of the pixels)
+    if (isTouch) { const bs = R.bloom.setSize.bind(R.bloom); R.bloom.setSize = (w, h) => bs(Math.max(64, w * 0.5), Math.max(64, h * 0.5)); }
     R.grade = new THREE.ShaderPass(GRADE); c.addPass(R.grade);
     R.post = c;
   } catch (e) { console.warn('post', e); R.post = null; }
@@ -1593,7 +1604,7 @@ const MAPS = {
   gold:  {n: 'Altın Saat', ic: '🌅', price: 2000, d: 'Akşamüstü altın ışık, uzun gölgeler.', sky: ['#3a2a5a', '#c86a3a', '#ffb347', '#ffe0a0'], fog: 0xd8a070, hemi: [0xffe0b0, 0x5a4030, 0.6], amb: [0xffd090, 0.18], sun: [0xffc070, 1.05], rim: [0xffe0a0, 0.4], ground: 0xf0e0d0, win: 0.6, bloom: [0.22, 0.94]},
   lava:  {n: 'Lav Vadisi', ic: '🌋', price: 4000, mod: 'lava', d: 'Oynanış: yerden lav fışkırır, sen de düşmanlar da yanarsın. Sürüyü lavın üstüne çek!', tip: 'Yerden lav fışkırıyor! Turuncu halkadan kaç, düşmanları içine çek.', sky: ['#1a0602', '#4a1206', '#a8340a', '#ff8a2a'], fog: 0x3a1408, hemi: [0xffa070, 0x2a0a04, 0.6], amb: [0x7a2a10, 0.25], sun: [0xff7a3a, 1.0], rim: [0xffa040, 0.55], ground: 0xc89080, win: 1.1, ash: 1, bloom: [0.6, 0.86]},
   ice:   {n: 'Buz Çağı', ic: '🧊', price: 4500, mod: 'ice', d: 'Oynanış: yer kaygan, kayarak durursun. Soğuk düşmanları yavaşlatır, tepeden buz sarkıtları düşer ve donduru.', tip: 'Yer buz gibi kaygan! Buz sarkıtları düşüyor, altında kalan donar.', sky: ['#3a5a8a', '#7aa0c8', '#b8d6ec', '#e0f0fa'], fog: 0xbcd6ea, hemi: [0xe0f0ff, 0x7a90b0, 0.7], amb: [0xd0e8ff, 0.18], sun: [0xe8f4ff, 0.75], rim: [0xa0d8ff, 0.5], ground: 0xeaf6ff, win: 0.5, snow: 1, bloom: [0.16, 0.97]},
-  quake: {n: 'Deprem Şehri', ic: '🏚️', price: 5000, mod: 'quake', d: 'Oynanış: ara ara deprem olur, taşlar düşer, çatlak binalar çöker ve altındakileri ezer. Kırılabilir bina çok!', tip: 'Deprem bölgesi! Çatlak binaları yık, düşen taşlara dikkat.', sky: ['#2a2420', '#5a4a3a', '#9a8064', '#d8b890'], fog: 0x6a5a48, hemi: [0xf0d8b0, 0x4a3a2a, 0.6], amb: [0x8a7a6a, 0.22], sun: [0xffd8a0, 0.95], rim: [0xd8c0a0, 0.35], ground: 0xd0c0a8, win: 0.6, dust: 1, bloom: [0.3, 0.94]}
+  quake: {n: 'Deprem Şehri', ic: '🏚️', price: 5000, mod: 'quake', d: 'Oynanış: ara ara deprem olur, yer yarılır, çatlak binalar çöker ve altındakileri ezer. Kırılabilir bina çok!', tip: 'Deprem bölgesi! Çatlak binaları yık, yer yarılınca parlayan çizgilerden kaç.', sky: ['#2a2420', '#5a4a3a', '#9a8064', '#d8b890'], fog: 0x6a5a48, hemi: [0xf0d8b0, 0x4a3a2a, 0.6], amb: [0x8a7a6a, 0.22], sun: [0xffd8a0, 0.95], rim: [0xd8c0a0, 0.35], ground: 0xd0c0a8, win: 0.6, dust: 1, bloom: [0.3, 0.94]}
 };
 const HELL_MAP = {n: 'Cehennem', sky: ['#050000', '#2a0402', '#7a1404', '#ff5a10'], fog: 0x3a0804, hemi: [0xff8a5a, 0x2a0402, 0.55], amb: [0x6a1a0a, 0.3], sun: [0xff8a4a, 1.0], rim: [0xff4a1a, 0.8], ground: 0xffffff, win: 1, ash: 1, bloom: [0.7, 0.8]};
 
@@ -1783,7 +1794,7 @@ function buildSkeletons() {
   const bone = new THREE.MeshLambertMaterial({color: 0xffffff});
   const ribTex = canvasTex(64, 64, (x) => { x.clearRect(0, 0, 64, 64); x.fillStyle = '#fff'; for (let i = 0; i < 4; i++) x.fillRect(0, 4 + i * 15, 64, 8); x.fillRect(29, 0, 6, 64); });
   const ribMat = new THREE.MeshLambertMaterial({color: 0xffffff, map: ribTex, alphaTest: 0.5, side: THREE.DoubleSide});
-  SK.skull = inst(new THREE.SphereGeometry(0.25, 16, 12), bone, MAXE, true);
+  SK.skull = inst(new THREE.SphereGeometry(0.25, 13, 10), bone, MAXE, true);
   SK.jaw = inst(new THREE.BoxGeometry(0.28, 0.1, 0.24), bone, MAXE, true);
   SK.socket = inst(new THREE.SphereGeometry(0.075, 8, 6), glow(0x15122b), MAXE * 2);
   SK.eye = inst(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({color: 0xffffff}), MAXE * 2, true);
@@ -1805,7 +1816,7 @@ function buildSkeletons() {
   SK.sheet = inst(new THREE.LatheGeometry(gp, 16), new THREE.MeshLambertMaterial({color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false, emissive: 0x334466}), MAXE, true);
   // zombies (cloth + skin)
   const skinM = new THREE.MeshLambertMaterial({color: 0xffffff}), cloth = new THREE.MeshLambertMaterial({color: 0xffffff});
-  ZB.head = inst(new THREE.SphereGeometry(0.22, 16, 12), skinM, MAXE, true);
+  ZB.head = inst(new THREE.SphereGeometry(0.22, 13, 10), skinM, MAXE, true);
   ZB.hair = inst(new THREE.SphereGeometry(0.228, 14, 8, 0, TAU, 0, Math.PI * 0.42), lam(0x2a2018), MAXE);
   ZB.mouth = inst(new THREE.BoxGeometry(0.13, 0.05, 0.05), glow(0x1a0606), MAXE);
   ZB.eye = inst(new THREE.SphereGeometry(0.042, 8, 6), new THREE.MeshBasicMaterial({color: 0xffffff}), MAXE * 2, true);
@@ -1827,7 +1838,7 @@ function buildSkeletons() {
   RB.thigh = inst(boxHang(0.16, 0.43), metal, MAXE * 2, true); RB.shin = inst(boxHang(0.15, 0.43), metal, MAXE * 2, true);
   RB.pod = inst(new THREE.BoxGeometry(0.3, 0.26, 0.42), metal, MAXE * 2, true);
   // flying hunter drones
-  DR.body = inst(new THREE.SphereGeometry(0.34, 16, 12), metal, MAXE, true);
+  DR.body = inst(new THREE.SphereGeometry(0.34, 14, 10), metal, MAXE, true);
   DR.ring = inst(new THREE.TorusGeometry(0.52, 0.05, 6, 28), metal, MAXE, true);
   DR.eye = inst(new THREE.SphereGeometry(0.1, 10, 8), new THREE.MeshBasicMaterial({color: 0xffffff}), MAXE, true);
   DR.gun = inst(new THREE.BoxGeometry(0.08, 0.08, 0.4), lam(0x222228), MAXE * 2);
@@ -1899,6 +1910,11 @@ const BOSSES = {
 function bossFor(n) { if (n % 10) return null; if (G.mode === 'story' && !G.endless && n <= STORY_LEN) return BOSSES[n === STORY_LEN ? 50 : n]; return BOSSES[((n / 10 - 1) % 5 + 1) * 10]; }
 // the difficulty climbs a clear step every 10 waves (story and endless alike)
 function tierOf(n) { return Math.floor((n - 1) / 10); }
+const DIFF = [{n: 'Kolay', hp: 0.72, dmg: 0.65, cnt: 0.85}, {n: 'Orta', hp: 1, dmg: 1, cnt: 1}, {n: 'Zor', hp: 1.3, dmg: 1.3, cnt: 1.12}, {n: 'Çok Zor', hp: 1.7, dmg: 1.65, cnt: 1.25}];
+function DF() { return DIFF[save.diff == null ? 1 : save.diff] || DIFF[1]; }
+function isEnd() { return G.mode === 'endless' || G.endless; }
+// endless: +10% every 10 waves and nothing more after wave 50 (waves 51+ replay the 41-50 cycle at the same strength)
+function endStep(n) { return 1 + 0.1 * Math.floor(Math.min(n, 50) / 10); }
 function waveDef(n) {
   const late = n > 20, m = late ? 20 : n, k = n % 10, tier = tierOf(n);
   const t = {walker: 2.6};
@@ -1979,7 +1995,7 @@ function newRun(mode) {
   Object.assign(G, {
     state: 'play', time: 0, wave: 1, waveT: 0, kills: 0, level: 1, xp: 0, xpNext: 5, hp: curHero().hp, maxHp: curHero().hp, px: 0, pz: 0, fx: 0, fz: 1, inv: 0, flix: 0,
     enemies: [], shots: [], eshots: [], gems: [], items: [], tels: [], zaps: [], pools: [], grab: 0, paid: 0, spawnT: 1, weps: Object.assign({toss: 1, [curHero().start]: 1}, curHero().start2 ? {[curHero().start2]: 1} : {}), pas: {}, ws: {}, pending: mode === 'boss' ? 4 : mode === 'hell' ? 3 : 0, boss: null, endless: mode === 'endless' || mode === 'hell', mode, picks: [], score: 0, combo: 0, comboT: 0, flixGot: 0, runCoins: 0, riftO: null, riftT: 35, riftsClosed: 0, huntT: 240, bestCombo: 0,
-    dmgMul: 1, hpBonus: 0, spdBonus: 0, cdBonus: 0, barr: [], fuses: [], carFires: [], traf: null, trafT: 12, dashT: 0, dashCd: 0, mines: [], torns: [], swipeFx: null, carsBlown: 0, comicQ: null, tier: 0, rockets: [], slash: null, slam: null, gearFx: null, gunOn: false, toss: [], tq: [], bombs: [], whips: [], turrets: [], throwT: 0, aimT: 0, aimA: 0, epiT: 0, finalT: 0, bossKills: 0, paidG: 0, boosts: [], bst: null, bstT: 20, trail: [],
+    dmgMul: 1, hpBonus: 0, spdBonus: 0, cdBonus: 0, barr: [], fuses: [], carFires: [], traf: null, trafT: 12, dashT: 0, dashCd: 0, mines: [], torns: [], swipeFx: null, carsBlown: 0, comicQ: null, tier: 0, fis: [], revived: false, fell: false, rockets: [], slash: null, slam: null, gearFx: null, gunOn: false, toss: [], tq: [], bombs: [], whips: [], turrets: [], throwT: 0, aimT: 0, aimA: 0, epiT: 0, finalT: 0, bossKills: 0, paidG: 0, boosts: [], bst: null, bstT: 20, trail: [],
     shake: 0, kx: 0, kz: 0, ult: null, beamOn: 0, hitstop: 0, slowT: 0, ally: null, allyIn: 0, allyCd: 2, allyId: null, compL: 1, comp: {kind: save.comp, x: 1.2, z: -1, t: 0, cd: 1, fa: 0}
   });
   G.mapMod = mode === 'hell' ? null : (MAPS[save.map] && MAPS[save.map].mod) || null; G.haz = {t: G.mapMod === 'quake' ? 12 : 5, q: 0, r: 24, fl: null}; G.ivx = G.ivz = 0; G.bldDown = 0; G.brkTip = 0;
@@ -2002,7 +2018,7 @@ function waveGift(n) {
 }
 function WNAME() { return G.mode === 'story' && !G.endless ? 'Seviye' : 'Dalga'; }
 function startWave(n) {
-  G.wave = n; G.waveT = 0; if (n > 1) for (const g of G.gems) g.pull = true; G.def = waveDef(G.mode === 'boss' ? n * 10 : G.mode === 'hell' ? hellWave(n) : n); if (G.mode === 'hell') hellDef(G.def, n); if (G.mode === 'boss') G.def.hpMul *= 0.85; G.evDone = false;
+  G.wave = n; G.waveT = 0; if (n > 1) for (const g of G.gems) g.pull = true; G.def = waveDef(G.mode === 'boss' ? n * 10 : G.mode === 'hell' ? hellWave(n) : isEnd() && n > 50 ? 40 + ((n - 1) % 10) + 1 : n); if (isEnd()) G.def.hpMul *= endStep(n) * 1.1; if (G.mode === 'hell') hellDef(G.def, n); if (G.mode === 'boss') G.def.hpMul *= 0.85; G.evDone = false;
   if ((n > 1 || G.mode !== 'boss') && !CITY.arena) spawnBarricades();
   if (G.mode === 'story' && n > 1) { doomZone(G.px, G.pz, 20 + n * 0.8); doomTarget((n - 1) / STORY_LEN * 0.6); }
   const d = G.def;
@@ -2024,7 +2040,7 @@ function spawnPos(rad) {
 }
 function addEnemy(type, x, z, rise) {
   if (G.enemies.length >= Math.min(MAXE - 2, type === 'boss' ? MAXE : ECAP())) return null;
-  const T = ET[type], hp = Math.round(T.hp * G.def.hpMul * (G.mode === 'story' && !G.endless ? 1 + Math.max(0, G.wave - 8) * 0.05 : 1) * (G.mode === 'endless' || G.endless ? 1 + Math.max(0, G.wave - 15) * 0.05 : 1) * (G.mode === 'hell' ? 1 + Math.max(0, G.wave - 3) * 0.08 : 1));
+  const T = ET[type], hp = Math.round(T.hp * G.def.hpMul * (G.mode === 'story' && !G.endless ? 1 + Math.max(0, G.wave - 8) * 0.05 : 1) * (isEnd() ? 1 + Math.max(0, Math.min(G.wave, 50) - 15) * 0.05 : 1) * DF().hp * (G.mode === 'hell' ? 1 + Math.max(0, G.wave - 3) * 0.08 : 1));
   const e = {type, x, z, vx: 0, vz: 0, hp, max: hp, r: T.r, spd: T.spd * rnd(0.9, 1.1) * (1 + (G.def.tier || 0) * 0.04) * (G.mapMod === 'ice' ? 0.82 : 1), dmg: T.dmg, xp: T.xp, fly: T.fly || 0, sz: T.size, t: rnd(0, 6), flash: 0, slow: 0, cd: rnd(1.5, 3), hitCd: {}, navT: 0, tx: G.px, tz: G.pz, los: false, fa: 0, rise: rise === false ? 0 : 0.7, st: 'walk', stT: 0, ph: rnd(0, 4)};
   if (type === 'necro') e.cd = rnd(2, 4);
   if (type === 'burrower') { e.under = true; e.rise = 0; }
@@ -2043,7 +2059,7 @@ function spawnTick(dt) {
   G.spawnT -= dt;
   if (G.spawnT <= 0) {
     G.spawnT = d.boss ? d.iv * 1.5 : d.iv;
-    const n = d.boss ? 2 : d.g, clumps = 1 + Math.floor(G.wave / 6);
+    const n = Math.round((d.boss ? 2 : d.g) * DF().cnt), clumps = 1 + Math.floor(G.wave / 6);
     for (let c = 0; c < clumps; c++) { const [x0, z0] = spawnPos(); for (let i = 0; i < Math.ceil(n / clumps); i++) addEnemy(pickType(), x0 + rnd(-1.6, 1.6), z0 + rnd(-1.6, 1.6)); }
   }
   if (d.ev && !G.evDone && G.waveT > 8) {
@@ -2067,7 +2083,7 @@ function navigate(e) {
 }
 function spawnBoss(B) {
   const [x, z] = spawnPos(15);
-  const hp = Math.round(B.hp * (1 + Math.floor(((G.mode === 'boss' ? G.wave * 10 : G.wave) - 1) / 50) * 1.6) * (G.mode === 'story' && !G.endless ? 1.2 : 1));
+  const hp = Math.round(DF().hp * B.hp * (1 + Math.floor(((G.mode === 'boss' ? G.wave * 10 : isEnd() ? Math.min(G.wave, 50) : G.wave) - 1) / 50) * 1.6) * (G.mode === 'story' && !G.endless ? 1.2 : 1));
   const e = {type: 'boss', boss: B, kind: B.kind, x, z, vx: 0, vz: 0, hp, max: hp, r: B.r, dmg: 18, xp: 0, fly: B.kind === 'dragon' ? 1.6 : B.kind === 'shadow' ? 0.5 : 0, spd: B.spd || (B.kind === 'tyrant' ? 2.3 : 2.1), t: 0, flash: 0, slow: 0, cd: 3, st: 'chase', stT: 0, hitCd: {}, los: true, sz: 1};
   HQSEG = 22; e.g = buildBoss(B); HQSEG = 0; charPatch(e.g, 0.35); e.g.position.set(x, 0, z); R.scene.add(e.g);
   if (B.final) { e.phase = 1; e.dmg = 26; e.spd = B.spd || 2.5; e.cd = 2; G.slowT = 1.6; G.shake = 1.2; buzz(200); }
@@ -2259,11 +2275,11 @@ function bossDown(e) {
 }
 function hurt(dmg, src) {
   if (G.inv > 0 || G.state !== 'play' || (G.bst && G.bst.k === 'star')) return;
-  const wv = G.mode === 'boss' ? G.wave * 10 : G.mode === 'hell' ? hellWave(G.wave) : G.wave; dmg *= Math.min(1, 0.55 + wv * 0.075) * (1 + tierOf(wv) * 0.2 + Math.max(0, wv - 9) * 0.018); // early waves forgive more, every 10 waves bite harder
-  const sty = G.mode === 'story' && !G.endless; dmg *= (1 - 0.07 * (G.pas.armor || 0)) * (G.mode === 'hell' ? 1.15 : 1) * (sty ? 1.1 + G.wave * 0.008 : 1); G.hp -= dmg; G.inv = sty && G.wave > 8 ? 0.4 : 0.5; G.shake = Math.max(G.shake, 0.35);
+  const wv = G.mode === 'boss' ? G.wave * 10 : G.mode === 'hell' ? hellWave(G.wave) : isEnd() ? Math.min(G.wave, 50) : G.wave; dmg *= Math.min(1, 0.55 + wv * 0.075) * (1 + tierOf(wv) * 0.2 + Math.max(0, wv - 9) * 0.018); // early waves forgive more, every 10 waves bite harder
+  const sty = G.mode === 'story' && !G.endless; dmg *= (1 - 0.07 * (G.pas.armor || 0)) * (G.mode === 'hell' ? 1.15 : 1) * (sty ? 1.1 + G.wave * 0.008 : 1) * (isEnd() ? 1.3 * endStep(G.wave) : 1) * DF().dmg; G.hp -= dmg; G.inv = (sty && G.wave > 8) || (isEnd() && G.wave > 4) ? 0.4 : 0.5; G.shake = Math.max(G.shake, 0.35);
   SFX.hurt(); buzz(40); $('flash').style.opacity = 1; setTimeout(() => $('flash').style.opacity = 0, 140);
   if (src) { const l = Math.hypot(G.px - src.x, G.pz - src.z) || 1; G.kx = (G.px - src.x) / l * 6; G.kz = (G.pz - src.z) / l * 6; }
-  if (G.hp <= 0) { G.hp = 0; G.state = 'dying'; G.dieT = 0; G.slowT = 1.2; banner('', curHero().n + ' yere düştü...', 1.4); }
+  if (G.hp <= 0) { G.hp = 0; G.state = 'dying'; G.dieT = 0; G.fell = true; G.slowT = 1.2; banner('', curHero().n + ' yere düştü...', 1.4); }
 }
 function dropGem(x, z, v) {
   const xv = v * G.stat.xp;
@@ -2405,7 +2421,7 @@ function update(dt) {
   G.inv = Math.max(0, G.inv - dt); G.castT = Math.max(0, (G.castT || 0) - dt);
   G.hp = Math.min(G.maxHp, G.hp + st.regen * dt);
   if (G.state === 'play') escapeTick(dt);
-  if (G.state === 'play') mapTick(dt);
+  if (G.state === 'play') { mapTick(dt); fissureTick(dt); }
   if (G.state === 'play') { spawnTick(dt); tickModes(dt); if (G.state !== 'play' && G.state !== 'dying') return; }
   buildGrid();
   // enemies
@@ -2558,7 +2574,7 @@ function update(dt) {
     if (G.pending > 0) showCards();
     if (G.finalT > 0) { G.finalT -= dt; if (G.finalT <= 0 && G.state === 'play') { victory(); return; } }
   }
-  if (G.state === 'dying') { G.dieT += dt; if (G.dieT > 1.2) gameOver(); }
+  if (G.state === 'dying') { G.dieT += dt; if (G.dieT > 1.2) { if (!G.revived && G.fell) showRevive(); else gameOver(); } }
 }
 function boom(x, z, r, dmg, star) {
   ringFx(x, z, r, star ? 0xffd23f : 0xff9f43, 0.3);
@@ -2793,6 +2809,29 @@ function abilLive() {
 
 /* ---------- end ---------- */
 function fmt(t) { const s = Math.floor(t); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+// one second chance per run: watch a rewarded ad (VIP owners skip the ad), the second fall ends the run
+let revTimer = null;
+function showRevive() {
+  G.state = 'revive'; G.revived = true; $('stickBase').classList.remove('on');
+  $('bRevAd').textContent = save.noads ? '⭐ VIP: ücretsiz devam et' : '📺 Reklam izle, devam et';
+  $('revNote').textContent = save.noads ? 'VIP olduğun için reklamsız devam edebilirsin. Her oyunda sadece bir kez.' : 'Kısa bir reklam izle, kahramanın tam canla geri dönsün. Her oyunda sadece bir kez.';
+  screen('revive'); let n = 8; $('revT').textContent = n; clearInterval(revTimer);
+  revTimer = setInterval(() => { n--; $('revT').textContent = n; if (n <= 0) { clearInterval(revTimer); if (G.state === 'revive') gameOver(); } }, 1000);
+}
+function playAd(done) {
+  const N = window.FlixNative;
+  if (N && N.showRewardedAd) { N.showRewardedAd().then(ok => done(ok !== false)).catch(() => done(true)); return; }
+  // web: a 5 second Flix Toys card stands in for the ad
+  screen('adBox'); let n = 5; $('adT').textContent = n; const iv = setInterval(() => { n--; $('adT').textContent = n; if (n <= 0) { clearInterval(iv); done(true); } }, 1000);
+}
+function revive() {
+  hideScreens(); G.hp = G.maxHp; G.inv = 3; G.fell = false; G.state = 'play'; G.dieT = 0; G.slowT = 0; $('bPause').style.display = 'block';
+  for (const e of G.enemies) if (!e.dead && e.type !== 'boss' && Math.hypot(e.x - G.px, e.z - G.pz) < 9) hit(e, e.hp + 1, '255,210,63', 12, e.x - G.px, e.z - G.pz);
+  for (const b of G.eshots) b.life = 0; ringFx(G.px, G.pz, 9, 0xffd23f, 0.8); confetti(G.px, 2, G.pz, 60, 1.8); SFX.level(); G.shake = 0.6;
+  banner('⭐ GERİ DÖNDÜN!', 'Tam can! Bu son şansındı.', 2.4);
+}
+$('bRevAd').onclick = () => { clearInterval(revTimer); if (save.noads) revive(); else playAd(ok => ok ? revive() : gameOver()); };
+$('bRevNo').onclick = () => { clearInterval(revTimer); gameOver(); };
 function gameOver(won) {
   G.state = 'over'; $('stickBase').classList.remove('on'); $('bPause').style.display = 'none';
   const best = G.wave > save.bestWave || (G.wave === save.bestWave && G.kills > save.bestKills);
@@ -3092,7 +3131,7 @@ function render(dt, rdt) {
     if (G.state === 'epilogue' || (G.state === 'over' && G.epiT > 0)) { const a = (G.epiT || 0) * 0.22 + (G.state === 'over' ? performance.now() / 9000 : 0); R.cam.position.set(G.px + Math.sin(a) * 12, 5.2, G.pz + Math.cos(a) * 12); R.cam.lookAt(G.px, 1.3, G.pz); menuTrick(H, rdt); }
   }
   if (G.state === 'menu' && R.sun && (R.sun.target.position.x !== 0 || R.sun.target.position.z !== 0)) { R.sun.position.set(-18, 26, 12); R.sun.target.position.set(0, 0, 0); R.renderer.shadowMap.needsUpdate = true; }
-  R.shF = (R.shF || 0) + 1; if (G.state === 'menu' || R.shF % 2 === 0 || (R.fps && R.fps > 58 && save.q === 'hi' && !isTouch)) R.renderer.shadowMap.needsUpdate = true;
+  R.shF = (R.shF || 0) + 1; if (G.state === 'menu' || R.shF % (isTouch && G.enemies.length > 90 ? 3 : 2) === 0 || (R.fps && R.fps > 58 && save.q === 'hi' && !isTouch)) R.renderer.shadowMap.needsUpdate = true;
   chrTick();
   if (R.post && save.q !== 'fast') R.post.render(); else R.renderer.render(R.scene, R.cam);
   drawFX(rdt, dt);
@@ -3104,14 +3143,14 @@ function drawFX(rdt, dt) {
   if (G.state === 'menu') return;
   { const pm = isTouch ? 320 : 560; if (FX.parts.length > pm) FX.parts.splice(0, FX.parts.length - pm); }
   if (FX.nums.length > 70) FX.nums.splice(0, FX.nums.length - 70);
-  let pc = '';
+  let pc = '', rot = 0;
   for (const p of FX.parts) {
     p.life -= dt || rdt * 0.3; p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt; if (!p.ember) p.vy -= 14 * dt; if (p.y < 0.05) { p.y = 0.05; p.vy *= -0.3; p.vx *= 0.7; p.vz *= 0.7; }
     projQ(p.x, p.y, p.z); if (PZ > 1 || PX < -20 || PX > LW + 20 || PY < -20 || PY > LH + 20 || p.life <= 0) continue; const sx = PX, sy = PY;
     const k = Math.max(0, p.life / p.max); x.globalAlpha = Math.min(1, k * 2); if (pc !== p.col) { pc = p.col; x.fillStyle = `rgb(${p.col})`; }
-    if (p.sq) { x.save(); x.translate(sx, sy); x.rotate(p.life * 9); x.fillRect(-p.sz / 2, -p.sz / 3, p.sz, p.sz * 0.66); x.restore(); } else { x.beginPath(); x.arc(sx, sy, p.sz * k, 0, TAU); x.fill(); }
+    if (p.sq) { const r = p.life * 9, cr = Math.cos(r) * d, sr = Math.sin(r) * d; x.setTransform(cr, sr, -sr, cr, sx * d, sy * d); rot = 1; x.fillRect(-p.sz / 2, -p.sz / 3, p.sz, p.sz * 0.66); } else { if (rot) { rot = 0; x.setTransform(d, 0, 0, d, 0, 0); } if (p.sz * k < 2.2) x.fillRect(sx - p.sz * k, sy - p.sz * k, p.sz * k * 2, p.sz * k * 2); else { x.beginPath(); x.arc(sx, sy, p.sz * k, 0, TAU); x.fill(); } }
   }
-  x.globalAlpha = 1; { let j = 0; const a = FX.parts; for (let i = 0; i < a.length; i++) if (a[i].life > 0) a[j++] = a[i]; a.length = j; }
+  if (rot) x.setTransform(d, 0, 0, d, 0, 0); x.globalAlpha = 1; { let j = 0; const a = FX.parts; for (let i = 0; i < a.length; i++) if (a[i].life > 0) a[j++] = a[i]; a.length = j; }
   // lightning from the sky
   for (const z of G.zaps) { const [ax, ay] = proj(z.x, 9, z.z), [bx, by] = proj(z.x, z.y, z.z); for (const [w, col] of [[10, 'rgba(255,240,120,.45)'], [4, '#fff']]) { x.strokeStyle = col; x.lineWidth = w; x.lineCap = 'round'; x.beginPath(); x.moveTo(ax, ay); for (let i = 1; i < 6; i++) { const k = i / 6; x.lineTo(ax + (bx - ax) * k + rnd(-10, 10), ay + (by - ay) * k); } x.lineTo(bx, by); x.stroke(); } }
   // telegraphs drawn on the street: archer aim lines, brute charge lanes, bomb fuses, health of big skeletons
@@ -3127,7 +3166,7 @@ function drawFX(rdt, dt) {
   x.textAlign = 'center';
   for (const nm of FX.nums) { nm.t -= rdt; nm.y += rdt * 2; const [sx, sy] = proj(nm.x, nm.y, nm.z); x.globalAlpha = Math.min(1, nm.t * 3); const pk = nm.t0 ? 1 + Math.max(0, nm.t - nm.t0 + 0.12) * 5 : 1; x.font = '700 ' + Math.round((nm.big ? 22 : 16) * pk) + 'px Fredoka, sans-serif'; x.lineWidth = 4; x.strokeStyle = '#2a2350'; x.strokeText(nm.txt, sx, sy); x.fillStyle = `rgb(${nm.col})`; x.fillText(nm.txt, sx, sy); }
   x.globalAlpha = 1; { let j = 0; const a = FX.nums; for (let i = 0; i < a.length; i++) if (a[i].t > 0) a[j++] = a[i]; a.length = j; }
-  drawSouls(x, dt || 0); drawEscape(x); drawBld(x); drawKO(x, rdt);
+  drawFissures(x); drawSouls(x, dt || 0); drawEscape(x); drawBld(x); drawKO(x, rdt);
   drawObjectives(x);
   // player hp bar
   const [hx, hy] = proj(G.px, 0, G.pz + 0.9);
@@ -3237,13 +3276,51 @@ function mapTick(dt) {
   if (G.mapMod === 'lava' && h.t <= 0) { h.t = rnd(1.6, 2.8) * (G.wave < 3 ? 1.4 : 1); const p = Math.random() < 0.4 ? hazNear(2.5, 1) : hazOnEnemy() || hazNear(10); if (p) hazTel(p[0], p[1], 'lava'); }
   if (G.mapMod === 'ice' && h.t <= 0) { h.t = rnd(2.2, 3.6); for (let i = 0; i < 2; i++) { const p = i === 0 ? hazNear(3, 1) : hazOnEnemy() || hazNear(9); if (p) hazTel(p[0], p[1], 'ice'); } }
   if (G.mapMod === 'quake') {
-    if (h.t <= 0 && h.q <= 0) { h.t = rnd(16, 24); h.q = 3.6; h.qr = 0; banner('🏚️ DEPREM!', 'Taşlar düşüyor, çatlak binalar çöküyor!', 2.2); SFX.boss(); buzz(200); G.brkTip = 1;
+    if (h.t <= 0 && h.q <= 0) { h.t = rnd(16, 24); h.q = 3.6; h.qr = 0; banner('🏚️ DEPREM!', 'Yer yarılıyor! Parlayan çatlaklardan uzak dur!', 2.2); SFX.boss(); buzz(200); G.brkTip = 1;
       for (const e of G.enemies) if (!e.dead && e.type !== 'boss') e.slow = Math.max(e.slow, 2);
       for (const [, c] of CITY.chunks) if (c.brk && Math.hypot(c.cx - G.px, c.cz - G.pz) < 70) bldDamage(c.cx, c.cz, bldMax() * rnd(0.3, 0.55)); }
-    if (h.q > 0) { h.q -= dt; G.shake = Math.max(G.shake, 0.32); h.qr -= dt; if (h.qr <= 0) { h.qr = 0.32; const p = Math.random() < 0.45 ? hazNear(4, 1) : hazOnEnemy() || hazNear(11); if (p) hazTel(p[0], p[1], 'rock'); } }
+    if (h.q > 0) { h.q -= dt; G.shake = Math.max(G.shake, 0.32); h.qr -= dt; if (h.qr <= 0) { h.qr = 0.55; addFissure(Math.random() < 0.5); } }
   }
 }
 // hell runs ahead of the story: a gentle first minute, then it outpaces it fast (wave 12 plays like story 18, wave 30 like 42)
+// earthquake fissures: a glowing line splits the street, then the ground breaks open along it
+function addFissure(atHero) {
+  const a = Math.random() * Math.PI, L = rnd(9, 15), cx = G.px + (atHero ? G.fx * 2 : rnd(-9, 9)), cz = G.pz + (atHero ? G.fz * 2 : rnd(-9, 9));
+  const dx = Math.cos(a) * L / 2, dz = Math.sin(a) * L / 2, pts = [];
+  for (let i = 0; i <= 8; i++) { const k = i / 8, j = i && i < 8 ? rnd(-0.45, 0.45) : 0; pts.push([cx - dx + dx * 2 * k - Math.sin(a) * j, cz - dz + dz * 2 * k + Math.cos(a) * j]); }
+  // side cracks branching off the main split
+  const br = []; for (let i = 0; i < 4; i++) { const p = pts[1 + Math.floor(Math.random() * 7)], b = a + (Math.random() < 0.5 ? 1 : -1) * rnd(0.5, 1.2), l = rnd(1.2, 2.6), q = [[p[0], p[1]]]; for (let k = 1; k <= 3; k++) q.push([p[0] + Math.cos(b) * l * k / 3 + rnd(-0.2, 0.2), p[1] + Math.sin(b) * l * k / 3 + rnd(-0.2, 0.2)]); br.push(q); }
+  (G.fis = G.fis || []).push({x1: cx - dx, z1: cz - dz, x2: cx + dx, z2: cz + dz, w: 1.05, t: 0, warn: 1.05, life: 6, pts, br, open: false});
+  if (G.fis.length > 14) G.fis.shift();
+}
+function segD(px, pz, f) { const vx = f.x2 - f.x1, vz = f.z2 - f.z1, l2 = vx * vx + vz * vz || 1; const k = clamp(((px - f.x1) * vx + (pz - f.z1) * vz) / l2, 0, 1); return Math.hypot(px - f.x1 - vx * k, pz - f.z1 - vz * k); }
+function fissureTick(dt) {
+  if (!G.fis || !G.fis.length) return;
+  for (const f of G.fis) { f.t += dt;
+    if (!f.open && f.t >= f.warn) { f.open = true; G.shake = Math.max(G.shake, 0.6); buzz(60); SFX.boom && SFX.boom();
+      if (segD(G.px, G.pz, f) < f.w) hurt(16, {x: (f.x1 + f.x2) / 2, z: (f.z1 + f.z2) / 2, haz: 'rock'});
+      for (const e of G.enemies) if (!e.dead && !e.fly && segD(e.x, e.z, f) < f.w + (e.r || 0.4)) { if (e.type === 'boss') hit(e, Math.round(30 * G.def.hpMul), '216,168,104', 0); else { hit(e, Math.round(40 * G.def.hpMul), '216,168,104', 0); e.slow = Math.max(e.slow, 2.5); } }
+      for (let i = 0; i < f.pts.length; i += 2) { bldDamageR(f.pts[i][0], f.pts[i][1], 2.2, 90); for (let j = 0; j < 3; j++) FX.parts.push({x: f.pts[i][0] + rnd(-0.4, 0.4), y: 0.3, z: f.pts[i][1] + rnd(-0.4, 0.4), vx: rnd(-1.5, 1.5), vy: rnd(3, 7), vz: rnd(-1.5, 1.5), life: rnd(0.5, 1), max: 1, sz: rnd(4, 9), col: Math.random() < 0.5 ? '170,140,100' : '120,100,80'}); } }
+    // an open crack keeps biting anyone standing on it
+    if (f.open && f.t < f.life - 0.6) { f.bite = (f.bite || 0) - dt; if (f.bite <= 0) { f.bite = 0.5; if (segD(G.px, G.pz, f) < f.w * 0.6) hurt(6, {x: G.px - 0.1, z: G.pz, haz: 'rock'}); } } }
+  G.fis = G.fis.filter(f => f.t < f.life);
+}
+function drawFissures(x) {
+  if (!G.fis || !G.fis.length) return; const t = performance.now() / 1000;
+  for (const f of G.fis) {
+    const pp = f.pts.map(([a, b]) => proj(a, 0.06, b)); x.lineCap = 'round'; x.lineJoin = 'round';
+    const m = f.pts[4], s0 = proj(m[0], 0.06, m[1]), s1 = proj(m[0] + 1, 0.06, m[1]), S = Math.max(8, Math.hypot(s1[0] - s0[0], s1[1] - s0[1]));
+    if (!f.open) { const k = f.t / f.warn, pul = 0.5 + 0.5 * Math.sin(t * 22);
+      x.strokeStyle = `rgba(255,${120 + 60 * pul},40,${0.25 + 0.5 * k})`; x.lineWidth = S * (0.4 + 1.7 * k); x.beginPath(); pp.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.stroke();
+      x.strokeStyle = `rgba(255,240,180,${0.5 + 0.5 * k})`; x.lineWidth = 2; x.beginPath(); pp.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.stroke(); }
+    else { const fade = Math.min(1, (f.life - f.t) / 0.8), grow = Math.min(1, (f.t - f.warn) / 0.15);
+      x.strokeStyle = `rgba(255,110,30,${0.55 * fade})`; x.lineWidth = S * 2 * grow; x.beginPath(); pp.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.stroke();
+      x.strokeStyle = `rgba(20,12,10,${0.95 * fade})`; x.lineWidth = S * 1.25 * grow; x.beginPath(); pp.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.stroke();
+      if (f.br) { x.lineWidth = S * 0.3 * grow; x.beginPath(); for (const q of f.br) q.forEach(([a, b], i) => { const [u, v] = proj(a, 0.06, b); i ? x.lineTo(u, v) : x.moveTo(u, v); }); x.stroke(); }
+      x.strokeStyle = `rgba(5,2,2,${0.9 * fade})`; x.lineWidth = S * 0.55 * grow; x.beginPath(); pp.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.stroke();
+      x.strokeStyle = `rgba(255,170,60,${0.7 * fade})`; x.lineWidth = 3; x.beginPath(); pp.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.stroke(); }
+  }
+}
 function hellWave(n) { return n + 2 + Math.floor(n / 3); }
 function hellDef(d, n) {
   d.hpMul *= 1.3; d.g = Math.ceil(d.g * 1.15); d.iv *= 0.95; d.intro = null;
@@ -4863,7 +4940,7 @@ function frame(now) {
   if (G.comicQ && G.state === 'play' && now > G.comicAt) { const k = G.comicQ; G.comicQ = null; comicShow(k, null, 'Devam ▶'); }
   if (R.on && G.state === 'menu' && !R.bossWarm && now > 2500) { R.bossWarm = 1; warmUp(); }
   if (R.on && G.state === 'play' && G.time > 0.25 && R.warmKey !== LOOK.hero + ':' + LOOK.hs) runWarm();
-  const still = G.state === 'paused' || G.state === 'cards' || G.state === 'over';
+  const still = G.state === 'paused' || G.state === 'cards' || G.state === 'over' || G.state === 'revive';
   if (R.on && !CM.on && (!still || now - (R.stillT || 0) > 100)) { R.stillT = now; render(dt, rdt); renderCivilians(dt); renderEscape(now / 1000); }
   doomTick(rdt);
   // keep it smooth: if the phone struggles in 2K, lower the pixel ratio step by step
@@ -4880,7 +4957,8 @@ function govTick(fps) {
   if ((g.low >= 2 || fps < tgt * 0.64) && g.i < PR_STEPS.length - 1) { g.i++; if (g.n - g.upN <= 3) g.cap = g.i; g.low = 0; g.cool = 2; R.prScale = PR_STEPS[g.i]; applyRes(); }
   else if (g.high >= 4 && g.i > g.cap) { g.i--; g.high = 0; g.cool = 3; g.upN = g.n; R.prScale = PR_STEPS[g.i]; applyRes(); }
 }
-function qLabel() { const s = save.q === 'ultra' ? '✨ 4K · 30 fps' : save.q === 'hi' ? '🎬 2K · 60 fps' : '⚡ Hızlı'; $('bQ').textContent = s; $('bQ2').textContent = s; }
+function diffLabel() { const b = $('bDiff'); if (b) b.textContent = '🎚️ Zorluk: ' + DF().n; }
+function qLabel() { diffLabel(); const s = save.q === 'ultra' ? '✨ 4K · 30 fps' : save.q === 'hi' ? '🎬 2K · 60 fps' : '⚡ Hızlı'; $('bQ').textContent = s; $('bQ2').textContent = s; }
 function toggleQ() { save.q = save.q === 'hi' ? 'ultra' : save.q === 'ultra' ? 'fast' : 'hi'; save.autoFast = 1; R.prScale = 1; R.gov = null; persist(); applyQuality(); qLabel(); toast(save.q === 'ultra' ? '4K · 30 fps: en keskin görüntü, sabit 30 kare' : save.q === 'hi' ? '2K · 60 fps: standart, akıcı ve keskin' : 'Hızlı: eski cihazlar için, efektler sade'); }
 
 /* ---------- menus ---------- */
@@ -4929,7 +5007,7 @@ for (const b of document.querySelectorAll('#ctrlList button')) b.onclick = () =>
 applyCtrl();
 const toggleSound = () => { save.sound = !save.sound; persist(); updateMenu(); };
 for (const w of document.querySelectorAll('#menu .wallet .pill')) w.onclick = () => shopOpen('gold');
-$('bSound').onclick = toggleSound; $('bSound2').onclick = toggleSound; $('bQ').onclick = toggleQ; $('bQ2').onclick = toggleQ; qLabel();
+$('bSound').onclick = toggleSound; $('bSound2').onclick = toggleSound; $('bQ').onclick = toggleQ; $('bDiff').onclick = () => { save.diff = ((save.diff == null ? 1 : save.diff) + 1) % 4; persist(); diffLabel(); toast(['Kolay: düşmanlar daha zayıf, çocuklar için ideal', 'Orta: standart zorluk', 'Zor: daha güçlü ve kalabalık düşmanlar', 'Çok Zor: sadece ustalar için!'][save.diff]); }; $('bQ2').onclick = toggleQ; qLabel();
 document.addEventListener('visibilitychange', () => { if (document.hidden) { pause(); try { if (AC && AC.state === 'running') AC.suspend(); } catch (e) {} } });
 setInterval(() => $('bFlip').classList.toggle('show', !!ROT && G.state === 'menu'), 300);
 window.addEventListener('resize', layout);
