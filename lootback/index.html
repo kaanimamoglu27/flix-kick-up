@@ -72,8 +72,8 @@ button{font-family:inherit;color:var(--ink);cursor:pointer}
 #bFlix{position:absolute;right:14px;bottom:14px;width:84px;height:84px;border-radius:50%;border:0;pointer-events:auto;background:conic-gradient(var(--flixy) calc(var(--k,0)*1%),rgba(255,255,255,.55) 0);box-shadow:0 5px 0 var(--ink);display:flex;align-items:center;justify-content:center;padding:0}
 #bFlix span{width:66px;height:66px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#f2f2f2 50%,#d8d8e8);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--flixr);letter-spacing:.5px}
 #bFlix.ready{animation:wob .7s ease-in-out infinite}
-#bFlix span img{width:84%;height:auto;filter:grayscale(.55) brightness(.95);opacity:.8;transition:transform .2s,filter .2s,opacity .2s;pointer-events:none}
-#bFlix.ready span img{filter:drop-shadow(0 0 6px #fff6b0);opacity:1;transform:scale(1.12)}
+#bFlix span img{width:84%;height:auto;opacity:.55;transition:transform .2s,opacity .2s;pointer-events:none}
+#bFlix.ready span img{opacity:1;transform:scale(1.12)}
 #flixFx{position:absolute;left:50%;top:38%;width:min(42vw,52vh);transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:16;opacity:0}
 #flixFx.on{animation:flixPop .95s cubic-bezier(.2,1.5,.4,1) forwards}
 #flixFx img{width:100%;display:block;filter:drop-shadow(0 6px 0 #120d14) drop-shadow(0 0 22px #ffd23f)}
@@ -367,6 +367,7 @@ h2{font-family:Bangers,Fredoka,sans-serif;font-weight:400;letter-spacing:2px;col
   </section>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>window.THREE || document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/script>');</script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
@@ -2863,7 +2864,7 @@ function gameOver(won) {
   $('overNote').textContent = (won && G.mode !== 'hunt' ? 'VORTEKS kurtarıldı, şehir özgür! ' : '') + (bestS ? `Yeni ${MODES[G.mode].n} rekoru! 🎉` : `${MODES[G.mode].n} rekoru: ${fmtN(save.best[G.mode] || 0)}`);
   $('overStats').innerHTML = `<span>Skor</span><b>${fmtN(G.score)}</b><span>${G.mode === 'boss' ? 'Patron' : G.mode === 'story' ? 'Seviye' : 'Dalga'}</span><b>${G.wave}</b><span>Flix</span><b>${G.flixGot}</b><span>Süre</span><b>${fmt(G.time)}</b><span>Güç</span><b>${G.level}</b><span>Yenilen düşman</span><b>${G.kills}</b><span>En uzun kombo</span><b>x${G.bestCombo || 0}</b>`;
   const gain = runReward(won) - (G.paid || 0); G.paid = (G.paid || 0) + gain; addCoins(gain); const gg = runGems(won) - (G.paidG || 0); G.paidG = (G.paidG || 0) + gg; addGems(gg); $('overCoins').textContent = '+🪙 ' + fmtN(gain) + (gg > 0 ? '  ·  +💎 ' + fmtN(gg) : '') + ' kazandın';
-  $('bEndless').style.display = 'none';
+  $('bEndless').style.display = won && G.mode === 'story' && !G.endless ? '' : 'none';
   screen('over'); updateMenu();
 }
 function victory() { if (G.mode === 'story') doomTarget(1); SFX.win(); confetti(G.px, 1, G.pz, 150, 2); if (G.mode === 'story' && !G.endless) comicShow('finale', startEpilogue, 'Devam ▶'); else gameOver(true); }
@@ -4952,6 +4953,12 @@ function frame(now) {
   if (now - last < (save.q === 'ultra' ? 28 : 14.5) && now > last) { requestAnimationFrame(frame); return; }
   const rdt = Math.min(0.05, (now - last) / 1000); last = now;
   requestAnimationFrame(frame);
+  try { frameBody(now, rdt); } catch (e) { frameErr(e); }
+}
+// one bad frame must never freeze the game: the error is logged, shown once as a small note, and the next frame carries on
+let errN = 0;
+function frameErr(e) { errN++; console.error(e); if (errN === 1 || errN === 60) toast('⚠️ Hata: ' + String(e && e.message || e).slice(0, 60)); }
+function frameBody(now, rdt) {
   if (bannerT > 0) { bannerT -= rdt; if (bannerT <= 0) $('banner').classList.remove('on'); }
   let dt = 0;
   if (G.state === 'play' || G.state === 'dying') {
