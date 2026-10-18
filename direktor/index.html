@@ -452,6 +452,17 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .ngl b,.ngt b{font-family:var(--display);font-style:italic;font-size:18px;text-transform:uppercase;line-height:1;} .ngl small,.ngt small,.rp small{font-size:11px;color:var(--mute);line-height:1.25;}
 .ngl button.on,.ngt.on,.rp button.on{border-color:var(--yellow);background:#fff;box-shadow:0 3px 0 var(--navy-deep);}
 .ngt.on b:before,.rp button.on b:before{content:'✓ ';color:var(--ok);}
+.omode{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:12px 14px;}
+.omode b{font-family:var(--display);font-style:italic;font-size:22px;text-transform:uppercase;line-height:1;} .omode small{font-size:12px;color:var(--mute);line-height:1.3;}
+#onLive{border:3px solid var(--yellow);}
+.dvs{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0;} .dvs b{font-family:var(--display);font-style:italic;font-size:18px;} .dvs i{font-family:var(--display);font-weight:900;color:var(--yellow);font-size:20px;} .dvs .kit,.dvs svg{width:38px;height:38px;}
+.dq{width:38px;height:38px;border-radius:50%;border:3px dashed rgba(255,255,255,.4);display:grid;place-items:center;font-weight:900;color:rgba(255,255,255,.6);animation:pulse 1.2s infinite;}
+.dots:after{content:'';animation:dots 1.2s steps(4) infinite;} @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.dvr{justify-content:center;} .dvr .in{border-radius:18px;margin:0 14px;border:3px solid var(--yellow);}
+.dvc{display:grid;grid-template-columns:1fr 1fr;gap:8px;} .dvk{background:var(--paper);color:var(--ink);border-radius:12px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;animation:dvflip .5s cubic-bezier(.3,1.4,.6,1) both;}
+.dvk.op{animation-delay:.35s;} .dvk .lbl{color:var(--mute);} .dvk b{font-size:13px;line-height:1.25;} .dvk svg{width:34px;height:34px;}
+@keyframes dvflip{from{transform:rotateY(90deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
+.race .tbl tr.win td{color:var(--yellow);font-weight:800;}
 .pcs .in{padding-top:0;max-height:96%;overflow:hidden;}
 .pc{position:relative;height:244px;flex:none;margin:0 -16px;border-radius:16px 16px 0 0;overflow:hidden;background:linear-gradient(#24357d,#15215c);}
 .pcwall{position:absolute;inset:0;background-size:58px;background-repeat:repeat;opacity:.12;}
@@ -804,7 +815,7 @@ function step(M){
   for(const s of ['h','a']){
     if(M.o.script&&M.o.script[s]){ for(const a of M.o.script[s])if(a.m===M.m&&applyAct(M,s,a))ev.push({t:'act',s,a}); }
     else if(M.o.replay&&M.o.replay.side===s){ for(const a of M.o.replay.acts)if(a.m===M.m-1&&applyAct(M,s,a))ev.push({t:'act',s,a}); }
-    else if(M.o.you!==s){ for(const a of aiActs(M,s))if(applyAct(M,s,a))ev.push({t:'act',s,a}); }
+    else if(M.o.you!==s&&!M.o.duel){ for(const a of aiActs(M,s))if(applyAct(M,s,a))ev.push({t:'act',s,a}); }
   }
   const lh=lam(M,'h',M.m),la=lam(M,'a',M.m),u1=M.r(),u2=M.r();
   if(u1<lh){M.gh++;ev.push({t:'goal',s:'h',p:pickScorer(M,'h')});} else if(u1<lh*3.2&&u1>lh*2.6)ev.push({t:'chance',s:'h',p:pickScorer(M,'h')});
@@ -856,7 +867,7 @@ function ffTo(target){
         const reveal=()=>{ if(LIVE!==L)return; L.lag[es]=Math.max(0,L.lag[es]-1); evChip(mm,`<span class="ico ball"></span>${cshort(S.c)} gol: ${esc(nm)} (${sc})`,'goal',true);
           goalFx(S.c,nm,es===you); L.wpBefore=null; es===you?crowd.roar():crowd.groan(); coachSay(es===you?'ecstatic':'angry'); drawCoach(); drawBoard(); buzz(es===you?[40,40,80]:120); };
         if(anim){ L.lag[es]++; shot=true; setTimeout(()=>shotFx(M,es,'goal',nm),0); setTimeout(()=>crowd.ooh(),900); setTimeout(reveal,1650); pause=Math.max(pause,4000); } else { reveal(); pause=Math.max(pause,2300); } scored=true;
-        if((!L.real||L.alt)&&you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!(L.moments||MOMENTS).some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;L.react=true;} }
+        if((!L.real||L.alt)&&!L.duel&&you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!(L.moments||MOMENTS).some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;L.react=true;} }
       else if(e.t==='card'){ evChip(M.m,`<span class="ico ${e.c==='y'?'yc':'rc'}"></span>${cshort(S.c)}: ${esc(e.p.short)}${e.c==='yr'?' (2. sarı)':''}`,e.c==='y'?'':'goal',true); if(e.c!=='y'){cardFx(true,e.p.short);pause=1800;e.s===you?crowd.boo(.07):crowd.cheer();coachSay(e.s===you?'shocked':'happy');} else if(e.s===you)crowd.boo(.025); }
       else if(e.t==='chance'){ if(!L.fast&&!shot){ shot=true; const es=e.s,nm=e.p.short,k=Math.random()<.55?'save':'miss'; setTimeout(()=>shotFx(M,es,k,nm),0); setTimeout(()=>{ if(LIVE===L){ crowd.ooh(); if(es===you)coachSay('worried'); } },1300); pause=Math.max(pause,2000); } else crowd.ooh(); }
       else if(e.t==='inj'){ injFx(e.p.short); crowd.worry(); evChip(M.m,`<span class="ico inj">+</span>${cshort(S.c)}: ${esc(e.p.short)} sakatlandı`,'goal',true); pause=Math.max(pause,1300); if(e.s===you)coachSay('shocked'); }
@@ -880,7 +891,7 @@ function drawAll(){ drawBoard(); drawPitch(); drawHand(); drawAct(); drawTac(); 
 /* taktik çubuğu: maçın her anında değiştirilebilir */
 function drawTac(){
   const L=LIVE,M=L.M,s=M.o.you,S=M.sides[s];
-  const RL=L.real&&(!L.alt||L.mode==='dec'), cur=RL?(L.utac??S.tac):S.tac, off=M.done||(L.real&&!L.alt&&L.mode!=='dec');
+  const RL=(L.real&&(!L.alt||L.mode==='dec'))||(L.duel&&L.mode==='dec'), cur=RL?(L.utac??S.tac):S.tac, off=M.done||(L.real&&!L.alt&&L.mode!=='dec')||(L.duel&&L.mode!=='dec');
   $('#tacbar').innerHTML=[-2,-1,0,1,2].map(v=>`<button class="${cur===v?'on':''}" data-v="${v}" ${off?'disabled':''}>${TAC[v].n}</button>`).join('');
   $('#tacbar').querySelectorAll('button').forEach(b=>b.onclick=()=>{ const v=+b.dataset.v; if(cur===v||off||L.mode==='eval')return;
     if(RL){ L.utac=v; beep(640,.05); buzz(8); drawTac(); $('#hint').textContent=v!==S.tac?`Kararına ${TAC[v].n.toLowerCase()} oyun eklendi.`:'Taktik değişikliği yok.'; drawAct(); return; }
@@ -949,7 +960,7 @@ function drawHand(){
   const L=LIVE,M=L.M,S=M.sides[M.o.you],box=$('#hand'); $('#match').classList.toggle('dec',L.mode==='dec');
   if(L.mode!=='dec'){
     const nx=L.target||90;
-    box.classList.add('idle'); box.innerHTML=`<div class="pcard live make"><div class="big">${M.m}'</div><div class="txt">${M.done?'Maç bitti':L.real&&!L.alt?(nx>=90?'Gerçekteki gibi bitiyor':`Gerçekteki gibi akıyor. Sonraki karar ${nx}'`):nx>=90?'Son dakikalar oynanıyor':`Maç oynanıyor. Sonraki karar ${nx}'`}</div></div>`;
+    box.classList.add('idle'); box.innerHTML=`<div class="pcard live make"><div class="big">${M.m}'</div><div class="txt">${L.mode==='wait'?'Kararın gönderildi. Rakibin kararı bekleniyor.':M.done?'Maç bitti':L.real&&!L.alt?(nx>=90?'Gerçekteki gibi bitiyor':`Gerçekteki gibi akıyor. Sonraki karar ${nx}'`):nx>=90?'Son dakikalar oynanıyor':`Maç oynanıyor. Sonraki karar ${nx}'`}</div></div>`;
     $('#hint').textContent=''; return;
   }
   box.classList.remove('idle'); box.innerHTML='';
@@ -991,6 +1002,7 @@ const cardLabel=(d,S)=>d.k==='sub'?`${d.mine?'Senin kartın':d.t}: ${S.P[d.i].sh
 function decide(){
   const L=LIVE; if(!L||L.mode!=='dec'||!(L.sel||utacOn(L)))return; clearInterval(L.timer); L.mode='eval'; L.flash=null; whistle(); buzz([20,40,20]);
   if(L.real)return decideReal();
+  if(L.duel)return decideDuel();
   const M=L.M,s=M.o.you,S=M.sides[s],sel=L.sel;
   const cands=(L.custom?[L.custom]:[]).concat(L.opts);
   const ev=cands.map(d=>({d,...mc(M,s,d)})), mine=ev.find(x=>sig(x.d)===sig(sel));
@@ -1605,12 +1617,13 @@ async function online(){
   B.innerHTML='<div class="note">Bağlanıyor…</div>';
   await Promise.race([capP,new Promise(r=>setTimeout(r,10500))]);
   if(!DB||!ME){ B.innerHTML=`<div class="panel note">Online düello, oyun Claude uygulamasındaki artifact linkinden açılınca çalışır. Arkadaşının da oynayabilmesi için linki ona <b>katılımcı</b> olarak paylaşman gerekir. Şu an bağlantı kurulamadı.</div>`; return; }
-  B.innerHTML=`<div class="panel note"><b style="color:var(--yellow)">Nasıl oynanır?</b> İkiniz aynı derbiyi yönetirsiniz: oda kuran ev sahibinin, katılan deplasmanın hocası olur. Önce oda sahibi oynar. Sonra rakip, onun kararlarına karşı oynar ve resmi skor çıkar.</div>
-   <button class="btn wide" id="onRand">Rastgele rakip bul</button>
-   <button class="btn ghost wide" id="onNew">Arkadaş için oda kur</button>
+  B.innerHTML=`<button class="card omode" id="onLive"><b>Canlı derbi</b><small>İkiniz de kendi takımınızı seçersiniz ve aynı anda oynarsınız. Karar anlarında ikiniz de gizlice seçersiniz, kartlar aynı anda açılır.</small></button>
+   <button class="card omode" id="onRace"><b>Gerçek maç yarışı</b><small>Aynı tarihi maçı ikiniz de yönetirsiniz. Kim gerçek hocadan daha iyi karar verdi, maç sonunda görürsünüz.</small></button>
+   <button class="card omode" id="onRand"><b>Rastgele rakip</b><small>Sırayla oynanan düello: önce biri oynar, sonra rakip onun kararlarına karşı oynar.</small></button>
+   <div class="lbl" style="opacity:.8">Arkadaşının kodu</div>
    <div class="inrow"><input id="onCode" maxlength="4" placeholder="KOD" autocomplete="off" aria-label="Oda kodu"><button class="btn" id="onJoin">Katıl</button></div>
    <div class="lbl" style="opacity:.8">Düellolarım</div><div id="onList" class="xi"></div>`;
-  $('#onRand').onclick=()=>{beep(520);findRandom();}; $('#onNew').onclick=()=>{beep(520);createRoom('friend');};
+  $('#onRand').onclick=()=>{beep(520);findRandom();}; $('#onLive').onclick=()=>{beep(520);liveCreate();}; $('#onRace').onclick=()=>{beep(520);raceCreate();};
   $('#onJoin').onclick=()=>{beep(520);joinRoom(($('#onCode').value||'').toUpperCase().trim());};
   renderDuels();
 }
@@ -1618,8 +1631,11 @@ async function renderDuels(){
   const box=$('#onList'); if(!box)return; const codes=myDuels(); if(!codes.length){box.innerHTML='<div class="note">Henüz düello yok.</div>';return;}
   const rows=await Promise.all(codes.map(async c=>{try{const s=await DB.doc('duels/'+c).get();return s.exists?s.data():null;}catch(e){return null;}}));
   box.innerHTML=rows.filter(Boolean).map(d=>{ const mine=d.p1===ME?'h':'a';
-    const st=d.status==='done'?`${d.result[0]}-${d.result[1]}`:d.status==='open'?'Rakip bekleniyor':d.status==='playing'?'Rakip oynuyor':'Yarım kaldı';
-    return `<div class="card duel"><div>${cname(d.h)} – ${cname(d.a)}<br><small style="color:var(--mute)">Kod ${d.code} · Sen: ${cname(d[mine])}</small></div><b>${st}</b></div>`;}).join('')||'<div class="note">Henüz düello yok.</div>';
+    if(d.mode==='race'){ const sc=REAL.find(x=>x.id===d.sc); if(!sc)return ''; const r=d[(d.p1===ME?'p1':'p2')+'res'];
+      return `<button class="card duel" data-code="${d.code}"><div>${esc(sc.title)}<br><small style="color:var(--mute)">Kod ${d.code} · maç yarışı</small></div><b>${r?r.my.join('-'):'Oyna'}</b></button>`; }
+    const st=d.status==='done'?`${d.result[0]}-${d.result[1]}`:d.status==='open'?'Rakip bekleniyor':d.status==='playing'?'Rakip oynuyor':d.status==='lobby'?'Rakip bekleniyor':d.status==='live'?'Oynandı':'Yarım kaldı';
+    return `<div class="card duel"><div>${cname(d.h)} – ${d.a?cname(d.a):'?'}<br><small style="color:var(--mute)">Kod ${d.code} · ${d.mode==='live'?'canlı derbi':'Sen: '+cname(d[mine]||d.h)}</small></div><b>${st}</b></div>`;}).join('')||'<div class="note">Henüz düello yok.</div>';
+  box.querySelectorAll('[data-code]').forEach(b=>b.onclick=()=>{ beep(520); joinRoom(b.dataset.code); });
 }
 async function createRoom(mode){
   const pool=SEASONS['2425'].play, h=pool[Math.floor(Math.random()*pool.length)]; let a; do{a=pool[Math.floor(Math.random()*pool.length)];}while(a===h);
@@ -1651,6 +1667,8 @@ async function joinRoom(code){
   if(!/^[A-Z]{4}$/.test(code))return note('Kod 4 harften oluşur.');
   let d; try{ const s=await DB.doc('duels/'+code).get(); d=s.exists?s.data():null; }catch(e){ return onErr(e); }
   if(!d)return note('Bu kodla bir oda yok.');
+  if(d.mode==='live'){ if(d.p1===ME)return liveLobby(code,d.h); return liveJoin(d); }
+  if(d.mode==='race')return raceJoin(d);
   if(d.p1===ME)return note('Bu oda senin, rakibini bekle.');
   if(d.status!=='open')return note(d.status==='p1'?'Oda sahibi henüz oynuyor, birazdan tekrar dene.':'Bu oda dolu.');
   try{ await DB.doc('duels/'+code).update({status:'playing',p2:ME}); }catch(e){ return onErr(e); }
@@ -1666,6 +1684,133 @@ async function joinRoom(code){
 function note(t){const B=$('#onBody');if(!B)return;const n=document.createElement('div');n.className='panel note';n.textContent=t;B.prepend(n);setTimeout(()=>n.remove(),3500);beep(220,.12);}
 function onErr(e){ show('online'); note(e&&(e.code==='permission_denied'||e.code==='not_granted')?'Bu sayfada yazma iznin yok. Sayfa sahibi linki seninle katılımcı olarak paylaşmalı.':'Bağlantı hatası, tekrar dene.'); }
 
+/* ---------- canlı derbi: iki hoca aynı anda, kararlar gizli. Maç iki telefonda aynı tohumla hesaplanır, aradan sadece kararlar gider ---------- */
+const actText=(S,a)=>a.k==='sub'?`${S.P[a.i].short} girdi, ${S.P[a.o].short} çıktı`:a.k==='tac'?`${TAC[a.v].n} oyun`:a.k==='talk'?`Devre arası: ${TALKS[a.v].n}`:'';
+const actsText=(S,acts)=>acts.length?acts.map(a=>actText(S,a)).join(' · '):'Değişiklik yok, böyle devam';
+function teamPick(season,exclude,title,cb){
+  const pool=SEASONS[season].play.filter(c=>c!==exclude), fv=favClub(), order=fv&&pool.includes(fv)?[fv,...pool.filter(c=>c!==fv)]:pool;
+  sheetOpen(title,`<div class="note">Rakibin seçtiğin takımı ancak maç başlayınca görür.</div><div class="xi">${order.map(c=>`<button class="card team" data-c="${c}">${kit(c)}<div><b>${c===fv?'<span class="fav">★</span>':''}${cname(c)}</b><small>${esc(squad(season,c).slice().sort((a,b)=>b.ovr-a.ovr).slice(0,3).map(p=>p.short).join(', '))}</small></div><div class="r">GÜÇ<em>${Math.round(strength(season,c).q*100)}</em></div></button>`).join('')}</div>`,
+    sh=>sh.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{ beep(560); sh.remove(); cb(b.dataset.c); }));
+}
+async function liveCreate(){
+  teamPick('2425',null,'Takımını seç',async h=>{
+    let code=newCode(); try{ for(let i=0;i<4;i++){const s=await DB.doc('duels/'+code).get(); if(!s.exists)break; code=newCode();} }catch(e){}
+    const room={code,mode:'live',season:'2425',h,seed:(Math.random()*1e9)|0,created:Date.now(),status:'lobby',p1:ME};
+    try{ await DB.doc('duels/'+code).set(room); }catch(e){ return onErr(e); }
+    addDuel(code); liveLobby(code,h);
+  });
+}
+function liveLobby(code,h){
+  show('online'); stopWatch();
+  $('#onBody').innerHTML=`<div class="panel" style="text-align:center"><div class="lbl" style="color:var(--yellow)">Canlı derbi · oda kodu</div><div class="code">${code}</div>
+    <div class="note">Bu kodu arkadaşına gönder. O da takımını seçince maç ikinizde aynı anda başlar.</div>
+    <div class="dvs">${kit(h)}<b>${cname(h)}</b><i>vs</i><span class="dq">?</span></div><div class="note dwt">Arkadaşın bekleniyor<span class="dots"></span></div></div>
+    <button class="btn ghost wide" id="lvBack">Vazgeç</button>`;
+  $('#lvBack').onclick=()=>{ beep(400); stopWatch(); try{ DB.doc('duels/'+code).update({status:'gone'}); }catch(e){} online(); };
+  try{ unsub=DB.doc('duels/'+code).onSnapshot(s=>{ const d=s.exists&&s.data(); if(!d||d.status!=='live'||LIVE)return; stopWatch(); startLive(d,'h'); },()=>{}); }catch(e){}
+}
+async function liveJoin(d){
+  if(d.status!=='lobby')return note(d.status==='live'?'Bu maç başladı.':'Bu oda kapandı.');
+  teamPick(d.season,d.h,'Takımını seç',async a=>{
+    try{ await DB.doc('duels/'+d.code).update({a,p2:ME,status:'live',started:Date.now()}); }catch(e){ return onErr(e); }
+    addDuel(d.code); startLive({...d,a,p2:ME,status:'live'},'a');
+  });
+}
+async function startLive(d,you){
+  const mine=d[you], list=squad(d.season,mine), xi=bestXI(list), opp=you==='h'?'a':'h';
+  const o={season:d.season,h:d.h,a:d.a,you,seed:d.seed,xi,bench:benchFor(list,xi),duel:1};
+  playMatch(o,M=>liveEnd(L,M)); const L=LIVE; L.you=you; L.duel={code:d.code,d,opp,name:'Rakip'};
+  nameOf(d[you==='h'?'p2':'p1']).then(n=>{ if(L.duel)L.duel.name=n; });
+  toast('Canlı derbi başladı');
+  try{ L.duel.unsub=DB.doc('duels/'+d.code).onSnapshot(s=>{ const x=s.exists&&s.data(); if(!x||!L.duel)return; L.duel.d=x; liveTry(L); },()=>{}); }catch(e){}
+}
+function decideDuel(){
+  const L=LIVE,M=L.M,s=L.you,S=M.sides[s],acts=[];
+  if(L.pendTalk)acts.push(L.pendTalk); L.pendTalk=null;
+  if(L.sel&&L.sel.k!=='wait')acts.push(actOf(L.sel,M.m));
+  if(L.utac!=null&&L.utac!==S.tac&&!(L.sel&&L.sel.k==='tac'))acts.push({k:'tac',v:L.utac,m:M.m});
+  L.utac=null; L.mode='wait'; L.mine=acts; L.dn=L.no;
+  try{ DB.doc('duels/'+L.duel.code).update({['mv'+L.no+s]:acts}); }catch(e){}
+  drawAll(); $('#tlbl').textContent='Kararın gönderildi'; beep(660,.06);
+  clearTimeout(L.duel.wt); L.duel.wt=setTimeout(()=>{ if(LIVE===L&&L.mode==='wait')liveStall(L); },45000);
+  liveTry(L);
+}
+function liveTry(L){
+  if(LIVE!==L||L.mode!=='wait'||!L.duel||!L.duel.d)return; const d=L.duel.d, n=L.dn, oa=d['mv'+n+L.duel.opp];
+  if(d['quit'+L.duel.opp]){ return liveSolo(L,'Rakip maçtan ayrıldı. Maçı bilgisayara karşı bitiriyorsun.'); }
+  if(!oa){ $('#tlbl').textContent=`${L.duel.name} düşünüyor…`; return; }
+  clearTimeout(L.duel.wt); const M=L.M, all={[L.you]:L.mine,[L.duel.opp]:oa};
+  for(const s of ['h','a'])for(const a of all[s]){ const act={...a,m:M.m}; if(!applyAct(M,s,act))continue; if(s===L.you)M.acts.push(act);
+    if(a.k!=='talk')evChip(M.m,`${s===L.you?'Sen':cshort(M.sides[s].c)}: ${esc(actText(M.sides[s],a))}`,s===L.you?'me':'',true); }
+  L.mode='reveal'; liveReveal(L,all,()=>{ if(LIVE===L){ drawAll(); ffTo(nextTarget(M.m)); } });
+}
+function liveReveal(L,all,done){
+  const M=L.M, o=L.duel.opp, sh=document.createElement('div'); sh.className='sheet dvr';
+  sh.innerHTML=`<div class="in"><span class="lbl" style="color:var(--yellow);text-align:center">${M.m}. dakika · kararlar açıldı</span><div class="dvc">
+    <div class="dvk me"><span class="lbl">Sen</span>${kit(M.sides[L.you].c)}<b>${esc(actsText(M.sides[L.you],all[L.you]))}</b></div>
+    <div class="dvk op"><span class="lbl">${esc(L.duel.name)}</span>${kit(M.sides[o].c)}<b>${esc(actsText(M.sides[o],all[o]))}</b></div></div>
+    <div class="note" style="text-align:center">Maç devam ediyor</div></div>`;
+  $('#app').appendChild(sh); beep(520,.05); setTimeout(()=>beep(780,.08),380); buzz([15,30,15]);
+  let ok=false; const fin=()=>{ if(ok)return; ok=true; sh.remove(); done(); }; sh.onclick=fin; setTimeout(fin,2600);
+}
+function liveStall(L){
+  const sh=document.createElement('div'); sh.className='sheet';
+  sh.innerHTML=`<div class="in"><h3 class="disp">Rakip yanıt vermiyor</h3><div class="note">${esc(L.duel.name)} bağlantıyı kaybetmiş olabilir. Biraz daha bekleyebilir ya da maçı bilgisayara karşı bitirebilirsin.</div>
+    <div class="foot"><button class="btn ghost" data-w>Bekle</button><button class="btn" data-s>Bilgisayarla bitir</button></div></div>`;
+  sh.querySelector('[data-w]').onclick=()=>{ sh.remove(); clearTimeout(L.duel.wt); L.duel.wt=setTimeout(()=>{ if(LIVE===L&&L.mode==='wait')liveStall(L); },45000); };
+  sh.querySelector('[data-s]').onclick=()=>{ sh.remove(); liveSolo(L,''); };
+  $('#app').appendChild(sh);
+}
+function liveSolo(L,msg){
+  const M=L.M; if(L.duel){ clearTimeout(L.duel.wt); try{ L.duel.unsub&&L.duel.unsub(); }catch(e){} try{ DB.doc('duels/'+L.duel.code).update({['quit'+L.you]:1}); }catch(e){} }
+  L.duel=null; M.o.duel=0; if(msg)toast('Rakip ayrıldı');
+  for(const a of (L.mine||[])){ const act={...a,m:M.m}; if(applyAct(M,L.you,act))M.acts.push(act); }
+  if(L.mode==='wait'){ drawAll(); ffTo(nextTarget(M.m)); }
+}
+function liveEnd(L,M){
+  const D=L.duel; if(D){ clearTimeout(D.wt); try{ D.unsub&&D.unsub(); }catch(e){} try{ DB.doc('duels/'+D.code).update({['res'+L.you]:[M.gh,M.ga],status:'done',result:[M.gh,M.ga]}); }catch(e){} }
+  const you=L.you, my=you==='h'?M.gh-M.ga:M.ga-M.gh, nm=D?D.name:'bilgisayar';
+  resultScreen({M,title:`Canlı derbi · rakip: ${nm}`,extra:`<div class="panel note" style="text-align:center">${my>0?`${esc(nm)} karşısında kazandın.`:my<0?`${esc(nm)} bu sefer seni geçti.`:'Berabere bitti.'} Kararların ikinizde aynı anda açıldı.</div>`,onNext:online,nextLabel:'Lobi'});
+}
+/* ---------- gerçek maç yarışı: aynı tarihi maçı ikiniz de yönetirsiniz, kim hocadan iyi karar verdi ---------- */
+let RACE=null;
+function raceCreate(){
+  const fv=favClub(), list=REAL.filter(canReal);
+  sheetOpen('Maçı seç',`<div class="note">İkiniz de aynı maçta aynı takımı yönetirsiniz. Kim gerçek hocadan daha iyi karar verdi, maç sonunda görürsünüz.</div><div class="xi">${list.map(sc=>{ const y=sc.h===fv?'h':sc.a===fv?'a':sc.you||'h';
+    return `<button class="card ticket" data-id="${sc.id}" data-y="${y}"><div class="tk2">${kit(sc.h)}<i>–</i>${kit(sc.a)}</div><div><b>${esc(sc.title)}</b><small>Sen: ${esc(cname(sc[y]))}</small></div></button>`; }).join('')}</div>`,
+    sh=>sh.querySelectorAll('[data-id]').forEach(b=>b.onclick=async()=>{ beep(560); sh.remove(); const sc=REAL.find(x=>x.id===b.dataset.id), y=b.dataset.y;
+      let code=newCode(); try{ for(let i=0;i<4;i++){const s=await DB.doc('duels/'+code).get(); if(!s.exists)break; code=newCode();} }catch(e){}
+      try{ await DB.doc('duels/'+code).set({code,mode:'race',sc:sc.id,you:y,created:Date.now(),status:'open',p1:ME}); }catch(e){ return onErr(e); }
+      addDuel(code); raceIntro(code,sc,y,'p1'); }));
+}
+function raceIntro(code,sc,y,role){
+  show('online'); stopWatch();
+  $('#onBody').innerHTML=`<div class="panel" style="text-align:center"><div class="lbl" style="color:var(--yellow)">Gerçek maç yarışı · oda kodu</div><div class="code">${code}</div>
+    <div class="note">${role==='p1'?'Kodu arkadaşına gönder. İstediğiniz zaman oynayabilirsiniz, sonuçlar burada buluşur.':'Arkadaşınla aynı maçı oynuyorsun.'}</div>
+    <div class="dvs">${kit(sc.h)}<b>${esc(sc.title)}</b>${kit(sc.a)}</div><div class="note">Sen: <b>${esc(cname(sc[y]))}</b></div></div>
+    <button class="btn wide" id="rcGo">Maça çık</button>`;
+  $('#rcGo').onclick=()=>{ beep(560); RACE={code,role}; playReal(sc,y); };
+}
+async function raceJoin(d){
+  const sc=REAL.find(x=>x.id===d.sc); if(!sc)return note('Bu maç bu sürümde yok.');
+  if(d.p1===ME)return raceIntro(d.code,sc,d.you,'p1');
+  if(d.p2&&d.p2!==ME)return note('Bu oda dolu.');
+  if(!d.p2){ try{ await DB.doc('duels/'+d.code).update({p2:ME}); }catch(e){ return onErr(e); } }
+  addDuel(d.code); raceIntro(d.code,sc,d.you,'p2');
+}
+function raceResult(L,res){
+  const R=RACE; RACE=null; if(!R||!DB)return;
+  const other=R.role==='p1'?'p2':'p1';
+  try{ DB.doc('duels/'+R.code).update({[R.role+'res']:res}); }catch(e){}
+  const box=document.createElement('div'); box.className='panel race'; box.id='raceBox'; box.innerHTML='<div class="lbl" style="color:var(--yellow)">Arkadaşınla yarış</div><div class="note">Arkadaşının sonucu bekleniyor…</div>';
+  const sc=$('#result .scroll'); if(sc)sc.insertBefore(box,sc.children[2]||null);
+  const you=L.you, ft=L.real.ft, draw=(d)=>{ const o=d[other+'res']; if(!o||!$('#raceBox'))return;
+    nameOf(d[other]).then(nm=>{ const me=res, rk=x=>x.mp*1000+x.gd*10+x.total/100, w=rk(me)>rk(o)?'me':rk(me)<rk(o)?'op':'eq';
+      const row=(n,x,c)=>`<tr class="${c}"><td>${n}</td><td class="n">${x.my[0]}-${x.my[1]}</td><td class="n">${x.total}</td></tr>`;
+      $('#raceBox').innerHTML=`<div class="lbl" style="color:var(--yellow)">Arkadaşınla yarış</div><table class="tbl"><tr><td></td><td class="n">Skor</td><td class="n">Karar puanı</td></tr>${row('Sen',me,w==='me'?'win':'')}${row(esc(nm),o,w==='op'?'win':'')}<tr><td>Gerçek hoca</td><td class="n">${ft[0]}-${ft[1]}</td><td class="n">–</td></tr></table>
+        <div class="verdict" style="font-size:22px;text-align:center">${w==='me'?'Yarışı kazandın':w==='op'?`${esc(nm)} kazandı`:'Berabere'}</div>`; if(w==='me')beep(880,.2); }); };
+  try{ unsub=DB.doc('duels/'+R.code).onSnapshot(s=>{ const d=s.exists&&s.data(); if(d)draw(d); },()=>{}); }catch(e){}
+}
 /* ---------- ana ekran ---------- */
 /* ---------- gerçek maçlar: dizilişler, goller, kartlar ve hocaların gerçek değişiklikleri. İsimler uydurma ---------- */
 /* kadro: ilk 11 (KL, SĞB, STP, STP, SLB, DOS, DOS, SĞK, OOS, SLK, FV sırasıyla) + yedekler. ev: [dakika, tür, taraf, oyuncu sırası(, giren)] g=gol y=sarı r=kırmızı s=değişiklik */
@@ -1741,7 +1886,7 @@ function momentsFor(sc,you){
 }
 const coachIn=(sc,you,t,nx)=>realActs(sc,you,t,nx,'s');
 const actsSig=acts=>acts.length?acts.map(a=>a.k==='sub'?'s'+a.o+'>'+a.i:'t'+a.v).sort().join(','):'w';
-const utacOn=L=>L.real&&L.utac!=null&&L.utac!==L.M.sides[L.you].tac;
+const utacOn=L=>(L.real||L.duel)&&L.utac!=null&&L.utac!==L.M.sides[L.you].tac;
 function userActs(L,M){
   const d=L.sel,acts=[]; if(d&&d.k==='sub')acts.push(actOf(d,M.m+1)); if(d&&d.k==='tac')acts.push(actOf(d,M.m+1));
   if(utacOn(L)&&!(d&&d.k==='tac'))acts.push({k:'tac',v:L.utac,m:M.m+1});
@@ -1849,6 +1994,7 @@ function finalReal(L){
    <div class="foot"><button class="btn ghost" id="rAgain">Tekrar</button><button class="btn" id="rNext">Maçlar</button></div>`;
   $('#rNext').onclick=()=>{beep(520);realList();}; $('#rAgain').onclick=()=>{beep(520);playReal(sc,you);};
   whistle(); if(better)setTimeout(()=>toast(mp>rp?'Tarih değişti':'Hocadan iyi'),300);
+  if(RACE)raceResult(L,{my,mp,gd:gd(my),total,verdict});
 }
 /* gerçek maç listesi */
 function realList(){
@@ -1936,7 +2082,7 @@ function goAlt(L){ if(!L.real||L.alt)return false; const M=L.M,opp=L.you==='h'?'
 function shoutMenu(){
   const L=LIVE; if(!L||L.M.done)return; const M=L.M,S=M.sides[M.o.you], box=$('#shouts');
   if(!box.hidden){ box.hidden=true; return; }
-  const left=SHOUT_MAX-(L.shouts||0), cd=(S.shoutNext||0)>M.m, ok=L.mode==='play'&&left>0&&!cd;
+  const left=SHOUT_MAX-(L.shouts||0), cd=(S.shoutNext||0)>M.m, ok=L.mode==='play'&&left>0&&!cd&&!L.duel;
   box.innerHTML=`<div class="sh-t">${left>0?(cd?`Oyuncular dinliyor, ${S.shoutNext-M.m} dk sonra`:`Sahaya bağır · ${left} hak`):'Bağırma hakkın bitti'}</div>`+
     `<button class="snd" data-snd>${window.SNDOFF?'Sesi aç':'Sesi kapat'}</button>`+Object.entries(SHOUTS).map(([k,v])=>`<button data-k="${k}" ${ok?'':'disabled'}><b>${v.n}</b><small>${k==='press'?'Gol şansı artar, kart riski de':k==='slow'?'Oyun yavaşlar, iki taraf da az atar':'Kart riski çok düşer'}</small></button>`).join('');
   box.hidden=false;
@@ -1955,7 +2101,7 @@ function injRoll(M,s,ev){
   if(M.r()>=.0009*(S.tac>=1?1.3:1)*(1+tired/120))return;
   let id=on[Math.floor(M.r()*on.length)]; if(S.P[id].g==='G'&&M.r()<.75)id=on.find(x=>S.P[x].g!=='G')||id;
   const p=S.P[id]; ev.push({t:'inj',s,p}); (M.inj=M.inj||[]).push({s,id,m:M.m});
-  if(M.live&&M.o.you===s){ M.pendInj=id; return; }
+  if(M.live&&M.o.you===s&&!M.o.duel){ M.pendInj=id; return; }
   const b=S.bench.map(x=>S.P[x]).filter(q=>p.g==='G'?q.g==='G':q.g!=='G').sort((a,c)=>(c.g===p.g)-(a.g===p.g)||c.ovr-a.ovr)[0];
   const a=b&&S.subs>0?{k:'sub',o:id,i:b.id,m:M.m}:{k:'red',o:id,m:M.m};
   if(applyAct(M,s,a)&&a.k==='sub')ev.push({t:'act',s,a});
@@ -2091,7 +2237,8 @@ function talkSheet(L,next){
   sh.innerHTML=`<div class="in"><div class="rcoach">${coachSVG(COACH,diff<0?'angry':diff>0?'happy':'neutral')}<div><h3 class="disp">Soyunma odası</h3><div class="note">İlk yarı ${M.gh}-${M.ga}. Oyuncular seni dinliyor.</div></div></div>
     <div class="injl">${Object.entries(TALKS).map(([k,t])=>`<button class="bp talk" data-k="${k}"><span><b>${t.n}</b><small>${t.d}</small></span></button>`).join('')}</div></div>`;
   sh.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; sh.remove(); beep(620);
-    if(k!=='keep'){ goAlt(L); markAct(L); const att=k==='fire'?1.15:k==='hard'?(diff<0?1.22:diff>0?.9:1.05):1, a={k:'talk',v:k,att,m:M.m}; applyAct(M,s,a); M.acts.push(a);
+    if(k!=='keep'&&L.duel)L.pendTalk={k:'talk',v:k,att:k==='fire'?1.15:k==='hard'?(diff<0?1.22:diff>0?.9:1.05):1,m:M.m};
+    else if(k!=='keep'){ goAlt(L); markAct(L); const att=k==='fire'?1.15:k==='hard'?(diff<0?1.22:diff>0?.9:1.05):1, a={k:'talk',v:k,att,m:M.m}; applyAct(M,s,a); M.acts.push(a);
       evChip(M.m,`Devre arası: ${TALKS[k].n}`,'me'); const say={calm:'Nefes alın!',fire:'Hadi!',hard:k==='hard'&&diff>0?'Rehavet yok!':'Uyanın!'}[k];
       L.flash={mood:k==='calm'?'neutral':'angry',until:M.m+2}; const bub=$('#coachBub'); bub.textContent=say; bub.hidden=false; clearTimeout(bub._t); bub._t=setTimeout(()=>bub.hidden=true,1600); crowd.cheer(); }
     next(); });
