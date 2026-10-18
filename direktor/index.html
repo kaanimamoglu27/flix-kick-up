@@ -69,6 +69,48 @@ svg.kit{display:block;}
 .hgo{min-height:62px;font-size:28px;justify-content:space-between;}
 .hgo i{font-style:normal;font-size:34px;}
 
+/* Maç efektleri */
+.ball{position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;border:2px solid var(--navy);transform:translate(-50%,-50%);transition:left .55s cubic-bezier(.3,.7,.4,1),top .55s cubic-bezier(.3,.7,.4,1);z-index:3;left:50%;top:50%;box-shadow:2px 3px 0 rgba(12,20,64,.35);pointer-events:none;}
+.mom{grid-column:1/-1;height:5px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden;margin-top:2px;}
+.mom i{display:block;height:100%;background:#9aa6e6;transition:width .6s;} .mom i.me{background:var(--yellow);}
+.board .mom{direction:ltr;}
+.ico.inj{width:12px;height:12px;border-radius:3px;background:#fff;color:var(--bad);font-weight:900;font-size:12px;line-height:12px;text-align:center;font-style:normal;}
+.fx{position:absolute;inset:0;z-index:28;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;overflow:hidden;}
+.fx b{font-size:74px;color:#fff;text-shadow:4px 4px 0 var(--navy);animation:fxin .45s cubic-bezier(.2,1.6,.4,1) both;}
+.fx em{font-style:normal;font-family:var(--display);font-weight:800;font-size:24px;text-transform:uppercase;background:var(--navy);color:var(--yellow);padding:2px 12px;border-radius:6px;animation:fxin .45s .15s cubic-bezier(.2,1.6,.4,1) both;}
+.fx.gfx{background:radial-gradient(circle at 50% 45%,rgba(12,20,64,.0),rgba(12,20,64,.55));animation:fxout 1.7s forwards;}
+.fx.gfx.mine b{color:var(--yellow);}
+.gfx .net{width:220px;height:auto;animation:netshake .5s .35s;}
+.gfx .gball{position:absolute;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--navy);left:50%;top:78%;animation:gball .45s cubic-bezier(.5,0,.7,.4) forwards;}
+.gfx i{position:absolute;top:-12px;width:9px;height:14px;border:1.5px solid var(--navy);animation:conf 1.5s ease-in forwards;}
+.fx.cfx,.fx.ifx{background:rgba(12,20,64,.45);animation:fxout 1.3s forwards;}
+.rcard{width:62px;height:88px;border-radius:7px;border:4px solid var(--navy);box-shadow:5px 5px 0 var(--navy);animation:cardup .5s cubic-bezier(.2,1.5,.4,1) both;}
+.rcard.red{background:#e8202a;} .rcard.yel{background:var(--yellow);}
+.cfx b,.ifx b{font-size:48px;}
+.cross{width:74px;height:74px;border-radius:16px;background:#fff;border:4px solid var(--navy);position:relative;animation:pulse .6s ease-in-out 2;}
+.cross::before,.cross::after{content:"";position:absolute;background:var(--bad);left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:48px;border-radius:3px;} .cross::after{width:48px;height:16px;}
+#app.shake{animation:shake .45s;}
+@keyframes fxin{from{transform:scale(.3) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes fxout{0%,75%{opacity:1}100%{opacity:0}}
+@keyframes gball{from{transform:translate(-50%,0) scale(1.3)}to{transform:translate(-50%,-150px) scale(.55)}}
+@keyframes netshake{0%,100%{transform:none}30%{transform:scale(1.06,.96) translateY(-4px)}60%{transform:scale(.98,1.03)}}
+@keyframes conf{from{transform:translate(0,0) rotate(0)}to{transform:translate(var(--dx),110vh) rotate(var(--r))}}
+@keyframes cardup{from{transform:translateY(120px) rotate(-25deg);opacity:0}to{transform:rotate(8deg);opacity:1}}
+@keyframes pulse{50%{transform:scale(1.15)}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
+/* Bağırma menüsü */
+#coachFace{padding:0;display:block;}
+.sh-l{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);background:var(--navy);color:var(--yellow);font-family:var(--display);font-style:italic;font-weight:800;font-size:11px;text-transform:uppercase;padding:0 6px;border-radius:4px;pointer-events:none;}
+.shouts{position:absolute;left:-4px;bottom:66px;z-index:6;width:236px;background:var(--navy);border:3px solid var(--yellow);border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:6px;box-shadow:0 5px 0 var(--navy-deep);animation:deal .2s ease-out;}
+.shouts .sh-t{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);}
+.shouts button{background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 10px;text-align:left;border:2px solid var(--navy-deep);}
+.shouts button b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:20px;text-transform:uppercase;line-height:1;}
+.shouts button small{font-size:11px;color:var(--mute);}
+.shouts button[disabled]{opacity:.45;}
+.shouts button.snd{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);font-size:12px;font-weight:700;padding:4px 10px;}
+.injl{display:flex;flex-direction:column;gap:6px;}
+.injl .bp{grid-template-columns:34px 1fr auto;}
+
 /* Hoca */
 .cchip span{opacity:1;font-size:inherit;}
 .cchip{display:flex;align-items:center;gap:8px;text-align:left;padding:5px 10px 5px 5px;color:#fff;}
@@ -378,7 +420,7 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
     <div class="hand" id="hand"></div>
     <div class="tacbar" id="tacbar" role="group" aria-label="Taktik"></div>
     <div class="act">
-      <div class="coachf"><div id="coachFace"></div><div class="cbub" id="coachBub" hidden></div></div>
+      <div class="coachf"><button id="coachFace" aria-label="Sahaya bağır"></button><span class="sh-l">Bağır</span><div class="cbub" id="coachBub" hidden></div><div class="shouts" id="shouts" hidden></div></div>
       <div class="timer"><div class="bar"><i id="tbar"></i></div><span id="tlbl"></span></div>
       <button class="btn" id="bDecide">Atla ›</button>
     </div>
@@ -415,11 +457,12 @@ const hash=str=>{let h=2166136261;for(const c of str){h^=c.charCodeAt(0);h=Math.
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let actx=null;
-function beep(f=660,d=.08,type='square',v=.045){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(actx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);o.stop(actx.currentTime+d+.02);}catch(e){}}
+function beep(f=660,d=.08,type='square',v=.045){if(window.SNDOFF)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(actx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);o.stop(actx.currentTime+d+.02);}catch(e){}}
 const whistle=()=>{beep(2300,.16,'sine',.06);setTimeout(()=>beep(2500,.3,'sine',.06),190);};
 const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 function show(id){for(const s of document.querySelectorAll('.screen'))s.hidden=s.id!==id;document.querySelectorAll('.toast').forEach(t=>t.remove());}
+window.SNDOFF=store.get('fdMute',false);
 function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;$('#app').appendChild(d);setTimeout(()=>d.remove(),1150);}
 
 /* ---------- takımlar: isimler ve formalar kurgusal ---------- */
@@ -577,17 +620,19 @@ function lam(M,s,m){
   const A=M.sides[s],B=M.sides[s==='h'?'a':'h'],qa=sideQ(A,m),qb=sideQ(B,m);
   let l=(GBASE/90)*(s==='h'?1.1:.9)*Math.pow(A.str.att*B.str.def,DOM)*Math.pow(qa.a/A.base.a,3)*Math.pow(B.base.d/qb.d,3);
   l*=TAC[A.tac].att*TAC[B.tac].opp;
+  const sa=shoutOf(A,m),sb=shoutOf(B,m); if(sa)l*=sa.att; if(sb)l*=sb.opp;
   return l;
 }
 function applyAct(M,s,act){
   const S=M.sides[s];
   if(act.k==='tac'){S.tac=act.v;return true;}
+  if(act.k==='shout'){S.shout={k:act.v,until:M.m+SHOUT_LEN};return true;}
   if(act.k==='red'){ const i=S.xi.indexOf(act.o); if(i<0)return false; S.xi[i]=null; return true; }
   if(act.k==='sub'){ const i=S.xi.indexOf(act.o); if(i<0||S.subs<=0||!S.bench.includes(act.i))return false;
     S.xi[i]=act.i; S.bench=S.bench.filter(x=>x!==act.i); S.entry[act.i]=M.m; S.sta0[act.i]=100; S.subs--; return true; }
   return false;
 }
-function cloneM(M){const C={...M,sides:{},cards:[]};for(const s of ['h','a']){const S=M.sides[s];C.sides[s]={...S,xi:S.xi.slice(),bench:S.bench.slice(),sta0:{...S.sta0},entry:{...S.entry},yc:{...(S.yc||{})}};}return C;}
+function cloneM(M){const C={...M,sides:{},cards:[],live:false,pendInj:null,inj:[]};for(const s of ['h','a']){const S=M.sides[s];C.sides[s]={...S,xi:S.xi.slice(),bench:S.bench.slice(),sta0:{...S.sta0},entry:{...S.entry},yc:{...(S.yc||{})}};}return C;}
 /* karar seçenekleri (en fazla 3) */
 function choices(M,s){
   const S=M.sides[s],m=M.m,diff=(s==='h'?M.gh-M.ga:M.ga-M.gh),out=[];
@@ -646,6 +691,7 @@ function step(M){
   if(u1<lh){M.gh++;ev.push({t:'goal',s:'h',p:pickScorer(M,'h')});} else if(u1<lh*3.2&&u1>lh*2.6)ev.push({t:'chance',s:'h',p:pickScorer(M,'h')});
   if(u2<la){M.ga++;ev.push({t:'goal',s:'a',p:pickScorer(M,'a')});} else if(u2<la*3.2&&u2>la*2.6)ev.push({t:'chance',s:'a',p:pickScorer(M,'a')});
   for(const s of ['h','a'])cardRoll(M,s,ev);
+  for(const s of ['h','a'])injRoll(M,s,ev);
   if(M.m===45)ev.push({t:'ht'});
   if(M.m>=90){M.done=true;}
   M.lh=lh;M.la=la;
@@ -656,7 +702,7 @@ const CARDF={'-2':1.35,'-1':1.15,'0':1,'1':1.1,'2':1.3},CARDW={G:.15,D:1.3,M:1.2
 function cardRoll(M,s,ev){
   const S=M.sides[s],u=M.r(),on=S.xi.filter(Boolean); if(!on.length)return;
   const tired=on.reduce((t,id)=>t+(100-staOf(S,id,M.m)),0)/on.length;
-  const py=.021*CARDF[S.tac]*(1+tired/150), pr=.0004*CARDF[S.tac];
+  const sf=(shoutOf(S,M.m)||{card:1}).card, py=.021*CARDF[S.tac]*(1+tired/150)*sf, pr=.0004*CARDF[S.tac]*sf;
   if(u>=py+pr)return;
   let t=on.reduce((a,id)=>a+CARDW[S.P[id].g],0)*M.r(), id=on[0]; for(const x of on){t-=CARDW[S.P[x].g];if(t<=0){id=x;break;}}
   const p=S.P[id]; let c='y';
@@ -668,13 +714,13 @@ function simToEnd(M){ while(!M.done){ step(M); const y=M.o.you; if(y&&!M.done)fo
 
 /* ---------- canlı maç: dakikalar akar, karar anlarında kart eli açılır ---------- */
 const SLOT=[[50,91],[86,66],[65,73],[35,73],[14,66],[66,52],[34,52],[85,32],[50,37],[15,32],[50,21]];
-const MOMENTS=[46,60,70,80], DEC_SEC=20;
+const MOMENTS=[30,46,60,70,80], DEC_SEC=20;
 let LIVE=null;
 const sig=d=>d.k==='sub'?'s'+d.o+'>'+d.i:d.k==='tac'?'t'+d.v:'w';
 const actOf=(d,m)=>d.k==='sub'?{k:'sub',o:d.o,i:d.i,m}:{k:'tac',v:d.v,m};
 const tacName=v=>TAC[v].n;
 function playMatch(o,onEnd){
-  const M=newMatch(o); M.dec=[];
+  const M=newMatch(o); M.dec=[]; M.live=true; crowd.start();
   LIVE={M,onEnd,mode:'play',sel:null,custom:null,outSel:null,opts:[],timer:null,run:null,fast:false,react:false};
   show('match'); $('#feed').innerHTML=''; evChip(0,'Başlama düdüğü'); whistle();
   drawAll(); ffTo(MOMENTS[0]);
@@ -684,18 +730,22 @@ function ffTo(target){
   const L=LIVE; L.mode='play'; L.target=target; L.fast=false; drawAll();
   const you=L.M.o.you;
   const tickF=()=>{
-    if(LIVE!==L||L.mode!=='play')return; const M=L.M; let pause=0;
+    if(LIVE!==L||L.mode!=='play')return; const M=L.M; let pause=0, scored=false;
     for(const e of (L.real&&!L.alt?realStep(M,L.real):step(M))){
       const S=e.s&&M.sides[e.s];
       if(e.t==='goal'){ M.scorers.push({m:M.m,s:e.s,n:e.p.short}); evChip(M.m,`<span class="ico ball"></span>${cshort(S.c)} gol: ${esc(e.p.short)} (${M.gh}-${M.ga})`,'goal',true);
-        toast('Gol'); coachSay(e.s===you?'ecstatic':'angry'); drawCoach(); beep(e.s===you?880:220,.25,'sawtooth',.05); buzz(e.s===you?[40,40,80]:120); pause=900;
-        if(!L.real&&you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!MOMENTS.some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;L.react=true;} }
-      else if(e.t==='card'){ evChip(M.m,`<span class="ico ${e.c==='y'?'yc':'rc'}"></span>${cshort(S.c)}: ${esc(e.p.short)}${e.c==='yr'?' (2. sarı)':''}`,e.c==='y'?'':'goal',true); if(e.c!=='y'){toast('Kırmızı');pause=700;coachSay(e.s===you?'shocked':'happy');} }
+        goalFx(S.c,e.p.short,e.s===you); moveBall(M,you,e.s); e.s===you?crowd.roar():crowd.groan(); coachSay(e.s===you?'ecstatic':'angry'); drawCoach(); buzz(e.s===you?[40,40,80]:120); pause=1500; scored=true;
+        if((!L.real||L.alt)&&you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!(L.moments||MOMENTS).some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;L.react=true;} }
+      else if(e.t==='card'){ evChip(M.m,`<span class="ico ${e.c==='y'?'yc':'rc'}"></span>${cshort(S.c)}: ${esc(e.p.short)}${e.c==='yr'?' (2. sarı)':''}`,e.c==='y'?'':'goal',true); if(e.c!=='y'){cardFx(true,e.p.short);pause=1200;e.s===you?crowd.boo(.07):crowd.cheer();coachSay(e.s===you?'shocked':'happy');} else if(e.s===you)crowd.boo(.025); }
+      else if(e.t==='chance'){ crowd.ooh(); }
+      else if(e.t==='inj'){ injFx(e.p.short); crowd.worry(); evChip(M.m,`<span class="ico inj">+</span>${cshort(S.c)}: ${esc(e.p.short)} sakatlandı`,'goal',true); pause=Math.max(pause,1300); if(e.s===you)coachSay('shocked'); }
       else if(e.t==='act'){ const a=e.a; if(a.k==='red')continue; evChip(M.m,a.k==='sub'?`<span class="ico sub">⇅</span>${cshort(S.c)}: ${esc(S.P[a.i].short)} girdi, ${esc(S.P[a.o].short)} çıktı`:`${cshort(S.c)} ${a.v===1?'hücuma geçti':a.v===-1?'kapandı':'dengeye döndü'}`,'',true); }
-      else if(e.t==='ht'){ evChip(45,`İlk yarı ${M.gh}-${M.ga}`,'',false); whistle(); pause=Math.max(pause,500); }
+      else if(e.t==='ht'){ evChip(45,`İlk yarı ${M.gh}-${M.ga}`,'',false); whistle(); applause(1.6,.1); pause=Math.max(pause,500); }
     }
+    if(!scored)moveBall(M,you);
     drawBoard(); drawPitch(); drawHand(); drawAct(); drawCoach();
-    if(M.done){ evChip(90,`Maç bitti ${M.gh}-${M.ga}`,'',false); whistle(); setTimeout(()=>{ if(LIVE===L){ LIVE=null; L.onEnd(M); } },1200); return; }
+    if(M.pendInj&&!M.done){ L.mode='inj'; setTimeout(()=>{ if(LIVE===L)injSheet(L,()=>{ if(LIVE===L){ drawAll(); ffTo(L.target); } }); },pause||300); return; }
+    if(M.done){ evChip(90,`Maç bitti ${M.gh}-${M.ga}`,'',false); whistle(); { const dd=you==='h'?M.gh-M.ga:M.ga-M.gh; setTimeout(()=>{ dd>0?crowd.cheer():dd<0?crowd.boo(.04):applause(1.5,.1); },400); setTimeout(()=>crowd.stop(),2200); } setTimeout(()=>{ if(LIVE===L){ LIVE=null; L.onEnd(M); } },1200); return; }
     if(M.m>=L.target-(L.real?1:0)||L.react){ const t=L.react?'Gol yedik!':L.target===46?'Devre arası':`${L.target}. dakika`; L.react=false; setTimeout(()=>{ if(LIVE===L)moment(t); },pause||300); return; }
     L.run=setTimeout(tickF,pause||(L.fast?15:85));
   };
@@ -721,7 +771,8 @@ function drawBoard(){
   const tag=s=>s===you?`Sen · ${tacName(M.sides[s].tac)}`:'Rakibi gör ›';
   $('#board').innerHTML=`<button class="bteam ${you==='h'?'me':''}" data-s="h">${kit(h.c)}<span>${cname(h.c)}<small>${tag('h')}</small></span></button>
     <div class="bscore"><b>${M.gh} - ${M.ga}</b><em>${LIVE.real&&LIVE.mode!=='play'&&!M.done?LIVE.target:M.m}'</em></div>
-    <button class="bteam r ${you==='a'?'me':''}" data-s="a"><span>${cname(a.c)}<small>${tag('a')}</small></span>${kit(a.c)}</button>`;
+    <button class="bteam r ${you==='a'?'me':''}" data-s="a"><span>${cname(a.c)}<small>${tag('a')}</small></span>${kit(a.c)}</button>
+    <div class="mom" aria-hidden="true"><i class="${you==='h'?'me':''}" style="width:${Math.round(100*(M.lh||1)/((M.lh||1)+(M.la||1)))}%"></i></div>`;
   $('#board').querySelectorAll('.bteam').forEach(b=>b.onclick=()=>{ if(b.dataset.s!==you)oppSheet(b.dataset.s); });
 }
 function situation(){
@@ -745,7 +796,7 @@ function drawPitch(){
     const sta=sel&&sel.o===id?100:staOf(S,id,M.m);
     h+=`<button class="tok${cls}" style="left:${x}%;top:${y}%" data-id="${id}" aria-label="${esc(p.name)}">${kit(S.c,p.num)}<span class="ov">${p.ovr}</span><span class="fl">${flag(p)}</span>${S.yc[p.id]?'<span class="ycd"></span>':''}
       <span class="nm">${esc(p.short)}</span><span class="sta"><i class="${sta<60?'low':''}" style="width:${sta}%"></i></span></button>`; });
-  $('#pitch').innerHTML=h;
+  const ball=$('#ball'); $('#pitch').innerHTML=h; $('#pitch').appendChild(ball||Object.assign(document.createElement('span'),{id:'ball',className:'ball'}));
   $('#pitch').querySelectorAll('.tok').forEach(b=>b.onclick=()=>playerSheet(b.dataset.id));
 }
 function cardHTML(d,tag){
@@ -784,7 +835,7 @@ function drawAct(){
 }
 $('#bDecide').onclick=()=>{ const L=LIVE; if(!L)return; if(L.mode==='play'){ L.fast=true; beep(500,.05); drawAct(); } else if(L.mode==='dec')decide(); };
 function moment(title){
-  const L=LIVE,M=L.M,s=M.o.you; L.mode='dec'; L.sel=null; L.custom=null; L.outSel=null; L.title=title;
+  const L=LIVE,M=L.M,s=M.o.you; $('#shouts').hidden=true; L.mode='dec'; L.sel=null; L.custom=null; L.outSel=null; L.title=title;
   L.opts=choices(M,s); L.no=(L.no||0)+1;
   beep(520,.1); buzz(30); toast(title==='Gol yedik!'?'Gol yedik':(L.real?L.target:M.m)+"'"); drawAll(); $('#hand').scrollLeft=0;
   clearInterval(L.timer); let left=DEC_SEC; const T=$('#tbar');
@@ -913,10 +964,10 @@ function injuries(season){
   return INJW[season]=out;
 }
 const injOf=(id,w=ST.week)=>(injuries(ST.season)[id]||[]).find(([f,t])=>w>=f&&w<t);
-const avail=id=>!(ST.ban&&ST.ban[id]>0)&&!injOf(id);
+const avail=id=>!(ST.ban&&ST.ban[id]>0)&&!injOf(id)&&!(ST.minj&&ST.minj[id]>0);
 function myList(){ return ST.roster.map(id=>{const p=getP(id); if(ST.num[id])p.num=ST.num[id]; return p;}); }
 function oppList(c){ const mine=new Set(ST.roster); return squad(ST.season,c).filter(p=>!mine.has(p.id)); }
-function missing(){ return myList().filter(p=>!avail(p.id)).map(p=>{const j=injOf(p.id); return {p,txt:j?`${j[2]}${j[1]>=38?'':`, ${j[1]-ST.week} hafta`}`:`Cezalı, ${ST.ban[p.id]} maç`,inj:!!j};}); }
+function missing(){ return myList().filter(p=>!avail(p.id)).map(p=>{const j=injOf(p.id), mj=ST.minj&&ST.minj[p.id]>0; return {p,txt:j?`${j[2]}${j[1]>=38?'':`, ${j[1]-ST.week} hafta`}`:mj?`Maçta sakatlandı, ${ST.minj[p.id]} hafta`:`Cezalı, ${ST.ban[p.id]} maç`,inj:!!j||mj};}); }
 function newStory(season,team){ ST={season,team,week:0,played:{},cond:{},n:0}; initRoster(); saveStory(); hub(); }
 /* puan tablosu: diğer bütün maçlar gerçek sonuç. Bizim maçımızda rakip de gerçekteki sonucunu alır, sadece bizim puanımız değişir */
 function table(){
@@ -985,8 +1036,9 @@ function playWeek(sim){
     const newB=[]; for(const c of M.cards)if(c.s===you){ const p=M.sides[you].P[c.id];
       if(c.c==='y'){ ST.yc[c.id]=(ST.yc[c.id]||0)+1; if(ST.yc[c.id]>=4){ST.yc[c.id]=0;ST.ban[c.id]=1;newB.push(`${p.short}: 4. sarı kart, 1 maç ceza`);} }
       else { ST.ban[c.id]=c.c==='r'?2:1; newB.push(`${p.short}: ${c.c==='r'?'direkt kırmızı, 2 maç':'ikinci sarıdan kırmızı, 1 maç'} ceza`); } }
+    ST.minj=ST.minj||{}; for(const k in ST.minj)if(ST.minj[k]>0)ST.minj[k]--; for(const j of (M.inj||[]))if(j.s===you){ const wk=1+Math.floor(Math.random()*2); ST.minj[j.id]=wk; newB.push(`${M.sides[you].P[j.id].short}: maçta sakatlandı, ${wk} hafta yok`); }
     weekDone(o.xi);
-    const bans=newB.length?`<div class="panel note"><b style="color:var(--yellow)">Cezalar</b><br>${newB.map(esc).join('<br>')}</div>`:'';
+    const bans=newB.length?`<div class="panel note"><b style="color:var(--yellow)">Cezalar ve sakatlar</b><br>${newB.map(esc).join('<br>')}</div>`:'';
     resultScreen({M,real,title:`Hafta ${w+1} · ${SEASONS[ST.season].label}`,extra:bans+weekOthers(w),onNext:hub}); };
   if(sim){ finish(simToEnd(newMatch(o))); return; }
   playMatch(o,finish);
@@ -1228,9 +1280,9 @@ function realStep(M,sc){
 }
 /* karar anları: devre arası + hocanın değişiklik yapmadan hemen önceki dakikalar */
 function momentsFor(sc,you){
-  const out=[46];
-  for(const t of [...new Set(sc.ev.filter(e=>e[1]==='s'&&e[2]===you&&e[0]>47&&e[0]<=90).map(e=>e[0]))].sort((a,b)=>a-b)){ const c=t-2; if(c-out[out.length-1]>=4&&out.length<4)out.push(c); }
-  for(const d of [62,74,84]){ if(out.length>=4)break; if(out.every(x=>Math.abs(x-d)>=6))out.push(d); }
+  const out=[30,46];
+  for(const t of [...new Set(sc.ev.filter(e=>e[1]==='s'&&e[2]===you&&e[0]>47&&e[0]<=90).map(e=>e[0]))].sort((a,b)=>a-b)){ const c=t-2; if(c-out[out.length-1]>=4&&out.length<5)out.push(c); }
+  for(const d of [62,74,84]){ if(out.length>=5)break; if(out.every(x=>Math.abs(x-d)>=6))out.push(d); }
   return out.sort((a,b)=>a-b);
 }
 const coachIn=(sc,you,t,nx)=>realActs(sc,you,t,nx,'s');
@@ -1259,7 +1311,7 @@ async function loadPlays(key){
 function playReal(sc,you){
   const M=newRealM(sc,you,(Math.random()*1e9)|0), key=sc.id+':'+you;
   LIVE={M,real:sc,you,moments:momentsFor(sc,you),onEnd:M=>finalReal(L),mode:'play',sel:null,custom:null,outSel:null,opts:[],timer:null,run:null,fast:false,react:false,decs:[],utac:null,plays:[]};
-  const L=LIVE; loadPlays(key).then(p=>{L.plays=p;});
+  const L=LIVE; M.live=true; crowd.start(); loadPlays(key).then(p=>{L.plays=p;});
   show('match'); $('#feed').innerHTML=''; evChip(0,'Başlama düdüğü'); whistle();
   drawAll(); ffTo(L.moments[0]);
 }
@@ -1278,7 +1330,7 @@ function userCardHTML(acts,S,utac){
 }
 function decideReal(){
   const L=LIVE,M=L.M,sc=L.real,you=L.you,opp=you==='h'?'a':'h',S=M.sides[you],t=M.m+1, wasAlt=!!L.alt;
-  const k=L.decs.length, nx=L.moments[k+1]||91;
+  const k=L.decs.length, nx=Math.min(92,nextTarget(M.m));
   const mine=userActs(L,M), coach=coachIn(sc,you,t,nx);
   const theirs=realActs(sc,opp,t), oursLater=realActs(sc,you,nx,91,'s'), oursReds=realActs(sc,you,t,91,'r');
   const u=mcLine(M,you,mine,[...oursLater,...oursReds],theirs), c=mcLine(M,you,[],[...realActs(sc,you,t)],theirs);
@@ -1367,6 +1419,118 @@ function sidePick(sc){
   sh.querySelectorAll('.side').forEach(b=>b.onclick=()=>{sh.remove();beep(620);playReal(sc,b.dataset.s);});
   $('#app').appendChild(sh);
 }
+
+/* ---------- taraftar sesi: hepsi tarayıcıda üretilir, dosya yok ---------- */
+const CROWD={amb:null,g:null,f:null,buf:null,last:{}};
+const sctx=()=>{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended')actx.resume(); return actx; };
+function crowdBuf(){
+  if(CROWD.buf)return CROWD.buf; const c=sctx(), n=c.sampleRate*3, b=c.createBuffer(1,n,c.sampleRate), d=b.getChannelData(0); let l=0;
+  for(let i=0;i<n;i++){ const w=Math.random()*2-1; l=(l+.03*w)/1.03; d[i]=l*2.2+w*.12; }
+  return CROWD.buf=b;
+}
+function noiseSrc(c){ const s=c.createBufferSource(); s.buffer=crowdBuf(); s.loop=true; s.playbackRate.value=.9+Math.random()*.2; return s; }
+/* tek bir taraftar dalgası: gürültü + bant filtresi + zarf */
+function wave({dur=1.5,peak=.3,f0=600,f1=900,q=.8,att=.15,type='bandpass',delay=0}){
+  if(window.SNDOFF)return; try{ const c=sctx(),t=c.currentTime+delay,s=noiseSrc(c),f=c.createBiquadFilter(),g=c.createGain();
+    f.type=type; f.Q.value=q; f.frequency.setValueAtTime(f0,t); f.frequency.linearRampToValueAtTime(f1,t+dur*.6);
+    g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(peak,t+att); g.gain.setValueAtTime(peak,t+dur*.55); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t,Math.random()*2); s.stop(t+dur+.05); }catch(e){}
+}
+function thump(t,f=72,v=.35){ try{ const c=sctx(),o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.setValueAtTime(f*1.6,t); o.frequency.exponentialRampToValueAtTime(f,t+.08);
+  g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.0001,t+.28); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+.3); }catch(e){} }
+function booTone(dur=1.6,v=.05){ if(window.SNDOFF)return; try{ const c=sctx(),t=c.currentTime,lp=c.createBiquadFilter(),g=c.createGain(); lp.type='lowpass'; lp.frequency.value=520;
+  g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(v,t+.3); g.gain.exponentialRampToValueAtTime(.0001,t+dur); lp.connect(g); g.connect(c.destination);
+  for(const f of [118,131,146,163]){ const o=c.createOscillator(),vib=c.createOscillator(),vg=c.createGain(); o.type='sawtooth'; o.frequency.value=f*(.97+Math.random()*.06); vib.frequency.value=4+Math.random()*3; vg.gain.value=5; vib.connect(vg); vg.connect(o.frequency); o.connect(lp); o.start(t); vib.start(t); o.stop(t+dur); vib.stop(t+dur); } }catch(e){} }
+function applause(dur=1.8,v=.16){ if(window.SNDOFF)return; try{ const c=sctx(),t0=c.currentTime;
+  for(let i=0;i<Math.round(dur*55);i++){ const t=t0+Math.random()*dur, s=noiseSrc(c),f=c.createBiquadFilter(),g=c.createGain(); f.type='bandpass'; f.frequency.value=1400+Math.random()*1800; f.Q.value=1.2;
+    const fade=1-(t-t0)/dur; g.gain.setValueAtTime(v*fade,t); g.gain.exponentialRampToValueAtTime(.0001,t+.035); s.connect(f); f.connect(g); g.connect(c.destination); s.start(t,Math.random()*2); s.stop(t+.05); } }catch(e){} }
+const crowd={
+  start(){ if(window.SNDOFF||CROWD.amb)return; try{ const c=sctx(),s=noiseSrc(c),f=c.createBiquadFilter(),g=c.createGain(),lfo=c.createOscillator(),lg=c.createGain();
+    f.type='bandpass'; f.frequency.value=650; f.Q.value=.6; g.gain.value=.0001; g.gain.linearRampToValueAtTime(.035,c.currentTime+1.2);
+    lfo.frequency.value=.13; lg.gain.value=.008; lfo.connect(lg); lg.connect(g.gain);
+    s.connect(f); f.connect(g); g.connect(c.destination); s.start(); lfo.start(); CROWD.amb={s,lfo}; CROWD.g=g; CROWD.f=f; }catch(e){} },
+  level(x){ if(!CROWD.g)return; try{ const c=sctx(); CROWD.g.gain.setTargetAtTime(.025+.075*clamp(x,0,1),c.currentTime,.6); CROWD.f.frequency.setTargetAtTime(560+500*clamp(x,0,1),c.currentTime,.6); }catch(e){} },
+  stop(){ if(!CROWD.amb)return; try{ const c=sctx(); CROWD.g.gain.setTargetAtTime(.0001,c.currentTime,.4); const a=CROWD.amb; setTimeout(()=>{try{a.s.stop();a.lfo.stop();}catch(e){}},1500); }catch(e){} CROWD.amb=null; CROWD.g=null; },
+  once(k,ms){ const n=Date.now(); if(CROWD.last[k]&&n-CROWD.last[k]<ms)return false; CROWD.last[k]=n; return true; },
+  roar(){ wave({dur:3.4,peak:.42,f0:480,f1:1150,q:.55,att:.22}); wave({dur:2.8,peak:.16,f0:1800,f1:2600,q:1.2,att:.3,delay:.1});
+    if(!window.SNDOFF){ try{ const t=sctx().currentTime+.9; [0,.42,.84,1.05,1.26].forEach((d,i)=>thump(t+d,i>2?84:72)); [0,.42,.84,1.05,1.26].forEach(d=>thump(t+1.8+d,72,.28)); }catch(e){} } },
+  groan(){ wave({dur:1.7,peak:.3,f0:760,f1:300,q:1.3,att:.06}); setTimeout(()=>booTone(1.5,.035),500); },
+  ooh(){ if(!crowd.once('ooh',2500))return; wave({dur:1.1,peak:.2,f0:380,f1:820,q:3,att:.25}); },
+  boo(v=.06){ booTone(2,v); wave({dur:1.8,peak:.14,f0:300,f1:420,q:1,att:.3}); },
+  cheer(){ wave({dur:1.6,peak:.24,f0:600,f1:1000,q:.7,att:.12}); },
+  worry(){ wave({dur:1.2,peak:.18,f0:520,f1:330,q:2.5,att:.2}); setTimeout(()=>applause(1.4,.1),1700); },
+  clap(){ if(crowd.once('clap',1500))applause(1.4,.12); },
+};
+/* ---------- animasyonlar ---------- */
+function fxLayer(cls,html,ms){ const d=document.createElement('div'); d.className='fx '+cls; d.innerHTML=html; $('#app').appendChild(d); setTimeout(()=>d.remove(),ms); return d; }
+function goalFx(c,name,mine){
+  const [, , ,c1,c2]=CLUB[c]; let conf='';
+  for(let i=0;i<34;i++){ const x=Math.random()*100, d=(Math.random()*.5).toFixed(2), r=Math.round(Math.random()*720-360), col=i%3?c1:c2;
+    conf+=`<i style="left:${x}%;background:${col};animation-delay:${d}s;--r:${r}deg;--dx:${Math.round(Math.random()*60-30)}px"></i>`; }
+  fxLayer('gfx'+(mine?' mine':''),`<svg class="net" viewBox="0 0 200 90" aria-hidden="true"><path d="M20 85 L28 12 L172 12 L180 85" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+    <g stroke="#fff" stroke-width="1.2" opacity=".6">${[40,56,72,88,104,120,136,152].map(x=>`<line x1="${x}" y1="12" x2="${x+(x-100)*.08}" y2="85"/>`).join('')}${[28,44,60,76].map(y=>`<line x1="${26-(y-12)*.08}" y1="${y}" x2="${174+(y-12)*.08}" y2="${y}"/>`).join('')}</g></svg>
+    <span class="gball"></span><b class="disp">Gol!</b><em>${esc(name)}</em>${mine?conf:''}`,1700);
+  const a=$('#app'); a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake');
+}
+function cardFx(red,name){ fxLayer('cfx',`<span class="rcard ${red?'red':'yel'}"></span><b class="disp">${red?'Kırmızı kart':'Sarı kart'}</b><em>${esc(name)}</em>`,1300); }
+function injFx(name){ fxLayer('ifx',`<span class="cross"></span><b class="disp">Sakatlık</b><em>${esc(name)}</em>`,1400); }
+/* topun sahadaki hareketi: hangi taraf baskılıysa top oraya gider */
+function moveBall(M,you,goalSide){
+  const b=$('#ball'); if(!b)return; const r=Math.random, opp=you==='h'?'a':'h';
+  let x,y;
+  if(goalSide){ x=50; y=goalSide===you?3:97; }
+  else { const ly=you==='h'?M.lh:M.la, lo=you==='h'?M.la:M.lh, p=(ly||.01)/((ly||.01)+(lo||.01)), att=r()<p;
+    x=12+r()*76; y=att?8+r()*40:52+r()*40; }
+  b.style.left=x+'%'; b.style.top=y+'%';
+  crowd.level(((you==='h'?M.lh:M.la)||0)*25);
+}
+/* ---------- maçta bağırma: hoca sahaya talimat verir, kısa süre etkili ---------- */
+const SHOUTS={press:{n:'Baskı!',say:'Bastırın!',att:1.25,opp:1.12,card:1.3},slow:{n:'Yavaşla!',say:'Topu tutun!',att:.8,opp:.75,card:1},calm:{n:'Sakin!',say:'Sakin olun!',att:.95,opp:1,card:.4}};
+const SHOUT_MAX=3, SHOUT_LEN=6, SHOUT_CD=8;
+const shoutOf=(S,m)=>S.shout&&m<=S.shout.until?SHOUTS[S.shout.k]:null;
+function goAlt(L){ if(!L.real||L.alt)return false; const M=L.M,opp=L.you==='h'?'a':'h'; L.alt=true; M.o.script={[opp]:realActs(L.real,opp,M.m+1)};
+  evChip(M.m,'Hocadan ayrıldın: maç artık senin','me'); return true; }
+function shoutMenu(){
+  const L=LIVE; if(!L||L.M.done)return; const M=L.M,S=M.sides[M.o.you], box=$('#shouts');
+  if(!box.hidden){ box.hidden=true; return; }
+  const left=SHOUT_MAX-(L.shouts||0), cd=(S.shoutNext||0)>M.m, ok=L.mode==='play'&&left>0&&!cd;
+  box.innerHTML=`<div class="sh-t">${left>0?(cd?`Oyuncular dinliyor, ${S.shoutNext-M.m} dk sonra`:`Sahaya bağır · ${left} hak`):'Bağırma hakkın bitti'}</div>`+
+    `<button class="snd" data-snd>${window.SNDOFF?'Sesi aç':'Sesi kapat'}</button>`+Object.entries(SHOUTS).map(([k,v])=>`<button data-k="${k}" ${ok?'':'disabled'}><b>${v.n}</b><small>${k==='press'?'Gol şansı artar, kart riski de':k==='slow'?'Oyun yavaşlar, iki taraf da az atar':'Kart riski çok düşer'}</small></button>`).join('');
+  box.hidden=false;
+  box.querySelector('[data-snd]').onclick=e=>{ e.stopPropagation(); window.SNDOFF=!window.SNDOFF; store.set('fdMute',window.SNDOFF); box.hidden=true; if(window.SNDOFF)crowd.stop(); else crowd.start(); };
+  box.querySelectorAll('[data-k]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.k; box.hidden=true;
+    if(LIVE!==L||L.mode!=='play'||M.done)return;
+    const wasReal=goAlt(L); const act={k:'shout',v:k,m:M.m}; applyAct(M,M.o.you,act); M.acts.push(act); S.shoutNext=M.m+SHOUT_CD; L.shouts=(L.shouts||0)+1;
+    L.flash={mood:'angry',until:M.m+2}; const bub=$('#coachBub'); bub.textContent=SHOUTS[k].say; bub.hidden=false; clearTimeout(bub._t); bub._t=setTimeout(()=>bub.hidden=true,1600);
+    evChip(M.m,`Sen: ${SHOUTS[k].n}`,'me'); crowd.cheer(); beep(740,.06); buzz(15);
+    if(wasReal)toast('Maç senin'); drawCoach(); drawBoard(); });
+}
+/* ---------- maç içi sakatlık: oyuncu devam edemez, yerine kimin gireceğini sen seçersin ---------- */
+function injRoll(M,s,ev){
+  const S=M.sides[s],on=S.xi.filter(Boolean); if(on.length<8)return;
+  const tired=on.reduce((t,id)=>t+(100-staOf(S,id,M.m)),0)/on.length;
+  if(M.r()>=.0009*(S.tac>=1?1.3:1)*(1+tired/120))return;
+  let id=on[Math.floor(M.r()*on.length)]; if(S.P[id].g==='G'&&M.r()<.75)id=on.find(x=>S.P[x].g!=='G')||id;
+  const p=S.P[id]; ev.push({t:'inj',s,p}); (M.inj=M.inj||[]).push({s,id,m:M.m});
+  if(M.live&&M.o.you===s){ M.pendInj=id; return; }
+  const b=S.bench.map(x=>S.P[x]).filter(q=>p.g==='G'?q.g==='G':q.g!=='G').sort((a,c)=>(c.g===p.g)-(a.g===p.g)||c.ovr-a.ovr)[0];
+  const a=b&&S.subs>0?{k:'sub',o:id,i:b.id,m:M.m}:{k:'red',o:id,m:M.m};
+  if(applyAct(M,s,a)&&a.k==='sub')ev.push({t:'act',s,a});
+}
+function injSheet(L,done){
+  const M=L.M,s=M.o.you,S=M.sides[s],id=M.pendInj,p=S.P[id];
+  const bench=S.bench.map(x=>S.P[x]).filter(q=>p.g==='G'?q.g==='G':q.g!=='G').sort((a,c)=>(c.g===p.g)-(a.g===p.g)||c.ovr-a.ovr).slice(0,6);
+  const can=S.subs>0&&bench.length;
+  const sh=document.createElement('div'); sh.className='sheet';
+  sh.innerHTML=`<div class="in"><h3 class="disp">Sakatlık!</h3><div class="pinfo">${kit(S.c,p.num)}<div><b>${esc(p.name)}</b><div class="note">${p.pos} · devam edemiyor</div></div></div>
+    ${can?`<div class="lbl" style="opacity:.8">Yerine kim girsin?</div><div class="injl">${bench.map(q=>`<button class="bp" data-i="${q.id}">${kit(S.c,q.num)}<span><b>${esc(q.short)}</b><small>${flag(q)} ${q.pos}${q.g===p.g?' · aynı mevki':''}</small></span><b>${q.ovr}</b></button>`).join('')}</div>`
+      :`<div class="note">Değişiklik hakkın kalmadı. Takım 10 kişi devam ediyor.</div><div class="foot"><span></span><button class="btn" data-ok>Devam</button></div>`}</div>`;
+  const fin=a=>{ M.pendInj=null; if(applyAct(M,s,a)){ M.acts.push(a); if(a.k==='sub')evChip(M.m,`<span class="ico sub">⇅</span>Sen: ${esc(S.P[a.i].short)} girdi, ${esc(p.short)} sakatlandı`,'me'); } sh.remove(); crowd.clap(); done(); };
+  sh.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{ beep(620); fin({k:'sub',o:id,i:b.dataset.i,m:M.m}); });
+  const ok=sh.querySelector('[data-ok]'); if(ok)ok.onclick=()=>fin({k:'red',o:id,m:M.m});
+  $('#app').appendChild(sh);
+}
+function soundBtn(){ const b=$('#sndBtn'); if(b)b.textContent=window.SNDOFF?'Ses kapalı':'Ses açık'; }
 
 /* ---------- hoca avatarı: düz çizim, kalın lacivert kontur. Yüz ifadesi maçın gidişatına göre değişir ---------- */
 const SKIN=['#f6d2b4','#e9b48f','#c98b62','#9a6440','#62402a'];
@@ -1476,7 +1640,7 @@ function coachScreen(first){
 /* ---------- ana ekran ---------- */
 function home(){
   if(!store.get('fdCoach',null))return coachScreen(true);
-  show('home'); stopWatch(); $('#hStreak').textContent=store.get('fdStreak',0); $('#hName').textContent=COACH.name; $('#hFace').innerHTML=coachSVG(COACH,'happy');
+  crowd.stop(); show('home'); stopWatch(); $('#hStreak').textContent=store.get('fdStreak',0); $('#hName').textContent=COACH.name; $('#hFace').innerHTML=coachSVG(COACH,'happy');
   const s=store.get('fdStory',null);
   $('#mStorySub').textContent=s&&!s.done?`Devam: ${cname(s.team)} · ${s.week+1}. hafta`:'Bir sezon seç, şampiyon yap';
   const fv=favClub(), wk=REAL.filter(x=>x.cat==='week'), sc=wk.find(x=>x.h===fv||x.a===fv)||wk[0], y=sc.h===fv?'h':sc.a===fv?'a':sc.you||'h', subs=sc.ev.filter(e=>e[1]==='s'&&e[2]===y), m0=subs.length?subs[0][0]:0, n0=subs.filter(e=>e[0]===m0).length;
@@ -1484,6 +1648,7 @@ function home(){
   $('#hTicket').onclick=()=>{beep(560);sidePick(sc);};
 }
 $('#mStory').onclick=()=>{beep(520); const s=store.get('fdStory',null); if(s){ST=s;hub();} else pickScreen('story');};
+$('#coachFace').onclick=shoutMenu;
 $('#hCoach').onclick=()=>{beep(520);coachScreen(false);};
 $('#mQuick').onclick=()=>{beep(520);realList();};
 $('#mOnline').onclick=()=>{beep(520);online();};
