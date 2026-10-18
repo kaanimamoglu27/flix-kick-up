@@ -106,47 +106,116 @@ svg.kit{display:block;}
 .rule{background:var(--navy);border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.4;}
 .rule b{color:var(--yellow);}
 
-/* Maç */
-#match{gap:8px;}
-.board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;background:var(--navy);border:2px solid var(--navy-deep);border-radius:14px;padding:8px 10px;}
-.bt{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;}
-.bt svg{width:40px;height:40px;}
-.bt span{font-family:var(--display);font-style:italic;font-weight:800;font-size:16px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-.bt.me span{color:var(--yellow);}
-.sc{text-align:center;}
-.sc b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:56px;line-height:.9;font-variant-numeric:tabular-nums;}
-.sc em{display:inline-block;font-style:normal;font-weight:800;font-size:14px;background:var(--yellow);color:var(--navy);border-radius:5px;padding:1px 8px;margin-top:4px;font-variant-numeric:tabular-nums;}
-.strip{position:relative;height:74px;flex:none;border:3px solid var(--navy);border-radius:10px;overflow:hidden;background:repeating-linear-gradient(90deg,#c4161f 0 10%,#b8121b 10% 20%);}
-.strip svg{position:absolute;inset:0;width:100%;height:100%;}
-.ball{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#fff;border:2px solid var(--navy);transition:left .45s ease,top .45s ease;}
-.mom{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:11px;font-weight:700;letter-spacing:.06em;}
-.mom .pb{height:8px;border-radius:4px;background:#9aa6e6;overflow:hidden;}
-.mom .pb i{display:block;height:100%;background:var(--yellow);transition:width .5s;}
-.feed{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:6px;}
-.line{display:flex;gap:8px;align-items:flex-start;background:rgba(12,20,64,.28);border-radius:10px;padding:7px 10px;font-size:14px;line-height:1.35;animation:in .25s ease-out;}
-.line b{font-variant-numeric:tabular-nums;min-width:30px;}
-.line.goal{background:var(--yellow);color:var(--navy);font-weight:700;}
-.line.me{background:var(--navy);}
-@keyframes in{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
-.mfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;}
-.chip{font-size:12px;font-weight:700;background:var(--navy);border-radius:999px;padding:6px 12px;}
-.chip.on{background:var(--yellow);color:var(--navy);}
-
-/* Karar kartı */
-.deck{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(12,20,64,.5);}
-.dcard{margin:0 max(12px,env(safe-area-inset-right,0px)) 14px max(12px,env(safe-area-inset-left,0px));background:var(--paper);color:var(--ink);border:3px solid var(--navy);border-radius:18px;box-shadow:0 6px 0 var(--navy);padding:14px;display:flex;flex-direction:column;gap:10px;animation:deal .28s cubic-bezier(.2,1.4,.4,1);}
-@keyframes deal{from{transform:translateY(60px) rotate(-4deg);opacity:0}to{transform:none;opacity:1}}
-.dcard h3{margin:0;font-size:32px;}
-.dcard p{margin:0;font-size:14px;line-height:1.4;color:#3a3f63;}
-.opt{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;text-align:left;background:#fff;border:3px solid var(--navy);border-radius:12px;padding:10px 12px;min-height:58px;box-shadow:0 3px 0 var(--navy);}
-.opt:active{transform:translateY(2px);box-shadow:0 1px 0 var(--navy);}
-.opt b{font-family:var(--display);font-style:italic;font-weight:800;font-size:21px;text-transform:uppercase;line-height:1;}
-.opt small{grid-column:1/2;font-size:12px;color:var(--mute);}
-.opt .fx{grid-row:1/3;grid-column:2;text-align:right;font-size:12px;font-weight:800;line-height:1.35;}
+/* Maç: üstte skorbord ve olay şeridi, ortada saha, altta kart eli; ana buton sağ altta */
+#match{gap:7px;padding-top:8px;}
+.board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:var(--navy);border:2px solid var(--navy-deep);border-radius:14px;padding:6px 10px;gap:8px;}
+.bteam{display:flex;align-items:center;gap:6px;min-width:0;text-align:left;}
+.bteam.r{justify-content:flex-end;text-align:right;}
+.bteam svg{width:30px;height:30px;flex:none;}
+.bteam span{font-family:var(--display);font-style:italic;font-weight:800;font-size:18px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.bteam small{display:block;font-family:var(--body);font-style:normal;font-weight:600;font-size:10px;letter-spacing:.04em;opacity:.75;text-transform:none;}
+.bteam.me span{color:var(--yellow);}
+.bscore{text-align:center;}
+.bscore b{font-family:var(--display);font-style:italic;font-weight:900;font-size:36px;line-height:1;font-variant-numeric:tabular-nums;}
+.bscore em{display:block;font-style:normal;font-size:12px;font-weight:700;color:var(--navy);background:var(--yellow);border-radius:4px;padding:0 6px;margin-top:2px;font-variant-numeric:tabular-nums;}
+.feed{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-height:26px;flex:none;}
+.feed::-webkit-scrollbar{display:none;}
+.ev{flex:none;display:flex;align-items:center;gap:5px;background:rgba(12,20,64,.32);border-radius:8px;padding:4px 8px;font-size:12px;white-space:nowrap;animation:in .25s ease-out;}
+.ev b{font-variant-numeric:tabular-nums;}
+.ev.goal{background:var(--yellow);color:var(--navy);font-weight:700;}
+.ev.me{background:var(--navy);}
+@keyframes in{from{transform:translateX(-10px);opacity:0}to{transform:none;opacity:1}}
+.ico{display:inline-block;flex:none;}
+.ico.ball{width:11px;height:11px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 2px var(--navy);}
+.ico.sub{font-weight:800;font-size:12px;color:var(--yellow);}
+.ev.goal .ico.sub{color:var(--navy);}
+.pitch{position:relative;flex:1;min-height:190px;border:3px solid var(--navy);border-radius:10px;overflow:hidden;background:repeating-linear-gradient(180deg,#c4161f 0 12.5%,#b8121b 12.5% 25%);}
+.pitch .lines{position:absolute;inset:0;width:100%;height:100%;}
+.sit{position:absolute;left:8px;right:8px;top:8px;display:flex;flex-wrap:wrap;gap:5px;z-index:3;pointer-events:none;}
+.chip{background:var(--navy);color:#fff;font-size:11.5px;font-weight:600;border-radius:999px;padding:3px 9px;}
+.chip.warn{background:var(--yellow);color:var(--navy);}
+.tok{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;width:70px;z-index:2;}
+.tok svg{width:34px;height:34px;filter:drop-shadow(0 2px 0 rgba(12,20,64,.45));transition:transform .15s;}
+.tok .nm{margin-top:1px;background:var(--navy);color:#fff;font-size:10.5px;font-weight:600;padding:1px 5px;border-radius:4px;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis;}
+.tok .sta{width:40px;height:4px;background:rgba(12,20,64,.5);border-radius:2px;margin-top:2px;overflow:hidden;}
+.tok .sta i{display:block;height:100%;background:#fff;}
+.tok .sta i.low{background:var(--yellow);}
+.tok .ov{position:absolute;top:-2px;left:8px;font-size:10px;font-weight:800;background:#fff;color:var(--navy);border-radius:4px;padding:0 3px;font-variant-numeric:tabular-nums;}
+.tok .fl{position:absolute;top:-3px;right:9px;font-size:13px;line-height:1;}
+.tok.out{opacity:.35;}
+.tok.in svg{transform:scale(1.12);}
+.tok.sel svg{transform:scale(1.18);}
+.tok.sel .nm,.tok.in .nm{background:var(--yellow);color:var(--navy);}
+.hint{text-align:center;font-size:11.5px;opacity:.9;margin-top:-2px;min-height:14px;}
+.hand{display:flex;gap:10px;overflow-x:auto;padding:12px 4px 8px;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:166px;flex:none;}
+.hand::-webkit-scrollbar{display:none;}
+.pcard{flex:none;width:136px;min-height:146px;scroll-snap-align:start;background:var(--paper);color:var(--ink);border:3px solid var(--navy);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 4px 0 var(--navy);transition:transform .15s,box-shadow .15s;position:relative;animation:deal .3s cubic-bezier(.2,1.4,.4,1) backwards;}
+.pcard:nth-child(2){animation-delay:.06s}.pcard:nth-child(3){animation-delay:.12s}.pcard:nth-child(4){animation-delay:.18s}
+@keyframes deal{from{transform:translateY(50px) rotate(-6deg);opacity:0}}
+.pcard:nth-child(odd){transform:rotate(-1.2deg);}
+.pcard:nth-child(even){transform:rotate(1.2deg);}
+.pcard.on{transform:translateY(-10px) rotate(0);box-shadow:0 10px 0 var(--navy);background:#fff;outline:3px solid var(--yellow);outline-offset:-7px;}
+.pcard .kind{font-family:var(--display);font-style:italic;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.03em;border-bottom:2px dashed var(--paper-edge);padding-bottom:4px;display:flex;justify-content:space-between;gap:4px;}
+.pcard .kind i{font-style:normal;color:var(--mute);font-size:13px;white-space:nowrap;}
+.prow{display:grid;grid-template-columns:14px 28px 1fr;gap:4px;align-items:center;}
+.prow svg{width:28px;height:28px;}
+.prow .arr{font-weight:900;font-size:14px;text-align:center;}
+.prow .arr.dn{color:var(--bad);} .prow .arr.up{color:var(--ok);}
+.prow .pn{font-size:12px;font-weight:700;line-height:1.15;min-width:0;overflow:hidden;}
+.prow .pn small{display:block;font-weight:500;color:var(--mute);font-size:10.5px;white-space:nowrap;}
+.pcard .big{font-family:var(--display);font-style:italic;font-weight:900;font-size:30px;text-transform:uppercase;line-height:.9;margin-top:4px;}
+.pcard .txt{font-size:11.5px;line-height:1.35;color:#3a3f63;}
+.pcard .fx{margin-top:auto;font-size:10.5px;font-weight:800;line-height:1.3;}
 .fx .up{color:var(--ok);} .fx .dn{color:var(--bad);}
-.opt.main{background:var(--yellow);}
-.dtimer{height:6px;border-radius:3px;background:var(--paper-edge);overflow:hidden;}
-.dtimer i{display:block;height:100%;background:var(--navy);transform-origin:left;}
+.pcard.make{background:transparent;border-style:dashed;border-color:var(--paper);color:#fff;box-shadow:none;justify-content:center;align-items:center;text-align:center;}
+.pcard.make .big{font-size:24px;}
+.pcard.make .txt{color:#fff;}
+.pcard.live{width:100%;animation:none;transform:none;}
+.pcard.live .big{font-size:40px;font-variant-numeric:tabular-nums;}
+.act{display:flex;align-items:center;gap:12px;}
+.timer{flex:1;min-width:0;}
+.timer .bar{height:8px;background:rgba(12,20,64,.4);border-radius:4px;overflow:hidden;}
+.timer .bar i{display:block;height:100%;background:var(--yellow);transform-origin:left;}
+.timer span{font-size:12px;display:block;margin-top:4px;opacity:.9;}
+/* Karar sonucu */
+.prob{display:grid;grid-template-columns:minmax(0,1fr) 92px 42px;gap:8px;align-items:center;font-size:12.5px;}
+.prob span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prob.mine span:first-child{color:var(--yellow);font-weight:700;}
+.prob .bar{height:12px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;}
+.prob .bar i{display:block;height:100%;background:#9aa6e6;}
+.prob.mine .bar i{background:var(--yellow);}
+.prob b{text-align:right;font-variant-numeric:tabular-nums;}
+.total{display:flex;align-items:flex-end;justify-content:space-between;border-top:2px dashed rgba(255,255,255,.25);padding-top:8px;}
+.total b{font-family:var(--display);font-style:italic;font-size:54px;line-height:.85;color:var(--yellow);font-variant-numeric:tabular-nums;}
+.pinfo{display:flex;gap:12px;align-items:center;}
+.pinfo svg{width:56px;height:56px;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.stat{background:rgba(255,255,255,.08);border-radius:10px;padding:6px;text-align:center;}
+.stat b{display:block;font-family:var(--display);font-style:italic;font-size:22px;font-variant-numeric:tabular-nums;}
+.stat span{font-size:10px;opacity:.8;letter-spacing:.06em;text-transform:uppercase;}
+.bp{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 10px;text-align:left;}
+.bp svg{width:34px;height:34px;}
+.bp b{font-family:var(--display);font-style:italic;font-size:22px;}
+.bp small{display:block;color:var(--mute);font-size:11px;}
+.bp[disabled]{opacity:.4;}
+.bp.ro{background:rgba(255,255,255,.08);color:#fff;}
+.bp.ro small{color:rgba(255,255,255,.7);}
+
+/* Transfer */
+.fchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:none;}
+.fchips button{flex:none;font-size:13px;font-weight:700;border:2px solid #fff;border-radius:999px;padding:5px 12px;}
+.fchips button.on{background:#fff;color:var(--red);}
+.pl.no{opacity:.5;}
+.pl .pr{text-align:right;line-height:1;}
+.pl .pr small{display:block;font-size:11px;font-weight:700;color:var(--yellow);margin-top:3px;white-space:nowrap;}
+.trf{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;text-align:left;padding:10px 12px;}
+.trf b{font-family:var(--display);font-style:italic;font-weight:900;font-size:24px;text-transform:uppercase;line-height:1;}
+.trf span{display:block;font-size:12px;color:var(--mute);margin-top:2px;}
+.trf i{font-style:normal;font-family:var(--display);font-weight:900;font-size:28px;}
+.last{font-size:13px;line-height:1.4;border-top:2px dashed var(--paper-edge);padding-top:6px;}
+.last b{font-variant-numeric:tabular-nums;}
+.wk{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;font-size:12.5px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.1);}
+.wk span:first-child{text-align:right;} .wk b{font-variant-numeric:tabular-nums;min-width:34px;text-align:center;}
 
 /* Sonuç */
 #result{background:var(--navy);}
@@ -203,6 +272,7 @@ svg.kit{display:block;}
     <div class="kpis" id="hubKpi"></div>
     <div class="scroll">
       <div class="card next" id="hubNext"></div>
+      <button class="card trf" id="hubTr"></button>
       <div class="panel"><div class="lbl" style="color:var(--yellow);margin-bottom:6px">Puan durumu</div><table class="tbl" id="hubTable"></table>
         <button class="back" id="fullTbl" style="font-size:13px">Tüm tabloyu gör</button></div>
     </div>
@@ -217,11 +287,24 @@ svg.kit{display:block;}
   </section>
 
   <section class="screen" id="match" hidden>
-    <div class="board" id="mBoard"></div>
-    <div class="mom" id="mMom"></div>
-    <div class="strip"><svg viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#15215c" stroke-width="1.4"><rect x="3" y="3" width="194" height="54"/><line x1="100" y1="3" x2="100" y2="57"/><circle cx="100" cy="30" r="11"/><rect x="3" y="15" width="22" height="30"/><rect x="175" y="15" width="22" height="30"/></g></svg><div class="ball" id="mBall"></div></div>
-    <div class="feed" id="mFeed"></div>
-    <div class="mfoot"><span class="chip" id="mTac">Dengeli</span><span class="chip" id="mSubs">5 değişiklik</span><button class="chip" id="mSpeed">Hız ×1</button></div>
+    <div class="board" id="board"></div>
+    <div class="feed" id="feed"></div>
+    <div class="pitch" id="pitch"></div>
+    <div class="hint" id="hint"></div>
+    <div class="hand" id="hand"></div>
+    <div class="act">
+      <div class="timer"><div class="bar"><i id="tbar"></i></div><span id="tlbl"></span></div>
+      <button class="btn" id="bDecide">Atla ›</button>
+    </div>
+  </section>
+
+  <section class="screen" id="transfer" hidden>
+    <div class="top"><button class="back" id="trBack">‹ Geri</button><h2 class="disp">Transfer</h2></div>
+    <div class="kpis" id="trKpi"></div>
+    <div class="rule" id="trRule"></div>
+    <div class="tabs" id="trTabs"></div>
+    <div class="fchips" id="trF"></div>
+    <div class="scroll" id="trList"></div>
   </section>
 
   <section class="screen" id="result" hidden></section>
@@ -321,6 +404,20 @@ const TR_L=['Aydınlı','Karabulut','Tezcan','Yavuzer','Erdemli','Sönmez','Akdo
 const FOR=['Lucas Brenvik','Tiago Mourão','Ousmane Dialé','Nikolai Vrebac','Mateo Saldivo','Jonas Feldtner','Kofi Amensah','Ivo Stanković','Rafael Quintela','Sami Okafar','Emil Brandvoll','Dario Pellucchi','Yannick Obéri','Marek Jelinko','Bruno Teixal','Axel Norrbeck','Ilias Benaddo','Pavel Hronik'];
 const GENPOS=['KL','SĞB','STP','STP','SLB','DOS','DOS','SĞK','OOS','SLK','FV','KL','STP','DOS','OOS','KNT','FV','BEK','DOS','SLK'];
 const NUM={KL:[1,12,35],SĞB:[2,22],STP:[4,5,15,3,44],SLB:[3,18,33],BEK:[13,24],DOS:[6,8,16,23,26],OOS:[10,20,14,21],SĞK:[7,17],SLK:[11,19],KNT:[27,77],FV:[9,99,29]};
+/* uyruk: soyadın son kelimesinden. Listede olmayan Türk oyuncudur */
+const NAT={Mustlera:'UY',Bovey:'FR',Nelssen:'DK',Sanchoz:'CO',Angelinyo:'ES',Torreyra:'UY',Ndombelli:'FR',Merdiven:'BE',Ziyeş:'MA',İkardo:'AR',Zahar:'CI',Teteoğlu:'BR',Kön:'DE',Olivero:'PT',
+ Livakovski:'HR','Osayi-Lemuel':'NG',Cicu:'GH',Bekon:'BR',Osterwolf:'NL',Fredo:'BR',Şimanski:'PL',Tadiş:'RS',Ceko:'BA',Batşuayi:'BE',Kentsel:'GB',Kruniç:'BA',Kingo:'NO',
+ Amarteyi:'GH',Kolley:'GM',Baylı:'CI',Masuako:'CD','Al-Mısrati':'LY',Fernandez:'PT',Gazal:'DZ',Abubekir:'CM',Raşika:'XK',Ananas:'CM',Rebiç:'HR',Muçiç:'AL',
+ Malheira:'PT',Denzwil:'NL',Mendi:'FR',Bardi:'MK',Bakaletas:'GR',Vişçe:'BA',Trezegol:'EG',Onuaçu:'NG',Pepeç:'CI',Puhaç:'PL',Orşiç:'HR',
+ Duartez:'BR',Opuku:'GH',Kemence:'FR',Limon:'BR',Şiş:'PL',Piontek:'PL',Kenyi:'SN',Aleksiç:'RS',
+ Jelerte:'DK',Jakops:'SN',Frankovski:'PL',Lemine:'GA',Sarah:'BR',Osimyen:'NG',Moratta:'ES',Salai:'HU',
+ Şkrinyar:'SK',Kostiç:'RS',Amrabet:'MA','Saint-Maksimen':'FR','En-Nesir':'MA',Taliska:'BR',
+ Svenson:'NO',Paulisto:'BR',Uduokay:'DE',Ndidy:'NG',Silvaz:'PT',İmmobilya:'IT',Marios:'PT',Ndur:'IT',Aroyo:'EC',
+ Batagof:'UA',Lundstrem:'GB',Çam:'AT',Draguş:'RO',Banzai:'CD',Nwakaemi:'NG',Zubkof:'UA',
+ Drongel:'NL',Şatka:'SK',Tomason:'IS',Nçam:'FR',Makumbu:'CG',Holsen:'DK',Kulibali:'ML',Muandil:'TD',Posiadalı:'PL',Borevkoviç:'HR',
+ Brenvik:'NO',Mourão:'PT',Dialé:'SN',Vrebac:'RS',Saldivo:'AR',Feldtner:'DE',Amensah:'GH',Stanković:'HR',Quintela:'BR',Okafar:'NG',Brandvoll:'NO',Pellucchi:'IT',Obéri:'CI',Jelinko:'CZ',Teixal:'PT',Norrbeck:'SE',Benaddo:'MA',Hronik:'CZ'};
+const flagOf=cc=>String.fromCodePoint(...[...cc].map(ch=>127397+ch.charCodeAt(0)));
+const flag=p=>flagOf(p.nat);
 const CACHE={};
 function squad(season,c){
   const key=season+'-'+c; if(CACHE[key])return CACHE[key];
@@ -330,7 +427,7 @@ function squad(season,c){
   else { const r=rngF(hash(key)),st=strength(season,c),base=Math.round(66+st.q*10),seen=new Set();
     list=GENPOS.map((pos,i)=>{let name;do{name=r()<.3?FOR[Math.floor(r()*FOR.length)]:TR_F[Math.floor(r()*TR_F.length)]+' '+TR_L[Math.floor(r()*TR_L.length)];}while(seen.has(name));seen.add(name);
       return {id:key+':'+i,pos,name,ovr:base+(i>10?-3:0)+Math.round((r()-.5)*6),y:FOR.includes(name)};}); }
-  list.forEach(p=>{p.g=GRP[p.pos];p.num=num(p.pos);const w=p.name.split(' ');p.short=w.length>1?w[0][0]+'. '+w.slice(1).join(' '):p.name;
+  list.forEach(p=>{p.nat=p.y?(NAT[p.name.split(' ').pop()]||'EU'):'TR';p.g=GRP[p.pos];p.num=num(p.pos);const w=p.name.split(' ');p.short=w.length>1?w[0][0]+'. '+w.slice(1).join(' '):p.name;
     p.att=p.g==='G'?10:p.g==='D'?p.ovr-16:p.g==='M'?p.ovr-4:p.ovr+3; p.def=p.g==='G'?p.ovr:p.g==='D'?p.ovr+2:p.g==='M'?p.ovr-3:p.ovr-28;});
   return CACHE[key]=list;
 }
@@ -366,23 +463,30 @@ function foreignCount(list,ids){return ids.filter(id=>list.find(p=>p.id===id).y)
 
 /* ---------- maç motoru (tohumlu) ---------- */
 const WA={G:0,D:.15,M:.35,A:.5},WD={G:.5,D:.4,M:.25,A:.05};
+let DOM=1.45,FAT=.45,GBASE=1.18; // DOM: güçlü-zayıf farkını açar (Poisson ortalamaya çeker), FAT: yorgunluğun etkisi
 function staOf(S,id,m){return clamp(S.sta0[id]-0.5*(m-(S.entry[id]||0)),25,100);}
 function sideQ(S,m){
   let a=0,d=0;
-  S.xi.forEach((id,k)=>{ if(!id)return; const p=S.P[id], f=.68+.32*staOf(S,id,m)/100;
+  S.xi.forEach((id,k)=>{ if(!id)return; const p=S.P[id], f=1-FAT+FAT*staOf(S,id,m)/100;
     const off=SLOTS[k][1].includes(p.pos)?1:(k===0)!==(p.g==='G')?.5:.88;
     a+=p.att*f*WA[p.g]*off; d+=p.def*f*WD[p.g]*off; });
   return {a,d};
 }
-function makeSide(season,c,xi,bench,cond){
-  const list=squad(season,c),P={},sta0={},full={};
-  list.forEach(p=>{P[p.id]=p;sta0[p.id]=cond?(cond[p.id]??100):100;full[p.id]=100;});
-  const S={c,xi:xi.slice(),bench:bench.slice(),P,sta0,entry:{},subs:5,tac:0,str:strength(season,c)};
-  S.base=sideQ({...S,sta0:full},0); return S;
+/* referans güç: kulübün gerçek kadrosunun en iyi 11'i. Zayıf 11 ya da transfer bu referansa göre etki eder */
+const BASE={};
+function baseOf(season,c){
+  const k=season+c; if(BASE[k])return BASE[k];
+  const list=squad(season,c),P={},sta0={}; list.forEach(p=>{P[p.id]=p;sta0[p.id]=100;});
+  return BASE[k]=sideQ({xi:bestXI(list),P,sta0,entry:{}},0);
+}
+function makeSide(season,c,xi,bench,cond,list=squad(season,c)){
+  const P={},sta0={};
+  list.forEach(p=>{P[p.id]=p;sta0[p.id]=cond?100-(100-(cond[p.id]??100))*.5:100;}); // haftalık yorgunluğun yarısı maça taşınır
+  return {c,xi:xi.slice(),bench:bench.slice(),P,sta0,entry:{},subs:5,tac:0,str:strength(season,c),base:baseOf(season,c)};
 }
 function lam(M,s,m){
   const A=M.sides[s],B=M.sides[s==='h'?'a':'h'],qa=sideQ(A,m),qb=sideQ(B,m);
-  let l=(1.42/90)*(s==='h'?1.1:.9)*A.str.att*B.str.def*Math.pow(qa.a/A.base.a,3)*Math.pow(B.base.d/qb.d,3);
+  let l=(GBASE/90)*(s==='h'?1.1:.9)*Math.pow(A.str.att*B.str.def,DOM)*Math.pow(qa.a/A.base.a,3)*Math.pow(B.base.d/qb.d,3);
   if(A.tac===1)l*=1.25; if(A.tac===-1)l*=.72; if(B.tac===1)l*=1.18; if(B.tac===-1)l*=.78;
   return l;
 }
@@ -429,12 +533,12 @@ function aiActs(M,s){
 }
 const FLAV=['ortadan çıkıyor','sağ kanattan yükleniyor','topu ayağında tutuyor','baskıyı artırdı','kontra ataklarla tehlikeli','duran topta etkili'];
 function newMatch(o){
-  // o: {season,h,a,you,seed,xi,bench,cond,sideXI,replay:{side,acts}}
+  // o: {season,h,a,you,seed,xi,bench,cond,lists,sideXI,replay:{side,acts}}
   const sides={};
-  for(const s of ['h','a']){ const c=o[s], list=squad(o.season,c), mine=o.you===s, cond=mine?o.cond:null;
+  for(const s of ['h','a']){ const c=o[s], list=(o.lists&&o.lists[s])||squad(o.season,c), mine=o.you===s, cond=mine?o.cond:null;
     const xi=mine&&o.xi?o.xi:(o.sideXI&&o.sideXI[s])||bestXI(list,cond);
     const bench=mine&&o.bench?o.bench:benchFor(list,xi,cond);
-    sides[s]=makeSide(o.season,c,xi,bench,cond); }
+    sides[s]=makeSide(o.season,c,xi,bench,cond,list); }
   return {o,sides,m:0,gh:0,ga:0,r:rngF(o.seed),acts:[],done:false,reactUsed:false,scorers:[]};
 }
 function pickScorer(M,s){
@@ -457,65 +561,182 @@ function step(M){
 }
 function simToEnd(M){ while(!M.done){ step(M); const y=M.o.you; if(y&&!M.done)for(const a of aiActs(M,y))applyAct(M,y,a); } return M; }
 
-/* ---------- canlı maç ekranı ---------- */
-let LIVE=null,tick=null,speed=1;
-const DEC_AT=[46,63,78];
+/* ---------- canlı maç: dakikalar akar, karar anlarında kart eli açılır ---------- */
+const SLOT=[[50,91],[86,66],[65,73],[35,73],[14,66],[66,52],[34,52],[85,32],[50,37],[15,32],[50,21]];
+const MOMENTS=[46,60,70,80], DEC_SEC=20;
+let LIVE=null;
+const sig=d=>d.k==='sub'?'s'+d.o+'>'+d.i:d.k==='tac'?'t'+d.v:'w';
+const actOf=(d,m)=>d.k==='sub'?{k:'sub',o:d.o,i:d.i,m}:{k:'tac',v:d.v,m};
+const tacName=v=>v===1?'Hücum':v===-1?'Kapalı':'Dengeli';
 function playMatch(o,onEnd){
-  const M=newMatch(o); LIVE={M,onEnd,pending:false,timer:null};
-  show('match'); $('#mFeed').innerHTML=''; speed=store.get('fdSpeed',1); $('#mSpeed').textContent='Hız ×'+speed;
-  drawBoard(); addLine(0,'Hakem başlama düdüğünü çaldı.'); whistle(); run();
+  const M=newMatch(o); M.dec=[];
+  LIVE={M,onEnd,mode:'play',sel:null,custom:null,outSel:null,opts:[],timer:null,run:null,fast:false,react:false};
+  show('match'); $('#feed').innerHTML=''; evChip(0,'Başlama düdüğü'); whistle();
+  drawAll(); ffTo(MOMENTS[0]);
 }
-function run(){ clearInterval(tick); tick=setInterval(frame,speed===2?140:290); }
-function frame(){
-  if(!LIVE||LIVE.pending)return; const M=LIVE.M, you=M.o.you;
-  const ev=step(M);
-  for(const e of ev){
-    const S=e.s&&M.sides[e.s], tn=e.s&&cname(S.c);
-    if(e.t==='goal'){ addLine(M.m,`GOL! ${e.p.short} (${tn}) · ${M.gh}-${M.ga}`,'goal'); toast('Gol'); beep(e.s===you?880:220,.25,'sawtooth',.05); buzz(e.s===you?[40,40,80]:120); M.scorers.push({m:M.m,s:e.s,n:e.p.short});
-      if(you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!DEC_AT.some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;M.forceDec='Gol yedik!';} }
-    else if(e.t==='chance')addLine(M.m,`${e.p.short} şutunu çekti, ${Math.random()<.5?'kaleci çıkardı':'top az farkla dışarıda'}.`);
-    else if(e.t==='act'){ const a=e.a; if(a.k==='sub')addLine(M.m,`${tn}: ${S.P[a.i].short} girdi, ${S.P[a.o].short} çıktı.`);
-      else addLine(M.m,`${tn} ${a.v===1?'hücuma geçti':a.v===-1?'kapandı':'dengeye döndü'}.`); }
-    else if(e.t==='ht'){addLine(45,`İlk yarı bitti: ${M.gh}-${M.ga}`);whistle();}
-  }
-  if(M.m%9===0&&!ev.length){ const s=M.lh>M.la?'h':'a'; addLine(M.m,`${cname(M.sides[s].c)} ${FLAV[Math.floor(Math.random()*FLAV.length)]}.`); }
-  drawBoard();
-  if(M.done){ clearInterval(tick); addLine(90,`Maç bitti: ${M.gh}-${M.ga}`); whistle(); const L=LIVE; setTimeout(()=>L.onEnd(M),1000); return; }
-  if(you&&(DEC_AT.includes(M.m)||M.forceDec)){ const title=M.forceDec||(M.m===46?'Devre arası':`${M.m}. dakika`); M.forceDec=null; decide(title); }
+function nextTarget(m){ return MOMENTS.find(x=>x>m)||90; }
+function ffTo(target){
+  const L=LIVE; L.mode='play'; L.target=target; L.fast=false; drawAll();
+  const you=L.M.o.you;
+  const tickF=()=>{
+    if(LIVE!==L||L.mode!=='play')return; const M=L.M; let pause=0;
+    for(const e of step(M)){
+      const S=e.s&&M.sides[e.s];
+      if(e.t==='goal'){ M.scorers.push({m:M.m,s:e.s,n:e.p.short}); evChip(M.m,`<span class="ico ball"></span>${cshort(S.c)} gol: ${esc(e.p.short)} (${M.gh}-${M.ga})`,'goal',true);
+        toast('Gol'); beep(e.s===you?880:220,.25,'sawtooth',.05); buzz(e.s===you?[40,40,80]:120); pause=900;
+        if(you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!MOMENTS.some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;L.react=true;} }
+      else if(e.t==='act'){ const a=e.a; evChip(M.m,a.k==='sub'?`<span class="ico sub">⇅</span>${cshort(S.c)}: ${esc(S.P[a.i].short)} girdi, ${esc(S.P[a.o].short)} çıktı`:`${cshort(S.c)} ${a.v===1?'hücuma geçti':a.v===-1?'kapandı':'dengeye döndü'}`,'',true); }
+      else if(e.t==='ht'){ evChip(45,`İlk yarı ${M.gh}-${M.ga}`,'',false); whistle(); pause=Math.max(pause,500); }
+    }
+    drawBoard(); drawPitch(); drawHand(); drawAct();
+    if(M.done){ evChip(90,`Maç bitti ${M.gh}-${M.ga}`,'',false); whistle(); setTimeout(()=>{ if(LIVE===L){ LIVE=null; L.onEnd(M); } },1200); return; }
+    if(M.m>=L.target||L.react){ const t=L.react?'Gol yedik!':M.m===46?'Devre arası':`${M.m}. dakika`; L.react=false; setTimeout(()=>{ if(LIVE===L)moment(t); },pause||300); return; }
+    L.run=setTimeout(tickF,pause||(L.fast?15:85));
+  };
+  L.run=setTimeout(tickF,350);
 }
-function addLine(m,t,cls=''){
-  const f=$('#mFeed'),d=document.createElement('div'); d.className='line '+cls; d.innerHTML=`<b>${m}'</b><span>${esc(t)}</span>`;
-  f.prepend(d); while(f.children.length>7)f.lastChild.remove();
+function evChip(m,html,cls='',live=true){
+  const f=$('#feed'),d=document.createElement('div'); d.className='ev '+cls; d.innerHTML=`<b>${m}'</b>${html}`;
+  f.prepend(d); while(f.children.length>14)f.lastChild.remove(); f.scrollLeft=0;
 }
+function drawAll(){ drawBoard(); drawPitch(); drawHand(); drawAct(); }
 function drawBoard(){
   const M=LIVE.M,h=M.sides.h,a=M.sides.a,you=M.o.you;
-  $('#mBoard').innerHTML=`<div class="bt ${you==='h'?'me':''}">${kit(h.c)}<span>${cname(h.c)}</span></div><div class="sc"><b>${M.gh}-${M.ga}</b><em>${M.m}'</em></div><div class="bt ${you==='a'?'me':''}">${kit(a.c)}<span>${cname(a.c)}</span></div>`;
-  const lh=M.lh||lam(M,'h',M.m),la=M.la||lam(M,'a',M.m),ph=Math.round(100*lh/(lh+la));
-  $('#mMom').innerHTML=`<span>BASKI %${ph}</span><div class="pb"><i style="width:${ph}%"></i></div><span>%${100-ph}</span>`;
-  const b=$('#mBall'); b.style.left=clamp(50+(ph-50)*1.4+((M.m*37)%23-11),8,92)+'%'; b.style.top=(28+((M.m*53)%44))+'%';
-  if(you){const S=M.sides[you];$('#mTac').textContent=S.tac===1?'Hücum':S.tac===-1?'Kapalı':'Dengeli';$('#mTac').className='chip'+(S.tac?' on':'');$('#mSubs').textContent=`${S.subs} değişiklik`;}
+  const tag=s=>s===you?`Sen · ${tacName(M.sides[s].tac)}`:'Rakibi gör ›';
+  $('#board').innerHTML=`<button class="bteam ${you==='h'?'me':''}" data-s="h">${kit(h.c)}<span>${cname(h.c)}<small>${tag('h')}</small></span></button>
+    <div class="bscore"><b>${M.gh} - ${M.ga}</b><em>${M.m}'</em></div>
+    <button class="bteam r ${you==='a'?'me':''}" data-s="a"><span>${cname(a.c)}<small>${tag('a')}</small></span>${kit(a.c)}</button>`;
+  $('#board').querySelectorAll('.bteam').forEach(b=>b.onclick=()=>{ if(b.dataset.s!==you)oppSheet(b.dataset.s); });
 }
-function decide(title){
-  const M=LIVE.M,s=M.o.you,c=choices(M,s),S=M.sides[s];
-  LIVE.pending=true; beep(520,.1); buzz(30);
-  const diff=s==='h'?M.gh-M.ga:M.ga-M.gh, tired=S.xi.filter(id=>staOf(S,id,M.m)<60).length;
-  const d=document.createElement('div'); d.className='deck';
-  d.innerHTML=`<div class="dcard"><div class="foot" style="align-items:flex-end"><h3 class="disp">${esc(title)}</h3><span class="lbl">${M.gh}-${M.ga} · ${diff>0?'öndesin':diff<0?'geridesin':'berabere'}</span></div>
-    <p>${tired?`${tired} oyuncun yoruldu. `:''}${S.subs?`${S.subs} değişiklik hakkın var.`:'Değişiklik hakkın bitti.'}</p>
-    ${c.map((x,i)=>{const fx=effect(M,s,x);return `<button class="opt ${i===0?'main':''}" data-i="${i}"><b>${esc(x.t)}</b><small>${esc(x.d)}</small><span class="fx">${fx?`<span class="${fx.g>=0?'up':'dn'}">Gol şansı ${fx.g>=0?'+':''}${fx.g}%</span><br><span class="${fx.r<=0?'up':'dn'}">Yeme riski ${fx.r>=0?'+':''}${fx.r}%</span>`:''}</span></button>`;}).join('')}
-    <div class="dtimer"><i id="dt"></i></div></div>`;
-  $('#app').appendChild(d);
-  const T=d.querySelector('#dt'); T.style.transition='transform 8s linear'; requestAnimationFrame(()=>requestAnimationFrame(()=>T.style.transform='scaleX(0)'));
-  const pick=i=>{ clearTimeout(LIVE.timer); d.remove(); const x=c[i]; beep(700,.06); buzz(10);
-    if(x.k!=='wait'){ const act=x.k==='sub'?{k:'sub',o:x.o,i:x.i,m:M.m}:{k:'tac',v:x.v,m:M.m};
-      if(applyAct(M,s,act)){ M.acts.push(act); const tn=cname(S.c);
-        addLine(M.m,act.k==='sub'?`${tn}: ${S.P[act.i].short} girdi, ${S.P[act.o].short} çıktı.`:`${tn} ${act.v===1?'hücuma geçti':act.v===-1?'kapandı':'dengeye döndü'}.`,'me'); } }
-    else addLine(M.m,'Değişiklik yok, oyun devam.','me');
-    drawBoard(); LIVE.pending=false; };
-  d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.i));
-  LIVE.timer=setTimeout(()=>pick(c.length-1),8000);
+function situation(){
+  const M=LIVE.M,s=M.o.you,S=M.sides[s],O=M.sides[s==='h'?'a':'h'],diff=s==='h'?M.gh-M.ga:M.ga-M.gh,c=[];
+  c.push(['',diff>0?`${diff} gol öndesin`:diff<0?`${-diff} gol geridesin`:'Skor eşit']);
+  c.push(['',`${S.subs} değişiklik hakkı`]);
+  const tired=S.xi.filter(id=>staOf(S,id,M.m)<60).length; if(tired)c.push(['warn',`${tired} oyuncu yorgun`]);
+  if(S.tac)c.push(['warn',tacName(S.tac)+' oyun']);
+  if(O.tac===1)c.push(['warn','Rakip hücumda']); else if(O.tac===-1)c.push(['','Rakip kapandı']);
+  return c.map(([k,t])=>`<span class="chip ${k}">${t}</span>`).join('');
 }
-$('#mSpeed').onclick=()=>{speed=speed===1?2:1;store.set('fdSpeed',speed);$('#mSpeed').textContent='Hız ×'+speed;run();};
+function drawPitch(){
+  const L=LIVE,M=L.M,s=M.o.you,S=M.sides[s];
+  const sel=L.mode==='dec'&&L.sel&&L.sel.k==='sub'?L.sel:null;
+  let h=`<svg class="lines" viewBox="0 0 100 150" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#15215c" stroke-width=".9" opacity=".9">
+    <rect x="4" y="4" width="92" height="142"/><line x1="4" y1="75" x2="96" y2="75"/><circle cx="50" cy="75" r="12"/>
+    <rect x="24" y="4" width="52" height="20"/><rect x="38" y="4" width="24" height="8"/><rect x="24" y="126" width="52" height="20"/><rect x="38" y="138" width="24" height="8"/></g></svg><div class="sit">${situation()}</div>`;
+  S.xi.forEach((id,k)=>{ let p=S.P[id],cls=''; const [x,y]=SLOT[k];
+    if(sel&&sel.o===id){p=S.P[sel.i];cls=' in';} if(L.outSel===id)cls=' sel';
+    const sta=sel&&sel.o===id?100:staOf(S,id,M.m);
+    h+=`<button class="tok${cls}" style="left:${x}%;top:${y}%" data-id="${id}" aria-label="${esc(p.name)}">${kit(S.c,p.num)}<span class="ov">${p.ovr}</span><span class="fl">${flag(p)}</span>
+      <span class="nm">${esc(p.short)}</span><span class="sta"><i class="${sta<60?'low':''}" style="width:${sta}%"></i></span></button>`; });
+  $('#pitch').innerHTML=h;
+  $('#pitch').querySelectorAll('.tok').forEach(b=>b.onclick=()=>playerSheet(b.dataset.id));
+}
+function cardHTML(d,tag){
+  const M=LIVE.M,s=M.o.you,S=M.sides[s],tm=tag?`<i>${tag}</i>`:'';
+  const fx=effect(M,s,d), fxh=fx?`<div class="fx"><span class="${fx.g>=0?'up':'dn'}">Gol şansı ${fx.g>=0?'+':''}${fx.g}%</span><br><span class="${fx.r<=0?'up':'dn'}">Yeme riski ${fx.r>=0?'+':''}${fx.r}%</span></div>`:'';
+  if(d.k==='sub'){ const o=S.P[d.o],i=S.P[d.i];
+    return `<div class="kind">${esc(d.t)}${tm}</div>
+      <div class="prow"><span class="arr dn">▼</span>${kit(S.c,o.num)}<div class="pn">${esc(o.short)}<small>${flag(o)} ${o.pos} · %${Math.round(staOf(S,o.id,M.m))}</small></div></div>
+      <div class="prow"><span class="arr up">▲</span>${kit(S.c,i.num)}<div class="pn">${esc(i.short)}<small>${flag(i)} ${i.pos} · Güç ${i.ovr}</small></div></div>${fxh}`; }
+  if(d.k==='wait')return `<div class="kind">Bekle${tm}</div><div class="big">Devam</div><div class="txt">Değişiklik yok. Takım böyle devam etsin.</div>`;
+  return `<div class="kind">Taktik${tm}</div><div class="big">${esc(d.t)}</div><div class="txt">${esc(d.d)}</div>${fxh}`;
+}
+function drawHand(){
+  const L=LIVE,M=L.M,S=M.sides[M.o.you],box=$('#hand');
+  if(L.mode!=='dec'){
+    const nx=L.target||90;
+    box.innerHTML=`<div class="pcard live make"><div class="big">${M.m}'</div><div class="txt">${M.done?'Maç bitti':nx>=90?'Son dakikalar oynanıyor':`Maç oynanıyor. Sonraki karar ${nx}'`}</div></div>`;
+    $('#hint').textContent='Rakibin dizilişini görmek için skorbordda adına dokun.'; return;
+  }
+  box.innerHTML='';
+  const list=(L.custom?[L.custom]:[]).concat(L.opts);
+  list.forEach(d=>{ const el=document.createElement('button'); el.type='button'; el.className='pcard'+(L.sel&&sig(L.sel)===sig(d)?' on':'');
+    el.innerHTML=cardHTML(d,d.mine?'Senin':''); el.onclick=()=>{ L.sel=L.sel&&sig(L.sel)===sig(d)?null:d; beep(L.sel?620:400,.05); buzz(8); drawHand(); drawPitch(); drawAct(); }; box.appendChild(el); });
+  if(S.subs>0){ const mk=document.createElement('button'); mk.type='button'; mk.className='pcard make';
+    mk.innerHTML='<div class="big">Kendi kartın</div><div class="txt">Sahadan bir oyuncuya dokun, yerine kimin gireceğini seç.</div>';
+    mk.onclick=()=>{ $('#hint').textContent='Çıkacak oyuncuya dokun.'; $('#pitch').animate([{transform:'scale(1)'},{transform:'scale(1.02)'},{transform:'scale(1)'}],{duration:300}); };
+    box.appendChild(mk); }
+  $('#hint').textContent=L.sel?'Kartın seçili. Kararı ver.':'Bir kart seç ya da oyuncuya dokunup kendi değişikliğini yap.';
+}
+function drawAct(){
+  const L=LIVE,b=$('#bDecide');
+  if(L.mode==='dec'){ b.textContent='Kararı ver'; b.disabled=!L.sel; }
+  else { b.textContent='Atla ›'; b.disabled=L.mode!=='play'||L.fast||L.M.done;
+    $('#tlbl').textContent=L.M.done?'Maç bitti':`${L.M.m}' · ${L.target>=90?'maç sonuna':'karar anına'} gidiliyor`;
+    const T=$('#tbar'); T.style.transition='none'; T.style.transform=`scaleX(${L.M.m/90})`; }
+}
+$('#bDecide').onclick=()=>{ const L=LIVE; if(!L)return; if(L.mode==='play'){ L.fast=true; beep(500,.05); drawAct(); } else if(L.mode==='dec')decide(); };
+function moment(title){
+  const L=LIVE,M=L.M,s=M.o.you; L.mode='dec'; L.sel=null; L.custom=null; L.outSel=null; L.title=title;
+  L.opts=choices(M,s); L.no=(L.no||0)+1;
+  beep(520,.1); buzz(30); toast(title==='Gol yedik!'?'Gol yedik':M.m+"'"); drawAll(); $('#hand').scrollLeft=0;
+  clearInterval(L.timer); let left=DEC_SEC; const T=$('#tbar');
+  T.style.transition='none'; T.style.transform='scaleX(1)'; void T.offsetWidth; T.style.transition=`transform ${DEC_SEC}s linear`; T.style.transform='scaleX(0)';
+  const lbl=()=>$('#tlbl').textContent=`${title} · ${left} sn`; lbl();
+  L.timer=setInterval(()=>{ if(LIVE!==L){clearInterval(L.timer);return;} left--; lbl(); if(left<=5&&left>0)beep(880,.05);
+    if(left<=0){ clearInterval(L.timer); if(!L.sel)L.sel=L.opts[L.opts.length-1]; decide(); } },1000);
+}
+/* kararın değeri: aynı rastgele sayılarla her kart için maçın kalanı 150 kez oynanır */
+function mc(M,s,d,n=150){
+  let w=0,ep=0; const base=hash(M.o.seed+':'+M.m);
+  for(let k=0;k<n;k++){ const C=cloneM(M); C.r=rngF(base+k*7919); if(d.k!=='wait')applyAct(C,s,actOf(d,C.m));
+    while(!C.done)step(C); const my=s==='h'?C.gh:C.ga,op=s==='h'?C.ga:C.gh; if(my>op){w++;ep+=3;}else if(my===op)ep+=1; }
+  return {w:w/n,ep:ep/n};
+}
+const cardLabel=(d,S)=>d.k==='sub'?`${d.mine?'Senin kartın':d.t}: ${S.P[d.i].short}`:d.k==='wait'?'Devam':d.t;
+function decide(){
+  const L=LIVE; if(!L||L.mode!=='dec'||!L.sel)return; clearInterval(L.timer); L.mode='eval'; whistle(); buzz([20,40,20]);
+  const M=L.M,s=M.o.you,S=M.sides[s],sel=L.sel;
+  const cands=(L.custom?[L.custom]:[]).concat(L.opts);
+  const ev=cands.map(d=>({d,...mc(M,s,d)})), mine=ev.find(x=>sig(x.d)===sig(sel));
+  const hi=Math.max(...ev.map(x=>x.ep)),lo=Math.min(...ev.map(x=>x.ep));
+  const pts=hi-lo<0.02?70:Math.round(30+70*(mine.ep-lo)/(hi-lo)), best=ev.slice().sort((a,b)=>b.ep-a.ep)[0];
+  if(sel.k!=='wait'){ const act=actOf(sel,M.m); if(applyAct(M,s,act)){ M.acts.push(act);
+    evChip(M.m,act.k==='sub'?`<span class="ico sub">⇅</span>Sen: ${esc(S.P[act.i].short)} girdi, ${esc(S.P[act.o].short)} çıktı`:`Sen: ${tacName(act.v).toLowerCase()} oyun`,'me'); } }
+  else evChip(M.m,'Sen: değişiklik yok','me');
+  M.dec.push({m:M.m,t:cardLabel(sel,S),pts});
+  const pct=x=>Math.round(x*100);
+  const sh=document.createElement('div'); sh.className='sheet';
+  sh.innerHTML=`<div class="in"><h3 class="disp">Kararının etkisi</h3>
+    <div class="lbl" style="opacity:.8">Bu andan maç sonuna kazanma ihtimali</div>
+    ${ev.map(x=>`<div class="prob ${x===mine?'mine':''}"><span>${x===mine?'▶ ':''}${esc(cardLabel(x.d,S))}</span><span class="bar"><i style="width:${pct(x.w)}%"></i></span><b>%${pct(x.w)}</b></div>`).join('')}
+    <div class="note">${hi-lo<0.02?'Kartların hepsi aşağı yukarı aynı sonucu veriyordu.':best===mine?'En iyi kartı seçtin.':`En iyi kart: ${esc(cardLabel(best.d,S))}.`}</div>
+    <div class="total"><span class="lbl">Karar puanı</span><b>${pts}</b></div>
+    <div class="foot"><span></span><button class="btn" data-n>${M.m>=80?'Maçı bitir':'Devam'}</button></div></div>`;
+  $('#app').appendChild(sh);
+  if(pts>=90)setTimeout(()=>toast('Süper karar'),200);
+  sh.querySelector('[data-n]').onclick=()=>{ sh.remove(); beep(520); if(LIVE===L)ffTo(nextTarget(M.m)); };
+  drawAll();
+}
+function playerSheet(id){
+  const L=LIVE,M=L.M,s=M.o.you,S=M.sides[s],p=S.P[id],dec=L.mode==='dec';
+  if(dec){L.outSel=id;drawPitch();}
+  const canSub=dec&&S.subs>0;
+  const sh=document.createElement('div'); sh.className='sheet';
+  sh.innerHTML=`<div class="in"><div class="pinfo">${kit(S.c,p.num)}<div><h3 class="disp">${esc(p.name)}</h3><div>${flag(p)} ${p.pos}${p.y?' · Yabancı':''}</div></div></div>
+    <div class="stats"><div class="stat"><b>${p.ovr}</b><span>Güç</span></div><div class="stat"><b>%${Math.round(staOf(S,id,M.m))}</b><span>Kondisyon</span></div>
+    <div class="stat"><b>${M.scorers.filter(g=>g.s===s&&g.n===p.short).length}</b><span>Gol</span></div><div class="stat"><b>${S.subs}</b><span>Hak</span></div></div>
+    ${canSub?`<div class="lbl" style="color:var(--yellow)">Yerine kim girsin?</div>${S.bench.map(b=>{const q=S.P[b],dis=(q.g==='G')!==(p.g==='G');
+      return `<button class="bp" data-b="${b}" ${dis?'disabled':''}>${kit(S.c,q.num)}<div><div style="font-weight:700">${flag(q)} ${esc(q.name)}</div><small>${q.pos}${q.y?' · Yabancı':''}</small></div><b>${q.ovr}</b></button>`;}).join('')}`
+      :`<div class="note">${dec?'Değişiklik hakkın bitti.':'Değişikliği karar anında yapabilirsin.'}</div>`}
+    <div class="foot"><span></span><button class="btn ghost" data-x>Kapat</button></div></div>`;
+  const close=()=>{sh.remove();L.outSel=null;if(LIVE===L)drawPitch();};
+  sh.onclick=e=>{if(e.target===sh||e.target.closest('[data-x]'))close();};
+  sh.querySelectorAll('.bp').forEach(b=>b.onclick=()=>{ const q=S.P[b.dataset.b];
+    const d={k:'sub',o:id,i:q.id,t:'Senin kartın',d:`${q.short} girsin, ${p.short} çıksın`,mine:1};
+    L.custom=d; L.sel=d; close(); beep(700,.06); buzz(10); drawHand(); drawPitch(); drawAct(); $('#hand').scrollTo({left:0,behavior:'smooth'}); });
+  $('#app').appendChild(sh);
+}
+function oppSheet(side){
+  const M=LIVE.M,S=M.sides[side];
+  const sh=document.createElement('div'); sh.className='sheet';
+  const row=(id,lbl)=>{const p=S.P[id];return `<div class="bp ro">${kit(S.c,p.num)}<div><div style="font-weight:700">${flag(p)} ${esc(p.name)}</div><small>${lbl} · %${Math.round(staOf(S,id,M.m))} kondisyon</small></div><b>${p.ovr}</b></div>`;};
+  sh.innerHTML=`<div class="in"><div class="pinfo">${kit(S.c)}<div><h3 class="disp">${cname(S.c)}</h3><div>${tacName(S.tac)} oyun · ${S.subs} değişiklik hakkı</div></div></div>
+    ${S.xi.map((id,k)=>row(id,SLOTS[k][0])).join('')}<div class="lbl" style="opacity:.8">Yedekler</div>${S.bench.map(id=>row(id,S.P[id].pos)).join('')}
+    <div class="foot"><span></span><button class="btn ghost" data-x>Kapat</button></div></div>`;
+  sh.onclick=e=>{if(e.target===sh||e.target.closest('[data-x]'))sh.remove();};
+  $('#app').appendChild(sh);
+}
 
 /* ---------- sonuç ekranı ---------- */
 const ptsOf=(you,sc)=>{const my=you==='h'?sc[0]:sc[1],op=you==='h'?sc[1]:sc[0];return my>op?3:my===op?1:0;};
@@ -525,14 +746,16 @@ function resultScreen({M,real,title,extra='',onNext,nextLabel='Devam',onAgain}){
   const you=M.o.you, sc=[M.gh,M.ga], p=ptsOf(you,sc);
   const stars=(p===3?2:p)+(real&&realBetter(you,sc,real)?1:0);
   const el=$('#result'); show('result');
+  const dsum=M.dec&&M.dec.length?`<div class="panel"><div class="total" style="border:0;padding:0"><span class="lbl" style="color:var(--yellow)">Direktör puanı</span><b>${Math.round(M.dec.reduce((a,d)=>a+d.pts,0)/M.dec.length)}</b></div>
+    ${M.dec.map(d=>`<div class="wk" style="grid-template-columns:38px 1fr auto"><b>${d.m}'</b><span style="text-align:left">${esc(d.t)}</span><b>${d.pts}</b></div>`).join('')}</div>`:'';
   const gl=M.scorers.map(g=>`${g.m}' ${esc(g.n)} (${cshort(M.sides[g.s].c)})`).join(' · ')||'Gol yok';
   el.innerHTML=`<div class="top"><span class="lbl" style="color:var(--yellow)">${esc(title||'Maç sonu')}</span></div>
    <div class="scroll"><div class="res-teams"><div>${kit(M.sides.h.c)}<div class="t">${cname(M.sides.h.c)}</div></div><div class="big">${M.gh}-${M.ga}</div><div>${kit(M.sides.a.c)}<div class="t">${cname(M.sides.a.c)}</div></div></div>
    <div class="verdict">${p===3?'Galibiyet':p===1?'Beraberlik':'Mağlubiyet'}</div>
    <div class="stars">${[0,1,2].map(i=>i<stars?'★':'<i>★</i>').join('')}</div>
-   ${real?`<div class="cmp"><div><b>${M.gh}-${M.ga}</b><span>Senin maçın</span></div><div><b>${real[0]}-${real[1]}</b><span>Gerçekte</span></div></div>
+   ${real?`<div class="cmp"><div><b>${M.gh}-${M.ga}</b><span>Senin maçın</span></div><div style="background:var(--yellow);color:var(--navy)"><b>${real[0]}-${real[1]}</b><span>Gerçek skor</span></div></div>
      <div class="note" style="text-align:center">${realBetter(you,sc,real)?'Gerçekteki hocadan daha iyi sonuç aldın. Ekstra yıldız!':(real[0]===sc[0]&&real[1]===sc[1])?'Gerçekteki skorun aynısı.':ptsOf(you,real)>p?'Gerçekte bu maç daha iyi bitmişti.':'Gerçekteki sonuca yakın.'}</div>`:''}
-   <div class="gl">${gl}</div>${extra}</div>
+   <div class="gl">${gl}</div>${dsum}${extra}</div>
    <div class="foot">${onAgain?'<button class="btn ghost" id="rAgain">Tekrar</button>':''}<button class="btn" id="rNext">${esc(nextLabel)}</button></div>`;
   $('#rNext').onclick=()=>{beep(520);onNext();}; if(onAgain)$('#rAgain').onclick=()=>{beep(520);onAgain();};
   store.set('fdStreak',p===3?store.get('fdStreak',0)+1:0);
@@ -551,12 +774,26 @@ function fixtures(season){
 }
 let ST=null;
 const saveStory=()=>store.set('fdStory',ST);
-function newStory(season,team){ ST={season,team,week:0,played:{},cond:{},n:0}; saveStory(); hub(); }
+const SQUAD_MAX=28, SQUAD_MIN=16, LIST_FOREIGN=14;
+const getP=id=>{const [k,i]=id.split(':');return squad(k.slice(0,4),k.slice(5))[+i];};
+const clubOf=id=>id.split(':')[0].slice(5);
+function initRoster(){
+  if(ST.roster)return;
+  ST.roster=squad(ST.season,ST.team).map(p=>p.id); ST.budget=Math.round(8+22*strength(ST.season,ST.team).q); ST.num={}; ST.log=[];
+  for(const k in ST.played){const [h,a]=k.split('-'); if(h!==ST.team&&a!==ST.team)delete ST.played[k];}
+}
+function myList(){ return ST.roster.map(id=>{const p=getP(id); if(ST.num[id])p.num=ST.num[id]; return p;}); }
+function oppList(c){ const mine=new Set(ST.roster); return squad(ST.season,c).filter(p=>!mine.has(p.id)); }
+function newStory(season,team){ ST={season,team,week:0,played:{},cond:{},n:0}; initRoster(); saveStory(); hub(); }
+/* puan tablosu: diğer bütün maçlar gerçek sonuç. Bizim maçımızda rakip de gerçekteki sonucunu alır, sadece bizim puanımız değişir */
 function table(){
-  const t={};
+  const t={},fx=fixtures(ST.season),R=RESULTS[ST.season].res;
   RESULTS[ST.season].teams.forEach(c=>t[c]={c,p:0,gf:0,ga:0,pts:SEASONS[ST.season].ded[c]||0});
-  for(const key in ST.played){const [h,a]=key.split('-'),[x,y]=ST.played[key];
-    for(const [c,f,g] of [[h,x,y],[a,y,x]]){const T=t[c];T.p++;T.gf+=f;T.ga+=g;T.pts+=f>g?3:f===g?1:0;}}
+  const add=(c,f,g)=>{const T=t[c];T.p++;T.gf+=f;T.ga+=g;T.pts+=f>g?3:f===g?1:0;};
+  for(let w=0;w<ST.week&&w<fx.length;w++)for(const [h,a] of fx[w]){ const real=R[h+'-'+a];
+    if(h===ST.team||a===ST.team){ const my=ST.played[h+'-'+a]||real;
+      if(h===ST.team){add(h,my[0],my[1]);add(a,real[1],real[0]);} else {add(h,real[0],real[1]);add(a,my[1],my[0]);} }
+    else { add(h,real[0],real[1]); add(a,real[1],real[0]); } }
   return Object.values(t).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
 }
 function realPtsTo(week){
@@ -565,8 +802,12 @@ function realPtsTo(week){
   return pts;
 }
 const trow=(r,tb)=>`<tr class="${r.c===ST.team?'me':''}"><td>${tb.indexOf(r)+1}</td><td><span class="tk">${kit(r.c)}${cname(r.c)}</span></td><td class="n">${r.p}</td><td class="n">${r.gf-r.ga>0?'+':''}${r.gf-r.ga}</td><td class="n"><b>${r.pts}</b></td></tr>`;
+const money=v=>(Math.round(v*10)/10).toLocaleString('tr-TR')+' M€';
+const priceOf=p=>Math.max(.3,Math.round(1.6*Math.pow(1.19,p.ovr-70)*10)/10);
+const sellOf=p=>Math.round(priceOf(p)*.85*10)/10;
+function trWindow(){ const H=fixtures(ST.season).length/2; return ST.week<3?'Yaz transfer dönemi':ST.week>=H-1&&ST.week<H+2?'Devre arası transfer dönemi':''; }
 function hub(){
-  show('hub'); const fx=fixtures(ST.season), total=fx.length;
+  initRoster(); show('hub'); const fx=fixtures(ST.season), total=fx.length;
   const tb=table(), pos=tb.findIndex(r=>r.c===ST.team)+1, me=tb.find(r=>r.c===ST.team);
   $('#hubSeason').textContent=`${SEASONS[ST.season].label} · Hafta ${Math.min(ST.week+1,total)}/${total}`;
   $('#hubHead').innerHTML=`${kit(ST.team)}<div><h2 class="disp">${cname(ST.team)}</h2><span>Hedef: şampiyonluk</span></div>`;
@@ -574,29 +815,36 @@ function hub(){
   $('#hubKpi').innerHTML=`<div class="kpi"><b>${pos}.</b><span>Sıra</span></div><div class="kpi"><b>${me.pts}</b><span>Puan</span></div><div class="kpi"><b class="${diff>0?'plus':diff<0?'minus':''}">${diff>0?'+':''}${diff}</b><span>Gerçeğe göre</span></div>`;
   const top=tb.slice(0,5); if(pos>5)top.push(me);
   $('#hubTable').innerHTML=top.map(r=>trow(r,tb)).join('');
+  const win=trWindow();
+  $('#hubTr').innerHTML=`<div><b>Transfer</b><span>Bütçe ${money(ST.budget)} · Kadro ${ST.roster.length} · ${win||'Pencere kapalı'}</span></div><i>›</i>`;
+  const L=ST.last, last=L?`<div class="last">Geçen hafta ${cname(L.h)} – ${cname(L.a)}: sen <b>${L.my[0]}-${L.my[1]}</b>, gerçekte <b>${L.real[0]}-${L.real[1]}</b></div>`:'';
   if(ST.week>=total){ seasonEnd(tb,pos); return; }
   const m=fx[ST.week].find(([h,a])=>h===ST.team||a===ST.team);
-  if(!m){ $('#hubNext').innerHTML=`<div class="lbl">Hafta ${ST.week+1}</div><div style="font-size:15px">Bu hafta maçın yok. Kadron dinleniyor.</div>`;
+  if(!m){ $('#hubNext').innerHTML=`<div class="lbl">Hafta ${ST.week+1}</div><div style="font-size:15px">Bu hafta maçın yok. Kadron dinleniyor.</div>${last}`;
     $('#hubPlay').textContent='Haftayı geç'; $('#hubSim').hidden=true; return; }
   const [h,a]=m; $('#hubPlay').textContent='Maça çık'; $('#hubSim').hidden=false;
-  const tired=squad(ST.season,ST.team).filter(p=>(ST.cond[p.id]??100)<70).length;
+  const tired=myList().filter(p=>(ST.cond[p.id]??100)<70).length;
   $('#hubNext').innerHTML=`<div class="foot"><span class="lbl">Hafta ${ST.week+1} · ${h===ST.team?'İç saha':'Deplasman'}</span><span class="lbl" style="color:var(--mute)">${tired?tired+' yorgun oyuncu':'Kadro hazır'}</span></div>
-   <div class="vsrow"><div>${kit(h)}<b>${cname(h)}</b></div><div class="mid">VS</div><div>${kit(a)}<b>${cname(a)}</b></div></div>`;
+   <div class="vsrow"><div>${kit(h)}<b>${cname(h)}</b></div><div class="mid">VS</div><div>${kit(a)}<b>${cname(a)}</b></div></div>${last}`;
 }
 function weekDone(starters){
-  const fx=fixtures(ST.season),R=RESULTS[ST.season].res,st=new Set(starters||[]);
-  for(const [h,a] of fx[ST.week]) if(h!==ST.team&&a!==ST.team) ST.played[h+'-'+a]=R[h+'-'+a];
-  squad(ST.season,ST.team).forEach(p=>{const c=ST.cond[p.id]??100; ST.cond[p.id]=st.has(p.id)?clamp(c-14,40,100):clamp(c+16,40,100);});
+  const st=new Set(starters||[]);
+  myList().forEach(p=>{const c=ST.cond[p.id]??100; ST.cond[p.id]=st.has(p.id)?clamp(c-9,55,100):clamp(c+20,55,100);});
   ST.week++; ST.n++; saveStory();
 }
+function weekOthers(w){
+  const R=RESULTS[ST.season].res;
+  return `<div class="panel"><div class="lbl" style="color:var(--yellow);margin-bottom:4px">Haftanın diğer maçları · gerçek skorlar</div>${fixtures(ST.season)[w].filter(([h,a])=>h!==ST.team&&a!==ST.team).map(([h,a])=>{const r=R[h+'-'+a];
+    return `<div class="wk"><span>${cname(h)}</span><b>${r[0]}-${r[1]}</b><span>${cname(a)}</span></div>`;}).join('')}</div>`;
+}
 function playWeek(sim){
-  const m=fixtures(ST.season)[ST.week].find(([h,a])=>h===ST.team||a===ST.team);
+  const w=ST.week, m=fixtures(ST.season)[w].find(([h,a])=>h===ST.team||a===ST.team);
   if(!m){ weekDone([]); hub(); return; }
-  const [h,a]=m, you=h===ST.team?'h':'a', real=RESULTS[ST.season].res[h+'-'+a], list=squad(ST.season,ST.team);
+  const [h,a]=m, you=h===ST.team?'h':'a', opp=you==='h'?a:h, real=RESULTS[ST.season].res[h+'-'+a], list=myList();
   const xi=bestXI(list,ST.cond);
-  const o={season:ST.season,h,a,you,seed:hash(ST.season+h+a+ST.n),xi,bench:benchFor(list,xi,ST.cond),cond:ST.cond};
-  const finish=M=>{ ST.played[h+'-'+a]=[M.gh,M.ga]; weekDone(o.xi);
-    resultScreen({M,real,title:`Hafta ${ST.week} · ${SEASONS[ST.season].label}`,onNext:hub}); };
+  const o={season:ST.season,h,a,you,seed:hash(ST.season+h+a+ST.n),xi,bench:benchFor(list,xi,ST.cond),cond:ST.cond,lists:{[you]:list,[you==='h'?'a':'h']:oppList(opp)}};
+  const finish=M=>{ ST.played[h+'-'+a]=[M.gh,M.ga]; ST.last={h,a,my:[M.gh,M.ga],real}; weekDone(o.xi);
+    resultScreen({M,real,title:`Hafta ${w+1} · ${SEASONS[ST.season].label}`,extra:weekOthers(w),onNext:hub}); };
   if(sim){ finish(simToEnd(newMatch(o))); return; }
   lineup(o,()=>playMatch(o,finish),hub);
 }
@@ -608,16 +856,68 @@ function seasonEnd(tb,pos){
 }
 $('#hubPlay').onclick=()=>{beep(520); if(ST.week>=fixtures(ST.season).length){store.set('fdStory',null);pickScreen('story');return;} playWeek(false);};
 $('#hubSim').onclick=()=>{beep(400);playWeek(true);};
+$('#hubTr').onclick=()=>{beep(520);transfer();};
 $('#fullTbl').onclick=()=>{const tb=table(),sh=document.createElement('div');sh.className='sheet';
   sh.innerHTML=`<div class="in"><h3 class="disp">Puan durumu</h3><table class="tbl"><tr class="lbl"><td></td><td>Takım</td><td class="n">O</td><td class="n">Av</td><td class="n">P</td></tr>${tb.map(r=>trow(r,tb)).join('')}</table>
-  <div class="note">Diğer maçların hepsi gerçek sezon sonuçlarıdır. ${Object.entries(SEASONS[ST.season].ded).map(([c,v])=>`${cname(c)} ${v} puan ceza`).join(', ')} (gerçekteki gibi).</div><div class="foot"><button class="btn ghost" data-x>Kapat</button></div></div>`;
+  <div class="note">Diğer takımların bütün maçları gerçek sezon sonuçlarıdır. Senin maçında da rakip gerçekte aldığı sonucu alır, sadece senin puanın değişir. ${Object.entries(SEASONS[ST.season].ded).map(([c,v])=>`${cname(c)} ${v} puan ceza`).join(', ')} (gerçekteki gibi).</div><div class="foot"><span></span><button class="btn ghost" data-x>Kapat</button></div></div>`;
   sh.onclick=e=>{if(e.target===sh||e.target.closest('[data-x]'))sh.remove();}; $('#app').appendChild(sh);};
+
+/* ---------- transfer: sadece o sezonun Süper Lig kulüplerinden, bütçeyle ---------- */
+let TR={tab:'buy',f:'all'};
+const TRF=[['all','Hepsi'],['G','Kaleci'],['D','Defans'],['M','Orta saha'],['A','Forvet']];
+function transfer(){ show('transfer'); renderTr(); }
+function trCheck(p,buy){
+  if(!trWindow())return 'Transfer penceresi kapalı. Yaz döneminde ilk 3 hafta, devre arasında 3 hafta açık.';
+  const mine=myList();
+  if(buy){ const seller=oppList(clubOf(p.id));
+    if(ST.budget<priceOf(p))return 'Bütçen yetmiyor.';
+    if(mine.length>=SQUAD_MAX)return `Kadro dolu (en fazla ${SQUAD_MAX}). Önce oyuncu sat.`;
+    if(p.y&&mine.filter(x=>x.y).length>=LIST_FOREIGN)return `Kadroda en fazla ${LIST_FOREIGN} yabancı olabilir.`;
+    if(seller.length<=SQUAD_MIN)return `${cname(clubOf(p.id))} daha fazla oyuncu satmıyor.`;
+    if(p.g==='G'&&seller.filter(x=>x.g==='G').length<=2)return `${cname(clubOf(p.id))} kalecisini satmıyor.`;
+  } else {
+    if(mine.length<=SQUAD_MIN)return `Kadroda en az ${SQUAD_MIN} oyuncu kalmalı.`;
+    if(p.g==='G'&&mine.filter(x=>x.g==='G').length<=2)return 'En az 2 kalecin kalmalı.';
+  }
+  return '';
+}
+function renderTr(){
+  const mine=myList(), fc=mine.filter(p=>p.y).length, win=trWindow();
+  $('#trKpi').innerHTML=`<div class="kpi"><b style="font-size:24px">${money(ST.budget)}</b><span>Bütçe</span></div><div class="kpi"><b>${mine.length}/${SQUAD_MAX}</b><span>Kadro</span></div><div class="kpi"><b>${fc}/${LIST_FOREIGN}</b><span>Yabancı</span></div>`;
+  $('#trRule').innerHTML=win?`<b>${win} açık.</b> Sadece bu sezonun Süper Lig kulüplerinden alırsın. Sattığın oyuncu değerinin %85'ini getirir.`:`<b>Pencere kapalı.</b> Yaz döneminde ilk 3 hafta, devre arasında 3 hafta açık. Şimdi listeye göz atabilirsin.`;
+  $('#trTabs').innerHTML=[['buy','Oyuncu al'],['sell','Oyuncu sat']].map(([k,t])=>`<button class="tab ${TR.tab===k?'on':''}" data-t="${k}">${t}</button>`).join('');
+  $('#trF').innerHTML=TRF.map(([k,t])=>`<button class="${TR.f===k?'on':''}" data-f="${k}">${t}</button>`).join('');
+  document.querySelectorAll('#trTabs .tab').forEach(b=>b.onclick=()=>{TR.tab=b.dataset.t;beep(500,.04);renderTr();$('#trList').scrollTop=0;});
+  document.querySelectorAll('#trF button').forEach(b=>b.onclick=()=>{TR.f=b.dataset.f;beep(500,.04);renderTr();$('#trList').scrollTop=0;});
+  let rows;
+  if(TR.tab==='buy'){ rows=RESULTS[ST.season].teams.filter(c=>c!==ST.team).flatMap(c=>oppList(c)).filter(p=>TR.f==='all'||p.g===TR.f).sort((a,b)=>b.ovr-a.ovr||priceOf(a)-priceOf(b)).slice(0,80); }
+  else rows=mine.filter(p=>TR.f==='all'||p.g===TR.f).sort((a,b)=>b.ovr-a.ovr);
+  $('#trList').innerHTML=rows.map(p=>{ const c=clubOf(p.id), buy=TR.tab==='buy', pr=buy?priceOf(p):sellOf(p), no=buy&&pr>ST.budget;
+    return `<button class="pl ${no?'no':''}" data-id="${p.id}"><span class="pos">${p.pos}</span>${kit(buy?c:ST.team,p.num)}<span class="nm">${flag(p)} ${esc(p.name)}${p.y?'<span class="y">Y</span>':''}<small>${buy?cname(c):c===ST.team?'Kendi oyuncun':'Transfer: '+cname(c)}</small></span><span class="pr"><b>${p.ovr}</b><small>${money(pr)}</small></span></button>`;}).join('')||'<div class="note">Bu mevkide oyuncu yok.</div>';
+  document.querySelectorAll('#trList .pl').forEach(b=>b.onclick=()=>trSheet(getP(b.dataset.id),TR.tab==='buy'));
+}
+function trSheet(p,buy){
+  const c=clubOf(p.id), pr=buy?priceOf(p):sellOf(p), why=trCheck(p,buy);
+  const sh=document.createElement('div'); sh.className='sheet';
+  sh.innerHTML=`<div class="in"><div class="pinfo">${kit(buy?c:ST.team,p.num)}<div><h3 class="disp">${esc(p.name)}</h3><div>${flag(p)} ${p.pos}${p.y?' · Yabancı':''} · ${buy?cname(c):cname(ST.team)}</div></div></div>
+    <div class="stats"><div class="stat"><b>${p.ovr}</b><span>Güç</span></div><div class="stat" style="grid-column:span 2"><b>${money(pr)}</b><span>${buy?'Bonservis':'Satış geliri'}</span></div><div class="stat"><b>${money(ST.budget)}</b><span>Bütçe</span></div></div>
+    ${why?`<div class="rule">${esc(why)}</div>`:`<div class="note">${buy?`Bütçen ${money(ST.budget-pr)} kalır.`:`Bütçen ${money(ST.budget+pr)} olur.`}</div>`}
+    <div class="foot"><button class="btn ghost" data-x>Vazgeç</button><button class="btn" data-ok ${why?'disabled':''}>${buy?'Satın al':'Sat'}</button></div></div>`;
+  sh.onclick=e=>{if(e.target===sh||e.target.closest('[data-x]'))sh.remove();};
+  sh.querySelector('[data-ok]').onclick=()=>{ if(trCheck(p,buy))return;
+    if(buy){ ST.budget=Math.round((ST.budget-pr)*10)/10; ST.roster.push(p.id);
+      const used=new Set(myList().filter(x=>x.id!==p.id).map(x=>x.num)); let n=[...(NUM[p.pos]||[]),...Array.from({length:98},(_,i)=>i+2)].find(x=>!used.has(x)); ST.num[p.id]=n; p.num=n; }
+    else { ST.budget=Math.round((ST.budget+pr)*10)/10; ST.roster=ST.roster.filter(x=>x!==p.id); delete ST.num[p.id]; delete ST.cond[p.id]; }
+    ST.log.push({w:ST.week,id:p.id,buy}); saveStory(); sh.remove(); beep(buy?880:600,.12); buzz(20); toast(buy?'İmza':'Satıldı'); renderTr(); };
+  $('#app').appendChild(sh);
+}
+$('#trBack').onclick=()=>{beep(400);hub();};
 
 /* ---------- kadro ekranı ---------- */
 function lineup(o,go,back){
-  show('lineup'); const c=o[o.you], list=squad(o.season,c), cond=o.cond||{}, P=id=>list.find(p=>p.id===id);
+  show('lineup'); const c=o[o.you], list=(o.lists&&o.lists[o.you])||squad(o.season,c), cond=o.cond||{}, P=id=>list.find(p=>p.id===id);
   let sel=null;
-  const row=(p,pos,k,extra='')=>{const cv=cond[p.id]??100;return `<button class="pl ${extra}" data-k="${k}"><span class="pos">${pos}</span>${kit(c,p.num)}<span class="nm">${esc(p.name)}${p.y?'<span class="y">Y</span>':''}<small>Kondisyon %${Math.round(cv)}<span class="cond"><i class="${cv<60?'low':cv<80?'mid':''}" style="width:${cv}%"></i></span></small></span><b>${p.ovr}</b></button>`;};
+  const row=(p,pos,k,extra='')=>{const cv=cond[p.id]??100;return `<button class="pl ${extra}" data-k="${k}"><span class="pos">${pos}</span>${kit(c,p.num)}<span class="nm">${flag(p)} ${esc(p.name)}${p.y?'<span class="y">Y</span>':''}<small>Kondisyon %${Math.round(cv)}<span class="cond"><i class="${cv<60?'low':cv<80?'mid':''}" style="width:${cv}%"></i></span></small></span><b>${p.ovr}</b></button>`;};
   const render=()=>{
     o.bench=benchFor(list,o.xi,cond); const fc=foreignCount(list,[...o.xi,...o.bench]);
     $('#luRule').innerHTML=`<b>Yabancı kuralı:</b> maç kadrosunda en fazla ${FOREIGN_MAX} yabancı. Şu an <b>${fc}/${FOREIGN_MAX}</b>. ${sel==null?'Değiştirmek istediğin oyuncuya dokun.':'Yerine girecek oyuncuyu seç.'}`;
