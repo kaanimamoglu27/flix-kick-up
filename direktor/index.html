@@ -408,6 +408,23 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .hand.idle .pcard.live .big{font-size:26px;margin:0;}
 .hand.idle .pcard.live .txt{font-size:12.5px;text-align:left;}
 .pcard .kind{font-size:14px;}
+
+.shot{position:absolute;inset:0;z-index:6;background:repeating-linear-gradient(180deg,#c4161f 0 12.5%,#b8121b 12.5% 25%);animation:in .2s ease-out;}
+.shot svg{position:absolute;inset:0;width:100%;height:100%;}
+.scap{position:absolute;left:0;right:0;bottom:8px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.scap span{background:var(--navy);color:#fff;font-size:12px;font-weight:700;border-radius:6px;padding:2px 9px;}
+.scap b{font-size:34px;line-height:1;color:#fff;text-shadow:3px 3px 0 var(--navy);animation:stamp .3s ease-out;} .scap b.goal{color:var(--yellow);}
+.ctab .ch,.ctab .cs{display:grid;grid-template-columns:1fr 74px 74px;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1);}
+.ctab .ch span{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:center;} .ctab .ch .me{color:var(--yellow);}
+.ctab .cs span{font-size:13px;} .ctab .cs b{text-align:center;font-family:var(--display);font-style:italic;font-size:22px;border-radius:8px;padding:1px 0;}
+.ctab .cs b.win{background:var(--yellow);color:var(--navy);}
+.ctab .cr{display:grid;grid-template-columns:30px 1fr 1fr 40px;gap:6px;align-items:start;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1);line-height:1.3;}
+.ctab .cr b{color:var(--yellow);} .ctab .cr em{font-style:normal;font-weight:800;text-align:right;} .ctab .cr em.up{color:#5fe08f;} .ctab .cr em.dn{color:#ff8a8a;}
+.ctab .cr i.u,.ctab .cr i.d{font-style:normal;font-size:10px;margin-right:2px;} .ctab .cr i.u{color:#5fe08f;} .ctab .cr i.d{color:#ff8a8a;}
+.ctab .cr.hd{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.7;} .ctab .cr .same{font-style:normal;color:#9aa6e6;}
+.crit .stack{display:flex;height:12px;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.15);margin:8px 0 6px;}
+.crit .stack i,.crit .leg i{display:block;height:100%;} .crit .b{background:#2fbf6a;} .crit .s{background:#9aa6e6;} .crit .w{background:var(--red);}
+.crit .leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;} .crit .leg span{display:flex;align-items:center;gap:5px;} .crit .leg i{width:10px;height:10px;border-radius:3px;}
 </style>
 
 <div id="app">
@@ -772,14 +789,16 @@ function ffTo(target){
   const L=LIVE; L.mode='play'; L.target=target; L.fast=false; drawAll();
   const you=L.M.o.you;
   const tickF=()=>{
-    if(LIVE!==L||L.mode!=='play')return; const M=L.M; let pause=0, scored=false;
+    if(LIVE!==L||L.mode!=='play')return; const M=L.M; let pause=0, scored=false, shot=false; L.lag=L.lag||{h:0,a:0};
     for(const e of (L.real&&!L.alt?realStep(M,L.real):step(M))){
       const S=e.s&&M.sides[e.s]; if(you)rateTick(M,you,e);
-      if(e.t==='goal'){ M.scorers.push({m:M.m,s:e.s,n:e.p.short}); evChip(M.m,`<span class="ico ball"></span>${cshort(S.c)} gol: ${esc(e.p.short)} (${M.gh}-${M.ga})`,'goal',true);
-        goalFx(S.c,e.p.short,e.s===you); L.wpBefore=null; e.s===you?crowd.roar():crowd.groan(); coachSay(e.s===you?'ecstatic':'angry'); drawCoach(); buzz(e.s===you?[40,40,80]:120); pause=2300; scored=true;
+      if(e.t==='goal'){ M.scorers.push({m:M.m,s:e.s,n:e.p.short}); const mm=M.m, sc=`${M.gh}-${M.ga}`, es=e.s, nm=e.p.short, anim=!L.fast&&!shot;
+        const reveal=()=>{ if(LIVE!==L)return; L.lag[es]=Math.max(0,L.lag[es]-1); evChip(mm,`<span class="ico ball"></span>${cshort(S.c)} gol: ${esc(nm)} (${sc})`,'goal',true);
+          goalFx(S.c,nm,es===you); L.wpBefore=null; es===you?crowd.roar():crowd.groan(); coachSay(es===you?'ecstatic':'angry'); drawCoach(); drawBoard(); buzz(es===you?[40,40,80]:120); };
+        if(anim){ L.lag[es]++; shot=true; setTimeout(()=>shotFx(M,es,'goal',nm),0); setTimeout(()=>crowd.ooh(),900); setTimeout(reveal,1650); pause=Math.max(pause,4000); } else { reveal(); pause=Math.max(pause,2300); } scored=true;
         if((!L.real||L.alt)&&you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!(L.moments||MOMENTS).some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;L.react=true;} }
       else if(e.t==='card'){ evChip(M.m,`<span class="ico ${e.c==='y'?'yc':'rc'}"></span>${cshort(S.c)}: ${esc(e.p.short)}${e.c==='yr'?' (2. sarı)':''}`,e.c==='y'?'':'goal',true); if(e.c!=='y'){cardFx(true,e.p.short);pause=1800;e.s===you?crowd.boo(.07):crowd.cheer();coachSay(e.s===you?'shocked':'happy');} else if(e.s===you)crowd.boo(.025); }
-      else if(e.t==='chance'){ crowd.ooh(); }
+      else if(e.t==='chance'){ if(!L.fast&&!shot){ shot=true; const es=e.s,nm=e.p.short,k=Math.random()<.55?'save':'miss'; setTimeout(()=>shotFx(M,es,k,nm),0); setTimeout(()=>{ if(LIVE===L){ crowd.ooh(); if(es===you)coachSay('worried'); } },1300); pause=Math.max(pause,2000); } else crowd.ooh(); }
       else if(e.t==='inj'){ injFx(e.p.short); crowd.worry(); evChip(M.m,`<span class="ico inj">+</span>${cshort(S.c)}: ${esc(e.p.short)} sakatlandı`,'goal',true); pause=Math.max(pause,1300); if(e.s===you)coachSay('shocked'); }
       else if(e.t==='act'){ const a=e.a; if(a.k==='red')continue; evChip(M.m,a.k==='sub'?`<span class="ico sub">⇅</span>${cshort(S.c)}: ${esc(S.P[a.i].short)} girdi, ${esc(S.P[a.o].short)} çıktı`:`${cshort(S.c)} ${a.v===1?'hücuma geçti':a.v===-1?'kapandı':'dengeye döndü'}`,'',true); }
       else if(e.t==='ht'){ evChip(45,`İlk yarı ${M.gh}-${M.ga}`,'',false); whistle(); applause(1.6,.1); pause=Math.max(pause,500); }
@@ -819,7 +838,7 @@ function drawBoard(){
   const M=LIVE.M,h=M.sides.h,a=M.sides.a,you=M.o.you;
   const tag=s=>s===you?`Sen · ${tacName(M.sides[s].tac)}`:'Rakibi gör ›';
   $('#board').innerHTML=`<button class="bteam ${you==='h'?'me':''}" data-s="h">${kit(h.c)}<span>${cname(h.c)}<small>${tag('h')}</small></span></button>
-    <div class="bscore"><b>${M.gh} - ${M.ga}</b><em>${LIVE.real&&LIVE.mode!=='play'&&!M.done?LIVE.target:M.m}'</em></div>
+    <div class="bscore"><b>${M.gh-((LIVE.lag||{}).h||0)} - ${M.ga-((LIVE.lag||{}).a||0)}</b><em>${LIVE.real&&LIVE.mode!=='play'&&!M.done?LIVE.target:M.m}'</em></div>
     <button class="bteam r ${you==='a'?'me':''}" data-s="a"><span>${cname(a.c)}<small>${tag('a')}</small></span>${kit(a.c)}</button>
     ${wpBar(M,you)}`;
   $('#board').querySelectorAll('.bteam').forEach(b=>b.onclick=()=>{ if(b.dataset.s!==you)oppSheet(b.dataset.s); });
@@ -851,9 +870,9 @@ function drawPitch(){
     if(sel&&sel.o===id){p=S.P[sel.i];cls=' in';} if(L.outSel===id)cls=' sel';
     const sta=sel&&sel.o===id?100:staOf(S,id,M.m);
     const rt=rtOf(M,p.id), rc=rt>=7.5?'hi':rt<6?'lo':''; if(rt<5.6&&!cls)cls=' rbad';
-    h+=`<button class="tok${cls}" style="left:${x}%;top:${y}%" data-id="${id}" aria-label="${esc(p.name)}">${kit(S.c,p.num)}<span class="ov">${p.ovr}</span>${M.m>=10&&!(sel&&sel.o===id)?`<span class="rt ${rc}">${rt.toFixed(1)}</span>`:''}${S.yc[p.id]?'<span class="ycd"></span>':''}
+    h+=`<button class="tok${cls}" style="left:${x}%;top:${y}%" data-id="${id}" aria-label="${esc(p.name)}">${kit(S.c,p.num)}${M.m>=10&&!(sel&&sel.o===id)?`<span class="rt ${rc}">${rt.toFixed(1)}</span>`:''}${S.yc[p.id]?'<span class="ycd"></span>':''}
       <span class="nm">${esc(sur(p))}</span><span class="sta"><i class="${sta<60?'low':''}" style="width:${sta}%"></i></span></button>`; });
-  $('#pitch').innerHTML=h;
+  const keep=$('#pitch .shot'); $('#pitch').innerHTML=h; if(keep)$('#pitch').appendChild(keep);
   $('#pitch').querySelectorAll('.tok').forEach(b=>b.onclick=()=>playerSheet(b.dataset.id));
 }
 function cardHTML(d,tag){
@@ -871,7 +890,7 @@ function drawHand(){
   if(L.mode!=='dec'){
     const nx=L.target||90;
     box.classList.add('idle'); box.innerHTML=`<div class="pcard live make"><div class="big">${M.m}'</div><div class="txt">${M.done?'Maç bitti':L.real&&!L.alt?(nx>=90?'Gerçekteki gibi bitiyor':`Gerçekteki gibi akıyor. Sonraki karar ${nx}'`):nx>=90?'Son dakikalar oynanıyor':`Maç oynanıyor. Sonraki karar ${nx}'`}</div></div>`;
-    $('#hint').textContent=L.real?(L.alt?'Bu senin maçın: skor senin kararlarınla değişiyor.':'Hocayla aynı yoldasın, maç gerçekteki gibi akıyor.'):'Rakibin dizilişini görmek için skorbordda adına dokun.'; return;
+    $('#hint').textContent=''; return;
   }
   box.classList.remove('idle'); box.innerHTML='';
   const list=(L.custom?[L.custom]:[]).concat(L.opts);
@@ -1331,6 +1350,7 @@ function realStep(M,sc){
     else if(e[1]==='s'){ const a={k:'sub',o:p.id,i:pid(sc,s,e[4]),m:M.m}; if(applyAct(M,s,a))ev.push({t:'act',s,a}); }
     else if(e[1]==='y'){ S.yc[p.id]=1; ev.push({t:'card',s,p,c:'y'}); }
     else if(e[1]==='r'){ applyAct(M,s,{k:'red',o:p.id}); ev.push({t:'card',s,p,c:'r'}); } }
+  for(const s of ['h','a'])if(!ev.some(e=>e.t==='goal')&&M.r()<((s==='h'?M.lh:M.la)||0)*.7)ev.push({t:'chance',s,p:pickScorer(M,s)});
   if(M.m===45)ev.push({t:'ht'});
   if(M.m>=90)M.done=true;
   M.lh=lam(M,'h',M.m); M.la=lam(M,'a',M.m);
@@ -1437,7 +1457,7 @@ function finalReal(L){
   const sameN=L.decs.filter(d=>d.same).length, M=L.M, my=[M.gh,M.ga], mp=ptsOf(you,my), rp=ptsOf(you,sc.ft), gd=x=>you==='h'?x[0]-x[1]:x[1]-x[0];
   const better=L.alt&&(mp>rp||(mp===rp&&gd(my)>gd(sc.ft))), worse=L.alt&&(mp<rp||(mp===rp&&gd(my)<gd(sc.ft)));
   const verdict=!L.alt?'Hocayla aynı maç':mp>rp?'Sonucu değiştirdin':better?'Hocadan iyi':worse?(mp<rp?'Hoca haklıydı':'Hocadan kötü'):'Aynı sonuç';
-  try{ if(DB)DB.collection('plays').add({my,d:L.decs.map(d=>d.uSig),s:L.decs.map(d=>d.same),pts:total,uw:userLine.w,cw:coachLine.w,at:Date.now()}); }catch(e){}
+  try{ if(DB)DB.collection('plays').add({sc:key,my,d:L.decs.map(d=>d.uSig),s:L.decs.map(d=>d.same),pts:total,uw:userLine.w,cw:coachLine.w,at:Date.now()}); }catch(e){}
   const st=store.get('fdReal',{}); st[key]=Math.max(st[key]||0,total); store.set('fdReal',st);
   const P=L.plays, n=P.length, avg=n?Math.round(P.reduce((a,p)=>a+(p.pts||0),0)/n):null;
   const pct=x=>Math.round(x*100), [lh,la]=userLine.top.split('-');
@@ -1446,14 +1466,9 @@ function finalReal(L){
    <div class="scroll"><div class="res-teams"><div>${kit(sc.h)}<div class="t">${cname(sc.h)}</div></div><div><div class="lbl" style="text-align:center;color:var(--yellow)">Gerçek skor</div><div class="big">${sc.ft[0]}-${sc.ft[1]}</div></div><div>${kit(sc.a)}<div class="t">${cname(sc.a)}</div></div></div>
    ${sc.note?`<div class="note" style="text-align:center">${esc(sc.note)}</div>`:''}
    <div class="rcoach">${coachSVG(COACH,better?'ecstatic':worse?'angry':mp===3?'happy':mp===1?'neutral':'worried')}<div class="verdict">${verdict}</div></div>
-   <div class="cmp"><div><b>${my[0]}-${my[1]}</b><span>${L.alt?'Senin maçın':'Senin maçın (hocayla aynı)'}</span></div><div style="background:var(--yellow);color:var(--navy)"><b>${sc.ft[0]}-${sc.ft[1]}</b><span>Gerçek skor</span></div></div>
    ${M.scorers.length?`<div class="gl">${M.scorers.map(g=>`${g.m}' ${esc(g.n)} (${cshort(M.sides[g.s].c)})`).join(' · ')}</div>`:''}
-   <div class="panel"><div class="lbl" style="color:var(--yellow);margin-bottom:6px">Aynı kararlarla 300 kez oynansa · kazanma</div>
-     <div class="prob mine"><span>Senin kararlarınla</span><span class="bar"><i style="width:${pct(userLine.w)}%"></i></span><b>%${pct(userLine.w)}</b></div>
-     <div class="prob"><span>Hocanın kararlarıyla</span><span class="bar"><i style="width:${pct(coachLine.w)}%"></i></span><b>%${pct(coachLine.w)}</b></div></div>
-   <div class="panel"><div class="total" style="border:0;padding:0"><span class="lbl" style="color:var(--yellow)">Direktör puanı</span><b>${total}</b></div>
-     ${L.decs.map(d=>`<div class="wk" style="grid-template-columns:38px 1fr auto"><b>${d.t}'</b><span style="text-align:left">${d.same?'Hocayla aynı':d.uSig==='w'?'Bekledin':'Farklı karar'} · hoca ${d.coach.length?d.coach.length+' değişiklik':'bekledi'}</span><b>${d.pts}</b></div>`).join('')}
-     <div class="note" style="margin-top:6px">${sameN} kararda hocayla aynı düşündün. Senin kararlarınla en olası skor ${lh}-${la}.${n?` Bu maçı ${n} kişi oynadı, ortalama puan ${avg}.`:''}</div></div>
+   ${cmpTable(L,userLine,coachLine,total)}
+   ${criticsPanel(L,{my,s:L.decs.map(d=>d.same),uw:userLine.w,cw:coachLine.w})}
    </div>
    <div class="foot"><button class="btn ghost" id="rAgain">Tekrar</button><button class="btn" id="rNext">Maçlar</button></div>`;
   $('#rNext').onclick=()=>{beep(520);realList();}; $('#rAgain').onclick=()=>{beep(520);playReal(sc,you);};
@@ -1708,6 +1723,81 @@ function talkSheet(L,next){
 }
 /* kararı geri alma (ödüllü): karar anındaki maçın kopyası */
 function snapM(M){ const C=cloneM(M); C.live=true; C.cards=M.cards.slice(); C.inj=(M.inj||[]).slice(); C.scorers=M.scorers.slice(); C.acts=M.acts.slice(); C.dec=(M.dec||[]).slice(); C.o={...M.o}; if(M.o.script)C.o.script={...M.o.script}; C.rt={...(M.rt||{})}; return C; }
+
+/* ---------- şut animasyonu: maç özetindeki gibi üstten saha, pas pas atak ve şut ---------- */
+function shotFx(M,side,kind,name){
+  const P=$('#pitch'); if(!P)return; const you=M.o.you, up=side===you, S=M.sides[side], O=M.sides[side==='h'?'a':'h'];
+  const hx=c=>{ c=c.replace('#',''); if(c.length===3)c=[...c].map(x=>x+x).join(''); return [0,2,4].map(i=>parseInt(c.substr(i,2),16)); }, cd=(x,y)=>{ const p=hx(x),q=hx(y); return Math.abs(p[0]-q[0])+Math.abs(p[1]-q[1])+Math.abs(p[2]-q[2]); };
+  let [, , ,a1,a2]=CLUB[S.c], [, , ,d1,d2]=CLUB[O.c]; const r=Math.random, Y=y=>up?y:150-y;
+  if(cd(a1,d1)<160){ [d1,d2]=cd(a1,d2)>=160?[d2,d1]:['#ffffff','#15215c']; }
+  if(cd(a1,'#c4161f')<120)[a1,a2]=[a2,a1];
+  if(cd(d1,'#c4161f')<120)[d1,d2]=[d2,d1];
+  const sx=20+r()*60, p0=[sx,Y(88+r()*10)], p1=[15+r()*70,Y(58+r()*10)], p2=[38+r()*24,Y(26+r()*6)];
+  const tx=kind==='goal'?(r()<.5?45.5+r()*2.5:52+r()*2.5):kind==='miss'?(r()<.5?40+r()*2:58+r()*2):46+r()*8, tgt=[tx,Y(kind==='miss'?-2:2.2)];
+  const d0=[[p1[0]+(r()*16-8),Y(46)],[p2[0]-14,Y(20)],[p2[0]+14,Y(22)]];
+  const el=document.createElement('div'); el.className='shot'; el.setAttribute('aria-hidden','true'); const K=(P.clientWidth/100)/(P.clientHeight/150)||1, R=3, RY=(R*K).toFixed(2);
+  const gy=up?0.5:146, cap=kind==='goal'?'GOL':kind==='save'?'KURTARDI':'AUT';
+  el.innerHTML=`<svg viewBox="0 0 100 150" preserveAspectRatio="none"><g fill="none" stroke="#15215c" stroke-width=".9" opacity=".9"><rect x="4" y="4" width="92" height="142"/><line x1="4" y1="75" x2="96" y2="75"/><circle cx="50" cy="75" r="12"/>
+    <rect x="24" y="4" width="52" height="20"/><rect x="38" y="4" width="24" height="8"/><rect x="24" y="126" width="52" height="20"/><rect x="38" y="138" width="24" height="8"/></g>
+    <rect x="44" y="${gy}" width="12" height="3.5" fill="#fff" fill-opacity=".25" stroke="#fff" stroke-width=".8"/>
+    <g class="trail"></g>
+    ${d0.map((d,i)=>`<ellipse class="df" data-i="${i}" cx="${d[0]}" cy="${d[1]}" rx="${R}" ry="${RY}" fill="${d1}" stroke="${d2}" stroke-width=".9"/>`).join('')}
+    <ellipse class="gk" cx="50" cy="${Y(5.5)}" rx="${R}" ry="${RY}" fill="#2fbf6a" stroke="#15215c" stroke-width=".7"/>
+    ${[p0,p1,p2].map((p,i)=>`<ellipse class="at" data-i="${i}" cx="${p[0]}" cy="${p[1]}" rx="${R}" ry="${RY}" fill="${a1}" stroke="${a2}" stroke-width=".7"/>`).join('')}
+    <ellipse class="bl" cx="${p0[0]}" cy="${p0[1]}" rx="1.5" ry="${(1.5*K).toFixed(2)}" fill="#fff" stroke="#15215c" stroke-width=".5"/></svg>
+    <div class="scap"><span>Şut · ${esc(name)}</span><b class="disp" hidden>${cap}</b></div>`;
+  P.appendChild(el);
+  const bl=el.querySelector('.bl'), gk=el.querySelector('.gk'), ats=[...el.querySelectorAll('.at')], dfs=[...el.querySelectorAll('.df')], tr=el.querySelector('.trail');
+  const lerp=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t], ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2, set=(e,p)=>{e.setAttribute('cx',p[0].toFixed(2));e.setAttribute('cy',p[1].toFixed(2));};
+  const reb=[tx<50?tx-14:tx+14,Y(14)], D=1750, t0=performance.now(); let shown=false, last=null;
+  const f=now=>{ if(!el.isConnected)return; const t=Math.min(1,(now-t0)/D); let b;
+    if(t<.3)b=lerp(p0,p1,ease(t/.3)); else if(t<.55)b=lerp(p1,p2,ease((t-.3)/.25)); else if(t<.62)b=p2;
+    else if(t<.82){ const k=(t-.62)/.2; b=kind==='save'?lerp(p2,[gkx(1),Y(5.5)],k):lerp(p2,tgt,k); }
+    else b=kind==='save'?lerp([gkx(1),Y(5.5)],reb,Math.min(1,(t-.82)/.12)):tgt;
+    set(bl,b);
+    if(t>=.62&&t<.86){ if(last){ const l=document.createElementNS('http://www.w3.org/2000/svg','line'); l.setAttribute('x1',last[0]);l.setAttribute('y1',last[1]);l.setAttribute('x2',b[0]);l.setAttribute('y2',b[1]);l.setAttribute('stroke','#fff');l.setAttribute('stroke-width','.8');l.setAttribute('opacity','.7');tr.appendChild(l);} last=b; }
+    ats.forEach((a,i)=>{ const base=[p0,p1,p2][i]; set(a,lerp(base,[base[0],base[1]+(up?-8:8)],Math.min(1,t*1.2))); });
+    dfs.forEach((d,i)=>set(d,lerp(d0[i],lerp(d0[i],b,.45),Math.min(1,t*1.4))));
+    set(gk,[t<.62?50+(b[0]-50)*.25:gkx(Math.min(1,(t-.62)/.2)),Y(5.5)]);
+    if(t>=.8&&!shown){ shown=true; const c=el.querySelector('.scap b'); c.hidden=false; c.className='disp '+kind; }
+    if(t<1)requestAnimationFrame(f); };
+  function gkx(k){ const goal=kind==='save'?tx:kind==='goal'?50+(tx-50)*.35:50+(tx-50)*.2; return 50+(goal-50)*k; }
+  requestAnimationFrame(f); setTimeout(()=>el.remove(),D+350);
+}
+/* ---------- maç sonu: sen ve gerçek hoca karşılaştırma tablosu ---------- */
+function actsTxt(acts,S){ if(!acts.length)return 'Bekledi';
+  return acts.map(a=>a.k==='sub'?`<i class="u">▲</i>${esc(sur(S.P[a.i]))} <i class="d">▼</i>${esc(sur(S.P[a.o]))}`:a.k==='tac'?TAC[a.v].n:'').filter(Boolean).join('<br>'); }
+function cmpTable(L,userLine,coachLine,total){
+  const sc=L.real,you=L.you,M=L.M,S=M.sides[you],pct=x=>Math.round(x*100),my=[M.gh,M.ga];
+  const cnt=(acts,k)=>acts.filter(a=>a.k===k).length;
+  const mineAll=L.decs.flatMap(d=>d.mine), coachSubs=sc.ev.filter(e=>e[1]==='s'&&e[2]===you).length;
+  const shouts=M.acts.filter(a=>a.k==='shout').length, talk=M.acts.find(a=>a.k==='talk');
+  const sgn=x=>x>0?`<em class="up">+${x}</em>`:x<0?`<em class="dn">${x}</em>`:'<em>0</em>';
+  const rows=L.decs.map(d=>{ const dl=pct(d.u.w)-pct(d.c.w);
+    return `<div class="cr"><b>${d.t}'</b><span>${d.same?'<i class="same">Aynı</i>':actsTxt(d.mine.length?d.mine:[],S).replace('Bekledi','Bekledin')}</span><span>${actsTxt(d.coach,S)}</span>${d.same?'<em>·</em>':sgn(dl)}</div>`; }).join('');
+  const best=(a,b,hi=true)=>a===b?['','']:((a>b)===hi?['win','']:['','win']);
+  const [w1,w2]=best(ptsOf(you,my)*10+gdOf(you,my),ptsOf(you,sc.ft)*10+gdOf(you,sc.ft)), [p1,p2]=best(pct(userLine.w),pct(coachLine.w));
+  return `<div class="panel ctab"><div class="ch"><span></span><span class="me">Sen</span><span class="co">Gerçek hoca</span></div>
+    <div class="cs"><span>Skor</span><b class="${w1}">${my[0]}-${my[1]}</b><b class="${w2}">${sc.ft[0]}-${sc.ft[1]}</b></div>
+    <div class="cs"><span>Kazanma ihtimali</span><b class="${p1}">%${pct(userLine.w)}</b><b class="${p2}">%${pct(coachLine.w)}</b></div>
+    <div class="cs"><span>Oyuncu değişikliği</span><b>${mineAll.filter(a=>a.k==='sub').length+M.acts.filter(a=>a.k==='sub'&&!mineAll.some(x=>x.k==='sub'&&x.i===a.i)).length}</b><b>${coachSubs}</b></div>
+    ${shouts||talk||M.acts.some(a=>a.k==='tac')?`<div class="note" style="margin-top:6px">Sen ayrıca ${[M.acts.filter(a=>a.k==='tac').length?M.acts.filter(a=>a.k==='tac').length+' kez taktik değiştirdin':'',shouts?shouts+' kez sahaya bağırdın':'',talk?'devre arasında "'+TALKS[talk.v].n+'" dedin':''].filter(Boolean).join(', ')}.</div>`:''}
+    <div class="lbl" style="color:var(--yellow);margin:10px 0 4px">Karar karar</div>
+    <div class="cr hd"><b>Dk</b><span>Sen</span><span>Hoca</span><em>Etki</em></div>${rows}
+    <div class="total" style="border:0;padding:8px 0 0"><span class="lbl" style="color:var(--yellow)">Direktör puanı</span><b>${total}</b></div>
+    <div class="note">Etki: senin kararınla hocanınki arasındaki kazanma ihtimali farkı (puan).</div></div>`;
+}
+function criticsPanel(L,mine){
+  const sc=L.real,you=L.you, P=L.plays.filter(p=>p.my&&p.s), all=P.concat([mine]), crit=all.filter(p=>p.s.some(x=>!x)), n=all.length, c=crit.length;
+  if(!c)return `<div class="panel crit"><div class="lbl" style="color:var(--yellow)">Hocayı eleştirenler</div><div class="note">Bu maçta herkes hocayla aynı kararları verdi. Farklı bir şey dene, eleştirenlerin ilki ol.</div></div>`;
+  const b=crit.filter(p=>realBetter(you,p.my,sc.ft)).length, w=crit.filter(p=>ptsOf(you,p.my)*10+gdOf(you,p.my)<ptsOf(you,sc.ft)*10+gdOf(you,sc.ft)).length, s=c-b-w, pc=x=>Math.round(100*x/c);
+  const uw=Math.round(100*crit.reduce((a,p)=>a+(p.uw||0),0)/c), cw=Math.round(100*crit.reduce((a,p)=>a+(p.cw||0),0)/c);
+  return `<div class="panel crit"><div class="lbl" style="color:var(--yellow)">Hocayı eleştirenler</div>
+    <div class="note">Bu maçı oynayan ${n} kişiden <b>${c}</b>'i hocadan farklı karar verdi.</div>
+    <div class="stack"><i class="b" style="width:${pc(b)}%"></i><i class="s" style="width:${pc(s)}%"></i><i class="w" style="width:${pc(w)}%"></i></div>
+    <div class="leg"><span><i class="b"></i>Daha iyi bitirdi %${pc(b)}</span><span><i class="s"></i>Aynı %${pc(s)}</span><span><i class="w"></i>Daha kötü %${pc(w)}</span></div>
+    <div class="note">Eleştirenlerin kararlarıyla kazanma ihtimali ortalama <b>%${uw}</b>, hocanın kararlarıyla <b>%${cw}</b>. ${uw>cw?'Eleştirenler haklı çıkıyor.':uw<cw?'Hoca haklı çıkıyor.':'Ortada bir maç.'}</div></div>`;
+}
 
 /* ---------- hoca avatarı: düz çizim, kalın lacivert kontur. Yüz ifadesi maçın gidişatına göre değişir ---------- */
 const SKIN=['#f6d2b4','#e9b48f','#c98b62','#9a6440','#62402a'];
