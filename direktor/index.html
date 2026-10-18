@@ -250,19 +250,19 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .ev.goal .ico.sub{color:var(--navy);}
 .pitch{position:relative;flex:1;min-height:190px;border:3px solid var(--navy);border-radius:10px;overflow:hidden;background:repeating-linear-gradient(180deg,#c4161f 0 12.5%,#b8121b 12.5% 25%);}
 .pitch .lines{position:absolute;inset:0;width:100%;height:100%;}
-.sit{position:absolute;left:8px;right:8px;top:8px;display:flex;flex-wrap:wrap;gap:5px;z-index:3;pointer-events:none;}
+.sitrow{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;flex:none;min-height:22px;} .sitrow::-webkit-scrollbar{display:none;} .sitrow .chip{flex:none;white-space:nowrap;}
 .chip{background:var(--navy);color:#fff;font-size:11.5px;font-weight:600;border-radius:999px;padding:3px 9px;}
 .chip.warn{background:var(--yellow);color:var(--navy);}
-.tok{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;width:70px;z-index:2;}
+.tok{position:absolute;transform:translate(-50%,-50%) scale(var(--ts,1));display:flex;flex-direction:column;align-items:center;width:72px;z-index:2;}
 .tok svg{width:34px;height:34px;filter:drop-shadow(0 2px 0 rgba(12,20,64,.45));transition:transform .15s;}
-.tok .nm{margin-top:1px;background:var(--navy);color:#fff;font-size:10.5px;font-weight:600;padding:1px 5px;border-radius:4px;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis;}
+.tok .nm{margin-top:1px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:1px 6px;border-radius:5px;white-space:nowrap;max-width:72px;box-shadow:0 2px 0 rgba(12,20,64,.35);overflow:hidden;text-overflow:ellipsis;}
 .tok .sta{width:40px;height:4px;background:rgba(12,20,64,.5);border-radius:2px;margin-top:2px;overflow:hidden;}
 .tok .sta i{display:block;height:100%;background:#fff;}
 .tok .sta i.low{background:var(--yellow);}
 .tok .ov{position:absolute;top:-2px;left:8px;font-size:10px;font-weight:800;background:#fff;color:var(--navy);border-radius:4px;padding:0 3px;font-variant-numeric:tabular-nums;}
 .tok .fl{position:absolute;top:-3px;right:9px;font-size:13px;line-height:1;}
 .tok.out{opacity:.35;}
-.tok .ycd{position:absolute;top:12px;right:13px;width:7px;height:10px;border-radius:2px;background:var(--yellow);border:1px solid var(--navy);}
+.tok .ycd{position:absolute;top:15px;right:12px;width:7px;height:10px;border-radius:2px;background:var(--yellow);border:1px solid var(--navy);}
 .ico.yc,.ico.rc{width:8px;height:11px;border-radius:2px;background:var(--yellow);}
 .ico.rc{background:#ff3b3b;}
 .tok.in svg{transform:scale(1.12);}
@@ -271,11 +271,11 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .hint{text-align:center;font-size:11.5px;opacity:.9;margin-top:-2px;min-height:14px;}
 .hand{display:flex;gap:10px;overflow-x:auto;padding:10px 4px 6px;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:160px;flex:none;}
 .hand::-webkit-scrollbar{display:none;}
-.pcard{flex:none;width:136px;min-height:146px;scroll-snap-align:start;background:var(--paper);color:var(--ink);border:3px solid var(--navy);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 4px 0 var(--navy);transition:transform .15s,box-shadow .15s;position:relative;animation:deal .3s cubic-bezier(.2,1.4,.4,1) backwards;}
+.pcard{flex:none;width:150px;min-height:150px;scroll-snap-align:start;background:var(--paper);color:var(--ink);border:3px solid var(--navy);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 4px 0 var(--navy);transition:transform .15s,box-shadow .15s;position:relative;animation:deal .3s cubic-bezier(.2,1.4,.4,1) backwards;}
 .pcard:nth-child(2){animation-delay:.06s}.pcard:nth-child(3){animation-delay:.12s}.pcard:nth-child(4){animation-delay:.18s}
 @keyframes deal{from{transform:translateY(50px) rotate(-6deg);opacity:0}}
-.pcard:nth-child(odd){transform:rotate(-1.2deg);}
-.pcard:nth-child(even){transform:rotate(1.2deg);}
+.pcard:nth-child(odd){transform:rotate(-.6deg);}
+.pcard:nth-child(even){transform:rotate(.6deg);}
 .pcard.on{transform:translateY(-10px) rotate(0);box-shadow:0 10px 0 var(--navy);background:#fff;outline:3px solid var(--yellow);outline-offset:-7px;}
 .pcard .kind{font-family:var(--display);font-style:italic;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.03em;border-bottom:2px dashed var(--paper-edge);padding-bottom:4px;display:flex;justify-content:space-between;gap:4px;}
 .pcard .kind i{font-style:normal;color:var(--mute);font-size:13px;white-space:nowrap;}
@@ -283,11 +283,12 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .prow svg{width:28px;height:28px;}
 .prow .arr{font-weight:900;font-size:14px;text-align:center;}
 .prow .arr.dn{color:var(--bad);} .prow .arr.up{color:var(--ok);}
-.prow .pn{font-size:12px;font-weight:700;line-height:1.15;min-width:0;overflow:hidden;}
+.prow .pn{font-size:12.5px;font-weight:800;line-height:1.15;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .prow .pn small{display:block;font-weight:500;color:var(--mute);font-size:10.5px;white-space:nowrap;}
 .pcard .big{font-family:var(--display);font-style:italic;font-weight:900;font-size:30px;text-transform:uppercase;line-height:.9;margin-top:4px;}
 .pcard .txt{font-size:11.5px;line-height:1.35;color:#3a3f63;}
-.pcard .fx{position:static;display:block;inset:auto;z-index:auto;overflow:visible;margin-top:auto;font-size:10.5px;font-weight:800;line-height:1.3;}
+.pcard .fx{position:static;display:flex;flex-direction:column;align-items:flex-start;gap:3px;inset:auto;z-index:auto;overflow:visible;margin-top:auto;font-size:10.5px;font-weight:800;line-height:1.2;}
+.pcard .fx span{border-radius:5px;padding:1px 6px;} .pcard .fx .up{background:#dff3e6;} .pcard .fx .dn{background:#fbe1e4;}
 .fx .up{color:var(--ok);} .fx .dn{color:var(--bad);}
 .pcard.make{background:transparent;border-style:dashed;border-color:var(--paper);color:#fff;box-shadow:none;justify-content:center;align-items:center;text-align:center;}
 .pcard.make .big{font-size:24px;}
@@ -378,7 +379,7 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .wp b{font-family:var(--display);font-style:italic;font-size:17px;color:var(--yellow);font-variant-numeric:tabular-nums;}
 .wp .dl{font-style:normal;font-weight:800;border-radius:4px;padding:0 4px;} .wp .dl.up{background:#2fbf6a;color:#fff;} .wp .dl.dn{background:#fff;color:var(--red);}
 .ghost{grid-column:1/-1;text-align:center;font-size:11px;opacity:.75;margin-top:-2px;}
-.tok .rt{position:absolute;top:21px;left:6px;z-index:1;font-size:10px;font-weight:800;background:var(--navy);color:#fff;border-radius:4px;padding:0 3px;font-variant-numeric:tabular-nums;}
+.tok .rt{position:absolute;top:-3px;right:8px;z-index:1;font-size:10px;font-weight:800;background:var(--navy);color:#fff;border-radius:4px;padding:0 3px;font-variant-numeric:tabular-nums;}
 .tok .rt.hi{background:#2fbf6a;} .tok .rt.lo{background:var(--red);}
 .tok.rbad .nm{background:var(--red);color:#fff;}
 .buyp{background:var(--paper);color:var(--ink);border-radius:12px;padding:12px;text-align:center;} .buyp b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:40px;line-height:1;} .buyp small{display:block;font-size:11px;color:var(--mute);margin-top:4px;}
@@ -399,6 +400,14 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .ticket .tr .lk{font-size:16px;} .ticket.locked{opacity:.92;} .ticket.locked .tr em{font-size:15px;}
 .chips button .lk{font-size:10px;font-weight:800;opacity:.85;margin-left:4px;}
 .shopsec{display:flex;flex-direction:column;gap:10px;}
+
+.hand.idle{min-height:0;padding:2px 0 0;}
+#match .sitrow{display:none;} #match.dec .sitrow{display:flex;} #match.dec .feed{display:none;}
+@media (max-height:700px){ .pitch{min-height:150px;} .hand{min-height:0;padding-top:6px;} .pcard{min-height:132px;} #match{gap:5px;} .board{padding:4px 10px;} .bscore b{font-size:30px;} }
+.hand.idle .pcard.live{min-height:0;flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;padding:6px 12px;border-width:2px;}
+.hand.idle .pcard.live .big{font-size:26px;margin:0;}
+.hand.idle .pcard.live .txt{font-size:12.5px;text-align:left;}
+.pcard .kind{font-size:14px;}
 </style>
 
 <div id="app">
@@ -440,6 +449,7 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
   <section class="screen" id="match" hidden>
     <div class="board" id="board"></div>
     <div class="feed" id="feed"></div>
+    <div class="sitrow" id="sit"></div>
     <div class="pitch" id="pitch"></div>
     <div class="hint" id="hint"></div>
     <div class="hand" id="hand"></div>
@@ -745,8 +755,8 @@ function cardRoll(M,s,ev){
 function simToEnd(M){ while(!M.done){ step(M); const y=M.o.you; if(y&&!M.done)for(const a of aiActs(M,y))applyAct(M,y,a); } return M; }
 
 /* ---------- canlı maç: dakikalar akar, karar anlarında kart eli açılır ---------- */
-const SLOT=[[50,91],[86,66],[65,73],[35,73],[14,66],[66,52],[34,52],[85,32],[50,37],[15,32],[50,21]];
-const MOMENTS=[30,46,60,70,80], DEC_SEC=20;
+const SLOT=[[50,91.5],[87,69],[63,75.5],[37,75.5],[13,69],[72,56],[28,56],[84,27],[50,41],[16,27],[50,15]];
+const MOMENTS=[30,46,60,70,80], DEC_SEC=25, TICK=240;
 let LIVE=null;
 const sig=d=>d.k==='sub'?'s'+d.o+'>'+d.i:d.k==='tac'?'t'+d.v:'w';
 const actOf=(d,m)=>d.k==='sub'?{k:'sub',o:d.o,i:d.i,m}:{k:'tac',v:d.v,m};
@@ -766,9 +776,9 @@ function ffTo(target){
     for(const e of (L.real&&!L.alt?realStep(M,L.real):step(M))){
       const S=e.s&&M.sides[e.s]; if(you)rateTick(M,you,e);
       if(e.t==='goal'){ M.scorers.push({m:M.m,s:e.s,n:e.p.short}); evChip(M.m,`<span class="ico ball"></span>${cshort(S.c)} gol: ${esc(e.p.short)} (${M.gh}-${M.ga})`,'goal',true);
-        goalFx(S.c,e.p.short,e.s===you); L.wpBefore=null; e.s===you?crowd.roar():crowd.groan(); coachSay(e.s===you?'ecstatic':'angry'); drawCoach(); buzz(e.s===you?[40,40,80]:120); pause=1500; scored=true;
+        goalFx(S.c,e.p.short,e.s===you); L.wpBefore=null; e.s===you?crowd.roar():crowd.groan(); coachSay(e.s===you?'ecstatic':'angry'); drawCoach(); buzz(e.s===you?[40,40,80]:120); pause=2300; scored=true;
         if((!L.real||L.alt)&&you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!(L.moments||MOMENTS).some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;L.react=true;} }
-      else if(e.t==='card'){ evChip(M.m,`<span class="ico ${e.c==='y'?'yc':'rc'}"></span>${cshort(S.c)}: ${esc(e.p.short)}${e.c==='yr'?' (2. sarı)':''}`,e.c==='y'?'':'goal',true); if(e.c!=='y'){cardFx(true,e.p.short);pause=1200;e.s===you?crowd.boo(.07):crowd.cheer();coachSay(e.s===you?'shocked':'happy');} else if(e.s===you)crowd.boo(.025); }
+      else if(e.t==='card'){ evChip(M.m,`<span class="ico ${e.c==='y'?'yc':'rc'}"></span>${cshort(S.c)}: ${esc(e.p.short)}${e.c==='yr'?' (2. sarı)':''}`,e.c==='y'?'':'goal',true); if(e.c!=='y'){cardFx(true,e.p.short);pause=1800;e.s===you?crowd.boo(.07):crowd.cheer();coachSay(e.s===you?'shocked':'happy');} else if(e.s===you)crowd.boo(.025); }
       else if(e.t==='chance'){ crowd.ooh(); }
       else if(e.t==='inj'){ injFx(e.p.short); crowd.worry(); evChip(M.m,`<span class="ico inj">+</span>${cshort(S.c)}: ${esc(e.p.short)} sakatlandı`,'goal',true); pause=Math.max(pause,1300); if(e.s===you)coachSay('shocked'); }
       else if(e.t==='act'){ const a=e.a; if(a.k==='red')continue; evChip(M.m,a.k==='sub'?`<span class="ico sub">⇅</span>${cshort(S.c)}: ${esc(S.P[a.i].short)} girdi, ${esc(S.P[a.o].short)} çıktı`:`${cshort(S.c)} ${a.v===1?'hücuma geçti':a.v===-1?'kapandı':'dengeye döndü'}`,'',true); }
@@ -779,7 +789,7 @@ function ffTo(target){
     if(M.pendInj&&!M.done){ L.mode='inj'; setTimeout(()=>{ if(LIVE===L)injSheet(L,()=>{ if(LIVE===L){ drawAll(); ffTo(L.target); } }); },pause||300); return; }
     if(M.done){ evChip(90,`Maç bitti ${M.gh}-${M.ga}`,'',false); whistle(); { const dd=you==='h'?M.gh-M.ga:M.ga-M.gh; setTimeout(()=>{ dd>0?crowd.cheer():dd<0?crowd.boo(.04):applause(1.5,.1); },400); setTimeout(()=>crowd.stop(),2200); } setTimeout(()=>{ if(LIVE===L){ LIVE=null; L.onEnd(M); } },1200); return; }
     if(M.m>=L.target-(L.real?1:0)||L.react){ const t=L.react?'Gol yedik!':L.target===46?'Devre arası':`${L.target}. dakika`; L.react=false; setTimeout(()=>{ if(LIVE!==L)return; if(L.target===46&&!L.talked&&t==='Devre arası')talkSheet(L,()=>{ if(LIVE===L)moment(t); }); else moment(t); },pause||300); return; }
-    L.run=setTimeout(tickF,pause||(L.fast?15:85));
+    L.run=setTimeout(tickF,pause||(L.fast?15:TICK));
   };
   L.run=setTimeout(tickF,350);
 }
@@ -826,6 +836,9 @@ function situation(){
   if(O.tac)c.push([O.tac>0?'warn':'','Rakip: '+tacName(O.tac).toLowerCase()]);
   return c.map(([k,t])=>`<span class="chip ${k}">${t}</span>`).join('');
 }
+const sur=p=>{ const s=p.short.replace(/^[A-ZÇĞİÖŞÜ]\.\s*/,''); return s.length>11?s.slice(0,10)+'.':s; };
+function fitPitch(){ const P=$('#pitch'); if(!P)return; const h=P.clientHeight,w=P.clientWidth; P.style.setProperty('--ts',Math.max(.62,Math.min(1,h/330,w/340)).toFixed(3)); }
+if(window.ResizeObserver)new ResizeObserver(fitPitch).observe($('#pitch')); else addEventListener('resize',fitPitch);
 function drawPitch(){
   const L=LIVE,M=L.M,s=M.o.you,S=M.sides[s];
   const sel=L.mode==='dec'&&L.sel&&L.sel.k==='sub'?L.sel:null;
@@ -833,19 +846,19 @@ function drawPitch(){
   if(L.pitchSig===sg&&$('#pitch').firstChild)return; L.pitchSig=sg;
   let h=`<svg class="lines" viewBox="0 0 100 150" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#15215c" stroke-width=".9" opacity=".9">
     <rect x="4" y="4" width="92" height="142"/><line x1="4" y1="75" x2="96" y2="75"/><circle cx="50" cy="75" r="12"/>
-    <rect x="24" y="4" width="52" height="20"/><rect x="38" y="4" width="24" height="8"/><rect x="24" y="126" width="52" height="20"/><rect x="38" y="138" width="24" height="8"/></g></svg><div class="sit">${situation()}</div>`;
+    <rect x="24" y="4" width="52" height="20"/><rect x="38" y="4" width="24" height="8"/><rect x="24" y="126" width="52" height="20"/><rect x="38" y="138" width="24" height="8"/></g></svg>`; $('#sit').innerHTML=situation();
   S.xi.forEach((id,k)=>{ if(!id)return; let p=S.P[id],cls=''; const [x,y]=SLOT[k];
     if(sel&&sel.o===id){p=S.P[sel.i];cls=' in';} if(L.outSel===id)cls=' sel';
     const sta=sel&&sel.o===id?100:staOf(S,id,M.m);
     const rt=rtOf(M,p.id), rc=rt>=7.5?'hi':rt<6?'lo':''; if(rt<5.6&&!cls)cls=' rbad';
-    h+=`<button class="tok${cls}" style="left:${x}%;top:${y}%" data-id="${id}" aria-label="${esc(p.name)}">${kit(S.c,p.num)}<span class="ov">${p.ovr}</span>${M.m>=10&&!(sel&&sel.o===id)?`<span class="rt ${rc}">${rt.toFixed(1)}</span>`:''}<span class="fl">${flag(p)}</span>${S.yc[p.id]?'<span class="ycd"></span>':''}
-      <span class="nm">${esc(p.short)}</span><span class="sta"><i class="${sta<60?'low':''}" style="width:${sta}%"></i></span></button>`; });
+    h+=`<button class="tok${cls}" style="left:${x}%;top:${y}%" data-id="${id}" aria-label="${esc(p.name)}">${kit(S.c,p.num)}<span class="ov">${p.ovr}</span>${M.m>=10&&!(sel&&sel.o===id)?`<span class="rt ${rc}">${rt.toFixed(1)}</span>`:''}${S.yc[p.id]?'<span class="ycd"></span>':''}
+      <span class="nm">${esc(sur(p))}</span><span class="sta"><i class="${sta<60?'low':''}" style="width:${sta}%"></i></span></button>`; });
   $('#pitch').innerHTML=h;
   $('#pitch').querySelectorAll('.tok').forEach(b=>b.onclick=()=>playerSheet(b.dataset.id));
 }
 function cardHTML(d,tag){
   const M=LIVE.M,s=M.o.you,S=M.sides[s],tm=tag?`<i>${tag}</i>`:'';
-  const fx=effect(M,s,d), fxh=fx?`<div class="fx"><span class="${fx.g>=0?'up':'dn'}">Gol şansı ${fx.g>=0?'+':''}${fx.g}%</span><br><span class="${fx.r<=0?'up':'dn'}">Yeme riski ${fx.r>=0?'+':''}${fx.r}%</span></div>`:'';
+  const fx=effect(M,s,d), fxh=fx?`<div class="fx"><span class="${fx.g>=0?'up':'dn'}">Gol şansı ${fx.g>=0?'+':''}${fx.g}%</span><span class="${fx.r<=0?'up':'dn'}">Yeme riski ${fx.r>=0?'+':''}${fx.r}%</span></div>`:'';
   if(d.k==='sub'){ const o=S.P[d.o],i=S.P[d.i];
     return `<div class="kind">${esc(d.t)}${tm}</div>
       <div class="prow"><span class="arr dn">▼</span>${kit(S.c,o.num)}<div class="pn">${esc(o.short)}<small>${flag(o)} ${o.pos} · %${Math.round(staOf(S,o.id,M.m))}</small></div></div>
@@ -854,13 +867,13 @@ function cardHTML(d,tag){
   return `<div class="kind">Taktik${tm}</div><div class="big">${esc(d.t)}</div><div class="txt">${esc(d.d)}</div>${fxh}`;
 }
 function drawHand(){
-  const L=LIVE,M=L.M,S=M.sides[M.o.you],box=$('#hand');
+  const L=LIVE,M=L.M,S=M.sides[M.o.you],box=$('#hand'); $('#match').classList.toggle('dec',L.mode==='dec');
   if(L.mode!=='dec'){
     const nx=L.target||90;
-    box.innerHTML=`<div class="pcard live make"><div class="big">${M.m}'</div><div class="txt">${M.done?'Maç bitti':L.real&&!L.alt?(nx>=90?'Gerçekteki gibi bitiyor':`Gerçekteki gibi akıyor. Sonraki karar ${nx}'`):nx>=90?'Son dakikalar oynanıyor':`Maç oynanıyor. Sonraki karar ${nx}'`}</div></div>`;
+    box.classList.add('idle'); box.innerHTML=`<div class="pcard live make"><div class="big">${M.m}'</div><div class="txt">${M.done?'Maç bitti':L.real&&!L.alt?(nx>=90?'Gerçekteki gibi bitiyor':`Gerçekteki gibi akıyor. Sonraki karar ${nx}'`):nx>=90?'Son dakikalar oynanıyor':`Maç oynanıyor. Sonraki karar ${nx}'`}</div></div>`;
     $('#hint').textContent=L.real?(L.alt?'Bu senin maçın: skor senin kararlarınla değişiyor.':'Hocayla aynı yoldasın, maç gerçekteki gibi akıyor.'):'Rakibin dizilişini görmek için skorbordda adına dokun.'; return;
   }
-  box.innerHTML='';
+  box.classList.remove('idle'); box.innerHTML='';
   const list=(L.custom?[L.custom]:[]).concat(L.opts);
   list.forEach(d=>{ const el=document.createElement('button'); el.type='button'; el.className='pcard'+(L.sel&&sig(L.sel)===sig(d)?' on':'');
     el.innerHTML=cardHTML(d,d.mine?'Senin':''); el.onclick=()=>{ L.sel=L.sel&&sig(L.sel)===sig(d)?null:d; beep(L.sel?620:400,.05); buzz(8); drawHand(); drawPitch(); drawAct(); }; box.appendChild(el); });
