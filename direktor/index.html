@@ -452,6 +452,30 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .ngl b,.ngt b{font-family:var(--display);font-style:italic;font-size:18px;text-transform:uppercase;line-height:1;} .ngl small,.ngt small,.rp small{font-size:11px;color:var(--mute);line-height:1.25;}
 .ngl button.on,.ngt.on,.rp button.on{border-color:var(--yellow);background:#fff;box-shadow:0 3px 0 var(--navy-deep);}
 .ngt.on b:before,.rp button.on b:before{content:'✓ ';color:var(--ok);}
+.pcs .in{padding-top:0;max-height:96%;overflow:hidden;}
+.pc{position:relative;height:244px;flex:none;margin:0 -16px;border-radius:16px 16px 0 0;overflow:hidden;background:linear-gradient(#24357d,#15215c);}
+.pcwall{position:absolute;inset:0;background-size:58px;background-repeat:repeat;opacity:.12;}
+.pclight{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(255,255,255,.18),transparent 60%);}
+.pccoach{position:absolute;left:50%;bottom:44px;width:128px;height:128px;transform:translateX(-50%);animation:pcbob 2.6s ease-in-out infinite;}
+.pccoach.talk{animation-duration:.45s;} .pccoach svg{width:100%;height:100%;display:block;}
+@keyframes pcbob{50%{transform:translateX(-50%) translateY(-3px)}}
+.pcmic{position:absolute;bottom:50px;width:16px;height:40px;transform-origin:50% 100%;}
+.pctable{position:absolute;left:0;right:0;bottom:0;height:56px;background:var(--red);border-top:4px solid var(--yellow);display:flex;align-items:center;justify-content:center;}
+.pctable span{font-family:var(--display);font-style:italic;text-transform:uppercase;color:#fff;font-size:17px;letter-spacing:.08em;text-shadow:0 2px 0 var(--navy-deep);}
+.pcrep{position:absolute;left:-10px;bottom:-6px;width:96px;height:96px;}
+.pcbub{position:absolute;top:10px;max-width:62%;background:#fff;color:var(--ink);border-radius:12px;padding:6px 9px 7px;font-size:13px;font-weight:700;line-height:1.25;box-shadow:0 3px 0 var(--navy-deep);opacity:0;transform:scale(.7);transition:opacity .2s,transform .25s cubic-bezier(.3,1.6,.6,1);}
+.pcbub.on{opacity:1;transform:none;} .pcbub small{display:block;font-size:10px;color:var(--mute);font-weight:800;text-transform:uppercase;letter-spacing:.04em;}
+.pcbub.rep{left:10px;transform-origin:0 100%;} .pcbub.co{right:10px;background:var(--yellow);transform-origin:100% 100%;} .pcbub.co small{color:var(--navy);}
+.pcbub:after{content:'';position:absolute;bottom:-7px;width:12px;height:12px;background:inherit;transform:rotate(45deg);} .pcbub.rep:after{left:18px;} .pcbub.co:after{right:28px;}
+.pcflash{position:absolute;width:110px;height:110px;border-radius:50%;background:radial-gradient(#fff,rgba(255,255,255,.7) 18%,transparent 64%);animation:pcfl .38s ease-out forwards;pointer-events:none;z-index:3;}
+@keyframes pcfl{0%{opacity:0;transform:scale(.3)}25%{opacity:1}100%{opacity:0;transform:scale(1.4)}}
+.pcstamp{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);z-index:2;}
+.pcstamp{background:var(--paper);color:var(--ink);border:3px solid var(--navy);border-radius:10px;padding:4px 10px;font-weight:800;font-size:12px;max-width:80%;text-align:center;animation:pcst .45s cubic-bezier(.3,1.6,.6,1) both;box-shadow:0 3px 0 var(--navy-deep);}
+@keyframes pcst{from{transform:translateX(-50%) scale(1.8) rotate(-8deg);opacity:0}to{transform:translateX(-50%) rotate(-2deg);opacity:1}}
+.pcans button{animation:deal .35s ease-out both;}
+.pcroom{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:10px;padding:8px 10px;animation:in .3s ease-out;} .pcroom .lbl{flex:1;} .pcroom b{font-family:var(--display);font-style:italic;font-size:20px;} .pcroom .plus{color:#7be3a6} .pcroom .minus{color:#ffb0b0}
+.pc:has(.pcstamp) .pctable span{opacity:0;}
+#pcBody{display:flex;flex-direction:column;gap:10px;min-height:60px;overflow-y:auto;flex:1 1 auto;margin:0 -4px;padding:0 4px 2px;}
 .rp{display:flex;flex-direction:column;gap:6px;} .rp b{font-size:14px;}
 .ngr{border:2px solid var(--red);font-size:13.5px;}
 </style>
@@ -1456,17 +1480,45 @@ function pressSheet(c,next){
   const T=[['Hafif antrenman','Kondisyon +12',()=>myList().forEach(p=>ST.cond[p.id]=clamp((ST.cond[p.id]??100)+12,55,100))],
     ['Yoğun antrenman','Kondisyon −6, gençler daha hızlı gelişir, moral +2',()=>{ myList().forEach(p=>{ ST.cond[p.id]=clamp((ST.cond[p.id]??100)-6,55,100); if(ageOf(getP(p.id))<=23){ ST.dev[p.id]=(ST.dev[p.id]||0)+.25; } }); tmAdd(2); }],
     ['Takım yemeği','Moral +6, kasadan 0,2 M€',()=>{ tmAdd(6); finAdd('Takım yemeği',-.2,'ceza'); }]];
-  let qa=0, ta=0;
-  const sh=document.createElement('div'); sh.className='sheet';
-  const render=()=>{ sh.innerHTML=`<div class="in"><div class="rcoach">${coachSVG(COACH,c.my>c.op?'happy':c.my<c.op?'worried':'neutral')}<div><h3 class="disp">Basın toplantısı</h3><div class="note">${esc(Q.q)}</div></div></div>
-    <div class="rp">${Q.a.map((a,i)=>`<button class="${qa===i?'on':''}" data-q="${i}"><b>“${esc(a[0])}”</b><small>${esc(a[1])}</small></button>`).join('')}</div>
-    <div class="lbl" style="color:var(--yellow)">Bu haftanın antrenmanı</div>
-    <div class="rp">${T.map((a,i)=>`<button class="${ta===i?'on':''}" data-t="${i}"><b>${esc(a[0])}</b><small>${esc(a[1])}</small></button>`).join('')}</div>
-    <div class="foot"><span class="lbl">Takım morali ${MOOD(tmOf())} ${Math.round(tmOf())}</span><button class="btn" data-ok>Devam</button></div></div>`;
-    sh.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ qa=+b.dataset.q; beep(560,.04); render(); });
-    sh.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ ta=+b.dataset.t; beep(560,.04); render(); });
-    sh.querySelector('[data-ok]').onclick=()=>{ Q.a[qa][2](); T[ta][2](); saveStory(); sh.remove(); beep(700); if(ST.fineNote){ ST.fineNote=0; toast('Federasyon cezası'); } next(); }; };
-  render(); $('#app').appendChild(sh);
+  const OUT=['Flix Spor','Tribün Gazetesi','Kale Arkası TV','Saha Kenarı','Gol Postası'], outlet=OUT[Math.floor(Math.random()*OUT.length)];
+  const MD=c.my>c.op?['ecstatic','happy','neutral']:c.my===c.op?['neutral','angry','happy']:['worried','angry','angry'], base=c.my>c.op?'happy':c.my<c.op?'worried':'neutral';
+  const talkM=m=>m==='happy'||m==='ecstatic'?'ecstatic':'shocked';
+  let ta=0, timers=[];
+  const sh=document.createElement('div'); sh.className='sheet pcs';
+  const mic=(x,r,col)=>`<svg class="pcmic" style="left:${x}%;transform:rotate(${r}deg)" viewBox="0 0 20 50"><rect x="8.5" y="14" width="3" height="36" fill="#222"/><rect x="3" y="12" width="14" height="9" rx="2" fill="${col}" stroke="#15215c" stroke-width="1.5"/><ellipse cx="10" cy="8" rx="6" ry="7.5" fill="#2b2f3a" stroke="#15215c" stroke-width="1.5"/></svg>`;
+  sh.innerHTML=`<div class="in"><div class="pc" id="pc"><div class="pcwall" style="background-image:url(${LOGO})"></div><div class="pclight"></div>
+    <div class="pccoach" id="pcC">${coachSVG(COACH,base,{nobg:1})}</div>
+    ${mic(36,-14,'#c8102e')}${mic(43,-5,'#ffc72c')}${mic(52,6,'#fff')}${mic(59,15,'#1d6fd8')}
+    <div class="pctable"><span>Basın toplantısı</span></div>
+    <svg class="pcrep" viewBox="0 0 100 100"><path d="M2 100 Q4 74 30 70 L50 70 Q66 72 72 84 L74 100Z" fill="#0c1440"/><circle cx="38" cy="48" r="21" fill="#0c1440"/><path d="M56 78 L80 44" stroke="#0c1440" stroke-width="8" stroke-linecap="round"/><rect x="74" y="36" width="15" height="11" rx="2" fill="#c8102e" stroke="#fff" stroke-width="1.5"/><circle cx="84" cy="31" r="7" fill="#2b2f3a" stroke="#fff" stroke-width="1.5"/></svg>
+    <div class="pcbub rep" id="pcQ"><small>${esc(outlet)}</small><span></span></div>
+    <div class="pcbub co" id="pcA"><small>${esc(COACH.name||'Hoca')}</small><span></span></div></div>
+    <div id="pcBody"><div class="rp pcans" hidden>${Q.a.map((a,i)=>`<button data-q="${i}" style="animation-delay:${i*90}ms"><b>“${esc(a[0])}”</b><small>${esc(a[1])}</small></button>`).join('')}</div></div></div>`;
+  $('#app').appendChild(sh);
+  const pc=sh.querySelector('#pc'), C=sh.querySelector('#pcC'), live=()=>sh.isConnected;
+  const later=(f,ms)=>timers.push(setTimeout(()=>{ if(live())f(); },ms));
+  const flash=(n=1)=>{ for(let i=0;i<n;i++)later(()=>{ const f=document.createElement('i'); f.className='pcflash'; f.style.left=(Math.random()*90-5)+'%'; f.style.top=(Math.random()*60-10)+'%'; pc.appendChild(f); setTimeout(()=>f.remove(),400); beep(1700+Math.random()*400,.012); },i*110+Math.random()*60); };
+  const amb=()=>{ if(!live())return; flash(Math.random()<.3?2:1); timers.push(setTimeout(amb,900+Math.random()*1300)); }; later(amb,500);
+  const type=(el,txt,done,talk)=>{ const sp=el.querySelector('span'); el.classList.add('on'); let i=0, mood=talk;
+    const t=setInterval(()=>{ if(!live())return clearInterval(t); i+=1+(txt[i]===' '?1:0); sp.textContent=txt.slice(0,i);
+      if(talk&&i%3===0){ mood=mood===talk?talkM(talk):talk; C.innerHTML=coachSVG(COACH,mood,{nobg:1}); }
+      if(i>=txt.length){ clearInterval(t); if(talk)C.innerHTML=coachSVG(COACH,talk,{nobg:1}); C.classList.remove('talk'); done&&done(); } },24);
+    if(talk)C.classList.add('talk'); timers.push(t); };
+  later(()=>type(sh.querySelector('#pcQ'),Q.q,()=>{ const a=sh.querySelector('.pcans'); a.hidden=false;
+    a.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>answer(+b.dataset.q)); }),350);
+  const answer=qa=>{ beep(620,.05); buzz(10); const m0=Math.round(tmOf()); Q.a[qa][2](); saveStory(); const m1=Math.round(tmOf());
+    sh.querySelector('#pcQ').classList.remove('on'); sh.querySelector('#pcBody').innerHTML='';
+    type(sh.querySelector('#pcA'),Q.a[qa][0],()=>{ flash(5);
+      const st=document.createElement('div'); st.className='pcstamp'; st.textContent=Q.a[qa][1]; pc.appendChild(st);
+      later(()=>showTrain(m0,m1),650); },MD[qa]); };
+  const showTrain=(m0,m1)=>{ const B=sh.querySelector('#pcBody');
+    const render=()=>{ B.innerHTML=`<div class="pcroom"><span class="lbl">Soyunma odası</span><b>${MOOD(m0)} ${m0}</b><span>→</span><b class="${m1>m0?'plus':m1<m0?'minus':''}">${MOOD(m1)} ${m1}</b></div>
+      <div class="lbl" style="color:var(--yellow)">Bu haftanın antrenmanı</div>
+      <div class="rp">${T.map((a,i)=>`<button class="${ta===i?'on':''}" data-t="${i}"><b>${esc(a[0])}</b><small>${esc(a[1])}</small></button>`).join('')}</div>
+      <div class="foot"><span></span><button class="btn" data-ok>Devam</button></div>`;
+      B.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ ta=+b.dataset.t; beep(560,.04); render(); });
+      B.querySelector('[data-ok]').onclick=()=>{ T[ta][2](); saveStory(); timers.forEach(t=>{clearTimeout(t);clearInterval(t);}); sh.remove(); beep(700); if(ST.fineNote){ ST.fineNote=0; toast('Federasyon cezası'); } next(); }; };
+    render(); };
 }
 /* ---------- haftalık olaylar ---------- */
 function makeEvent(){
