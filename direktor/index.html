@@ -147,7 +147,7 @@ svg.kit{display:block;}
 .tok.sel svg{transform:scale(1.18);}
 .tok.sel .nm,.tok.in .nm{background:var(--yellow);color:var(--navy);}
 .hint{text-align:center;font-size:11.5px;opacity:.9;margin-top:-2px;min-height:14px;}
-.hand{display:flex;gap:10px;overflow-x:auto;padding:12px 4px 8px;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:166px;flex:none;}
+.hand{display:flex;gap:10px;overflow-x:auto;padding:10px 4px 6px;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:160px;flex:none;}
 .hand::-webkit-scrollbar{display:none;}
 .pcard{flex:none;width:136px;min-height:146px;scroll-snap-align:start;background:var(--paper);color:var(--ink);border:3px solid var(--navy);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:0 4px 0 var(--navy);transition:transform .15s,box-shadow .15s;position:relative;animation:deal .3s cubic-bezier(.2,1.4,.4,1) backwards;}
 .pcard:nth-child(2){animation-delay:.06s}.pcard:nth-child(3){animation-delay:.12s}.pcard:nth-child(4){animation-delay:.18s}
@@ -173,6 +173,9 @@ svg.kit{display:block;}
 .pcard.live{width:100%;animation:none;transform:none;}
 .pcard.live .big{font-size:40px;font-variant-numeric:tabular-nums;}
 .act{display:flex;align-items:center;gap:12px;}
+.tacbar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--navy);border-radius:12px;padding:4px;flex:none;}
+.tacbar button{min-height:34px;border-radius:9px;font-family:var(--display);font-style:italic;font-weight:800;font-size:15px;text-transform:uppercase;}
+.tacbar button.on{background:var(--yellow);color:var(--navy);}
 .timer{flex:1;min-width:0;}
 .timer .bar{height:8px;background:rgba(12,20,64,.4);border-radius:4px;overflow:hidden;}
 .timer .bar i{display:block;height:100%;background:var(--yellow);transform-origin:left;}
@@ -279,19 +282,13 @@ svg.kit{display:block;}
     <div class="foot"><button class="btn ghost" id="hubSim">Hızlı sonuç</button><button class="btn" id="hubPlay">Maça çık</button></div>
   </section>
 
-  <section class="screen" id="lineup" hidden>
-    <div class="top"><button class="back" id="luBack">‹ Geri</button><h2 class="disp">Kadro</h2></div>
-    <div class="rule" id="luRule"></div>
-    <div class="scroll"><div class="xi" id="luXI"></div><div class="lbl" style="opacity:.8" id="luBenchLbl">Yedekler (maç kadrosu)</div><div class="xi" id="luBench"></div></div>
-    <div class="foot"><button class="btn ghost" id="luAuto">En iyi 11</button><button class="btn" id="luGo">Başla</button></div>
-  </section>
-
   <section class="screen" id="match" hidden>
     <div class="board" id="board"></div>
     <div class="feed" id="feed"></div>
     <div class="pitch" id="pitch"></div>
     <div class="hint" id="hint"></div>
     <div class="hand" id="hand"></div>
+    <div class="tacbar" id="tacbar" role="group" aria-label="Taktik"></div>
     <div class="act">
       <div class="timer"><div class="bar"><i id="tbar"></i></div><span id="tlbl"></span></div>
       <button class="btn" id="bDecide">Atla ›</button>
@@ -376,18 +373,18 @@ function kit(c,num){
   return `<svg class="kit" viewBox="0 0 40 40" aria-hidden="true"><defs><clipPath id="${id}"><path d="${shirt}"/></clipPath></defs><g clip-path="url(#${id})">${p}</g><path d="${shirt}" fill="none" stroke="#15215c" stroke-width="1.6" stroke-linejoin="round"/>${t}</svg>`;
 }
 
-/* ---------- kadrolar: gerçek oyunculara gönderme yapan çakma isimler. Y = yabancı ---------- */
+/* ---------- kadrolar: tamamen uydurma, sadece hafifçe çağrıştıran isimler. Sondaki iki harf = uyruk (yoksa Türk) ---------- */
 const SQ={
- '2324-GAL':'KL Fernando Mustlera 82 Y|SĞB Sacha Bovey 79 Y|STP Victor Nelssen 79 Y|STP Davinson Sanchoz 80 Y|STP Abdülkerim Bardakçık 77|SLB Angelinyo 78 Y|DOS Lucas Torreyra 83 Y|DOS Kerem Demirbey 78|DOS Tanguy Ndombelli 77 Y|OOS Dries Merdiven 81 Y|SĞK Hakim Ziyeş 82 Y|SLK Kerem Aktürkoyun 81|FV Mauro İkardo 86 Y|SLK Wilfried Zahar 79 Y|SĞK Barış Alper Yılmazer 79|KNT Teté Teteoğlu 76 Y|DOS Kaan Ayhanlı 76|OOS Berkan Kutlubey 74|FV Halil Dervişoğlan 74|SLK Yunus Akgünay 75|KL Günay Güvencli 72|SLB Derrick Kön 74 Y|OOS Sergio Olivero 76 Y',
- '2324-FEN':'KL Dominik Livakovski 82 Y|SĞB Bright Osayi-Lemuel 78 Y|STP Alexander Cicu 78 Y|STP Rodrigo Bekon 77 Y|STP Çağlar Söylüncü 79|SLB Ferdi Kadıoğlan 82|SLB Jayden Osterwolf 77 Y|DOS Fredo 83 Y|DOS İsmail Yüksekçe 78|OOS Sebastian Şimanski 83 Y|SLK Dušan Tadiş 83 Y|SĞK İrfan Can Kahveli 79|FV Edin Ceko 84 Y|FV Michy Batşuayi 78 Y|SĞK Cengiz Ündercan 78|SLK Ryan Kentsel 74 Y|DOS Mert Hakan Yandaşlı 75|DOS Rade Kruniç 76 Y|KL İrfan Can Eğrisayat 73|STP Serdar Azizoğlu 74|FV Joshua Kingo 74 Y|SĞB Mert Müldürlü 76',
- '2324-BEŞ':'KL Mert Gönük 80|SĞB Onur Bulutlu 74|STP Daniel Amarteyi 75 Y|STP Omar Kolley 76 Y|STP Eric Baylı 76 Y|SLB Arthur Masuako 77 Y|DOS Al-Mısrati 78 Y|DOS Gedson Fernandez 80 Y|DOS Salih Uçanoğlu 76|OOS Rachid Gazal 79 Y|FV Vincent Abubekir 80 Y|FV Cenk Tosuncuk 76|FV Semih Kılıçsoylu 75|SLK Milot Raşika 77 Y|DOS Jean Ananas 75 Y|SĞK Ante Rebiç 77 Y|DOS Necip Uysallı 73|OOS Ernest Muçiç 75 Y|KL Ersin Destancı 72|BEK Emrecan Uzunhanlı 71|SĞK Tayfur Bingöllü 74',
- '2324-TRA':'KL Uğurcan Çakmak 81|SĞB Pedro Malheira 75 Y|STP Stefano Denzwil 75 Y|STP Hüseyin Türkmenli 73|SLB Eren Elmalıca 75|BEK Mehmetcan Aydınlık 73|DOS Batista Mendi 76 Y|OOS Enis Bardi 78 Y|OOS Anastasios Bakaletas 77 Y|OOS Abdülkadir Ömürlü 76|SĞK Edin Vişçe 79 Y|SLK Trezegol 79 Y|FV Paul Onuaçu 82 Y|FV Umut Bozoklu 74|SĞK Nikola Pepeç 78 Y|SLB Tymoteusz Puhaç 74 Y|DOS Ozan Tufancı 75|KL Taha Tepeli 70|SLK Mislav Orşiç 76 Y|STP Serdar Saatçioğlu 72',
- '2324-BAŞ':'KL Volkan Babacanlı 76|SĞB Ömer Ali Şahinbey 72|STP Leo Duartez 76 Y|STP Jerome Opuku 75 Y|STP Hamza Gürelek 71|SLB Lucas Bilginer 72|DOS Berat Özdemirci 76|DOS Olivier Kemence 75 Y|DOS Mahmut Tekdemirli 74|OOS Deniz Türüçlü 76|OOS Lukas Limon 75 Y|SĞK Serdar Gürlek 75|SLK Patryk Şiş 74 Y|FV Krzysztof Piontek 79 Y|FV Philippe Kenyi 72 Y|KNT Ahmed Kutucuklu 71|KL Muhammed Şengezer 70|DOS Danijel Aleksiç 74 Y|BEK Ravil Tagir 71',
- '2425-GAL':'KL Fernando Mustlera 81 Y|SĞB Elias Jelerte 74 Y|STP Davinson Sanchoz 80 Y|STP Abdülkerim Bardakçık 78|SLB İsmail Jakops 77 Y|BEK Kaan Ayhanlı 76|BEK Przemek Frankovski 77 Y|DOS Lucas Torreyra 83 Y|DOS Mario Lemine 79 Y|OOS Gabriel Sarah 81 Y|OOS Dries Merdiven 79 Y|SĞK Barış Alper Yılmazer 82|SLK Yunus Akgünay 79|FV Victor Osimyen 88 Y|FV Alvaro Moratta 81 Y|SĞK Roland Salai 78 Y|FV Mauro İkardo 84 Y|DOS Kerem Demirbey 76|OOS Berkan Kutlubey 74|STP Metehan Baltacık 70|KL Günay Güvencli 72|FV Ahmed Kutucuklu 72',
- '2425-FEN':'KL Dominik Livakovski 82 Y|SĞB Mert Müldürlü 77|STP Milan Şkrinyar 82 Y|STP Alexander Cicu 78 Y|STP Çağlar Söylüncü 77|SLB Jayden Osterwolf 78 Y|SLB Filip Kostiç 78 Y|SĞB Bright Osayi-Lemuel 77 Y|DOS Sofyan Amrabet 81 Y|DOS Fredo 82 Y|DOS İsmail Yüksekçe 78|OOS Sebastian Şimanski 81 Y|SLK Dušan Tadiş 82 Y|SLK Allan Saint-Maksimen 79 Y|FV Youssef En-Nesir 83 Y|FV Edin Ceko 82 Y|SĞK İrfan Can Kahveli 79|SĞK Cengiz Ündercan 76|OOS Anderson Taliska 80 Y|SĞK Oğuz Aydınoğlu 75|KL İrfan Can Eğrisayat 73',
- '2425-BEŞ':'KL Mert Gönük 80|SĞB Jonas Svenson 75 Y|STP Gabriel Paulisto 78 Y|STP Felix Uduokay 77 Y|SLB Arthur Masuako 76 Y|DOS Wilfred Ndidy 80 Y|DOS Gedson Fernandez 80 Y|DOS Al-Mısrati 76 Y|OOS Rafa Silvaz 84 Y|FV Ciro İmmobilya 82 Y|FV Semih Kılıçsoylu 76|OOS Ernest Muçiç 77 Y|SLK Milot Raşika 76 Y|DOS Salih Uçanoğlu 75|SĞK Joao Marios 78 Y|DOS Cher Ndur 75 Y|DOS Necip Uysallı 72|KL Ersin Destancı 72|STP Emirhan Topçuk 73|SĞK Keny Aroyo 75 Y',
- '2425-TRA':'KL Uğurcan Çakmak 81|SĞB Pedro Malheira 74 Y|STP Stefano Denzwil 75 Y|STP Arseniy Batagof 74 Y|SLB Eren Elmalıca 74|BEK Mehmetcan Aydınlık 72|DOS Okay Yokuşçu 75|DOS Batista Mendi 76 Y|DOS John Lundstrem 76 Y|DOS Ozan Tufancı 74|SĞK Edin Vişçe 77 Y|SLK Muhammed Çam 77 Y|FV Simon Banzai 80 Y|SĞK Denis Draguş 76 Y|SLK Trezegol 78 Y|KNT Anthony Nwakaemi 75 Y|OOS Oleksandr Zubkof 76 Y|FV Umut Bozoklu 72|KL Taha Tepeli 70|STP Serdar Saatçioğlu 73',
- '2425-SAM':'KL Okan Koçak 76|SĞB Zeki Yavrucuk 73|STP Rick van Drongel 77 Y|STP Lubomir Şatka 75 Y|SLB Logi Tomason 74 Y|BEK Soner Gönüllü 72|DOS Olivier Nçam 77 Y|DOS Antoine Makumbu 75 Y|DOS Celil Yükselen 72|OOS Carlo Holsen 77 Y|SLK Emre Kılıçlı 75|SĞK Tanguy Kulibali 75 Y|FV Marius Muandil 77 Y|FV Yunus Emre Çiftçi 71|OOS Efe Berkay Gümüş 70|KNT Polat Yaldızlı 70|KL Albert Posiadalı 72 Y|STP Toni Borevkoviç 73 Y',
+ '2324-GAL':'KL Fernando Muşmula 82 UY|SĞB Saşa Boyacı 79 FR|STP Viktor Nelbiber 79 DK|STP Davidson Sandviç 80 CO|STP Abdülkadir Bardaklı 77|SLB Anjeloş 78 ES|DOS Lukas Tereyağ 83 UY|DOS Kerim Demirbaş 78|DOS Tango Dombili 77 FR|OOS Dris Merdiven 81 BE|SĞK Hakim Ziyafet 82 MA|SLK Kerem Aktavuk 81|FV Mavro Kartopu 86 AR|SLK Wilfred Zahire 79 CI|SĞK Barış Alp Yılmazgil 79|KNT Tete Tepetaş 76 BR|DOS Kaan Ayvalı 76|OOS Berkant Kutludağ 74|FV Halim Dervişali 74|SLK Yunus Akgüneş 75|KL Güney Güvenli 72|SLB Derek Kömür 74 DE|OOS Sergio Zeytinero 76 PT',
+ '2324-FEN':'KL Dominik Lavaboviç 82 HR|SĞB Brayt Osaylemon 78 NG|STP Aleks Cikcik 78 GH|STP Rodrigo Bekmez 77 BR|STP Çağlar Söylemez 79|SLB Ferdi Kadayıf 82|SLB Jayden Oysterkurt 77 NL|DOS Fredolino 83 BR|DOS İsmail Yüksektepe 78|OOS Sebastyan Şimşekski 83 PL|SLK Duşan Tatlış 83 RS|SĞK İrfan Can Kahvaltı 79|FV Edin Çekiç 84 BA|FV Miki Batsuyu 78 BE|SĞK Cengiz Ünlücan 78|SLK Rayan Kentsel 74 GB|DOS Mert Kağan Yanaşık 75|DOS Rade Kurabiyeviç 76 BA|KL İrfan Can Eğribayır 73|STP Serdar Azizcan 74|FV Coşua Kinglet 74 NO|SĞB Mert Müdürlü 76',
+ '2324-BEŞ':'KL Mert Gönülsüz 80|SĞB Onur Bulutsu 74|STP Danyel Amartelli 75 GH|STP Omar Kolaylı 76 GM|STP Erik Baylan 76 CI|SLB Artur Masamaku 77 CD|DOS El-Mısırlı 78 LY|DOS Gedson Fındıkdez 80 PT|DOS Salih Uçurtma 76|OOS Raşid Gazoz 79 DZ|FV Vinsent Abubaba 80 CM|FV Cenk Tosbağa 76|FV Semih Kılıçbaşı 75|SLK Milot Raşitka 77 XK|DOS Jan Ananas 75 CM|SĞK Ante Reçelviç 77 HR|DOS Necip Uysalcan 73|OOS Ernest Muçuk 75 AL|KL Ersin Destansı 72|BEK Emrecan Uzunboylu 71|SĞK Tayfun Bingöllüoğlu 74',
+ '2324-TRA':'KL Uğurcan Çakmaktaş 81|SĞB Pedro Malhazır 75 PT|STP Stefano Denizvil 75 NL|STP Hüseyin Türkmenoğlu 73|SLB Eren Elmalıtepe 75|BEK Mehmetcan Aydıncık 73|DOS Batista Mendil 76 FR|OOS Enis Bardak 78 MK|OOS Anastas Bakkaletas 77 GR|OOS Abdülkadir Ömürboyu 76|SĞK Edin Vişne 79 BA|SLK Trezegolcü 79 EG|FV Pol Onuçalı 82 NG|FV Umut Bozokçu 74|SĞK Nikola Pepelaz 78 CI|SLB Timoteuş Puhaçik 74 PL|DOS Ozan Tufanlı 75|KL Taha Tepecik 70|SLK Mislav Orkiniç 76 HR|STP Serdar Saatlıoğlu 72',
+ '2324-BAŞ':'KL Volkan Babacık 76|SĞB Ömer Ali Şahinkaya 72|STP Leo Duvarte 76 BR|STP Jerom Opucuk 75 GH|STP Hamza Güreşçi 71|SLB Lukas Bilgiç 72|DOS Berat Özdemirtaş 76|DOS Olivye Kemence 75 FR|DOS Mahmut Tekdemirci 74|OOS Deniz Türküçlü 76|OOS Lukas Limonata 75 BR|SĞK Serdar Gürlekçi 75|SLK Patrik Şişkebap 74 PL|FV Kriştof Piyonçek 79 PL|FV Filip Kenyalı 72 SN|KNT Ahmet Kutucuk 71|KL Muhammet Şengezgin 70|DOS Danyel Aleksoviç 74 RS|BEK Ravil Tağıl 71',
+ '2425-GAL':'KL Fernando Muşmula 81 UY|SĞB Elyas Jöleli 74 DK|STP Davidson Sandviç 80 CO|STP Abdülkadir Bardaklı 78|SLB İsmail Jakoben 77 SN|BEK Kaan Ayvalı 76|BEK Pşemek Frankfurtski 77 PL|DOS Lukas Tereyağ 83 UY|DOS Mario Limoni 79 GA|OOS Gabriel Saraylı 81 BR|OOS Dris Merdiven 79 BE|SĞK Barış Alp Yılmazgil 82|SLK Yunus Akgüneş 79|FV Viktor Osmanyen 88 NG|FV Alvaro Mortadella 81 ES|SĞK Roland Salata 78 HU|FV Mavro Kartopu 84 AR|DOS Kerim Demirbaş 76|OOS Berkant Kutludağ 74|STP Metehan Baltalı 70|KL Güney Güvenli 72|FV Ahmet Kutucuk 72',
+ '2425-FEN':'KL Dominik Lavaboviç 82 HR|SĞB Mert Müdürlü 77|STP Milan Şekerinyar 82 SK|STP Aleks Cikcik 78 GH|STP Çağlar Söylemez 77|SLB Jayden Oysterkurt 78 NL|SLB Filip Köstekiç 78 RS|SĞB Brayt Osaylemon 77 NG|DOS Sofyan Amrapet 81 MA|DOS Fredolino 82 BR|DOS İsmail Yüksektepe 78|OOS Sebastyan Şimşekski 81 PL|SLK Duşan Tatlış 82 RS|SLK Alan Sen-Maksimum 79 FR|FV Yusuf En-Neşeli 83 MA|FV Edin Çekiç 82 BA|SĞK İrfan Can Kahvaltı 79|SĞK Cengiz Ünlücan 76|OOS Anderson Talaşka 80 BR|SĞK Oğuz Aydıncan 75|KL İrfan Can Eğribayır 73',
+ '2425-BEŞ':'KL Mert Gönülsüz 80|SĞB Yonas Sevensen 75 NO|STP Gabriel Pavlisto 78 BR|STP Feliks Udukay 77 DE|SLB Artur Masamaku 76 CD|DOS Vilfred Didili 80 NG|DOS Gedson Fındıkdez 80 PT|DOS El-Mısırlı 76 LY|OOS Rafa Silgiç 84 PT|FV Ciro İmmobilya 82 IT|FV Semih Kılıçbaşı 76|OOS Ernest Muçuk 77 AL|SLK Milot Raşitka 76 XK|DOS Salih Uçurtma 75|SĞK Joao Marulyo 78 PT|DOS Şer Ndurdu 75 IT|DOS Necip Uysalcan 72|KL Ersin Destansı 72|STP Emirhan Topçubaşı 73|SĞK Keni Arayolu 75 EC',
+ '2425-TRA':'KL Uğurcan Çakmaktaş 81|SĞB Pedro Malhazır 74 PT|STP Stefano Denizvil 75 NL|STP Arseni Batakof 74 UA|SLB Eren Elmalıtepe 74|BEK Mehmetcan Aydıncık 72|DOS Okay Yokuşlu 75|DOS Batista Mendil 76 FR|DOS Con Lunapark 76 GB|DOS Ozan Tufanlı 74|SĞK Edin Vişne 77 BA|SLK Muhammed Çamlıca 77 AT|FV Simon Bonzai 80 CD|SĞK Denis Dragula 76 RO|SLK Trezegolcü 78 EG|KNT Antoni Nakamiş 75 NG|OOS Aleksandr Zımbakof 76 UA|FV Umut Bozokçu 72|KL Taha Tepecik 70|STP Serdar Saatlıoğlu 73',
+ '2425-SAM':'KL Okan Koçyiğit 76|SĞB Zeki Yavrukuş 73|STP Rik van Dondurma 77 NL|STP Lubomir Şatafat 75 SK|SLB Logi Tomatesson 74 IS|BEK Soner Gönülçelen 72|DOS Olivye Ncamcı 77 FR|DOS Antuan Makarna 75 CG|DOS Celil Yükseltepe 72|OOS Karlo Holsenli 77 DK|SLK Emre Kılıçarslanlı 75|SĞK Tango Kulübeli 75 ML|FV Marius Mandalina 77 TD|FV Yunus Emre Çiftlikçi 71|OOS Efe Berkay Gümüşlük 70|KNT Polat Yaldızcı 70|KL Albert Posyadalı 72 PL|STP Toni Börekoviç 73 HR',
 };
 const SEASONS={
  '2324':{label:'2023-24',ded:{KAY:-3,İST:-3},play:['GAL','FEN','TRA','BAŞ','BEŞ'],
@@ -395,7 +392,6 @@ const SEASONS={
  '2425':{label:'2024-25',ded:{ADE:-12},play:['GAL','FEN','BEŞ','SAM','TRA'],
    real:{GAL:'1. · 95 puan',FEN:'2. · 84 puan',SAM:'3. · 64 puan',BEŞ:'4. · 62 puan',TRA:'7. · 51 puan'}},
 };
-const FOREIGN_MAX=12; // maç kadrosunda (11 + 7 yedek) en fazla 12 yabancı
 const GRP={KL:'G',SĞB:'D',STP:'D',SLB:'D',BEK:'D',DOS:'M',OOS:'M',SĞK:'A',SLK:'A',KNT:'A',FV:'A'};
 const SLOTS=[['KL',['KL']],['SĞB',['SĞB','BEK']],['STP',['STP']],['STP',['STP']],['SLB',['SLB','BEK']],['DOS',['DOS']],['DOS',['DOS','OOS']],['SĞK',['SĞK','KNT','SLK']],['OOS',['OOS','DOS']],['SLK',['SLK','KNT','SĞK']],['FV',['FV']]];
 const FILL=[0,10,2,3,5,8,1,4,7,9,6];
@@ -404,18 +400,8 @@ const TR_L=['Aydınlı','Karabulut','Tezcan','Yavuzer','Erdemli','Sönmez','Akdo
 const FOR=['Lucas Brenvik','Tiago Mourão','Ousmane Dialé','Nikolai Vrebac','Mateo Saldivo','Jonas Feldtner','Kofi Amensah','Ivo Stanković','Rafael Quintela','Sami Okafar','Emil Brandvoll','Dario Pellucchi','Yannick Obéri','Marek Jelinko','Bruno Teixal','Axel Norrbeck','Ilias Benaddo','Pavel Hronik'];
 const GENPOS=['KL','SĞB','STP','STP','SLB','DOS','DOS','SĞK','OOS','SLK','FV','KL','STP','DOS','OOS','KNT','FV','BEK','DOS','SLK'];
 const NUM={KL:[1,12,35],SĞB:[2,22],STP:[4,5,15,3,44],SLB:[3,18,33],BEK:[13,24],DOS:[6,8,16,23,26],OOS:[10,20,14,21],SĞK:[7,17],SLK:[11,19],KNT:[27,77],FV:[9,99,29]};
-/* uyruk: soyadın son kelimesinden. Listede olmayan Türk oyuncudur */
-const NAT={Mustlera:'UY',Bovey:'FR',Nelssen:'DK',Sanchoz:'CO',Angelinyo:'ES',Torreyra:'UY',Ndombelli:'FR',Merdiven:'BE',Ziyeş:'MA',İkardo:'AR',Zahar:'CI',Teteoğlu:'BR',Kön:'DE',Olivero:'PT',
- Livakovski:'HR','Osayi-Lemuel':'NG',Cicu:'GH',Bekon:'BR',Osterwolf:'NL',Fredo:'BR',Şimanski:'PL',Tadiş:'RS',Ceko:'BA',Batşuayi:'BE',Kentsel:'GB',Kruniç:'BA',Kingo:'NO',
- Amarteyi:'GH',Kolley:'GM',Baylı:'CI',Masuako:'CD','Al-Mısrati':'LY',Fernandez:'PT',Gazal:'DZ',Abubekir:'CM',Raşika:'XK',Ananas:'CM',Rebiç:'HR',Muçiç:'AL',
- Malheira:'PT',Denzwil:'NL',Mendi:'FR',Bardi:'MK',Bakaletas:'GR',Vişçe:'BA',Trezegol:'EG',Onuaçu:'NG',Pepeç:'CI',Puhaç:'PL',Orşiç:'HR',
- Duartez:'BR',Opuku:'GH',Kemence:'FR',Limon:'BR',Şiş:'PL',Piontek:'PL',Kenyi:'SN',Aleksiç:'RS',
- Jelerte:'DK',Jakops:'SN',Frankovski:'PL',Lemine:'GA',Sarah:'BR',Osimyen:'NG',Moratta:'ES',Salai:'HU',
- Şkrinyar:'SK',Kostiç:'RS',Amrabet:'MA','Saint-Maksimen':'FR','En-Nesir':'MA',Taliska:'BR',
- Svenson:'NO',Paulisto:'BR',Uduokay:'DE',Ndidy:'NG',Silvaz:'PT',İmmobilya:'IT',Marios:'PT',Ndur:'IT',Aroyo:'EC',
- Batagof:'UA',Lundstrem:'GB',Çam:'AT',Draguş:'RO',Banzai:'CD',Nwakaemi:'NG',Zubkof:'UA',
- Drongel:'NL',Şatka:'SK',Tomason:'IS',Nçam:'FR',Makumbu:'CG',Holsen:'DK',Kulibali:'ML',Muandil:'TD',Posiadalı:'PL',Borevkoviç:'HR',
- Brenvik:'NO',Mourão:'PT',Dialé:'SN',Vrebac:'RS',Saldivo:'AR',Feldtner:'DE',Amensah:'GH',Stanković:'HR',Quintela:'BR',Okafar:'NG',Brandvoll:'NO',Pellucchi:'IT',Obéri:'CI',Jelinko:'CZ',Teixal:'PT',Norrbeck:'SE',Benaddo:'MA',Hronik:'CZ'};
+/* üretilen yabancı oyuncuların uyruğu */
+const NAT={Brenvik:'NO',Mourão:'PT',Dialé:'SN',Vrebac:'RS',Saldivo:'AR',Feldtner:'DE',Amensah:'GH',Stanković:'HR',Quintela:'BR',Okafar:'NG',Brandvoll:'NO',Pellucchi:'IT',Obéri:'CI',Jelinko:'CZ',Teixal:'PT',Norrbeck:'SE',Benaddo:'MA',Hronik:'CZ'};
 const flagOf=cc=>String.fromCodePoint(...[...cc].map(ch=>127397+ch.charCodeAt(0)));
 const flag=p=>flagOf(p.nat);
 const CACHE={};
@@ -423,11 +409,11 @@ function squad(season,c){
   const key=season+'-'+c; if(CACHE[key])return CACHE[key];
   const used={}, num=pos=>{const l=NUM[pos];used[pos]=(used[pos]||0)+1;return l[(used[pos]-1)%l.length]+(used[pos]>l.length?40:0);};
   let list;
-  if(SQ[key]) list=SQ[key].split('|').map((s,i)=>{const t=s.split(' ');const pos=t[0],y=t[t.length-1]==='Y';const ovr=+t[y?t.length-2:t.length-1];const name=t.slice(1,y?-2:-1).join(' ');return {id:key+':'+i,pos,name,ovr,y};});
+  if(SQ[key]) list=SQ[key].split('|').map((s,i)=>{const t=s.split(' ');const pos=t[0],nat=/^[A-Z]{2}$/.test(t[t.length-1])?t.pop():'TR';const ovr=+t.pop();return {id:key+':'+i,pos,name:t.slice(1).join(' '),ovr,nat};});
   else { const r=rngF(hash(key)),st=strength(season,c),base=Math.round(66+st.q*10),seen=new Set();
     list=GENPOS.map((pos,i)=>{let name;do{name=r()<.3?FOR[Math.floor(r()*FOR.length)]:TR_F[Math.floor(r()*TR_F.length)]+' '+TR_L[Math.floor(r()*TR_L.length)];}while(seen.has(name));seen.add(name);
-      return {id:key+':'+i,pos,name,ovr:base+(i>10?-3:0)+Math.round((r()-.5)*6),y:FOR.includes(name)};}); }
-  list.forEach(p=>{p.nat=p.y?(NAT[p.name.split(' ').pop()]||'EU'):'TR';p.g=GRP[p.pos];p.num=num(p.pos);const w=p.name.split(' ');p.short=w.length>1?w[0][0]+'. '+w.slice(1).join(' '):p.name;
+      return {id:key+':'+i,pos,name,ovr:base+(i>10?-3:0)+Math.round((r()-.5)*6),nat:FOR.includes(name)?NAT[name.split(' ').pop()]:'TR'};}); }
+  list.forEach(p=>{p.g=GRP[p.pos];p.num=num(p.pos);const w=p.name.split(' ');p.short=w.length>1?w[0][0]+'. '+w.slice(1).join(' '):p.name;
     p.att=p.g==='G'?10:p.g==='D'?p.ovr-16:p.g==='M'?p.ovr-4:p.ovr+3; p.def=p.g==='G'?p.ovr:p.g==='D'?p.ovr+2:p.g==='M'?p.ovr-3:p.ovr-28;});
   return CACHE[key]=list;
 }
@@ -442,7 +428,7 @@ function strength(season,c){
   return STR[k]={att,def,q:clamp((att/def-0.6)/1.6,0,1)};
 }
 
-/* en iyi 11 ve maç kadrosu (yabancı sınırı) */
+/* en iyi 11 ve yedekler */
 const valOf=(p,cond)=>p.ovr*(0.75+0.25*((cond&&cond[p.id])??100)/100);
 function bestXI(list,cond){
   const xi=Array(11).fill(null),used=new Set();
@@ -453,16 +439,17 @@ function bestXI(list,cond){
   return xi;
 }
 function benchFor(list,xi,cond){
-  const inXI=new Set(xi); let fc=foreignCount(list,xi);
+  const inXI=new Set(xi);
   const rest=list.filter(p=>!inXI.has(p.id)).sort((a,b)=>valOf(b,cond)-valOf(a,cond)), bench=[];
-  const gk=rest.find(p=>p.g==='G'&&(!p.y||fc<FOREIGN_MAX)); if(gk){bench.push(gk.id);if(gk.y)fc++;}
-  for(const p of rest){if(bench.length>=7)break;if(bench.includes(p.id)||p.g==='G')continue;if(p.y&&fc>=FOREIGN_MAX)continue;bench.push(p.id);if(p.y)fc++;}
+  const gk=rest.find(p=>p.g==='G'); if(gk)bench.push(gk.id);
+  for(const p of rest){if(bench.length>=7)break;if(p.g==='G')continue;bench.push(p.id);}
   return bench;
 }
-function foreignCount(list,ids){return ids.filter(id=>list.find(p=>p.id===id).y).length;}
 
 /* ---------- maç motoru (tohumlu) ---------- */
 const WA={G:0,D:.15,M:.35,A:.5},WD={G:.5,D:.4,M:.25,A:.05};
+/* taktik: kendi golüne çarpan (att) ve rakibin golüne çarpan (opp) */
+const TAC={'-2':{n:'Otobüs',att:.5,opp:.6},'-1':{n:'Kapalı',att:.75,opp:.78},'0':{n:'Dengeli',att:1,opp:1},'1':{n:'Hücum',att:1.25,opp:1.18},'2':{n:'Yüklen',att:1.48,opp:1.4}};
 let DOM=1.45,FAT=.45,GBASE=1.18; // DOM: güçlü-zayıf farkını açar (Poisson ortalamaya çeker), FAT: yorgunluğun etkisi
 function staOf(S,id,m){return clamp(S.sta0[id]-0.5*(m-(S.entry[id]||0)),25,100);}
 function sideQ(S,m){
@@ -487,7 +474,7 @@ function makeSide(season,c,xi,bench,cond,list=squad(season,c)){
 function lam(M,s,m){
   const A=M.sides[s],B=M.sides[s==='h'?'a':'h'],qa=sideQ(A,m),qb=sideQ(B,m);
   let l=(GBASE/90)*(s==='h'?1.1:.9)*Math.pow(A.str.att*B.str.def,DOM)*Math.pow(qa.a/A.base.a,3)*Math.pow(B.base.d/qb.d,3);
-  if(A.tac===1)l*=1.25; if(A.tac===-1)l*=.72; if(B.tac===1)l*=1.18; if(B.tac===-1)l*=.78;
+  l*=TAC[A.tac].att*TAC[B.tac].opp;
   return l;
 }
 function applyAct(M,s,act){
@@ -567,7 +554,7 @@ const MOMENTS=[46,60,70,80], DEC_SEC=20;
 let LIVE=null;
 const sig=d=>d.k==='sub'?'s'+d.o+'>'+d.i:d.k==='tac'?'t'+d.v:'w';
 const actOf=(d,m)=>d.k==='sub'?{k:'sub',o:d.o,i:d.i,m}:{k:'tac',v:d.v,m};
-const tacName=v=>v===1?'Hücum':v===-1?'Kapalı':'Dengeli';
+const tacName=v=>TAC[v].n;
 function playMatch(o,onEnd){
   const M=newMatch(o); M.dec=[];
   LIVE={M,onEnd,mode:'play',sel:null,custom:null,outSel:null,opts:[],timer:null,run:null,fast:false,react:false};
@@ -599,7 +586,15 @@ function evChip(m,html,cls='',live=true){
   const f=$('#feed'),d=document.createElement('div'); d.className='ev '+cls; d.innerHTML=`<b>${m}'</b>${html}`;
   f.prepend(d); while(f.children.length>14)f.lastChild.remove(); f.scrollLeft=0;
 }
-function drawAll(){ drawBoard(); drawPitch(); drawHand(); drawAct(); }
+function drawAll(){ drawBoard(); drawPitch(); drawHand(); drawAct(); drawTac(); }
+/* taktik çubuğu: maçın her anında değiştirilebilir */
+function drawTac(){
+  const L=LIVE,M=L.M,s=M.o.you,S=M.sides[s];
+  $('#tacbar').innerHTML=[-2,-1,0,1,2].map(v=>`<button class="${S.tac===v?'on':''}" data-v="${v}" ${M.done?'disabled':''}>${TAC[v].n}</button>`).join('');
+  $('#tacbar').querySelectorAll('button').forEach(b=>b.onclick=()=>{ const v=+b.dataset.v; if(S.tac===v||M.done||L.mode==='eval')return;
+    const act={k:'tac',v,m:M.m}; applyAct(M,s,act); M.acts.push(act); beep(640,.05); buzz(8);
+    evChip(M.m,`Sen: ${TAC[v].n.toLowerCase()} oyun`,'me'); if(L.mode==='dec'){L.opts=choices(M,s);L.sel=null;} drawAll(); });
+}
 function drawBoard(){
   const M=LIVE.M,h=M.sides.h,a=M.sides.a,you=M.o.you;
   const tag=s=>s===you?`Sen · ${tacName(M.sides[s].tac)}`:'Rakibi gör ›';
@@ -614,7 +609,7 @@ function situation(){
   c.push(['',`${S.subs} değişiklik hakkı`]);
   const tired=S.xi.filter(id=>staOf(S,id,M.m)<60).length; if(tired)c.push(['warn',`${tired} oyuncu yorgun`]);
   if(S.tac)c.push(['warn',tacName(S.tac)+' oyun']);
-  if(O.tac===1)c.push(['warn','Rakip hücumda']); else if(O.tac===-1)c.push(['','Rakip kapandı']);
+  if(O.tac)c.push([O.tac>0?'warn':'','Rakip: '+tacName(O.tac).toLowerCase()]);
   return c.map(([k,t])=>`<span class="chip ${k}">${t}</span>`).join('');
 }
 function drawPitch(){
@@ -713,11 +708,11 @@ function playerSheet(id){
   if(dec){L.outSel=id;drawPitch();}
   const canSub=dec&&S.subs>0;
   const sh=document.createElement('div'); sh.className='sheet';
-  sh.innerHTML=`<div class="in"><div class="pinfo">${kit(S.c,p.num)}<div><h3 class="disp">${esc(p.name)}</h3><div>${flag(p)} ${p.pos}${p.y?' · Yabancı':''}</div></div></div>
+  sh.innerHTML=`<div class="in"><div class="pinfo">${kit(S.c,p.num)}<div><h3 class="disp">${esc(p.name)}</h3><div>${flag(p)} ${p.pos}</div></div></div>
     <div class="stats"><div class="stat"><b>${p.ovr}</b><span>Güç</span></div><div class="stat"><b>%${Math.round(staOf(S,id,M.m))}</b><span>Kondisyon</span></div>
     <div class="stat"><b>${M.scorers.filter(g=>g.s===s&&g.n===p.short).length}</b><span>Gol</span></div><div class="stat"><b>${S.subs}</b><span>Hak</span></div></div>
     ${canSub?`<div class="lbl" style="color:var(--yellow)">Yerine kim girsin?</div>${S.bench.map(b=>{const q=S.P[b],dis=(q.g==='G')!==(p.g==='G');
-      return `<button class="bp" data-b="${b}" ${dis?'disabled':''}>${kit(S.c,q.num)}<div><div style="font-weight:700">${flag(q)} ${esc(q.name)}</div><small>${q.pos}${q.y?' · Yabancı':''}</small></div><b>${q.ovr}</b></button>`;}).join('')}`
+      return `<button class="bp" data-b="${b}" ${dis?'disabled':''}>${kit(S.c,q.num)}<div><div style="font-weight:700">${flag(q)} ${esc(q.name)}</div><small>${q.pos}</small></div><b>${q.ovr}</b></button>`;}).join('')}`
       :`<div class="note">${dec?'Değişiklik hakkın bitti.':'Değişikliği karar anında yapabilirsin.'}</div>`}
     <div class="foot"><span></span><button class="btn ghost" data-x>Kapat</button></div></div>`;
   const close=()=>{sh.remove();L.outSel=null;if(LIVE===L)drawPitch();};
@@ -774,7 +769,7 @@ function fixtures(season){
 }
 let ST=null;
 const saveStory=()=>store.set('fdStory',ST);
-const SQUAD_MAX=28, SQUAD_MIN=16, LIST_FOREIGN=14;
+const SQUAD_MAX=28, SQUAD_MIN=16;
 const getP=id=>{const [k,i]=id.split(':');return squad(k.slice(0,4),k.slice(5))[+i];};
 const clubOf=id=>id.split(':')[0].slice(5);
 function initRoster(){
@@ -846,7 +841,7 @@ function playWeek(sim){
   const finish=M=>{ ST.played[h+'-'+a]=[M.gh,M.ga]; ST.last={h,a,my:[M.gh,M.ga],real}; weekDone(o.xi);
     resultScreen({M,real,title:`Hafta ${w+1} · ${SEASONS[ST.season].label}`,extra:weekOthers(w),onNext:hub}); };
   if(sim){ finish(simToEnd(newMatch(o))); return; }
-  lineup(o,()=>playMatch(o,finish),hub);
+  playMatch(o,finish);
 }
 function seasonEnd(tb,pos){
   const champ=pos===1; if(!ST.done){ST.done=true;saveStory();if(champ){setTimeout(()=>toast('Şampiyon'),200);whistle();}}
@@ -872,7 +867,6 @@ function trCheck(p,buy){
   if(buy){ const seller=oppList(clubOf(p.id));
     if(ST.budget<priceOf(p))return 'Bütçen yetmiyor.';
     if(mine.length>=SQUAD_MAX)return `Kadro dolu (en fazla ${SQUAD_MAX}). Önce oyuncu sat.`;
-    if(p.y&&mine.filter(x=>x.y).length>=LIST_FOREIGN)return `Kadroda en fazla ${LIST_FOREIGN} yabancı olabilir.`;
     if(seller.length<=SQUAD_MIN)return `${cname(clubOf(p.id))} daha fazla oyuncu satmıyor.`;
     if(p.g==='G'&&seller.filter(x=>x.g==='G').length<=2)return `${cname(clubOf(p.id))} kalecisini satmıyor.`;
   } else {
@@ -882,8 +876,8 @@ function trCheck(p,buy){
   return '';
 }
 function renderTr(){
-  const mine=myList(), fc=mine.filter(p=>p.y).length, win=trWindow();
-  $('#trKpi').innerHTML=`<div class="kpi"><b style="font-size:24px">${money(ST.budget)}</b><span>Bütçe</span></div><div class="kpi"><b>${mine.length}/${SQUAD_MAX}</b><span>Kadro</span></div><div class="kpi"><b>${fc}/${LIST_FOREIGN}</b><span>Yabancı</span></div>`;
+  const mine=myList(), avg=Math.round(bestXI(mine).reduce((t,id)=>t+getP(id).ovr,0)/11), win=trWindow();
+  $('#trKpi').innerHTML=`<div class="kpi"><b style="font-size:24px">${money(ST.budget)}</b><span>Bütçe</span></div><div class="kpi"><b>${mine.length}/${SQUAD_MAX}</b><span>Kadro</span></div><div class="kpi"><b>${avg}</b><span>İlk 11 gücü</span></div>`;
   $('#trRule').innerHTML=win?`<b>${win} açık.</b> Sadece bu sezonun Süper Lig kulüplerinden alırsın. Sattığın oyuncu değerinin %85'ini getirir.`:`<b>Pencere kapalı.</b> Yaz döneminde ilk 3 hafta, devre arasında 3 hafta açık. Şimdi listeye göz atabilirsin.`;
   $('#trTabs').innerHTML=[['buy','Oyuncu al'],['sell','Oyuncu sat']].map(([k,t])=>`<button class="tab ${TR.tab===k?'on':''}" data-t="${k}">${t}</button>`).join('');
   $('#trF').innerHTML=TRF.map(([k,t])=>`<button class="${TR.f===k?'on':''}" data-f="${k}">${t}</button>`).join('');
@@ -893,13 +887,13 @@ function renderTr(){
   if(TR.tab==='buy'){ rows=RESULTS[ST.season].teams.filter(c=>c!==ST.team).flatMap(c=>oppList(c)).filter(p=>TR.f==='all'||p.g===TR.f).sort((a,b)=>b.ovr-a.ovr||priceOf(a)-priceOf(b)).slice(0,80); }
   else rows=mine.filter(p=>TR.f==='all'||p.g===TR.f).sort((a,b)=>b.ovr-a.ovr);
   $('#trList').innerHTML=rows.map(p=>{ const c=clubOf(p.id), buy=TR.tab==='buy', pr=buy?priceOf(p):sellOf(p), no=buy&&pr>ST.budget;
-    return `<button class="pl ${no?'no':''}" data-id="${p.id}"><span class="pos">${p.pos}</span>${kit(buy?c:ST.team,p.num)}<span class="nm">${flag(p)} ${esc(p.name)}${p.y?'<span class="y">Y</span>':''}<small>${buy?cname(c):c===ST.team?'Kendi oyuncun':'Transfer: '+cname(c)}</small></span><span class="pr"><b>${p.ovr}</b><small>${money(pr)}</small></span></button>`;}).join('')||'<div class="note">Bu mevkide oyuncu yok.</div>';
+    return `<button class="pl ${no?'no':''}" data-id="${p.id}"><span class="pos">${p.pos}</span>${kit(buy?c:ST.team,p.num)}<span class="nm">${flag(p)} ${esc(p.name)}<small>${buy?cname(c):c===ST.team?'Kendi oyuncun':'Transfer: '+cname(c)}</small></span><span class="pr"><b>${p.ovr}</b><small>${money(pr)}</small></span></button>`;}).join('')||'<div class="note">Bu mevkide oyuncu yok.</div>';
   document.querySelectorAll('#trList .pl').forEach(b=>b.onclick=()=>trSheet(getP(b.dataset.id),TR.tab==='buy'));
 }
 function trSheet(p,buy){
   const c=clubOf(p.id), pr=buy?priceOf(p):sellOf(p), why=trCheck(p,buy);
   const sh=document.createElement('div'); sh.className='sheet';
-  sh.innerHTML=`<div class="in"><div class="pinfo">${kit(buy?c:ST.team,p.num)}<div><h3 class="disp">${esc(p.name)}</h3><div>${flag(p)} ${p.pos}${p.y?' · Yabancı':''} · ${buy?cname(c):cname(ST.team)}</div></div></div>
+  sh.innerHTML=`<div class="in"><div class="pinfo">${kit(buy?c:ST.team,p.num)}<div><h3 class="disp">${esc(p.name)}</h3><div>${flag(p)} ${p.pos} · ${buy?cname(c):cname(ST.team)}</div></div></div>
     <div class="stats"><div class="stat"><b>${p.ovr}</b><span>Güç</span></div><div class="stat" style="grid-column:span 2"><b>${money(pr)}</b><span>${buy?'Bonservis':'Satış geliri'}</span></div><div class="stat"><b>${money(ST.budget)}</b><span>Bütçe</span></div></div>
     ${why?`<div class="rule">${esc(why)}</div>`:`<div class="note">${buy?`Bütçen ${money(ST.budget-pr)} kalır.`:`Bütçen ${money(ST.budget+pr)} olur.`}</div>`}
     <div class="foot"><button class="btn ghost" data-x>Vazgeç</button><button class="btn" data-ok ${why?'disabled':''}>${buy?'Satın al':'Sat'}</button></div></div>`;
@@ -912,32 +906,6 @@ function trSheet(p,buy){
   $('#app').appendChild(sh);
 }
 $('#trBack').onclick=()=>{beep(400);hub();};
-
-/* ---------- kadro ekranı ---------- */
-function lineup(o,go,back){
-  show('lineup'); const c=o[o.you], list=(o.lists&&o.lists[o.you])||squad(o.season,c), cond=o.cond||{}, P=id=>list.find(p=>p.id===id);
-  let sel=null;
-  const row=(p,pos,k,extra='')=>{const cv=cond[p.id]??100;return `<button class="pl ${extra}" data-k="${k}"><span class="pos">${pos}</span>${kit(c,p.num)}<span class="nm">${flag(p)} ${esc(p.name)}${p.y?'<span class="y">Y</span>':''}<small>Kondisyon %${Math.round(cv)}<span class="cond"><i class="${cv<60?'low':cv<80?'mid':''}" style="width:${cv}%"></i></span></small></span><b>${p.ovr}</b></button>`;};
-  const render=()=>{
-    o.bench=benchFor(list,o.xi,cond); const fc=foreignCount(list,[...o.xi,...o.bench]);
-    $('#luRule').innerHTML=`<b>Yabancı kuralı:</b> maç kadrosunda en fazla ${FOREIGN_MAX} yabancı. Şu an <b>${fc}/${FOREIGN_MAX}</b>. ${sel==null?'Değiştirmek istediğin oyuncuya dokun.':'Yerine girecek oyuncuyu seç.'}`;
-    if(sel==null){
-      $('#luXI').innerHTML=o.xi.map((id,k)=>row(P(id),SLOTS[k][0],k)).join('');
-      $('#luBench').innerHTML=o.bench.map(id=>row(P(id),P(id).pos,'b')).join(''); $('#luBenchLbl').hidden=false;
-    }else{
-      const ok=SLOTS[sel][1];
-      const cand=list.filter(p=>!o.xi.includes(p.id)).sort((a,b)=>(ok.includes(b.pos)-ok.includes(a.pos))||b.ovr-a.ovr);
-      $('#luXI').innerHTML=row(P(o.xi[sel]),SLOTS[sel][0],sel,'sel')+cand.map(p=>row(p,p.pos+(ok.includes(p.pos)?'':'?'),'c:'+p.id)).join('');
-      $('#luBench').innerHTML=''; $('#luBenchLbl').hidden=true;
-    }
-    document.querySelectorAll('#lineup .pl').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; beep(600,.04);
-      if(k==='b')return; if(k.startsWith('c:')){o.xi[sel]=k.slice(2);sel=null;} else sel=sel===+k?null:+k; render(); $('#lineup .scroll').scrollTop=0; });
-  };
-  render();
-  $('#luAuto').onclick=()=>{o.xi=bestXI(list,cond);sel=null;render();beep(500);};
-  $('#luGo').onclick=()=>{beep(620);go();};
-  $('#luBack').onclick=()=>{beep(400);back();};
-}
 
 /* ---------- seçim ekranı ---------- */
 let PICK={mode:'story',season:'2324',step:0,h:null};
@@ -962,7 +930,7 @@ function quickMatch(season,h,a){
   const list=squad(season,h),xi=bestXI(list);
   const o={season,h,a,you:'h',seed:(Math.random()*1e9)|0,xi,bench:benchFor(list,xi)};
   const real=RESULTS[season].res[h+'-'+a];
-  lineup(o,()=>playMatch(o,M=>resultScreen({M,real,title:`Hızlı maç · ${SEASONS[season].label}`,onNext:home,nextLabel:'Menü',onAgain:()=>quickMatch(season,h,a)})),()=>pickScreen('quick'));
+  playMatch(o,M=>resultScreen({M,real,title:`Hızlı maç · ${SEASONS[season].label}`,onNext:home,nextLabel:'Menü',onAgain:()=>quickMatch(season,h,a)}));
 }
 
 /* ---------- online düello (paylaşımlı veri) ---------- */
@@ -1004,11 +972,11 @@ async function createRoom(mode){
   addDuel(code);
   const list=squad('2425',h),xi=bestXI(list);
   const o={season:'2425',h,a,you:'h',seed:room.seed,xi,bench:benchFor(list,xi)};
-  lineup(o,()=>playMatch(o,async M=>{
+  playMatch(o,async M=>{
     try{ await DB.doc('duels/'+code).update({status:'open',p1acts:M.acts,p1xi:o.xi,p1pre:[M.gh,M.ga]}); }catch(e){}
     resultScreen({M,title:'Düello · senin turun bitti',extra:`<div class="panel" style="text-align:center"><div class="lbl" style="color:var(--yellow)">Oda kodu</div><div class="code">${code}</div><div class="note">${mode==='friend'?'Bu kodu arkadaşına gönder.':'Rastgele bir rakip girince sonuç burada çıkar.'} Bu skor bilgisayara karşı oynadığın deneme. Resmi skor, rakip senin kararlarına karşı oynayınca belli olur.</div><div class="note" id="liveRes"></div></div>`,onNext:online,nextLabel:'Lobi'});
     watchRoom(code);
-  }),online);
+  });
 }
 function watchRoom(code){
   stopWatch();
@@ -1033,10 +1001,10 @@ async function joinRoom(code){
   const list=squad(d.season,d.a),xi=bestXI(list);
   const o={season:d.season,h:d.h,a:d.a,you:'a',seed:d.seed,xi,bench:benchFor(list,xi),sideXI:{h:d.p1xi},replay:{side:'h',acts:d.p1acts||[]}};
   const nm=await nameOf(d.p1);
-  lineup(o,()=>playMatch(o,async M=>{
+  playMatch(o,async M=>{
     try{ await DB.doc('duels/'+code).update({status:'done',result:[M.gh,M.ga],p2acts:M.acts}); }catch(e){}
     resultScreen({M,title:`Düello · rakip: ${nm}`,extra:'<div class="note" style="text-align:center">Bu resmi skor. Rakibin de lobide görecek.</div>',onNext:online,nextLabel:'Lobi'});
-  }),online);
+  });
 }
 function note(t){const B=$('#onBody');if(!B)return;const n=document.createElement('div');n.className='panel note';n.textContent=t;B.prepend(n);setTimeout(()=>n.remove(),3500);beep(220,.12);}
 function onErr(e){ show('online'); note(e&&(e.code==='permission_denied'||e.code==='not_granted')?'Bu sayfada yazma iznin yok. Sayfa sahibi linki seninle katılımcı olarak paylaşmalı.':'Bağlantı hatası, tekrar dene.'); }
