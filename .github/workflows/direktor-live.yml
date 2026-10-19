@@ -1,0 +1,41 @@
+name: Direktör canlı bülten
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Örnek veri yapısını loga yaz'
+        default: '0'
+permissions:
+  contents: write
+concurrency:
+  group: direktor-live
+  cancel-in-progress: false
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: m
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: p
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Veriyi çek
+        env:
+          DEBUG: ${{ github.event.inputs.debug }}
+        run: node m/tools/direktor-live.mjs p/direktor/live.json
+      - name: Değiştiyse yükle
+        run: |
+          cd p
+          git config user.name "flix-bot"
+          git config user.email "flix-bot@users.noreply.github.com"
+          git add direktor/live.json
+          if git diff --cached --quiet; then echo "değişiklik yok"; exit 0; fi
+          git commit -m "Direktör canlı bülten verisi"
+          for i in 1 2 3; do git pull --rebase -q origin gh-pages && git push -q origin HEAD:gh-pages && break; sleep 5; done
