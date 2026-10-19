@@ -10,13 +10,15 @@ const mw=w=>{ if(w.length<=2||w.endsWith('.'))return w; if(w.includes('-'))retur
   const s=[...w]; const idx=s.map((c,i)=>V.includes(c.toLowerCase())&&i>0?i:-1).filter(i=>i>=0); if(!idx.length)return w;
   const i=idx[idx.length-1], c=s[i], n=SW[c.toLowerCase()]||'a'; s[i]=c===c.toUpperCase()?n.toUpperCase():n; return s.join(''); };
 const mangle=n=>String(n||'').split(/\s+/).filter(Boolean).map(mw).join(' ');
-const get=async u=>{ for(let t=0;t<3;t++){ try{ const r=await fetch(u,{headers:{'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36','accept':'application/json'}}); if(r.ok)return await r.json(); console.log('HTTP',r.status,u.slice(0,120)); }catch(e){ console.log('ERR',String(e).slice(0,160),u.slice(0,120)); } await new Promise(r=>setTimeout(r,1500)); } return null; };
+const get=async u=>{ for(let t=0;t<3;t++){ try{ const r=await fetch(u,{headers:{'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36','accept':'application/json'}}); if(r.ok)return await r.json(); console.log('HTTP',r.status,u.slice(0,120),(await r.text()).slice(0,160)); if(r.status>=400&&r.status<500)return null; }catch(e){ console.log('ERR',String(e).slice(0,160),u.slice(0,120)); } await new Promise(r=>setTimeout(r,1500)); } return null; };
 const col=c=>/^[0-9a-f]{6}$/i.test(c||'')?'#'+c.toLowerCase():null;
 const team=x=>{ const n=mangle(x.team.displayName||x.team.name); return {n,s:n.replace(/[^A-Za-zÇĞİÖŞÜçğıöşü]/g,'').slice(0,3).toUpperCase(),c:col(x.team.color)||'#15215c',c2:col(x.team.alternateColor)||'#ffffff',g:x.score!=null&&x.score!==''?+x.score:null,id:x.team.id}; };
 let prev={}; try{ prev=JSON.parse(fs.readFileSync(OUT,'utf8')); }catch(e){}
 const out={t:Date.now(),ev:[],sum:{}}; let nsum=0, dbg=!DEBUG;
 for(const lg of LG){
-  const j=await get(`${B}${lg}/scoreboard?dates=${day(-4)}-${day(8)}&limit=300`); if(!j||!j.events){ console.log('no events',lg); continue; } console.log(lg,j.events.length);
+  let j=await get(`${B}${lg}/scoreboard?dates=${day(-4)}-${day(8)}`);
+  if(!j||!j.events){ const all=[]; for(let k=-4;k<=8;k++){ const d=await get(`${B}${lg}/scoreboard?dates=${day(k)}`); if(d&&d.events)all.push(...d.events); } if(!all.length){ const d=await get(`${B}${lg}/scoreboard`); if(d&&d.events)all.push(...d.events); } j={events:all}; }
+  if(!j.events.length)j=null; if(!j||!j.events){ console.log('no events',lg); continue; } console.log(lg,j.events.length);
   for(const e of j.events){ const c=(e.competitions||[])[0]; if(!c)continue; const hm=c.competitors.find(x=>x.homeAway==='home'), aw=c.competitors.find(x=>x.homeAway==='away'); if(!hm||!aw)continue;
     const st=c.status||e.status||{}, ty=st.type||{};
     const E={id:e.id,lg,d:e.date,st:ty.state||'pre',det:ty.shortDetail||'',clk:st.displayClock||'',h:team(hm),a:team(aw)}; out.ev.push(E);
