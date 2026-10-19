@@ -655,6 +655,11 @@ function warmUp() {
     const g = new THREE.Group(); g.visible = false; const tmp = [];
     for (const k of [10, 20, 30, 40, 50]) { HQSEG = 22; const o = buildBoss(BOSSES[k]); HQSEG = 0; charPatch(o, 0.35); g.add(o); tmp.push(o); }
     for (const id of ['flix', 'kick', 'flick']) if (HEROES[id] && id !== save.hero) g.add(allyRig(id).g);
+    // things that first appear mid-run: see-through buildings (when the hero walks behind one), pickups, power-up beacons, sprites
+    const bx = new THREE.BoxGeometry(1, 1, 1); tmp.push({traverse: f => f({geometry: bx})});
+    for (const k in CITY.mats) g.add(new THREE.Mesh(bx, [CITY.mats[k].fade, CITY.mats[k].fade, CITY.roofFade, CITY.roofFade, CITY.mats[k].fade, CITY.mats[k].fade]));
+    for (const k of ['heart', 'magnet', 'chest']) g.add(ITEM_TPL[k] || (ITEM_TPL[k] = itemModel(k)));
+    for (const k in BOOST) g.add(BOOST_TPL[k] || (BOOST_TPL[k] = boostModel(k)));
     R.scene.add(g); R.renderer.compile(R.scene, R.cam); R.scene.remove(g);
     for (const o of g.children.slice()) g.remove(o);
     for (const o of tmp) o.traverse(m => { if (m.geometry) m.geometry.dispose(); });
@@ -1933,7 +1938,12 @@ function DF() { return DIFF[save.diff == null ? 1 : save.diff] || DIFF[1]; }
 function isEnd() { return G.mode === 'endless' || G.endless; }
 // endless: +10% every 10 waves and nothing more after wave 50 (waves 51+ replay the 41-50 cycle at the same strength)
 // Sonsuz mode (and the endless run after the story) is 25% tougher: enemies have 25% more health and hit 25% harder
-function END25() { return isEnd() && G.mode !== 'hell' ? 1.25 : 1; }
+// Sonsuz difficulty curve: gentle start so new players get hooked, then a steady climb after wave b so skill decides how far you get
+const BAL = Object.assign({e: 0.7, a: 8, b: 25, late: 0.02}, window.__BAL || {});
+function END25() {
+  if (!isEnd() || G.mode === 'hell') return 1; const w = G.wave;
+  return w <= BAL.a ? BAL.e : w <= BAL.b ? BAL.e + (1 - BAL.e) * (w - BAL.a) / (BAL.b - BAL.a) : 1 + (w - BAL.b) * BAL.late;
+}
 function endStep(n) { return 1 + 0.1 * Math.floor(Math.min(n, 50) / 10); }
 function waveDef(n) {
   const late = n > 20, m = late ? 20 : n, k = n % 10, tier = tierOf(n);
@@ -2306,12 +2316,18 @@ function dropGem(x, z, v) {
   if (G.gems.length >= 600) { let best = null, bd = 1e9; for (const g of G.gems) { const d = Math.abs(g.x - x) + Math.abs(g.z - z); if (d < bd) { bd = d; best = g; } } if (best && bd < 8) { best.v += xv; return; } gainXp(xv); return; }
   G.gems.push({x: x + rnd(-0.3, 0.3), z: z + rnd(-0.3, 0.3), v: xv, t: rnd(0, 6), pull: false});
 }
+// pickups are built once per kind and cloned (shared geometry + materials), so a drop never uploads new meshes mid-fight
+const ITEM_TPL = {};
 function dropItem(kind, x, z) {
+  const k = kind === 'heart' || kind === 'magnet' ? kind : 'chest', g = (ITEM_TPL[k] || (ITEM_TPL[k] = itemModel(kind))).clone();
+  g.position.set(x, 0.5, z); R.scene.add(g); G.items.push({kind, x, z, g, t: 0});
+}
+function itemModel(kind) {
   const g = new THREE.Group();
   if (kind === 'heart') { const h = new THREE.Shape(); h.moveTo(0, -0.5); h.bezierCurveTo(-0.9, 0.1, -0.5, 0.7, 0, 0.3); h.bezierCurveTo(0.5, 0.7, 0.9, 0.1, 0, -0.5); const m = mesh(new THREE.ExtrudeGeometry(h, {depth: 0.25, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.06, bevelSegments: 1}), toon(0xff5a6e)); m.geometry.center(); m.scale.setScalar(0.8); g.add(m); }
   else if (kind === 'magnet') { const m = mesh(new THREE.TorusGeometry(0.4, 0.14, 8, 16, Math.PI), toon(0xff5a6e)); m.rotation.z = Math.PI; g.add(m); for (const s of [-1, 1]) { const t = mesh(new THREE.BoxGeometry(0.28, 0.25, 0.28), toon(0xeeeeff)); t.position.set(s * 0.4, 0.1, 0); g.add(t); } }
   else { const b = mesh(new THREE.BoxGeometry(1.2, 0.8, 0.8), toon(0xc9853a)); b.position.y = 0.4; g.add(b); const l = mesh(new THREE.BoxGeometry(1.25, 0.25, 0.85), toon(0xffd23f)); l.position.y = 0.85; g.add(l); const k = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), glow(0xffffff)); k.position.set(0, 0.6, 0.42); g.add(k); const a = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 10), addGlow(0xffd23f, 0.25)); a.position.y = 0.5; g.add(a); }
-  g.position.set(x, 0.5, z); R.scene.add(g); G.items.push({kind, x, z, g, t: 0});
+  return g;
 }
 
 /* ---------- fx ---------- */
@@ -4835,15 +4851,21 @@ const BTEX = {};
 function boostTex(k) {
   return BTEX[k] || (BTEX[k] = canvasTex(128, 128, (x, w) => { const B = BOOST[k]; x.beginPath(); x.arc(64, 64, 56, 0, TAU); x.fillStyle = '#120d14'; x.fill(); x.beginPath(); x.arc(64, 64, 49, 0, TAU); const g = x.createRadialGradient(50, 44, 6, 64, 64, 52); g.addColorStop(0, '#ffffff'); g.addColorStop(1, B.col); x.fillStyle = g; x.fill(); x.font = '58px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(B.ic, 64, 68); }));
 }
+const BOOST_TPL = {};
+function boostModel(k) {
+  const g = new THREE.Group();
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: boostTex(k), depthWrite: false})); sp.scale.set(1.5, 1.5, 1); sp.position.y = 1.4; g.add(sp);
+  const col = new THREE.Color(BOOST[k].col);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.75, 7, 16, 1, true), new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide})); beam.position.y = 3.5; g.add(beam);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.15, 40), new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false})); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.1; g.add(ring);
+  return g;
+}
 function spawnBoost() {
   const kinds = Object.keys(BOOST), k = kinds[Math.floor(Math.random() * kinds.length)];
   for (let i = 0; i < 12; i++) {
     const a = Math.random() * TAU, r = rnd(12, 19), x = G.px + Math.cos(a) * r, z = G.pz + Math.sin(a) * r * 0.85; if (blockSolid(x, z, 1.4)) continue;
-    const g = new THREE.Group(); g.position.set(x, 0, z);
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: boostTex(k), depthWrite: false})); sp.scale.set(1.5, 1.5, 1); sp.position.y = 1.4; g.add(sp);
-    const col = new THREE.Color(BOOST[k].col);
-    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.75, 7, 16, 1, true), new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide})); beam.position.y = 3.5; g.add(beam);
-    const ring = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.15, 40), new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false})); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.1; g.add(ring);
+    const g = (BOOST_TPL[k] || (BOOST_TPL[k] = boostModel(k))).clone(); g.position.set(x, 0, z);
+    const sp = g.children[0], ring = g.children[2];
     R.scene.add(g); G.boosts.push({k, x, z, g, sp, ring, t: 0, life: 24}); return;
   }
 }
@@ -4988,7 +5010,7 @@ function frameBody(now, rdt) {
   doomTick(rdt);
   // keep it smooth: if the phone struggles in 2K, lower the pixel ratio step by step
   // 60 fps governor: drop the pixel ratio a notch when frames fall under ~52, win it back when there is headroom
-  if (save.q !== 'fast' && R.on && G.state === 'play') { fpsAcc += rdt; fpsN++; if (fpsAcc > 1.5) { const fps = fpsN / fpsAcc; R.fps = fps; fpsAcc = fpsN = 0; govTick(fps); } }
+  if (save.q !== 'fast' && R.on && G.state === 'play') { fpsAcc += rdt; fpsN++; if (fpsAcc > 0.75) { const fps = fpsN / fpsAcc; R.fps = fps; fpsAcc = fpsN = 0; govTick(fps); } }
 }
 let fpsAcc = 0, fpsN = 0;
 const PR_STEPS = [1, 0.86, 0.74, 0.63, 0.54, 0.46];
