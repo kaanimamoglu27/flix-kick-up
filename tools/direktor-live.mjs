@@ -37,7 +37,7 @@ for(const lg of LG){
       const ps=(k.participants||[]).map(x=>x.athlete&&x.athlete.id);
       if(!sd)continue;
       if(t.includes('goal')||t.includes('penalty---scored'))kev.push([m,'g',sd,ps[0]||null,t.includes('own')?1:0]);
-      else if(t.includes('substitution'))kev.push([m,'s',sd,ps[1]||null,ps[0]||null,(k.text||'').slice(0,90)]);
+      else if(t.includes('substitution'))kev.push([m,'s',sd,ps[1]||null,ps[0]||null]);
       else if(t.includes('yellow'))kev.push([m,'y',sd,ps[0]||null]);
       else if(t.includes('red'))kev.push([m,'r',sd,ps[0]||null]); }
     out.sum[e.id]={ro,kev};
