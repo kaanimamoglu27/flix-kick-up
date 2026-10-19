@@ -16,8 +16,8 @@ const team=x=>{ const n=mangle(x.team.displayName||x.team.name); return {n,s:n.r
 let prev={}; try{ prev=JSON.parse(fs.readFileSync(OUT,'utf8')); }catch(e){}
 const out={t:Date.now(),ev:[],sum:{}}; let nsum=0, dbg=!DEBUG;
 for(const lg of LG){
-  let j=await get(`${B}${lg}/scoreboard?dates=${day(-4)}-${day(8)}`);
-  if(!j||!j.events){ const all=[]; for(let k=-4;k<=8;k++){ const d=await get(`${B}${lg}/scoreboard?dates=${day(k)}`); if(d&&d.events)all.push(...d.events); } if(!all.length){ const d=await get(`${B}${lg}/scoreboard`); if(d&&d.events)all.push(...d.events); } j={events:all}; }
+  let j=null;
+  { const all=[]; for(let k=-4;k<=8;k++){ const d=await get(`${B}${lg}/scoreboard?dates=${day(k)}`); if(d&&d.events)all.push(...d.events); } if(!all.length){ const d=await get(`${B}${lg}/scoreboard`); if(d&&d.events)all.push(...d.events); } j={events:all}; }
   if(!j.events.length)j=null; if(!j||!j.events){ console.log('no events',lg); continue; } console.log(lg,j.events.length);
   for(const e of j.events){ const c=(e.competitions||[])[0]; if(!c)continue; const hm=c.competitors.find(x=>x.homeAway==='home'), aw=c.competitors.find(x=>x.homeAway==='away'); if(!hm||!aw)continue;
     const st=c.status||e.status||{}, ty=st.type||{};
