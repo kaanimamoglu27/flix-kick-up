@@ -1932,6 +1932,8 @@ const DIFF = [{n: 'Kolay', hp: 0.72, dmg: 0.65, cnt: 0.85}, {n: 'Orta', hp: 1, d
 function DF() { return DIFF[save.diff == null ? 1 : save.diff] || DIFF[1]; }
 function isEnd() { return G.mode === 'endless' || G.endless; }
 // endless: +10% every 10 waves and nothing more after wave 50 (waves 51+ replay the 41-50 cycle at the same strength)
+// Sonsuz mode (and the endless run after the story) is 25% tougher: enemies have 25% more health and hit 25% harder
+function END25() { return isEnd() && G.mode !== 'hell' ? 1.25 : 1; }
 function endStep(n) { return 1 + 0.1 * Math.floor(Math.min(n, 50) / 10); }
 function waveDef(n) {
   const late = n > 20, m = late ? 20 : n, k = n % 10, tier = tierOf(n);
@@ -2013,7 +2015,7 @@ function newRun(mode) {
   Object.assign(G, {
     state: 'play', time: 0, wave: 1, waveT: 0, kills: 0, level: 1, xp: 0, xpNext: 5, hp: curHero().hp, maxHp: curHero().hp, px: 0, pz: 0, fx: 0, fz: 1, inv: 0, flix: 0,
     enemies: [], shots: [], eshots: [], gems: [], items: [], tels: [], zaps: [], pools: [], grab: 0, paid: 0, spawnT: 1, weps: Object.assign({toss: 1, [curHero().start]: 1}, curHero().start2 ? {[curHero().start2]: 1} : {}), pas: {}, ws: {}, pending: mode === 'boss' ? 4 : mode === 'hell' ? 3 : 0, boss: null, endless: mode === 'endless' || mode === 'hell', mode, picks: [], score: 0, combo: 0, comboT: 0, flixGot: 0, runCoins: 0, riftO: null, riftT: 35, riftsClosed: 0, huntT: 240, bestCombo: 0,
-    dmgMul: 1, hpBonus: 0, spdBonus: 0, cdBonus: 0, barr: [], fuses: [], carFires: [], traf: null, trafT: 12, dashT: 0, dashCd: 0, mines: [], torns: [], swipeFx: null, carsBlown: 0, comicQ: null, tier: 0, fis: [], revived: false, fell: false, rockets: [], slash: null, slam: null, gearFx: null, gunOn: false, toss: [], tq: [], bombs: [], whips: [], turrets: [], throwT: 0, aimT: 0, aimA: 0, epiT: 0, finalT: 0, bossKills: 0, paidG: 0, boosts: [], bst: null, bstT: 20, trail: [],
+    dmgMul: 1, hpBonus: 0, spdBonus: 0, cdBonus: 0, barr: [], fuses: [], carFires: [], traf: null, trafT: 12, dashT: 0, dashCd: 0, mines: [], torns: [], swipeFx: null, carsBlown: 0, comicQ: null, tier: 0, fis: [], revived: false, fell: false, rockets: [], slash: null, slam: null, gearFx: null, gunOn: false, toss: [], tq: [], bombs: [], whips: [], turrets: [], throwT: 0, aimT: 0, aimA: 0, epiT: 0, finalT: 0, bossKills: 0, paidG: 0, boosts: [], bst: null, bstT: 20, trail: [], camp: null,
     shake: 0, kx: 0, kz: 0, ult: null, beamOn: 0, hitstop: 0, slowT: 0, ally: null, allyIn: 0, allyCd: 2, allyId: null, compL: 1, comp: {kind: save.comp, x: 1.2, z: -1, t: 0, cd: 1, fa: 0}
   });
   G.mapMod = mode === 'hell' ? null : (MAPS[save.map] && MAPS[save.map].mod) || null; G.haz = {t: G.mapMod === 'quake' ? 12 : 5, q: 0, r: 24, fl: null}; G.ivx = G.ivz = 0; G.bldDown = 0; G.brkTip = 0;
@@ -2058,7 +2060,7 @@ function spawnPos(rad) {
 }
 function addEnemy(type, x, z, rise) {
   if (G.enemies.length >= Math.min(MAXE - 2, type === 'boss' ? MAXE : ECAP())) return null;
-  const T = ET[type], hp = Math.round(T.hp * G.def.hpMul * (G.mode === 'story' && !G.endless ? 1 + Math.max(0, G.wave - 8) * 0.05 : 1) * (isEnd() ? 1 + Math.max(0, Math.min(G.wave, 50) - 15) * 0.05 : 1) * DF().hp * (G.mode === 'hell' ? 1 + Math.max(0, G.wave - 3) * 0.08 : 1));
+  const T = ET[type], hp = Math.round(T.hp * G.def.hpMul * (G.mode === 'story' && !G.endless ? 1 + Math.max(0, G.wave - 8) * 0.05 : 1) * (isEnd() ? 1 + Math.max(0, Math.min(G.wave, 50) - 15) * 0.05 : 1) * DF().hp * END25() * (G.mode === 'hell' ? 1 + Math.max(0, G.wave - 3) * 0.08 : 1));
   const e = {type, x, z, vx: 0, vz: 0, hp, max: hp, r: T.r, spd: T.spd * rnd(0.9, 1.1) * (1 + (G.def.tier || 0) * 0.04) * (G.mapMod === 'ice' ? 0.82 : 1), dmg: T.dmg, xp: T.xp, fly: T.fly || 0, sz: T.size, t: rnd(0, 6), flash: 0, slow: 0, cd: rnd(1.5, 3), hitCd: {}, navT: 0, tx: G.px, tz: G.pz, los: false, fa: 0, rise: rise === false ? 0 : 0.7, st: 'walk', stT: 0, ph: rnd(0, 4)};
   if (type === 'necro') e.cd = rnd(2, 4);
   if (type === 'burrower') { e.under = true; e.rise = 0; }
@@ -2101,7 +2103,7 @@ function navigate(e) {
 }
 function spawnBoss(B) {
   const [x, z] = spawnPos(15);
-  const hp = Math.round(DF().hp * B.hp * (1 + Math.floor(((G.mode === 'boss' ? G.wave * 10 : isEnd() ? Math.min(G.wave, 50) : G.wave) - 1) / 50) * 1.6) * (G.mode === 'story' && !G.endless ? 1.2 : 1));
+  const hp = Math.round(DF().hp * B.hp * (1 + Math.floor(((G.mode === 'boss' ? G.wave * 10 : isEnd() ? Math.min(G.wave, 50) : G.wave) - 1) / 50) * 1.6) * (G.mode === 'story' && !G.endless ? 1.2 : 1) * END25());
   const e = {type: 'boss', boss: B, kind: B.kind, x, z, vx: 0, vz: 0, hp, max: hp, r: B.r, dmg: 18, xp: 0, fly: B.kind === 'dragon' ? 1.6 : B.kind === 'shadow' ? 0.5 : 0, spd: B.spd || (B.kind === 'tyrant' ? 2.3 : 2.1), t: 0, flash: 0, slow: 0, cd: 3, st: 'chase', stT: 0, hitCd: {}, los: true, sz: 1};
   HQSEG = 22; e.g = buildBoss(B); HQSEG = 0; charPatch(e.g, 0.35); e.g.position.set(x, 0, z); R.scene.add(e.g);
   if (B.final) { e.phase = 1; e.dmg = 26; e.spd = B.spd || 2.5; e.cd = 2; G.slowT = 1.6; G.shake = 1.2; buzz(200); }
@@ -2294,7 +2296,7 @@ function bossDown(e) {
 function hurt(dmg, src) {
   if (G.inv > 0 || G.state !== 'play' || (G.bst && G.bst.k === 'star')) return;
   const wv = G.mode === 'boss' ? G.wave * 10 : G.mode === 'hell' ? hellWave(G.wave) : isEnd() ? Math.min(G.wave, 50) : G.wave; dmg *= Math.min(1, 0.55 + wv * 0.075) * (1 + tierOf(wv) * 0.2 + Math.max(0, wv - 9) * 0.018); // early waves forgive more, every 10 waves bite harder
-  const sty = G.mode === 'story' && !G.endless; dmg *= (1 - 0.07 * (G.pas.armor || 0)) * (G.mode === 'hell' ? 1.15 : 1) * (sty ? 1.1 + G.wave * 0.008 : 1) * (isEnd() ? 1.3 * endStep(G.wave) : 1) * DF().dmg; G.hp -= dmg; G.inv = (sty && G.wave > 8) || (isEnd() && G.wave > 4) ? 0.4 : 0.5; G.shake = Math.max(G.shake, 0.35);
+  const sty = G.mode === 'story' && !G.endless; dmg *= (1 - 0.07 * (G.pas.armor || 0)) * (G.mode === 'hell' ? 1.15 : 1) * (sty ? 1.1 + G.wave * 0.008 : 1) * (isEnd() ? 1.3 * endStep(G.wave) : 1) * DF().dmg * END25(); G.hp -= dmg; G.inv = (sty && G.wave > 8) || (isEnd() && G.wave > 4) ? 0.4 : 0.5; G.shake = Math.max(G.shake, 0.35);
   SFX.hurt(); buzz(40); $('flash').style.opacity = 1; setTimeout(() => $('flash').style.opacity = 0, 140);
   if (src) { const l = Math.hypot(G.px - src.x, G.pz - src.z) || 1; G.kx = (G.px - src.x) / l * 6; G.kz = (G.pz - src.z) / l * 6; }
   if (G.hp <= 0) { G.hp = 0; G.state = 'dying'; G.dieT = 0; G.fell = true; G.slowT = 1.2; banner('', curHero().n + ' yere düştü...', 1.4); }
@@ -2387,6 +2389,17 @@ function tickWeapons(dt) {
 }
 function castAnim() { G.castT = 0.18; }
 function ringFx(x, z, r, col, dur) { const m = R.rings.find(m => !m.visible); if (!m) return; m.visible = true; m.material.color.setHex(col); m.position.set(x, 0.12, z); m.userData = {t: 0, dur, r}; }
+// standing still is never safe: after a few seconds in one spot, red strike circles start landing on the hero (step out to dodge)
+function campTick(dt) {
+  if (G.mode === 'hunt' && G.huntT <= 0) return;
+  const c = G.camp || (G.camp = {x: G.px, z: G.pz, t: 0, cd: 0, warned: false});
+  if (Math.hypot(G.px - c.x, G.pz - c.z) > 2.6) { c.x = G.px; c.z = G.pz; c.t = 0; c.cd = 0; return; }
+  c.t += dt; if (c.t < 3.5 || G.waveT < 2) return;
+  c.cd -= dt; if (c.cd > 0) return;
+  c.cd = Math.max(1.1, 2 - c.t * 0.04);
+  if (!c.warned) { c.warned = true; banner('', '⚠️ Yerinde durma, kıpırda!', 1.6); }
+  addTel(G.px, G.pz, 2.1, 1.0, 0xff2a4a, {dmg: 12 + Math.min(G.wave, 50) * 0.5 + c.t * 0.6});
+}
 function addTel(x, z, r, dur, col, o) { G.tels.push(Object.assign({x, z, r, dur, t: 0, col}, o)); }
 function useFlix() {
   if (G.flix < 100 || G.state !== 'play') return;
@@ -2432,6 +2445,7 @@ function updateComp(dt) {
 /* ---------- update ---------- */
 function update(dt) {
   G.time += dt; if (G.state === 'play') G.waveT += dt;
+  if (G.state === 'play') campTick(dt);
   const st = G.stat;
   // movement
   let mx = input.mx, mz = input.mz; const k = input.keys;
