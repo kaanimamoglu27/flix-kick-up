@@ -1030,7 +1030,7 @@ function fillProps(bi0, bj0) {
 
 /* ---------- heroes: four original characters, each with skins ---------- */
 const HEROES = {
-  flix: {n: 'FLIX', ic: '🔥', price: 0, d: 'Flix maskotu: pelerinli, iki meşaleli kahraman. Meşale ateşi ile başlar.', start: 'fire', start2: 0, hp: 110, spd: 1, crit: 0.05,
+  flix: {n: 'FLIX', ic: '🔥', price: 0, d: 'Flix maskotu: pelerinli, iki meşaleli kahraman. Meşale ateşi ile başlar.', start: 'fire', start2: 0, hp: 99, spd: 1, crit: 0.05,
     skins: [
       {n: 'Kraliyet', price: 0, body: 0xe22511, cloak: 0x0a2a5e, cloakIn: 0x9a0f14, metal: 0xaab2c0, gold: 0xffc20e, flame: 0xff8a1a, glove: 0xfbf6ea, plate: 0x0a2a5e, acc: 0xe22511, glow: 0xff8a1a},
       {n: 'Kıyamet', price: 1500, body: 0xc81e14, cloak: 0x1f5a2a, cloakIn: 0x123a1a, metal: 0x6a7484, gold: 0xb08a3a, flame: 0x7dff6a, glove: 0xd8dde4, plate: 0x1f5a2a, acc: 0x6a7484, glow: 0x7dff6a},
@@ -1939,9 +1939,13 @@ function isEnd() { return G.mode === 'endless' || G.endless; }
 // endless: +10% every 10 waves and nothing more after wave 50 (waves 51+ replay the 41-50 cycle at the same strength)
 // Sonsuz mode (and the endless run after the story) is 25% tougher: enemies have 25% more health and hit 25% harder
 // Sonsuz difficulty curve: gentle start so new players get hooked, then a steady climb after wave b so skill decides how far you get
-const BAL = Object.assign({e: 0.7, a: 8, b: 25, late: 0.02}, window.__BAL || {});
+const BAL = Object.assign({e: 0.7, a: 8, b: 25, late: 0.02, all: 1.1, w10: 1.1}, window.__BAL || {});
 function END25() {
   if (!isEnd() || G.mode === 'hell') return 1; const w = G.wave;
+  // Kaan: endless +10% overall, and another +10% from wave 11 on
+  return BAL.all * (w > 10 ? BAL.w10 : 1) * endCurve(w);
+}
+function endCurve(w) {
   return w <= BAL.a ? BAL.e : w <= BAL.b ? BAL.e + (1 - BAL.e) * (w - BAL.a) / (BAL.b - BAL.a) : 1 + (w - BAL.b) * BAL.late;
 }
 function endStep(n) { return 1 + 0.1 * Math.floor(Math.min(n, 50) / 10); }
