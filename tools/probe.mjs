@@ -1,0 +1,2 @@
+const U=process.argv.slice(2);
+for(const u of U){ try{ const r=await fetch(u,{headers:{'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36','accept':'text/html,application/json,*/*','range':'bytes=0-3000'}}); const t=await r.text(); console.log('==',r.status,u,'\n',t.slice(0,1500).replace(/\s+/g,' ')); }catch(e){ console.log('== ERR',u,String(e)); } }
