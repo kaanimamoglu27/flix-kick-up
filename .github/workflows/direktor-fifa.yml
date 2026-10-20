@@ -1,0 +1,21 @@
+name: Direktör FIFA verisi
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fifa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Çıkar
+        run: python3 tools/fifa-extract.py out
+      - name: Veri dalına yükle
+        run: |
+          git config user.name "flix-bot"
+          git config user.email "flix-bot@users.noreply.github.com"
+          git checkout --orphan direktor-data
+          git rm -rfq --cached .
+          git add -f out
+          git commit -qm "Direktör FIFA Süper Lig verisi"
+          git push -fq origin HEAD:direktor-data
