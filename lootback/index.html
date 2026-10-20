@@ -325,7 +325,7 @@ h2{font-family:Bangers,Fredoka,sans-serif;font-weight:400;letter-spacing:2px;col
         <button data-c="touch"><i>👆</i><b>Dokunmatik</b><span>Dokunduğun yere yürür, basılı tutarsan parmağını takip eder</span></button>
         <button data-c="pad"><i>✛</i><b>Yön tuşları</b><span>Sol altta ok tuşları, ikisine birden basınca çapraz gider</span></button>
       </div>
-      <div class="row" style="margin-top:10px"><button class="btn small" id="bSound">🔊 Ses açık</button><button class="btn small" id="bQ">🎬 2K · 60 fps</button><button class="btn small" id="bDiff">🎚️ Zorluk: Orta</button></div>
+      <div class="row" style="margin-top:10px"><button class="btn small" id="bSound">🔊 Ses açık</button><button class="btn small" id="bQ">🎬 2K · 60 fps</button></div>
       <div class="row" style="margin-top:10px"><button class="btn main" id="bSetOk">Tamam</button></div>
     </div>
   </section>
@@ -1934,20 +1934,14 @@ function bossFor(n) { if (n % 10) return null; if (G.mode === 'story' && !G.endl
 // the difficulty climbs a clear step every 10 waves (story and endless alike)
 function tierOf(n) { return Math.floor((n - 1) / 10); }
 const DIFF = [{n: 'Kolay', hp: 0.72, dmg: 0.65, cnt: 0.85}, {n: 'Orta', hp: 1, dmg: 1, cnt: 1}, {n: 'Zor', hp: 1.3, dmg: 1.3, cnt: 1.12}, {n: 'Çok Zor', hp: 1.7, dmg: 1.65, cnt: 1.25}];
-function DF() { return DIFF[save.diff == null ? 1 : save.diff] || DIFF[1]; }
+// one fixed difficulty for everyone (the Kolay/Zor setting was removed)
+function DF() { return DIFF[1]; }
 function isEnd() { return G.mode === 'endless' || G.endless; }
 // endless: +10% every 10 waves and nothing more after wave 50 (waves 51+ replay the 41-50 cycle at the same strength)
 // Sonsuz mode (and the endless run after the story) is 25% tougher: enemies have 25% more health and hit 25% harder
-// Sonsuz difficulty curve: gentle start so new players get hooked, then a steady climb after wave b so skill decides how far you get
-const BAL = Object.assign({e: 0.7, a: 8, b: 25, late: 0.02, all: 1.1, w10: 1.1}, window.__BAL || {});
-function END25() {
-  if (!isEnd() || G.mode === 'hell') return 1; const w = G.wave;
-  // Kaan: endless +10% overall, and another +10% from wave 11 on
-  return BAL.all * (w > 10 ? BAL.w10 : 1) * endCurve(w);
-}
-function endCurve(w) {
-  return w <= BAL.a ? BAL.e : w <= BAL.b ? BAL.e + (1 - BAL.e) * (w - BAL.a) / (BAL.b - BAL.a) : 1 + (w - BAL.b) * BAL.late;
-}
+// Sonsuz: steady up to wave 15, then enemy health and damage +10% every 10 waves (15, 25, 35...) and enemy count +3% every 5 waves (15, 20, 25...)
+function END25() { if (!isEnd() || G.mode === 'hell' || G.wave < 15) return 1; return Math.pow(1.1, Math.floor((G.wave - 5) / 10)); }
+function endCount() { if (!isEnd() || G.mode === 'hell' || G.wave < 15) return 1; return 1 + 0.03 * Math.floor((G.wave - 10) / 5); }
 function endStep(n) { return 1 + 0.1 * Math.floor(Math.min(n, 50) / 10); }
 function waveDef(n) {
   const late = n > 20, m = late ? 20 : n, k = n % 10, tier = tierOf(n);
@@ -2092,7 +2086,7 @@ function spawnTick(dt) {
   const d = G.def;
   G.spawnT -= dt;
   if (G.spawnT <= 0) {
-    G.spawnT = d.boss ? d.iv * 1.5 : d.iv;
+    G.spawnT = (d.boss ? d.iv * 1.5 : d.iv) / endCount(); // more often = more enemies
     const n = Math.round((d.boss ? 2 : d.g) * DF().cnt), clumps = 1 + Math.floor(G.wave / 6);
     for (let c = 0; c < clumps; c++) { const [x0, z0] = spawnPos(); for (let i = 0; i < Math.ceil(n / clumps); i++) addEnemy(pickType(), x0 + rnd(-1.6, 1.6), z0 + rnd(-1.6, 1.6)); }
   }
@@ -5026,7 +5020,7 @@ function govTick(fps) {
   if ((g.low >= 2 || fps < tgt * 0.64) && g.i < PR_STEPS.length - 1) { g.i++; if (g.n - g.upN <= 3) g.cap = g.i; g.low = 0; g.cool = 2; R.prScale = PR_STEPS[g.i]; applyRes(); }
   else if (g.high >= 4 && g.i > g.cap) { g.i--; g.high = 0; g.cool = 3; g.upN = g.n; R.prScale = PR_STEPS[g.i]; applyRes(); }
 }
-function diffLabel() { const b = $('bDiff'); if (b) b.textContent = '🎚️ Zorluk: ' + DF().n; }
+function diffLabel() {}
 function qLabel() { diffLabel(); const s = save.q === 'ultra' ? '✨ 4K · 30 fps' : save.q === 'hi' ? '🎬 2K · 60 fps' : '⚡ Hızlı'; $('bQ').textContent = s; $('bQ2').textContent = s; }
 function toggleQ() { save.q = save.q === 'hi' ? 'ultra' : save.q === 'ultra' ? 'fast' : 'hi'; save.autoFast = 1; R.prScale = 1; R.gov = null; persist(); applyQuality(); qLabel(); toast(save.q === 'ultra' ? '4K · 30 fps: en keskin görüntü, sabit 30 kare' : save.q === 'hi' ? '2K · 60 fps: standart, akıcı ve keskin' : 'Hızlı: eski cihazlar için, efektler sade'); }
 
@@ -5076,7 +5070,7 @@ for (const b of document.querySelectorAll('#ctrlList button')) b.onclick = () =>
 applyCtrl();
 const toggleSound = () => { save.sound = !save.sound; persist(); updateMenu(); };
 for (const w of document.querySelectorAll('#menu .wallet .pill')) w.onclick = () => shopOpen('gold');
-$('bSound').onclick = toggleSound; $('bSound2').onclick = toggleSound; $('bQ').onclick = toggleQ; $('bDiff').onclick = () => { save.diff = ((save.diff == null ? 1 : save.diff) + 1) % 4; persist(); diffLabel(); toast(['Kolay: düşmanlar daha zayıf, çocuklar için ideal', 'Orta: standart zorluk', 'Zor: daha güçlü ve kalabalık düşmanlar', 'Çok Zor: sadece ustalar için!'][save.diff]); }; $('bQ2').onclick = toggleQ; qLabel();
+$('bSound').onclick = toggleSound; $('bSound2').onclick = toggleSound; $('bQ').onclick = toggleQ; $('bQ2').onclick = toggleQ; qLabel();
 document.addEventListener('visibilitychange', () => { if (document.hidden) { pause(); try { if (AC && AC.state === 'running') AC.suspend(); } catch (e) {} } });
 setInterval(() => $('bFlip').classList.toggle('show', !!ROT && G.state === 'menu'), 300);
 window.addEventListener('resize', layout);
