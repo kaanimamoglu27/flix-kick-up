@@ -1,0 +1,25 @@
+{
+  "name": "flix-direktor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Flix Direktör by Flix - Capacitor 8 wrapper",
+  "scripts": {
+    "build": "python3 tools/build_www.py && node tools/minify.js",
+    "sync": "npm run build && npx cap sync ios && python3 tools/ios_setup.py",
+    "ios": "npx cap open ios",
+    "android": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
+    "cordova-plugin-purchase": "^13.19.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
+    "terser": "^5.36.0",
+    "clean-css": "^5.3.3"
+  }
+}

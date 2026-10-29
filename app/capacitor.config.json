@@ -3,6 +3,16 @@
   "appName": "FLIX Kick Up",
   "webDir": "www",
   "backgroundColor": "#e22511",
-  "ios": { "contentInset": "never", "scrollEnabled": false, "backgroundColor": "#e22511" },
-  "android": { "allowMixedContent": false, "backgroundColor": "#e22511" }
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": false,
+    "backgroundColor": "#e22511",
+    "webContentsDebuggingEnabled": false,
+    "preferredContentMode": "mobile",
+    "allowsLinkPreview": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#e22511"
+  }
 }

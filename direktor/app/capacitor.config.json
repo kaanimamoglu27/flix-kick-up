@@ -1,0 +1,18 @@
+{
+  "appId": "com.flixtoys.direktor",
+  "appName": "Flix Direktör",
+  "webDir": "www",
+  "backgroundColor": "#d81e27",
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": false,
+    "backgroundColor": "#d81e27",
+    "webContentsDebuggingEnabled": false,
+    "preferredContentMode": "mobile",
+    "allowsLinkPreview": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#d81e27"
+  }
+}

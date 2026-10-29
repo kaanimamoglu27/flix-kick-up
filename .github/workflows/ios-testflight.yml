@@ -1,0 +1,93 @@
+# Builds, signs and uploads FLIX Kick Up or Flix Direktör to App Store Connect (TestFlight). No Mac needed.
+# Run it from the Actions tab ("iOS TestFlight" > Run workflow) or from any terminal:
+#   gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=kickup -f version=1.0
+# Needs these repository secrets (Settings > Secrets and variables > Actions), the same values as in Flix-Arkana:
+#   ASC_KEY_ID        App Store Connect API key id (Users and Access > Integrations > App Store Connect API, Admin role)
+#   ASC_ISSUER_ID     Issuer id shown on the same page
+#   ASC_KEY_P8        the full text of the downloaded AuthKey_XXXX.p8 file
+#   APPLE_TEAM_ID     10-character Team ID (developer.apple.com > Membership)
+name: iOS TestFlight
+run-name: TestFlight ${{ inputs.app }} ${{ inputs.version }}
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'Which game'
+        type: choice
+        options: [kickup, direktor]
+        default: kickup
+      version:
+        description: 'Version shown in the App Store (e.g. 1.0)'
+        required: true
+        default: '1.0'
+jobs:
+  upload:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: ${{ inputs.app == 'direktor' && 'direktor/app' || 'app' }}
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - name: Check secrets
+        run: |
+          for v in ASC_KEY_ID ASC_ISSUER_ID APPLE_TEAM_ID; do [ -n "${!v}" ] || { echo "::error::Secret $v is missing (Settings > Secrets and variables > Actions)"; exit 1; }; done
+          [ -n "${{ secrets.ASC_KEY_P8 }}" ] || { echo "::error::Secret ASC_KEY_P8 is missing"; exit 1; }
+        working-directory: .
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Use the newest stable Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_*.app | grep -vi beta | sort -V | tail -1)
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+      - run: npm ci
+      - name: Create the iOS project
+        run: npx cap add ios --packagemanager CocoaPods
+      - name: Configure the iOS project
+        env:
+          APP_VERSION: ${{ inputs.version }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: python3 tools/ios_setup.py
+      - name: App Store Connect key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8"
+          echo "KEY_PATH=$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8" >> "$GITHUB_ENV"
+      - name: Archive
+        run: |
+          set -o pipefail
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            -allowProvisioningUpdates -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            archive | tail -n 80
+      - name: Upload to App Store Connect
+        run: |
+          set -o pipefail
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" | tail -n 60
+          echo "Uploaded ${{ inputs.app }} build ${{ github.run_number }} (version ${{ inputs.version }}). It appears in App Store Connect > TestFlight after Apple processes it."

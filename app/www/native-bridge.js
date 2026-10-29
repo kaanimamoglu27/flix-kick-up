@@ -1,4 +1,4 @@
-/* FLIX Kick Up native bridge (Capacitor 6).
+/* FLIX Kick Up native bridge (Capacitor 8).
    The game calls window.FlixNative.{buy, restore, price, haptic}.
    On the web this file does nothing and the store runs as a clearly marked demo.
    Inside the iOS / Android app it connects to:
