@@ -43,6 +43,19 @@ for R in kaanimamoglu27/flix-kick-up kaanimamoglu27/Flix-Arkana; do
 done
 ```
 
+Windows'ta (PowerShell) aynı adım:
+
+```powershell
+foreach ($R in "kaanimamoglu27/flix-kick-up", "kaanimamoglu27/Flix-Arkana") {
+  gh secret set ASC_KEY_ID    -R $R -b "KEY_ID_BURAYA"
+  gh secret set ASC_ISSUER_ID -R $R -b "ISSUER_ID_BURAYA"
+  gh secret set APPLE_TEAM_ID -R $R -b "TEAM_ID_BURAYA"
+  Get-Content "$HOME\Downloads\AuthKey_KEY_ID_BURAYA.p8" -Raw | gh secret set ASC_KEY_P8 -R $R
+}
+```
+
+Bu komutları başka biri (ör. Onat) çalıştıracaksa, iki repoda da ortak çalışan (repo > Settings > Collaborators) olmalı.
+
 Yükle (her biri 15-25 dakika sürer, sonra 10-30 dakikada TestFlight'ta görünür):
 
 ```bash
