@@ -6,7 +6,8 @@ Bu klasör FLIX Kick Up'ı iPhone (ve istersen Android) uygulamasına çeviren h
 - `www/index.html` oyunun kendisi. Elle düzenleme: web sürümü (`../flix-kick-up.html`) değişince `python3 tools/build_www.py` çalıştır. Bu dosyayı yeniden üretir ve dış bağlantı kalmadığını kontrol eder.
 - `www/native-bridge.js` gerçek satın alma (App Store / Google Play) ve titreşim bağlantısı. Web'de hiçbir şey yapmaz.
 - `capacitor.config.json` uygulama kimliği `com.flixtoys.kickup`, adı FLIX Kick Up.
-- `tools/ios_setup.sh` iOS projesini dikey ekrana kilitler, sadece iPhone uygulaması yapar (iPad ekran görüntüsü gerekmez), durum çubuğunu gizler, şifreleme sorusunu kapatır.
+- `tools/ios_setup.py` iOS projesini dikey ekrana kilitler, sadece iPhone uygulaması yapar (iPad ekran görüntüsü gerekmez), durum çubuğunu gizler, şifreleme sorusunu kapatır, ikon ve açılış ekranını koyar (Mac, Linux ve GitHub'ın bulut Mac'inde çalışır).
+- `ios.sh` Mac terminalinden tek komutla hazırlama, simülatör ve TestFlight'a yükleme.
 - `store/icon-1024.png` uygulama ikonu (FLIX logosu, kırmızı ışınlı zemin).
 - `store/screenshots/` 7 adet 1290x2796 ekran görüntüsü: ana ekran, hareket, bot yarışı, dikey mod, dolap, modlar, sahneler. App Store 6,7" ve 6,9" bölümüne yüklenir.
 
@@ -16,15 +17,8 @@ Bu klasör FLIX Kick Up'ı iPhone (ve istersen Android) uygulamasına çeviren h
 - Online yarış uygulamada "Yakında" olarak görünüyor. Online şu an sadece claude.ai linkinde çalışıyor; uygulamaya gelmesi için bir sunucu (ör. Supabase) bağlamak gerekir.
 - Titreşim telefonun kendi titreşim motoruyla: vuruşta hafif, harekette orta, düşüşte güçlü.
 
-## Yayına çıkmak için adımlar (bir geliştirici, Mac ile 1 gün)
-1. Mac'e Xcode ve Node 20 kur. Bu klasörde: `npm install`, `npx cap add ios`, `sh tools/ios_setup.sh`, `npm run sync`.
-2. Apple Developer hesabı (yıllık 99 $), Flix şirketi adına. ARKANA için açılan hesap aynen kullanılır. App Store Connect'te yeni uygulama: paket kimliği `com.flixtoys.kickup`.
-3. App Store Connect > Uygulama İçi Satın Alma bölümünde aşağıdaki 7 ürünü **aynı kimliklerle** oluştur.
-4. Xcode'da `ios/App` projesini aç, Signing'de ekibi seç, Capabilities'e "In-App Purchase" ekle. App ikonunu `store/icon-1024.png` ile değiştir.
-5. Gizlilik politikasını (aşağıda) flixtoysofficial.com'da yayınla, linkini App Store Connect'e gir.
-6. TestFlight ile gerçek telefonda dene: Sandbox hesabıyla bir tüy paketini ve Başlangıç Paketi'ni satın al, "Satın alımları geri yükle"yi dene, titreşimi hisset.
-7. Yaş derecelendirmesi anketinde her şeye "Yok" de. Sonuç 4+ olur.
-8. Ekran görüntülerini, metinleri yükle ve incelemeye gönder.
+## Yayına çıkmak için adımlar
+Bütün adımlar ve terminal komutları: [../TESTFLIGHT_REHBERI.md](../TESTFLIGHT_REHBERI.md). Kısaca: Mac'te bu klasörde `./ios.sh yukle 1.0`, Mac yoksa `gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=kickup -f version=1.0`.
 
 ## Uygulama içi ürünler
 | Kimlik | Tür | Fiyat | İçerik |

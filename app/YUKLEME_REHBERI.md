@@ -16,31 +16,11 @@ Hesabın yoksa:
 2. Hesap türü için öneri **Şirket (Organization)**: mağazada satıcı adı "Flix" görünür. Şirketin **D-U-N-S numarası** gerekir (ücretsiz, birkaç gün sürebilir). **Bireysel** hesap daha hızlı açılır ama satıcı adı senin adın olur.
 3. https://appstoreconnect.apple.com > **Anlaşmalar, Vergi ve Bankacılık**: "Ücretli Uygulamalar" anlaşmasını imzala, banka ve vergi bilgilerini gir. Bu olmadan satın alma çalışmaz.
 
-## 2. Uygulamayı derleme (Mac gerekir; yoksa bir geliştiriciye ver)
+## 2. Uygulamayı derleme ve yükleme (Mac GEREKMEZ)
 
-| Yol | Kime uygun | Maliyet |
-|---|---|---|
-| Kendi Mac'in | Mac'in varsa | Ücretsiz |
-| Serbest çalışan iOS/Capacitor geliştirici | Mac yoksa, en kolayı | Genelde yarım gün-1 gün |
-| Bulutta derleme (Codemagic, Ionic Appflow) | Mac yoksa, kendin yapmak istersen | Ücretsiz kotalar var |
-
-Geliştiriciye vereceğin tek şey bu klasör ve şu cümle: *"Capacitor 6 projesi, README'deki adımlarla iOS'a derle, TestFlight'a yükle."*
-
-Mac'te adımlar (Terminal'de, `app` klasörünün içinde):
-
-```
-npm install
-npx cap add ios
-sh tools/ios_setup.sh
-npm run sync
-npx cap open ios
-```
-
-Xcode açılınca:
-1. Sol üstte **App** projesine tıkla. **Signing & Capabilities** sekmesinde Team olarak Apple hesabını seç.
-2. **+ Capability** ile **In-App Purchase** ekle.
-3. **Assets > AppIcon** içine `store/icon-1024.png` dosyasını sürükle.
-4. Üst menüden **Product > Archive**. Bitince **Distribute App > App Store Connect > Upload**.
+Terminal komutları: [../TESTFLIGHT_REHBERI.md](../TESTFLIGHT_REHBERI.md).
+- Mac yoksa: GitHub'ın bulut Mac'i derler ve yükler, `gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=kickup -f version=1.0`.
+- Mac varsa: bu klasörde `./ios.sh yukle 1.0`.
 
 ## 3. App Store Connect'te uygulama sayfası
 
