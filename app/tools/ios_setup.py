@@ -17,7 +17,7 @@ pl['UIStatusBarHidden'] = True
 pl['UIViewControllerBasedStatusBarAppearance'] = False
 pl['ITSAppUsesNonExemptEncryption'] = False
 pl['CADisableMinimumFrameDurationOnPhone'] = True
-pl['CFBundleDisplayName'] = 'FLIX Kick Up'
+pl['CFBundleDisplayName'] = 'Flix Kick Up'
 with open(pl_path, 'wb') as f: plistlib.dump(pl, f)
 xc = ios / 'App' / 'Assets.xcassets'
 shutil.copy(app / 'store' / 'icon-1024.png', xc / 'AppIcon.appiconset' / 'AppIcon-512@2x.png')

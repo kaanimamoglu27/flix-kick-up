@@ -1,11 +1,11 @@
-# FLIX Kick Up: App Store paketi
+# Flix Kick Up: App Store paketi
 
-Bu klasör FLIX Kick Up'ı iPhone (ve istersen Android) uygulamasına çeviren hazır iskelettir. Oyun `www/` içinde, internet olmadan çalışır: Rubik yazı tipi dosyaları yanında, dışarıdan hiçbir şey yüklenmez.
+Bu klasör Flix Kick Up'ı iPhone (ve istersen Android) uygulamasına çeviren hazır iskelettir. Oyun `www/` içinde, internet olmadan çalışır: Rubik yazı tipi dosyaları yanında, dışarıdan hiçbir şey yüklenmez.
 
 ## Klasörler
 - `www/index.html` oyunun kendisi. Elle düzenleme: web sürümü (`../flix-kick-up.html`) değişince `python3 tools/build_www.py` çalıştır. Bu dosyayı yeniden üretir ve dış bağlantı kalmadığını kontrol eder.
 - `www/native-bridge.js` gerçek satın alma (App Store / Google Play) ve titreşim bağlantısı. Web'de hiçbir şey yapmaz.
-- `capacitor.config.json` uygulama kimliği `com.flixtoys.kickup`, adı FLIX Kick Up.
+- `capacitor.config.json` uygulama kimliği `com.flixtoys.kickup`, adı Flix Kick Up.
 - `tools/ios_setup.py` iOS projesini dikey ekrana kilitler, sadece iPhone uygulaması yapar (iPad ekran görüntüsü gerekmez), durum çubuğunu gizler, şifreleme sorusunu kapatır, ikon ve açılış ekranını koyar (Mac, Linux ve GitHub'ın bulut Mac'inde çalışır).
 - `ios.sh` Mac terminalinden tek komutla hazırlama, simülatör ve TestFlight'a yükleme.
 - `store/icon-1024.png` uygulama ikonu (FLIX logosu, kırmızı ışınlı zemin).
@@ -43,7 +43,7 @@ Not: satın alma şu an telefonun içinde onaylanıyor. İleride hileyi azaltmak
 - Sahne ve dolap kartlarının küçük resimleri bir kez çizilip saklanır.
 
 ## Mağaza metni (TR)
-**Ad:** FLIX Kick Up
+**Ad:** Flix Kick Up
 **Alt başlık:** Sektir, hareket yap, rekor kır!
 **Açıklama:**
 FLIX'i havada tut! Ekrana dokunarak tüylü FLIX'i sektir, direklerin arasından geçir, havada hareketler yap ve rekorunu kır.
@@ -60,7 +60,7 @@ FLIX'i havada tut! Ekrana dokunarak tüylü FLIX'i sektir, direklerin arasından
 **Anahtar kelimeler:** flix, kick up, sektirme, tüy, jianzi, refleks, arcade, rekor, futbol, oyuncak
 
 ## Store listing (EN)
-**Name:** FLIX Kick Up
+**Name:** Flix Kick Up
 **Subtitle:** Kick it, Flick it, Flix it!
 **Description:**
 Keep FLIX in the air! Tap to kick the feathered FLIX, fly it through the gaps between the posts, pull off tricks in mid-air and beat your high score.
@@ -77,7 +77,7 @@ Keep FLIX in the air! Tap to kick the feathered FLIX, fly it through the gaps be
 **Keywords:** flix, kick up, keepy uppy, shuttlecock, jianzi, reflex, arcade, high score, football, toy
 
 ## Gizlilik politikası (yayınlanacak metin)
-FLIX Kick Up (Flix) hesap oluşturmaz; ad, e-posta, konum veya reklam kimliği toplamaz. Oyun ilerlemesi yalnızca cihazınızda saklanır. Uygulama içi satın alımlar Apple App Store tarafından işlenir; ödeme bilgilerinizi görmeyiz. Oyunda reklam ve analiz aracı yoktur. İletişim: flixtoysofficial.com.
+Flix Kick Up (Flix) hesap oluşturmaz; ad, e-posta, konum veya reklam kimliği toplamaz. Oyun ilerlemesi yalnızca cihazınızda saklanır. Uygulama içi satın alımlar Apple App Store tarafından işlenir; ödeme bilgilerinizi görmeyiz. Oyunda reklam ve analiz aracı yoktur. İletişim: flixtoysofficial.com.
 
 App Store "Uygulama Gizliliği" bölümünde: **Veri toplanmıyor** seçilebilir.
 

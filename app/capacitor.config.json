@@ -1,12 +1,12 @@
 {
   "appId": "com.flixtoys.kickup",
-  "appName": "FLIX Kick Up",
+  "appName": "Flix Kick Up",
   "webDir": "www",
-  "backgroundColor": "#e22511",
+  "backgroundColor": "#05040c",
   "ios": {
     "contentInset": "never",
     "scrollEnabled": false,
-    "backgroundColor": "#e22511",
+    "backgroundColor": "#05040c",
     "webContentsDebuggingEnabled": false,
     "preferredContentMode": "mobile",
     "allowsLinkPreview": false

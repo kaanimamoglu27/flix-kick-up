@@ -1,12 +1,12 @@
 {
   "appId": "com.flixtoys.direktor",
-  "appName": "Flix Direktör",
+  "appName": "Flix Sen Olsaydın",
   "webDir": "www",
-  "backgroundColor": "#d81e27",
+  "backgroundColor": "#05040c",
   "ios": {
     "contentInset": "never",
     "scrollEnabled": false,
-    "backgroundColor": "#d81e27",
+    "backgroundColor": "#05040c",
     "webContentsDebuggingEnabled": false,
     "preferredContentMode": "mobile",
     "allowsLinkPreview": false

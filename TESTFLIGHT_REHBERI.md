@@ -1,12 +1,16 @@
 # Üç Flix oyununu TestFlight'a yükleme
 
-FLIX Kick Up, ARKANA ve Flix Direktör artık gerçek iPhone uygulaması olarak derlenmeye hazır. Her biri kendi klasöründe, internetsiz çalışan bir Capacitor 8 projesi:
+Flix Kick Up, Flix Arkana ve Flix Sen Olsaydın artık gerçek iPhone uygulaması olarak derlenmeye hazır. Her biri kendi klasöründe, internetsiz çalışan bir Capacitor 8 projesi:
 
 | Oyun | Klasör | Paket kimliği (Bundle ID) | Ekran |
 |---|---|---|---|
-| FLIX Kick Up | `flix-kick-up` reposu, `app/` | `com.flixtoys.kickup` | iPhone, dikey |
-| Flix Direktör | `flix-kick-up` reposu, `direktor/app/` | `com.flixtoys.direktor` | iPhone, dikey |
-| ARKANA | `Flix-Arkana` reposu, `app/` | `com.flixtoys.arkana` | iPhone + iPad, yatay |
+| Flix Kick Up | `flix-kick-up` reposu, `app/` | `com.flixtoys.kickup` | iPhone, dikey |
+| Flix Sen Olsaydın | `flix-kick-up` reposu, `direktor/app/` (yakında kendi reposuna taşınacak) | `com.flixtoys.direktor` | iPhone, dikey |
+| Flix Arkana | `Flix-Arkana` reposu, `app/` | `com.flixtoys.arkana` | iPhone + iPad, yatay |
+
+**Yayın sırası:** önce Flix Kick Up, sonra Flix Arkana, en son Flix Sen Olsaydın. Üçü de birbirinden bağımsız; birini yüklemek diğerlerini etkilemez.
+
+Her oyun açılışta önce "FLIX TOYS presents" ekranını gösterir (iPhone'un açılış ekranı da aynı görüntü).
 
 Yüklemenin iki yolu var, ikisi de terminalden:
 - **Yol A, Mac gerekmez:** GitHub'ın bulut Mac'i derler ve yükler. Sen terminalden tek komut yazarsın (Windows, Mac ya da Linux).
@@ -19,7 +23,7 @@ Yüklemenin iki yolu var, ikisi de terminalden:
 1. **Apple Developer Program** (yıllık 99 $): https://developer.apple.com/programs/enroll. Üç oyun aynı hesapta durur.
 2. **App Store Connect > Anlaşmalar, Vergi ve Bankacılık**: "Ücretli Uygulamalar" anlaşmasını imzala. Bu olmadan satın almalar TestFlight'ta bile çalışmaz.
 3. **Üç uygulama kimliği**: https://developer.apple.com/account > Identifiers > **+** > App IDs > App. Bundle ID **Explicit**, tablodaki üç kimlik. (In-App Purchase kendiliğinden açık gelir.)
-4. **Üç uygulama kaydı**: https://appstoreconnect.apple.com > Uygulamalar > **+** > Yeni Uygulama. Platform iOS, dil Türkçe, paket kimliği yukarıdaki tablodan, SKU `kickup1`, `direktor1`, `arkana1`. Adlar: **FLIX Kick Up**, **Flix Direktör**, **ARKANA: Flix Kahramanları**.
+4. **Üç uygulama kaydı**: https://appstoreconnect.apple.com > Uygulamalar > **+** > Yeni Uygulama. Platform iOS, dil Türkçe, paket kimliği yukarıdaki tablodan, SKU `kickup1`, `direktor1`, `arkana1`. Adlar: **Flix Kick Up**, **Flix Sen Olsaydın**, **Flix Arkana**.
 5. **API anahtarı** (sadece Yol A için ya da Mac'te Xcode'a giriş yapmak istemezsen): App Store Connect > Kullanıcılar ve Erişim > Entegrasyonlar > App Store Connect API > Ekip Anahtarları > **+**. Ad `GitHub`, erişim **Yönetici**. `.p8` dosyasını indir (bir kez indirilebilir), **Key ID** ve **Issuer ID**'yi not al.
 6. **Team ID**: https://developer.apple.com/account > Membership details (10 karakter).
 
@@ -61,14 +65,14 @@ Yükle (her biri 15-25 dakika sürer, sonra 10-30 dakikada TestFlight'ta görün
 ```bash
 gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=kickup   -f version=1.0
 gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=direktor -f version=1.0
-gh workflow run ios-testflight.yml -R kaanimamoglu27/Flix-Arkana  -f version=1.0
+gh workflow run ios-testflight.yml -R kaanimamoglu27/Flix-Arkana   -f version=1.0
 ```
 
-İzlemek için: `gh run watch -R kaanimamoglu27/flix-kick-up` (ARKANA için `-R kaanimamoglu27/Flix-Arkana`). Kırmızı çıkarsa `gh run view --log-failed -R ...` çıktısını bana at, düzeltirim.
+İzlemek için: `gh run watch -R kaanimamoglu27/flix-kick-up` (Flix Arkana için `-R kaanimamoglu27/Flix-Arkana`). Kırmızı çıkarsa `gh run view --log-failed -R ...` çıktısını bana at, düzeltirim.
 
 Güncelleme yüklerken sadece `version`'ı artır (1.1, 1.2...). Derleme numarası kendiliğinden artar.
 
-ARKANA'da gerçek reklam için iki bilgi daha girebilirsin (girmezsen Google'ın test reklamı çıkar):
+Flix Arkana'da gerçek reklam için iki bilgi daha girebilirsin (girmezsen Google'ın test reklamı çıkar):
 ```bash
 gh secret set ADMOB_APP_ID      -R kaanimamoglu27/Flix-Arkana -b "ca-app-pub-...~..."
 gh secret set ADMOB_REWARDED_ID -R kaanimamoglu27/Flix-Arkana -b "ca-app-pub-.../..."
@@ -93,8 +97,8 @@ export APPLE_TEAM_ID=TEAM_ID_BURAYA
 
 cd flix-kick-up/app            && ./ios.sh simulator    # önce simülatörde dene
 ./ios.sh yukle 1.0                                      # Kick Up'ı TestFlight'a yükle
-cd ../direktor/app             && ./ios.sh yukle 1.0    # Direktör
-cd ../../../Flix-Arkana/app    && ./ios.sh yukle 1.0    # ARKANA
+cd ../direktor/app             && ./ios.sh yukle 1.0    # Sen Olsaydın
+cd ../../../Flix-Arkana/app    && ./ios.sh yukle 1.0    # Flix Arkana
 ```
 
 `./ios.sh` komutları: `hazirla` (projeyi kurar), `simulator` (simülatörde açar), `xcode` (Xcode'da açar), `yukle 1.0` (derler ve yükler). Telefonunu kabloyla bağlayıp Xcode'da ▶ ile doğrudan da kurabilirsin.
@@ -110,11 +114,11 @@ cd ../../../Flix-Arkana/app    && ./ios.sh yukle 1.0    # ARKANA
 
 Ürünler TestFlight'ta satın alma denemek için gerekir; oyun ürünler olmadan da açılır ve oynanır.
 
-**FLIX Kick Up (7):** `kickup_starter` (tüketilemez, 2,99 $), `kickup_feathers_500`, `_1200`, `_3500`, `_8000`, `_18000`, `_50000` (tüketilebilir, 0,99-49,99 $). Ayrıntı: `app/README.md`.
+**Flix Kick Up (7):** `kickup_starter` (tüketilemez, 2,99 $), `kickup_feathers_500`, `_1200`, `_3500`, `_8000`, `_18000`, `_50000` (tüketilebilir, 0,99-49,99 $). Ayrıntı: `app/README.md`.
 
-**ARKANA (17):** liste `Flix-Arkana/app/README.md` içinde.
+**Flix Arkana (17):** liste `Flix-Arkana/app/README.md` içinde.
 
-**Flix Direktör (8):**
+**Flix Sen Olsaydın (8):**
 
 | Kimlik | Tür | Fiyat (TL) | İçerik |
 |---|---|---|---|
@@ -132,6 +136,6 @@ cd ../../../Flix-Arkana/app    && ./ios.sh yukle 1.0    # ARKANA
 ## 6. Mağaza sayfası için gerekenler
 
 - **Gizlilik politikası linki** (üç oyun için aynı): https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html
-- **Uygulama Gizliliği** anketi: Kick Up ve Direktör için "Veri toplanmıyor". ARKANA'da reklam olduğu için `Flix-Arkana/app/README.md`'deki seçimler.
-- **Yaş derecesi**: Kick Up ve Direktör 4+, ARKANA 9+ (hafif fantastik şiddet).
-- Ekran görüntüleri: Kick Up `app/store/screenshots/`, ARKANA `app/store/cizgi_roman/`. Direktör için ekran görüntüsü henüz yok; TestFlight'tan sonra hazırlayabilirim. (TestFlight için ekran görüntüsü gerekmez.)
+- **Uygulama Gizliliği** anketi: Kick Up ve Direktör için "Veri toplanmıyor". Flix Arkana'da reklam olduğu için `Flix-Arkana/app/README.md`'deki seçimler.
+- **Yaş derecesi**: Kick Up ve Direktör 4+, Flix Arkana 9+ (hafif fantastik şiddet).
+- Ekran görüntüleri: Kick Up `app/store/screenshots/`, Flix Arkana `app/store/cizgi_roman/`. Direktör için ekran görüntüsü henüz yok; TestFlight'tan sonra hazırlayabilirim. (TestFlight için ekran görüntüsü gerekmez.)

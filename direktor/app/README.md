@@ -1,4 +1,4 @@
-# Flix Direktör: iPhone uygulaması
+# Flix Sen Olsaydın: iPhone uygulaması
 
 Yükleme adımları: [../../TESTFLIGHT_REHBERI.md](../../TESTFLIGHT_REHBERI.md). Kısaca: Mac'te `./ios.sh yukle 1.0`, Mac yoksa `gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=direktor -f version=1.0`.
 

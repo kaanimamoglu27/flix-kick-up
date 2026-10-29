@@ -1,4 +1,4 @@
-# FLIX Kick Up'ı App Store'a yükleme rehberi
+# Flix Kick Up'ı App Store'a yükleme rehberi
 
 Oyun hazır: `app/` klasörü iPhone uygulamasına dönüşecek her şeyi içeriyor (oyun, internetsiz çalışan dosyalar, ikon, 7 ekran görüntüsü, mağaza metinleri, satın alma kimlikleri). Aynı klasör GitHub'da da var: `kaanimamoglu27/flix-kick-up` reposunun `app/` klasörü.
 
@@ -26,7 +26,7 @@ Terminal komutları: [../TESTFLIGHT_REHBERI.md](../TESTFLIGHT_REHBERI.md).
 
 1. **Uygulamalarım > + > Yeni Uygulama**
    - Platform: iOS
-   - Ad: **FLIX Kick Up**
+   - Ad: **Flix Kick Up**
    - Dil: Türkçe
    - Paket kimliği: **com.flixtoys.kickup**
    - SKU: `kickup1`

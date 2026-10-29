@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Prepares the iOS project after `npx cap add ios` / `npx cap sync ios`. Works on Mac, Linux and GitHub Actions.
-- locks Flix Direktör to portrait and makes it an iPhone-only app (no iPad screenshots needed)
+- locks Flix Sen Olsaydın to portrait and makes it an iPhone-only app (no iPad screenshots needed)
 - hides the status bar, declares no non-exempt encryption (skips the export-compliance question on every upload)
 - lets ProMotion iPhones run at 120 Hz
 - copies the app icon (store/icon-1024.png) and launch screen (store/acilis_ekrani.png)
@@ -17,7 +17,7 @@ pl['UIStatusBarHidden'] = True
 pl['UIViewControllerBasedStatusBarAppearance'] = False
 pl['ITSAppUsesNonExemptEncryption'] = False
 pl['CADisableMinimumFrameDurationOnPhone'] = True
-pl['CFBundleDisplayName'] = 'Direktör'
+pl['CFBundleDisplayName'] = 'Sen Olsaydın'
 with open(pl_path, 'wb') as f: plistlib.dump(pl, f)
 xc = ios / 'App' / 'Assets.xcassets'
 shutil.copy(app / 'store' / 'icon-1024.png', xc / 'AppIcon.appiconset' / 'AppIcon-512@2x.png')
