@@ -1,0 +1,54 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Flix 3 2 1 Videolar</title><meta name="robots" content="noindex">
+<style>
+:root{--bg:#f5f2e9;--ink:#141821;--navy:#0b2552;--red:#c4121a;--card:#fff;--mute:#5c6070}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,system-ui,sans-serif;padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 40px max(16px,env(safe-area-inset-left))}
+main{max-width:520px;margin:0 auto;display:grid;gap:22px}
+header h1{margin:0;font-size:26px;color:var(--navy)}header p{margin:6px 0 0;color:var(--mute)}
+.how{background:var(--navy);color:#fff;border-radius:14px;padding:14px 16px;font-size:15px}.how b{color:#ffc20e}
+.card{background:var(--card);border:2px solid var(--navy);border-radius:16px;padding:16px;display:grid;gap:12px}
+.no{margin:0;font:700 13px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:var(--red)}h2{margin:0;font-size:21px;color:var(--navy)}
+video{width:100%;border-radius:10px;background:#000;aspect-ratio:9/16;max-height:70vh}
+.btns{display:grid;gap:8px}.b{display:block;text-align:center;padding:14px;border-radius:12px;border:2px solid var(--navy);color:var(--navy);font-weight:700;text-decoration:none}.b.main{background:var(--navy);color:#fff}
+.caph{display:flex;justify-content:space-between;align-items:center}h3{margin:0;font-size:16px}
+button{font:700 15px system-ui;background:#ffc20e;border:2px solid var(--ink);border-radius:10px;padding:8px 16px}
+pre{margin:0;white-space:pre-wrap;font:14px/1.5 ui-monospace,Menlo,monospace;background:var(--bg);border-radius:10px;padding:12px}
+</style></head><body><main>
+<header><h1>Flix 3 2 1 · Videolar</h1><p>Instagram'a atılacak hazır videolar.</p></header>
+<div class="how"><b>Telefona kaydetmek için:</b> "Reels videosunu aç" düğmesine bas. Video açılınca alttaki <b>paylaş</b> simgesine (kare ve yukarı ok) dokun, <b>Videoyu Kaydet</b>'i seç. Video Fotoğraflar'a iner. Bu sayfayı Safari'de açarsan en sorunsuz çalışır.</div>
+<section class="card">
+<p class="no">POST 2 · YENİ</p><h2>Prova: KICK ve FLICK tartışıyor</h2>
+<video src="prova_reels.mp4" poster="k_prova.jpg" controls playsinline preload="none"></video>
+<div class="btns"><a class="b main" href="prova_reels.mp4">Reels videosunu aç (9:16)</a><a class="b" href="prova_4x5.mp4">Gönderi videosunu aç (4:5)</a></div>
+<div class="caph"><h3>Açıklama</h3><button data-c="c1">Kopyala</button></div>
+<pre id="c1">Komisyon, Flix 3 2 1 çıkmadan önce olabilecek her ihtimali prova etti.
+KICK ve FLICK bu süreçte 47 kez &quot;bir daha&quot; dedi. Bir kez de hiç konuşmadı.
+
+Senin &quot;Arda Turan&quot; tartışmanı yaşadığın arkadaşını etiketle. Prova o kişiyle yapılacak.
+
+Galatasaray&#x27;da ve Barcelona&#x27;da oynamış kaç futbolcu sayabilirsin? Yorumlara yaz, komisyon inceleyecek.
+
+Flix 3 2 1 · Yakında App Store&#x27;da
+
+#flix321 #futbol #futbolbilgisi #arkadaşınıetiketle #mobiloyun #flixtoys</pre></section>
+<section class="card">
+<p class="no">POST 1</p><h2>Lansman: İtirazlar reddedildi</h2>
+<video src="lansman_reels.mp4" poster="k_lansman.jpg" controls playsinline preload="none"></video>
+<div class="btns"><a class="b main" href="lansman_reels.mp4">Reels videosunu aç (9:16)</a><a class="b" href="lansman_4x5.mp4">Gönderi videosunu aç (4:5)</a></div>
+<div class="caph"><h3>Açıklama</h3><button data-c="c2">Kopyala</button></div>
+<pre id="c2">Komisyon, Flix 3 2 1&#x27;in yayınlanmasına itiraz etmiştir. İtirazlar reddedilmiştir.
+
+Futbolu senden iyi bildiğini iddia eden kişiyi etiketle.
+Komisyon ikinize iki takım verecek. İki takımda da oynamış bir futbolcuyu ilk yazan kazanır.
+
+Kaybeden itiraz edebilir. İtiraz reddedilecektir.
+
+Flix 3 2 1 · Yakında App Store&#x27;da
+
+#flix321 #futbol #futbolbilgisi #arkadaşınıetiketle #flixtoys</pre></section>
+<p style="color:var(--mute);font-size:14px;margin:0">Kapak görselleri: <a href="kapak_prova.jpg">Prova kapağı</a> · <a href="kapak_lansman.jpg">Lansman kapağı</a> (açıp basılı tut, "Fotoğraflar'a Ekle").</p>
+</main><script>
+document.querySelectorAll('button[data-c]').forEach(b=>b.onclick=()=>{const t=document.getElementById(b.dataset.c).innerText;
+const ok=()=>{b.textContent='Kopyalandı';setTimeout(()=>b.textContent='Kopyala',1500)};
+(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(ok).catch(()=>{const r=document.createRange();r.selectNodeContents(document.getElementById(b.dataset.c));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');ok();})});
+</script></body></html>
