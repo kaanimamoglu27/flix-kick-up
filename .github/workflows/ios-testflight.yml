@@ -78,6 +78,76 @@ jobs:
             -allowProvisioningUpdates -authenticationKeyPath "$KEY_PATH" \
             -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             archive | tail -n 80
+      # Read-only signing report: what the archive was signed with, what is on this runner, and what the
+      # App Store Connect API key can see (bundle id, certificates, profiles). Prints ids, types and dates only,
+      # never the key or any secret. Never fails the job.
+      - name: Signing diagnostics
+        if: always()
+        continue-on-error: true
+        run: |
+          A="$RUNNER_TEMP/App.xcarchive"; APP=$(ls -d "$A"/Products/Applications/*.app 2>/dev/null | head -1)
+          echo "::group::Archive"
+          if [ -z "$APP" ]; then echo "no archive found"; else
+            BID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"); echo "bundle id: $BID"
+            echo "APPLE_TEAM_ID set: $([ -n "$APPLE_TEAM_ID" ] && echo "yes, ${#APPLE_TEAM_ID} chars" || echo no)"
+            codesign -dvv "$APP" 2>&1 | grep -E '^(Authority|TeamIdentifier)=' || echo "app is not signed"
+            if [ -f "$APP/embedded.mobileprovision" ]; then
+              security cms -D -i "$APP/embedded.mobileprovision" > "$RUNNER_TEMP/emb.plist" 2>/dev/null
+              P() { /usr/libexec/PlistBuddy -c "Print :$1" "$RUNNER_TEMP/emb.plist" 2>/dev/null; }
+              echo "embedded profile: $(P Name) | expires $(P ExpirationDate) | app id $(P Entitlements:application-identifier)"
+              P ProvisionedDevices >/dev/null && echo "profile type: development (archive was signed for development; export must re-sign for the App Store)" || echo "profile type: distribution"
+              [ "$(P TeamIdentifier:0)" = "$APPLE_TEAM_ID" ] && echo "profile team matches APPLE_TEAM_ID: yes" || echo "profile team matches APPLE_TEAM_ID: NO"
+            else echo "no embedded.mobileprovision"; fi
+          fi
+          echo "::endgroup::"
+          echo "::group::This runner (keychain and installed profiles)"
+          security find-identity -v -p codesigning | sed 's/^ *[0-9]*) [0-9A-F]* /  /'
+          for d in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            for f in "$d"/*.mobileprovision; do [ -f "$f" ] || continue
+              security cms -D -i "$f" > "$RUNNER_TEMP/p.plist" 2>/dev/null
+              echo "  profile: $(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/p.plist") | $(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$RUNNER_TEMP/p.plist")"
+            done
+          done
+          echo "::endgroup::"
+          echo "::group::App Store Connect API (what this key can see)"
+          python3 -m venv "$RUNNER_TEMP/venv" && "$RUNNER_TEMP/venv/bin/pip" install -q pyjwt cryptography >/dev/null 2>&1
+          BID="${BID:-}" "$RUNNER_TEMP/venv/bin/python" - <<'PY'
+          import os, time, json, urllib.request, urllib.error, jwt
+          key = open(os.environ['KEY_PATH']).read()
+          tok = jwt.encode({'iss': os.environ['ASC_ISSUER_ID'], 'iat': int(time.time()), 'exp': int(time.time()) + 600, 'aud': 'appstoreconnect-v1'},
+                           key, algorithm='ES256', headers={'kid': os.environ['ASC_KEY_ID'], 'typ': 'JWT'})
+          def get(path):
+              req = urllib.request.Request('https://api.appstoreconnect.apple.com' + path, headers={'Authorization': 'Bearer ' + tok})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r: return r.status, json.load(r)
+              except urllib.error.HTTPError as e:
+                  try: msg = json.load(e)['errors'][0].get('detail', '')
+                  except Exception: msg = ''
+                  return e.code, msg
+          bid = os.environ.get('BID') or 'com.flixtoys.kickup'
+          s, j = get('/v1/bundleIds?filter[identifier]=' + bid + '&limit=20')
+          if s == 200:
+              ids = [b for b in j['data'] if b['attributes']['identifier'] == bid]
+              print('App ID (bundle id) %s registered: %s' % (bid, 'yes' if ids else 'NO - register it in Certificates, Identifiers & Profiles'))
+          else: print('bundle ids: HTTP %s %s' % (s, j))
+          s, j = get('/v1/apps?filter[bundleId]=' + bid)
+          print('App Store Connect app record: %s' % (('yes' if j['data'] else 'NO - create the app in App Store Connect') if s == 200 else 'HTTP %s %s' % (s, j)))
+          s, j = get('/v1/certificates?limit=200')
+          if s == 200:
+              certs = [c['attributes'] for c in j['data']]
+              for t in sorted({c['certificateType'] for c in certs}):
+                  print('certificates %s: %s (expires %s)' % (t, sum(c['certificateType'] == t for c in certs), ', '.join(sorted(c['expirationDate'][:10] for c in certs if c['certificateType'] == t))))
+              if not any(c['certificateType'] in ('DISTRIBUTION', 'IOS_DISTRIBUTION') for c in certs):
+                  print('no Apple Distribution certificate in the team (cloud signing creates a cloud-managed one if the key is allowed to)')
+          else: print('certificates: HTTP %s %s  <- this key cannot read certificates (needs a Team key with Admin access)' % (s, j))
+          s, j = get('/v1/profiles?filter[profileType]=IOS_APP_STORE&include=bundleId&limit=200')
+          if s == 200:
+              inc = {i['id']: i['attributes'].get('identifier') for i in j.get('included', [])}
+              mine = [p for p in j['data'] if inc.get(p['relationships']['bundleId']['data']['id']) == bid]
+              print('App Store profiles for %s: %s' % (bid, ', '.join('%s (%s, expires %s)' % (p['attributes']['name'], p['attributes']['profileState'], p['attributes']['expirationDate'][:10]) for p in mine) or 'none'))
+          else: print('profiles: HTTP %s %s' % (s, j))
+          PY
+          echo "::endgroup::"
       - name: Upload to App Store Connect
         run: |
           set -o pipefail
@@ -93,8 +163,14 @@ jobs:
             <key>manageAppVersionAndBuildNumber</key><false/>
           </dict></plist>
           PLIST
-          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
+          if ! xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
             -allowProvisioningUpdates -authenticationKeyPath "$KEY_PATH" \
-            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" | tail -n 60
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" | tail -n 60; then
+            # Xcode keeps the real reason (e.g. the cloud signing answer from Apple) in its distribution log
+            L=$(ls -td "${TMPDIR:-/tmp}"/*.xcdistributionlogs 2>/dev/null | head -1)
+            [ -n "$L" ] && { echo "::group::Xcode distribution log"; tail -n 150 "$L/IDEDistribution.standard.log" 2>/dev/null; echo "::endgroup::"; }
+            echo "::error::Export failed. See 'Signing diagnostics' above and the Xcode distribution log."
+            exit 1
+          fi
           echo "Uploaded ${{ inputs.app }} build ${{ github.run_number }} (version ${{ inputs.version }}). It appears in App Store Connect > TestFlight after Apple processes it."
