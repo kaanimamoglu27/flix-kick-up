@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Builds app/www/index.html from the web game (../flix-kick-up.html by default).
 Swaps Google Fonts for the local Rubik files so the app works offline (App Store review
-runs without relying on outside servers), and loads native-bridge.js before the game."""
-import re, sys, pathlib
+runs without relying on outside servers), and loads ads-config.js, ads.js and native-bridge.js before the game.
+Also copies the online client (../online-config.js, ../online.js) next to it."""
+import re, sys, pathlib, shutil
 app = pathlib.Path(__file__).resolve().parent.parent
 src = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else app.parent / 'flix-kick-up.html'
 s = src.read_text()
@@ -14,11 +15,12 @@ fonts = '<style>' + ''.join([
   face('normal', '300 900', 'rubik-latin-ext.woff2', 'woff2', EXT),
   face('italic', '900', 'rubik-italic-latin.woff', 'woff', LATIN),
   face('italic', '900', 'rubik-italic-latin-ext.woff', 'woff', EXT),
-]) + '</style>\n<link rel="manifest" href="manifest.json">\n<script src="native-bridge.js"></script>'
+]) + '</style>\n<link rel="manifest" href="manifest.json">\n<script src="ads-config.js"></script>\n<script src="ads.js"></script>\n<script src="native-bridge.js"></script>'
 s = re.sub(r'<link rel="preconnect"[^>]*>\s*', '', s)
 s, n = re.subn(r'<link rel="stylesheet" href="https://fonts.googleapis.com[^>]*>', lambda m: fonts, s)
 if n != 1: sys.exit('Google Fonts link not found')
 left = re.findall(r'(?:src|href)="(https?://[^"]+)"', s)
 if left: sys.exit('external resources still referenced: %s' % left)
 (app / 'www' / 'index.html').write_text(s)
+for name in ('online-config.js', 'online.js'): shutil.copy(app.parent / name, app / 'www' / name)
 print('www/index.html written from', src.name, len(s), 'bytes')

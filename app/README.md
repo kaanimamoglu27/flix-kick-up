@@ -5,6 +5,7 @@ Bu klasör Flix Kick Up'ı iPhone (ve istersen Android) uygulamasına çeviren h
 ## Klasörler
 - `www/index.html` oyunun kendisi. Elle düzenleme: web sürümü (`../flix-kick-up.html`) değişince `python3 tools/build_www.py` çalıştır. Bu dosyayı yeniden üretir ve dış bağlantı kalmadığını kontrol eder.
 - `www/native-bridge.js` gerçek satın alma (App Store / Google Play) ve titreşim bağlantısı. Web'de hiçbir şey yapmaz.
+- `www/ads.js` AdMob reklam servisi, `www/ads-config.js` reklam kimlikleri ve ayarları. Web'de hiçbir şey yapmaz.
 - `capacitor.config.json` uygulama kimliği `com.flixtoys.kickup`, adı Flix Kick Up.
 - `tools/ios_setup.py` iOS projesini dikey ekrana kilitler, sadece iPhone uygulaması yapar (iPad ekran görüntüsü gerekmez), durum çubuğunu gizler, şifreleme sorusunu kapatır, ikon ve açılış ekranını koyar (Mac, Linux ve GitHub'ın bulut Mac'inde çalışır).
 - `ios.sh` Mac terminalinden tek komutla hazırlama, simülatör ve TestFlight'a yükleme.
@@ -13,10 +14,12 @@ Bu klasör Flix Kick Up'ı iPhone (ve istersen Android) uygulamasına çeviren h
 
 ## Uygulamada web sürümünden farklı olanlar
 - Mağaza gerçek: satın alma Apple'ın kendi penceresiyle yapılır, fiyatlar mağazadan TL olarak okunur.
-- Reklamlar (1.4) Google AdMob ile: düşünce "Kaldığın yerden devam" ve "Tüyleri 2 katına çıkar" ödüllü reklamları (oyuncu isterse, tur başına bir kez), her 3 tekrarda bir tur arası reklam (ilk 90 saniye ve iki reklam arası 90 saniye boyunca yok). "Reklamsız" (kickup_noads) tur arası reklamları kapatır. Web sürümünde reklam ağı olmadığı için aynı yerlerde gerçek FLIX oyuncağının kendi reklamı çıkar (flixtoysofficial.com'a gider).
-- Gerçek reklam kimlikleri GitHub secret olarak girilir: KICKUP_ADMOB_APP_ID, KICKUP_ADMOB_REWARDED_ID, KICKUP_ADMOB_INTERSTITIAL_ID. Girilmezse Google'ın test reklamları çıkar. Uygulama açılışta iPhone'un takip izni sorusunu sorar.
+- Reklamlar Google AdMob ile (`www/ads.js` servisi): düşünce "Kaldığın yerden devam" ve "Tüyleri 2 katına çıkar" ödüllü reklamları. Bunlar sadece oyuncu basarsa açılır, ödül yalnızca reklam sonuna kadar izlenince verilir, reklam hazır değilse mesaj çıkar. Tur arası reklam en erken 3. bitmiş oyundan sonra, sonra her 3 oyunda bir ve en fazla 90 saniyede bir çıkar; sadece sonuç ekranından çıkarken (Tekrar / Menü / Mağaza) gösterilir, oyun sırasında asla. Hazır değilse beklemeden atlanır. "Reklamsız" (kickup_noads) tur arası reklamı ve banner'ı tamamen kapatır, ödüllü reklamlar isteğe bağlı kalır. Web sürümünde reklam ağı olmadığı için aynı yerlerde gerçek FLIX oyuncağının kendi reklamı çıkar (flixtoysofficial.com'a gider).
+- Reklam tempo ve ödül ayarları oyunda tek yerde: `AD_CFG` (`../flix-kick-up.html`, "ads" bölümü). Reklam kimlikleri, test/gerçek seçimi, banner ve takip izni anahtarı: `www/ads-config.js`. Kimlikler GitHub secret olarak da girilebilir: KICKUP_ADMOB_APP_ID, KICKUP_ADMOB_REWARDED_ID, KICKUP_ADMOB_INTERSTITIAL_ID, KICKUP_ADMOB_BANNER_ID. Boş ya da biçimi yanlış kimlik yerine Google'ın test reklamı çıkar. Takip izni sorusu (`requestTracking`) Google'ın onay penceresinden sonra bir kez sorulur.
+- Banner desteği hazır ama kapalı (`bannerEnabled: false`), çünkü ana ekranın alt butonları banner'ın yerinde duruyor. Açılırsa sadece ana ekranda görünür.
+- "Reklamsız" ve "Başlangıç Paketi" cihazda saklanır. Uygulama her açılışta mağazanın bildirdiği sahipliği de tekrar okur. "Satın alımları geri yükle" bulduğunu verir; bir şey yoksa ya da mağazaya ulaşılamıyorsa bunu söyler.
 - Başlangıç Paketi'ndeki üstü çizili "$9.99" fiyatı uygulamada gösterilmiyor.
-- Online yarış uygulamada "Yakında" olarak görünüyor. Online şu an sadece claude.ai linkinde çalışıyor; uygulamaya gelmesi için bir sunucu (ör. Supabase) bağlamak gerekir.
+- Online oyna: ana ekranda "ONLINE OYNA" (ve Oyna > Yarış'ta "Online oyna"). Hızlı eşleşme ya da 6 haneli özel oda; ikisi de "Hazırım" deyince sunucu 3-2-1 sayar, maç 60 saniye, en çok puanı yapan kazanır (düşen oyuncu kaldığı yerden devam eder), sonra "Tekrar oyna" veya "Menü". Sunucu `../server/`, adres `../online-config.js` içinde `ONLINE_SERVER_URL` (ya da GitHub değişkeni `KICKUP_ONLINE_SERVER_URL`); adres yoksa düğme görünmez. Online maç sırasında reklam açılmaz; tur arası reklam ancak sonuç ekranından menüye dönerken mevcut tempoyla çıkabilir, ödüllü reklam maç sonucunu değiştirmez. Online maç rekor ve hayalet kaydını etkilemez.
 - Titreşim telefonun kendi titreşim motoruyla: vuruşta hafif, harekette orta, düşüşte güçlü.
 
 ## Yayına çıkmak için adımlar

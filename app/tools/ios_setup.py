@@ -4,8 +4,10 @@
 - hides the status bar, declares no non-exempt encryption (skips the export-compliance question on every upload)
 - lets ProMotion iPhones run at 120 Hz
 - copies the app icon (store/icon-1024.png) and launch screen (store/acilis_ekrani.png)
-- AdMob: app id (env ADMOB_APP_ID, Google's TEST id if unset), tracking prompt text, SKAdNetwork ids;
-  env ADMOB_REWARDED_ID / ADMOB_INTERSTITIAL_ID put the real ad units into the app's native-bridge.js
+- AdMob: app id, tracking prompt text, SKAdNetwork ids. Ids come from www/ads-config.js; the env variables
+  ADMOB_APP_ID / ADMOB_REWARDED_ID / ADMOB_INTERSTITIAL_ID / ADMOB_BANNER_ID (GitHub secrets) override them and are
+  written into the app's copy of ads-config.js. Missing or malformed ids fall back to Google's TEST ids.
+- online: optional env ONLINE_SERVER_URL (wss://.../ws) is written into the app's copy of online-config.js
 - optional env BUILD_NUMBER / APP_VERSION set the build number and version shown in the App Store"""
 import json, os, plistlib, subprocess, pathlib, re, shutil
 app = pathlib.Path(__file__).resolve().parent.parent
@@ -20,7 +22,21 @@ pl['UIViewControllerBasedStatusBarAppearance'] = False
 pl['ITSAppUsesNonExemptEncryption'] = False
 pl['CADisableMinimumFrameDurationOnPhone'] = True
 pl['CFBundleDisplayName'] = 'Flix Kick Up'
-pl['GADApplicationIdentifier'] = os.environ.get('ADMOB_APP_ID') or 'ca-app-pub-3940256099942544~1458002511'
+# AdMob ids: env (GitHub secrets) first, then www/ads-config.js. A malformed app id would crash the app at launch, so it is checked.
+ads_cfg = (app / 'www' / 'ads-config.js').read_text(encoding='utf-8')
+def cfg_id(key):
+    m = re.search(r"\b%s:\s*'([^']*)'" % key, ads_cfg)
+    return m.group(1).strip() if m else ''
+env_units = {k: (os.environ.get('ADMOB_%s_ID' % k) or '').strip() for k in ('REWARDED', 'INTERSTITIAL', 'BANNER')}
+units = {k: env_units[k] or cfg_id('IOS_' + k) for k in env_units}
+TEST_APP_ID = 'ca-app-pub-3940256099942544~1458002511'
+app_id = (os.environ.get('ADMOB_APP_ID') or '').strip() or cfg_id('IOS_APP_ID')
+if app_id and not re.fullmatch(r'ca-app-pub-\d{16}~\d{10}', app_id):
+    print('WARNING: AdMob app id %r is not in the ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX form, using the TEST app id' % app_id); app_id = ''
+real_units = [k for k, v in units.items() if re.fullmatch(r'ca-app-pub-\d{16}/\d{10}', v)]
+if real_units and not app_id: print('WARNING: real ad units (%s) but no real AdMob app id: ads will not fill. Set IOS_APP_ID / ADMOB_APP_ID.' % ', '.join(real_units))
+if app_id and not real_units: print('NOTE: real AdMob app id but no real ad units: the app shows Google test ads.')
+pl['GADApplicationIdentifier'] = app_id or TEST_APP_ID
 pl['NSUserTrackingUsageDescription'] = 'Reklamları sana daha uygun göstermek için kullanılır. Hayır dersen oyun aynı şekilde çalışır.'
 pl['SKAdNetworkItems'] = [{'SKAdNetworkIdentifier': i} for i in ['cstr6suwn9.skadnetwork', '4fzdc2evr5.skadnetwork', '2fnua5tdw4.skadnetwork', 'ydx93a7ass.skadnetwork', 'p78axxw29g.skadnetwork', 'v72qych5uu.skadnetwork', 'ludvb6z3bs.skadnetwork', 'cp8zw746q7.skadnetwork', '3sh42y64q3.skadnetwork', 'c6k4g5qg8m.skadnetwork', 's39g8k73mm.skadnetwork', '3qy4746246.skadnetwork', 'hs6bdukanm.skadnetwork', 'mlmmfzh3r3.skadnetwork', 'v4nxqhlyqp.skadnetwork', 'wzmmz9fp6w.skadnetwork', 'su67r6k2v3.skadnetwork', 'yclnxrl5pm.skadnetwork', '7ug5zh24hu.skadnetwork', 'gta9lk7p23.skadnetwork', 'vutu7akeur.skadnetwork', 'y5ghdn5j9k.skadnetwork', 'v9wttpbfk9.skadnetwork', 'n38lu8286q.skadnetwork', '47vhws6wlr.skadnetwork', 'kbd757ywx3.skadnetwork', '9t245vhmpl.skadnetwork', 'a2p9lx4jpn.skadnetwork', '22mmun2rn5.skadnetwork', '4468km3ulz.skadnetwork', '2u9pt9hc89.skadnetwork', '8s468mfl3y.skadnetwork', 'ppxm28t8ap.skadnetwork', 'uw77j35x4d.skadnetwork', 'pwa73g5rt2.skadnetwork', '578prtvx9j.skadnetwork', '4dzt52r2t5.skadnetwork', 'tl55sbb4fm.skadnetwork', 'e5fvkxwrpn.skadnetwork', '8c4e2ghe7u.skadnetwork', '3rd42ekr43.skadnetwork', '3qcr597p9d.skadnetwork']]
 with open(pl_path, 'wb') as f: plistlib.dump(pl, f)
@@ -41,17 +57,30 @@ if splash.exists():
         else:
             shutil.copy(splash, si / 'splash.png'); name = 'splash.png'
     (si / 'Contents.json').write_text(json.dumps({'images': [{'idiom': 'universal', 'filename': name}], 'info': {'author': 'xcode', 'version': 1}}, indent=2))
-# real ad units go into the copy of native-bridge.js inside the app (the web copy keeps Google's test units)
-nb = ios / 'App' / 'public' / 'native-bridge.js'
-if nb.exists():
-    t = nb.read_text()
-    if os.environ.get('ADMOB_REWARDED_ID'): t = t.replace("'ca-app-pub-3940256099942544/1712485313'", repr(os.environ['ADMOB_REWARDED_ID']))
-    if os.environ.get('ADMOB_INTERSTITIAL_ID'): t = t.replace("'ca-app-pub-3940256099942544/4411468910'", repr(os.environ['ADMOB_INTERSTITIAL_ID']))
-    nb.write_text(t)
+# ad units from the env go into the app's copy of ads-config.js (the copy in www/ stays as it is)
+ac = ios / 'App' / 'public' / 'ads-config.js'
+if ac.exists():
+    t = ac.read_text(encoding='utf-8')
+    for k, v in env_units.items():
+        if v: t = re.sub(r"(\bIOS_%s:\s*)'[^']*'" % k, lambda m: m.group(1) + "'%s'" % v.replace("'", ''), t)
+    ac.write_text(t, encoding='utf-8')
+elif any(env_units.values()):
+    print('WARNING: ios/App/App/public/ads-config.js not found, run npx cap sync ios first')
+# online server address (the copy in www/ and ../online-config.js stays as it is)
+oc = ios / 'App' / 'public' / 'online-config.js'
+online_url = (os.environ.get('ONLINE_SERVER_URL') or '').strip()
+if online_url:
+    if not re.fullmatch(r'wss://[^\s\'"]+', online_url): print('WARNING: ONLINE_SERVER_URL must start with wss:// (iOS blocks plain ws://), ignored')
+    elif oc.exists():
+        t = oc.read_text(encoding='utf-8')
+        oc.write_text(re.sub(r"(\bONLINE_SERVER_URL:\s*)'[^']*'", lambda m: m.group(1) + "'%s'" % online_url, t), encoding='utf-8')
+if oc.exists():
+    m = re.search(r"\bONLINE_SERVER_URL:\s*'([^']*)'", oc.read_text(encoding='utf-8'))
+    print('online server:', (m and m.group(1)) or 'none (online play hidden in the app)')
 pbx = ios / 'App.xcodeproj' / 'project.pbxproj'
 s = pbx.read_text()
 s = s.replace('TARGETED_DEVICE_FAMILY = "1,2";', 'TARGETED_DEVICE_FAMILY = 1;')
 if os.environ.get('BUILD_NUMBER'): s = re.sub(r'CURRENT_PROJECT_VERSION = [^;]+;', 'CURRENT_PROJECT_VERSION = %s;' % os.environ['BUILD_NUMBER'], s)
 if os.environ.get('APP_VERSION'): s = re.sub(r'MARKETING_VERSION = [^;]+;', 'MARKETING_VERSION = %s;' % os.environ['APP_VERSION'], s)
 pbx.write_text(s)
-print('iOS project ready: portrait, iPhone only, icon, launch screen, AdMob app id', pl['GADApplicationIdentifier'])
+print('iOS project ready: portrait, iPhone only, icon, launch screen, AdMob app id', pl['GADApplicationIdentifier'], '| real ad units:', ', '.join(real_units) or 'none (test ads)')
