@@ -194,7 +194,7 @@ html.rot{--st:0px;--sr:0px;--sb:0px;--sl:0px}
 .btn.main{font-size:34px;background:linear-gradient(180deg,#fff27a,#ffc20e);animation:cwob 1.8s ease-in-out infinite;transform:skew(-6deg)}
 .btn.main:active{transform:skew(-6deg) translate(3px,4px)}
 @keyframes cwob{0%,100%{transform:skew(-6deg)}50%{transform:skew(-6deg) scale(1.05)}}
-.btn.shopb{font-size:26px;transform:skew(-6deg);background:linear-gradient(180deg,#b6fbe6,#3ee6b5)}
+.btn.shopb{font-size:26px;transform:skew(-6deg);background:linear-gradient(180deg,#b6fbe6,#3ee6b5)}.btn.shopb{position:relative}.btn.shopb.can::after{content:'Yeni kostüm alabilirsin!';position:absolute;right:-6px;top:-12px;font:700 11px Fredoka,sans-serif;letter-spacing:0;background:#ff2d6a;color:#fff;padding:3px 8px;border-radius:10px;border:2px solid #120d14;transform:skew(6deg) rotate(4deg);animation:wob 1.4s infinite}.nextSkin{display:block;margin-top:6px;font-size:14px;color:#ffe14d}
 .btn.shopb:active{transform:skew(-6deg) translate(3px,4px)}
 .panel{border:4px solid #120d14;border-radius:18px;box-shadow:7px 8px 0 #120d14}
 h2{font-family:Bangers,Fredoka,sans-serif;font-weight:400;letter-spacing:2px;color:#ffe14d;-webkit-text-stroke:2px #120d14;text-shadow:4px 4px 0 #e22511,7px 7px 0 #120d14;transform:skew(-6deg)}
@@ -1036,34 +1036,34 @@ const HEROES = {
     skins: [
       {n: 'Kraliyet', price: 0, body: 0xe22511, cloak: 0x0a2a5e, cloakIn: 0x9a0f14, metal: 0xaab2c0, gold: 0xffc20e, flame: 0xff8a1a, glove: 0xfbf6ea, plate: 0x0a2a5e, acc: 0xe22511, glow: 0xff8a1a},
       {n: 'Kıyamet', price: 1500, body: 0xc81e14, cloak: 0x1f5a2a, cloakIn: 0x123a1a, metal: 0x6a7484, gold: 0xb08a3a, flame: 0x7dff6a, glove: 0xd8dde4, plate: 0x1f5a2a, acc: 0x6a7484, glow: 0x7dff6a},
-      {n: 'Altın Taç', price: 2200, body: 0xffb81a, cloak: 0xfbf6ea, cloakIn: 0xe22511, metal: 0xfff2c0, gold: 0xffffff, flame: 0xffe06a, glove: 0xffffff, plate: 0xfbf6ea, acc: 0xffb81a, glow: 0xffe06a},
-      {n: 'Gece Alevi', price: 3000, body: 0x6a0e1a, cloak: 0x0a0a12, cloakIn: 0x2d6cff, metal: 0x2a2e38, gold: 0x4ad8ff, flame: 0x4ad8ff, glove: 0x2a2e38, plate: 0x0a0a12, acc: 0x6a0e1a, glow: 0x4ad8ff},
-      {n: 'Buzul', price: 2600, body: 0x5ab8f0, cloak: 0xf4f8ff, cloakIn: 0x2d6cff, metal: 0xd8e8f8, gold: 0xffffff, flame: 0x9fe8ff, glove: 0xffffff, plate: 0xf4f8ff, acc: 0x5ab8f0, glow: 0x9fe8ff},
-      {n: 'Neon', price: 3400, body: 0xff2d9a, cloak: 0x14062a, cloakIn: 0x2fe8ff, metal: 0x2fe8ff, gold: 0x2fe8ff, flame: 0xff6af0, glove: 0x2fe8ff, plate: 0x14062a, acc: 0xff2d9a, glow: 0xff6af0},
-      {n: 'Süper Yıldız', price: 4200, body: 0x7a2cff, cloak: 0xffc20e, cloakIn: 0x7a2cff, metal: 0xffe08a, gold: 0xffffff, flame: 0xffe06a, glove: 0xfff6dc, plate: 0xffc20e, acc: 0x7a2cff, glow: 0xffe06a},
-      {n: 'Ejder Kral', price: 8000, body: 0x1a8a4a, cloak: 0x0a1a0a, cloakIn: 0xffc20e, metal: 0xffd86a, gold: 0xffe9a0, flame: 0x7dff6a, glove: 0xfff2c0, plate: 0x0a1a0a, acc: 0x1a8a4a, glow: 0x7dff6a},
+      {n: 'Altın Taç', price: 3000, body: 0xffb81a, cloak: 0xfbf6ea, cloakIn: 0xe22511, metal: 0xfff2c0, gold: 0xffffff, flame: 0xffe06a, glove: 0xffffff, plate: 0xfbf6ea, acc: 0xffb81a, glow: 0xffe06a},
+      {n: 'Gece Alevi', price: 5000, body: 0x6a0e1a, cloak: 0x0a0a12, cloakIn: 0x2d6cff, metal: 0x2a2e38, gold: 0x4ad8ff, flame: 0x4ad8ff, glove: 0x2a2e38, plate: 0x0a0a12, acc: 0x6a0e1a, glow: 0x4ad8ff},
+      {n: 'Buzul', price: 9000, body: 0x5ab8f0, cloak: 0xf4f8ff, cloakIn: 0x2d6cff, metal: 0xd8e8f8, gold: 0xffffff, flame: 0x9fe8ff, glove: 0xffffff, plate: 0xf4f8ff, acc: 0x5ab8f0, glow: 0x9fe8ff},
+      {n: 'Neon', price: 16000, body: 0xff2d9a, cloak: 0x14062a, cloakIn: 0x2fe8ff, metal: 0x2fe8ff, gold: 0x2fe8ff, flame: 0xff6af0, glove: 0x2fe8ff, plate: 0x14062a, acc: 0xff2d9a, glow: 0xff6af0},
+      {n: 'Süper Yıldız', price: 28000, body: 0x7a2cff, cloak: 0xffc20e, cloakIn: 0x7a2cff, metal: 0xffe08a, gold: 0xffffff, flame: 0xffe06a, glove: 0xfff6dc, plate: 0xffc20e, acc: 0x7a2cff, glow: 0xffe06a},
+      {n: 'Ejder Kral', price: 50000, body: 0x1a8a4a, cloak: 0x0a1a0a, cloakIn: 0xffc20e, metal: 0xffd86a, gold: 0xffe9a0, flame: 0x7dff6a, glove: 0xfff2c0, plate: 0x0a1a0a, acc: 0x1a8a4a, glow: 0x7dff6a},
       {n: 'Kozmik', gem: 1200, fx: 'mythic', body: 0x3a1a8a, cloak: 0x05030f, cloakIn: 0xff4fd8, metal: 0x8a7aff, gold: 0xffffff, flame: 0xb06aff, glove: 0xd8d0ff, plate: 0x05030f, acc: 0x3a1a8a, glow: 0xff6af0},
       {n: 'Flix Tanrısı', gem: 6500, fx: 'godlike', body: 0xffd23f, cloak: 0xfff8e8, cloakIn: 0xffc20e, metal: 0xfff6dc, gold: 0xffffff, flame: 0xffffff, glove: 0xffffff, plate: 0xfff8e8, acc: 0xffd23f, glow: 0xfff6a0}]},
-  kick: {n: 'KICK', ic: '🦸', price: 2500, d: 'Pelerinli hızlı kahraman: +12% hız, 95 can. Şimşek ile başlar.', start: 'zap', hp: 95, spd: 1.12, crit: 0.05,
+  kick: {n: 'KICK', ic: '🦸', price: 6000, d: 'Pelerinli hızlı kahraman: +12% hız, 95 can. Şimşek ile başlar.', start: 'zap', hp: 95, spd: 1.12, crit: 0.05,
     skins: [
       {n: 'Klasik', price: 0, d: 'Kırmızı pelerin ve eldivenler', body: 0xffc21a, glove: 0xd8261c, cape: 0xd8261c, capeIn: 0xa5150f, plate: 0xffc21a, acc: 0xd8261c, glow: 0xffd23f},
       {n: 'Gece Maskesi', price: 1500, d: 'Göz maskesi, lacivert pelerin, kemer', body: 0xffc21a, glove: 0x1b2a5e, boot: 0x1b2a5e, cape: 0x1b2a5e, capeIn: 0xffc20e, mask: '#1b2a5e', belt: 0x1b2a5e, wear: ['belt'], plate: 0xffc21a, acc: 0x1b2a5e, glow: 0x6fd3ff},
-      {n: 'Astronot', price: 2200, d: 'Cam kask, jetpack, uzay eldivenleri', body: 0xffc21a, glove: 0xf2f4f8, boot: 0xf2f4f8, accC: 0xf2f4f8, accC2: 0xff7a1a, belt: 0xff7a1a, wear: ['astro', 'jetpack', 'belt'], plate: 0xf2f4f8, acc: 0xff7a1a, glow: 0x9fe8ff},
-      {n: 'Ninja', price: 2600, d: 'Uçuşan kırmızı bant ve ninja atkısı', body: 0xffc21a, glove: 0x15151c, boot: 0x15151c, accC: 0xd8261c, accC2: 0x15151c, belt: 0x15151c, wear: ['band', 'scarf', 'belt'], plate: 0x15151c, acc: 0xd8261c, glow: 0xff5a3a},
-      {n: 'Korsan', price: 3400, d: 'Puantiyeli bandana, göz bandı, kaptan pelerini', body: 0xffc21a, glove: 0x6b3a1e, boot: 0x2a1a12, cape: 0x2a1a12, capeIn: 0xd8261c, accC: 0xd8261c, patch: true, belt: 0x6b3a1e, wear: ['bandana', 'belt'], plate: 0xd8261c, acc: 0x2a1a12, glow: 0xffd23f},
-      {n: 'Viking', price: 4200, d: 'Boynuzlu miğfer ve kürk pelerin', body: 0xffc21a, glove: 0x8a5a2a, boot: 0x5a3a1e, cape: 0x7a4a2a, capeIn: 0xc8a070, accC: 0xb8bcc8, accC2: 0xf6eedc, belt: 0x5a3a1e, wear: ['viking', 'belt'], plate: 0xb8bcc8, acc: 0x7a4a2a, glow: 0xffe08a},
-      {n: 'Şimşek Kral', price: 8000, d: 'Altın taç, şimşek arması, mor kraliyet pelerini', body: 0xffd23f, glove: 0x5a1aa8, boot: 0x5a1aa8, cape: 0x5a1aa8, capeIn: 0xffc20e, belt: 0xffc20e, wear: ['crown', 'bolt', 'belt'], plate: 0xffd23f, acc: 0x5a1aa8, glow: 0xffd23f},
+      {n: 'Astronot', price: 3000, d: 'Cam kask, jetpack, uzay eldivenleri', body: 0xffc21a, glove: 0xf2f4f8, boot: 0xf2f4f8, accC: 0xf2f4f8, accC2: 0xff7a1a, belt: 0xff7a1a, wear: ['astro', 'jetpack', 'belt'], plate: 0xf2f4f8, acc: 0xff7a1a, glow: 0x9fe8ff},
+      {n: 'Ninja', price: 5000, d: 'Uçuşan kırmızı bant ve ninja atkısı', body: 0xffc21a, glove: 0x15151c, boot: 0x15151c, accC: 0xd8261c, accC2: 0x15151c, belt: 0x15151c, wear: ['band', 'scarf', 'belt'], plate: 0x15151c, acc: 0xd8261c, glow: 0xff5a3a},
+      {n: 'Korsan', price: 10000, d: 'Puantiyeli bandana, göz bandı, kaptan pelerini', body: 0xffc21a, glove: 0x6b3a1e, boot: 0x2a1a12, cape: 0x2a1a12, capeIn: 0xd8261c, accC: 0xd8261c, patch: true, belt: 0x6b3a1e, wear: ['bandana', 'belt'], plate: 0xd8261c, acc: 0x2a1a12, glow: 0xffd23f},
+      {n: 'Viking', price: 22000, d: 'Boynuzlu miğfer ve kürk pelerin', body: 0xffc21a, glove: 0x8a5a2a, boot: 0x5a3a1e, cape: 0x7a4a2a, capeIn: 0xc8a070, accC: 0xb8bcc8, accC2: 0xf6eedc, belt: 0x5a3a1e, wear: ['viking', 'belt'], plate: 0xb8bcc8, acc: 0x7a4a2a, glow: 0xffe08a},
+      {n: 'Şimşek Kral', price: 45000, d: 'Altın taç, şimşek arması, mor kraliyet pelerini', body: 0xffd23f, glove: 0x5a1aa8, boot: 0x5a1aa8, cape: 0x5a1aa8, capeIn: 0xffc20e, belt: 0xffc20e, wear: ['crown', 'bolt', 'belt'], plate: 0xffd23f, acc: 0x5a1aa8, glow: 0xffd23f},
       {n: 'Lav Kalbi', gem: 1200, fx: 'mythic', d: 'Lav damarlı parlayan gövde, alev saç', pat: 'lava', body: 0xff5a1a, glove: 0x1a0a0a, boot: 0x1a0a0a, cape: 0x1a0a0a, capeIn: 0xff4a10, wear: ['flameHair'], plate: 0xff5a1a, acc: 0x1a0a0a, glow: 0xff6a1a},
       {n: 'Güneş Tanrısı', gem: 6500, fx: 'godlike', d: 'Güneş ışınları, melek kanatları, gökkuşağı gövde', body: 0xffe066, glove: 0xffffff, boot: 0xffffff, cape: 0xfff8e8, capeIn: 0xffc20e, wear: ['sunrays', 'wings'], plate: 0xffe066, acc: 0xffffff, glow: 0xfff6a0}]},
-  flick: {n: 'FLICK', ic: '😄', price: 4000, d: 'Neşeli ve dayanıklı: 130 can, +10% kritik. Zıplayan Flix ile başlar.', start: 'flix', hp: 130, spd: 0.98, crit: 0.1,
+  flick: {n: 'FLICK', ic: '😄', price: 12000, d: 'Neşeli ve dayanıklı: 130 can, +10% kritik. Zıplayan Flix ile başlar.', start: 'flix', hp: 130, spd: 0.98, crit: 0.1,
     skins: [
       {n: 'Klasik', price: 0, d: 'Pembe yanaklar, kocaman gülüş', body: 0xf6ecdc, plate: 0xf6ecdc, acc: 0xf2a0a0, glow: 0xffffff},
       {n: 'DJ', price: 1500, d: 'Kulaklık, ters şapka, spor ayakkabı', body: 0xf6ecdc, boot: 0x1b2a5e, accC: 0xd8261c, accC2: 0x1b2a5e, wear: ['phones', 'cap'], plate: 0xf6ecdc, acc: 0xd8261c, glow: 0xff4fd8},
-      {n: 'Aşçı', price: 2200, d: 'Kabarık aşçı şapkası ve fular', body: 0xf6ecdc, accC: 0xffffff, accC2: 0xd8261c, wear: ['chef', 'neck'], plate: 0xffffff, acc: 0xd8261c, glow: 0xffd23f},
-      {n: 'Kardan Adam', price: 2600, d: 'Silindir şapka, havuç burun, mavi atkı', body: 0xffffff, accC: 0x1a1a22, accC2: 0x2d6cff, blush: 'rgba(120,170,255,.45)', wear: ['tophat', 'carrot', 'scarf', 'buttons'], plate: 0xffffff, acc: 0x2d6cff, glow: 0x9fe8ff},
-      {n: 'Büyücü', price: 3400, d: 'Yıldızlı büyücü şapkası ve cüppe', body: 0xf6ecdc, accC: 0x3a2a8a, accC2: 0xffd23f, cape: 0x3a2a8a, capeIn: 0x6a4ad8, wear: ['wizard'], plate: 0x3a2a8a, acc: 0xffd23f, glow: 0xb06aff},
-      {n: 'Robot', price: 4200, d: 'Metal gövde, anten, parlayan göğüs', pat: 'metal', body: 0xc3ccd8, accC: 0xc8d0dc, accC2: 0x2fe8ff, eye: '#1b8fb0', blush: false, wear: ['antenna', 'bolts', 'chest'], plate: 0xc3ccd8, acc: 0x2fe8ff, glow: 0x2fe8ff},
-      {n: 'Şövalye', price: 8000, d: 'Tüylü miğfer, kalkan, kırmızı pelerin', body: 0xf6ecdc, glove: 0xa8b0bc, boot: 0xa8b0bc, accC: 0xc8d0dc, accC2: 0xd8261c, cape: 0xd8261c, capeIn: 0x8a1010, wear: ['knight', 'shield'], plate: 0xc8d0dc, acc: 0xd8261c, glow: 0xffe08a},
+      {n: 'Aşçı', price: 3000, d: 'Kabarık aşçı şapkası ve fular', body: 0xf6ecdc, accC: 0xffffff, accC2: 0xd8261c, wear: ['chef', 'neck'], plate: 0xffffff, acc: 0xd8261c, glow: 0xffd23f},
+      {n: 'Kardan Adam', price: 5000, d: 'Silindir şapka, havuç burun, mavi atkı', body: 0xffffff, accC: 0x1a1a22, accC2: 0x2d6cff, blush: 'rgba(120,170,255,.45)', wear: ['tophat', 'carrot', 'scarf', 'buttons'], plate: 0xffffff, acc: 0x2d6cff, glow: 0x9fe8ff},
+      {n: 'Büyücü', price: 10000, d: 'Yıldızlı büyücü şapkası ve cüppe', body: 0xf6ecdc, accC: 0x3a2a8a, accC2: 0xffd23f, cape: 0x3a2a8a, capeIn: 0x6a4ad8, wear: ['wizard'], plate: 0x3a2a8a, acc: 0xffd23f, glow: 0xb06aff},
+      {n: 'Robot', price: 22000, d: 'Metal gövde, anten, parlayan göğüs', pat: 'metal', body: 0xc3ccd8, accC: 0xc8d0dc, accC2: 0x2fe8ff, eye: '#1b8fb0', blush: false, wear: ['antenna', 'bolts', 'chest'], plate: 0xc3ccd8, acc: 0x2fe8ff, glow: 0x2fe8ff},
+      {n: 'Şövalye', price: 45000, d: 'Tüylü miğfer, kalkan, kırmızı pelerin', body: 0xf6ecdc, glove: 0xa8b0bc, boot: 0xa8b0bc, accC: 0xc8d0dc, accC2: 0xd8261c, cape: 0xd8261c, capeIn: 0x8a1010, wear: ['knight', 'shield'], plate: 0xc8d0dc, acc: 0xd8261c, glow: 0xffe08a},
       {n: 'Galaksi', gem: 1200, fx: 'mythic', d: 'Yıldızlı gövde, gezegen halkası', pat: 'galaxy', body: 0x2a1a5a, accC: 0xb06aff, eye: '#fff2a0', blush: 'rgba(255,120,220,.5)', wear: ['ring'], plate: 0x2a1a5a, acc: 0xb06aff, glow: 0xb06aff},
       {n: 'Bulut Tanrısı', gem: 6500, fx: 'godlike', d: 'Defne tacı, kanatlar, kocaman gülüş', body: 0xffffff, grin: true, wear: ['laurel', 'wings'], plate: 0xffffff, acc: 0xffd23f, glow: 0xfff6a0}]}
 };
@@ -1601,21 +1601,21 @@ function renderComp2(C, c, ck, t, rdt) {
 }
 const COMP = {
   dog:    {ic: '🐕', n: 'Robo-Köpek Rex', price: 0, build: buildDog, d: ['Yakındaki düşmanlara atılıp ısırır', 'Daha sık atılır', 'Isırık hasarı +10', 'Isırık etrafa da vurur', 'Çok hızlı, çift ısırık'],
-    skins: [{n: 'Klasik', price: 0, a: 0xeef2f8, b: 0x1b3a8c, c: 0xe22511, e: 0x6fe8ff}, {n: 'Altın', price: 900, a: 0xffe9a8, b: 0xb07a2a, c: 0xffffff, e: 0xffd24a}, {n: 'Gece', price: 1400, a: 0x2a2e38, b: 0x101218, c: 0x2d6cff, e: 0x4ad8ff}, {n: 'Kaplan', price: 1800, a: 0xff9a2a, b: 0x2a1a0a, c: 0xffffff, e: 0x7dff6a}, {n: 'Kristal Kurt', price: 4500, a: 0xbfe8ff, b: 0x2a3a6a, c: 0xffffff, d: 0x6fd3ff, e: 0x9ff8ff}, {n: 'Cehennem Tazısı', gem: 600, fx: 'mythic', a: 0x2a0a0a, b: 0xff4a1a, c: 0xffc20e, d: 0xff4a1a, e: 0xff6a1a}]},
+    skins: [{n: 'Klasik', price: 0, a: 0xeef2f8, b: 0x1b3a8c, c: 0xe22511, e: 0x6fe8ff}, {n: 'Altın', price: 1000, a: 0xffe9a8, b: 0xb07a2a, c: 0xffffff, e: 0xffd24a}, {n: 'Gece', price: 2500, a: 0x2a2e38, b: 0x101218, c: 0x2d6cff, e: 0x4ad8ff}, {n: 'Kaplan', price: 6000, a: 0xff9a2a, b: 0x2a1a0a, c: 0xffffff, e: 0x7dff6a}, {n: 'Kristal Kurt', price: 15000, a: 0xbfe8ff, b: 0x2a3a6a, c: 0xffffff, d: 0x6fd3ff, e: 0x9ff8ff}, {n: 'Cehennem Tazısı', gem: 600, fx: 'mythic', a: 0x2a0a0a, b: 0xff4a1a, c: 0xffc20e, d: 0xff4a1a, e: 0xff6a1a}]},
   drone:  {ic: '🛸', n: 'Flix Drone', price: 0, build: buildDrone, d: ['Üstünden lazer atar', 'Daha sık atış', 'Lazer hasarı +6', 'Çift lazer', 'Lazer deler geçer'],
-    skins: [{n: 'Klasik', price: 0, a: 0xffffff, b: 0x1b3a8c, c: 0xe22511, e: 0xffc20e}, {n: 'Kızıl', price: 900, a: 0xffb0a0, b: 0x8c1a14, c: 0xffc20e, e: 0xff5a3a}, {n: 'Buz', price: 1400, a: 0xd8f0ff, b: 0x8ab4d8, c: 0xffffff, e: 0x6fe8ff}, {n: 'Altın', price: 1800, a: 0xffe08a, b: 0xb07a2a, c: 0xffffff, e: 0xffffff}, {n: 'Savaş Uydusu', price: 4500, a: 0x2a2e38, b: 0xffc20e, c: 0xff4a1a, d: 0xffc20e, e: 0xff4a1a}, {n: 'Kuantum', gem: 600, fx: 'mythic', a: 0xd8d0ff, b: 0x7a2cff, c: 0x2fe8ff, d: 0x7a2cff, e: 0x2fe8ff}]},
+    skins: [{n: 'Klasik', price: 0, a: 0xffffff, b: 0x1b3a8c, c: 0xe22511, e: 0xffc20e}, {n: 'Kızıl', price: 1000, a: 0xffb0a0, b: 0x8c1a14, c: 0xffc20e, e: 0xff5a3a}, {n: 'Buz', price: 2500, a: 0xd8f0ff, b: 0x8ab4d8, c: 0xffffff, e: 0x6fe8ff}, {n: 'Altın', price: 6000, a: 0xffe08a, b: 0xb07a2a, c: 0xffffff, e: 0xffffff}, {n: 'Savaş Uydusu', price: 15000, a: 0x2a2e38, b: 0xffc20e, c: 0xff4a1a, d: 0xffc20e, e: 0xff4a1a}, {n: 'Kuantum', gem: 600, fx: 'mythic', a: 0xd8d0ff, b: 0x7a2cff, c: 0x2fe8ff, d: 0x7a2cff, e: 0x2fe8ff}]},
   cat:    {ic: '🐈', n: 'Şifacı Mia', price: 0, build: buildCat, d: ['Arada canını doldurur, kristal toplar', 'Daha sık iyileştirir', 'Daha çok can', 'Yakındakileri yavaşlatır', 'Kalkan: 2 sn hasar almazsın'],
-    skins: [{n: 'Turuncu', price: 0, a: 0xf29a3a, b: 0xffe7c4, c: 0x022753, d: 0xe22511, e: 0x46d38a}, {n: 'Kar', price: 900, a: 0xf4f4f8, b: 0xffffff, c: 0x6fa8ff, d: 0x6fa8ff, e: 0x6fd3ff}, {n: 'Kara', price: 1400, a: 0x26242c, b: 0x4a4650, c: 0xffc20e, d: 0x7b5cff, e: 0xffd24a}, {n: 'Uzay', price: 1800, a: 0x6a5aff, b: 0xd8d0ff, c: 0xffffff, d: 0x14062a, e: 0xff6af0}, {n: 'Aslan', price: 4500, a: 0xffb81a, b: 0xfff2c0, c: 0x8a3a0a, d: 0xe22511, e: 0xffd23f}, {n: 'Ruh Kedisi', gem: 600, fx: 'mythic', a: 0x9fe8ff, b: 0xffffff, c: 0x2d6cff, d: 0x6fd3ff, e: 0x9ff8ff}]},
+    skins: [{n: 'Turuncu', price: 0, a: 0xf29a3a, b: 0xffe7c4, c: 0x022753, d: 0xe22511, e: 0x46d38a}, {n: 'Kar', price: 1000, a: 0xf4f4f8, b: 0xffffff, c: 0x6fa8ff, d: 0x6fa8ff, e: 0x6fd3ff}, {n: 'Kara', price: 2500, a: 0x26242c, b: 0x4a4650, c: 0xffc20e, d: 0x7b5cff, e: 0xffd24a}, {n: 'Uzay', price: 6000, a: 0x6a5aff, b: 0xd8d0ff, c: 0xffffff, d: 0x14062a, e: 0xff6af0}, {n: 'Aslan', price: 15000, a: 0xffb81a, b: 0xfff2c0, c: 0x8a3a0a, d: 0xe22511, e: 0xffd23f}, {n: 'Ruh Kedisi', gem: 600, fx: 'mythic', a: 0x9fe8ff, b: 0xffffff, c: 0x2d6cff, d: 0x6fd3ff, e: 0x9ff8ff}]},
   eagle:  {ic: '🦅', n: 'Robo-Kartal', price: 2000, build: buildEagle, d: ['Gökten dalıp düşmanı pençeler', 'Daha sık dalar', 'Pençe hasarı +10', 'Dalış etrafa da vurur', 'Çok hızlı, çift dalış'],
-    skins: [{n: 'Kartal', price: 0, a: 0xf4f0e8, b: 0x6a4a2a, c: 0xffc20e, e: 0xff5a3a}, {n: 'Altın', price: 900, a: 0xfff2c0, b: 0xc99a2e, c: 0xffffff, e: 0x6fe8ff}, {n: 'Gece', price: 1400, a: 0x8a94a8, b: 0x1a1c24, c: 0x4ad8ff, e: 0x4ad8ff}, {n: 'Anka', price: 1800, a: 0xff7a1a, b: 0xd2221a, c: 0xffe06a, e: 0xffe06a}, {n: 'Fırtına', price: 4500, a: 0x4a5a7a, b: 0x1a2030, c: 0x9ff8ff, d: 0x6fd3ff, e: 0xfff06a}, {n: 'Zümrüt Anka', gem: 600, fx: 'mythic', a: 0x3fd08a, b: 0x0a4a2a, c: 0xffe06a, d: 0x3fd08a, e: 0x7dff6a}]},
+    skins: [{n: 'Kartal', price: 0, a: 0xf4f0e8, b: 0x6a4a2a, c: 0xffc20e, e: 0xff5a3a}, {n: 'Altın', price: 1000, a: 0xfff2c0, b: 0xc99a2e, c: 0xffffff, e: 0x6fe8ff}, {n: 'Gece', price: 2500, a: 0x8a94a8, b: 0x1a1c24, c: 0x4ad8ff, e: 0x4ad8ff}, {n: 'Anka', price: 6000, a: 0xff7a1a, b: 0xd2221a, c: 0xffe06a, e: 0xffe06a}, {n: 'Fırtına', price: 15000, a: 0x4a5a7a, b: 0x1a2030, c: 0x9ff8ff, d: 0x6fd3ff, e: 0xfff06a}, {n: 'Zümrüt Anka', gem: 600, fx: 'mythic', a: 0x3fd08a, b: 0x0a4a2a, c: 0xffe06a, d: 0x3fd08a, e: 0x7dff6a}]},
   dragon: {ic: '🐉', n: 'Kıvılcım', price: 3500, build: buildDragon, d: ['Alev üfler (zombileri yakar)', 'Daha sık üfler', 'Ateş hasarı +8', 'Üçlü ateş', 'Ateş deler geçer'],
-    skins: [{n: 'Kızıl', price: 0, a: 0xd2321a, b: 0xffc23a, c: 0xff7a3a, e: 0xfff06a}, {n: 'Zümrüt', price: 900, a: 0x1f8a54, b: 0xc8f07a, c: 0x3fd08a, e: 0xffe040}, {n: 'Buz', price: 1400, a: 0x6aa8e8, b: 0xe8f6ff, c: 0xa8d8ff, e: 0xffffff}, {n: 'Gece', price: 1800, a: 0x1a1a2e, b: 0x7a3cff, c: 0xb06aff, e: 0xff6ad8}, {n: 'Altın Ejder', price: 4500, a: 0xffc20e, b: 0xfff2c0, c: 0xffe08a, d: 0xffc20e, e: 0xffffff}, {n: 'Kara Alev', gem: 600, fx: 'mythic', a: 0x14101c, b: 0xb04aff, c: 0x7a2cff, d: 0xb04aff, e: 0xff6af0}]},
+    skins: [{n: 'Kızıl', price: 0, a: 0xd2321a, b: 0xffc23a, c: 0xff7a3a, e: 0xfff06a}, {n: 'Zümrüt', price: 1000, a: 0x1f8a54, b: 0xc8f07a, c: 0x3fd08a, e: 0xffe040}, {n: 'Buz', price: 2500, a: 0x6aa8e8, b: 0xe8f6ff, c: 0xa8d8ff, e: 0xffffff}, {n: 'Gece', price: 6000, a: 0x1a1a2e, b: 0x7a3cff, c: 0xb06aff, e: 0xff6ad8}, {n: 'Altın Ejder', price: 15000, a: 0xffc20e, b: 0xfff2c0, c: 0xffe08a, d: 0xffc20e, e: 0xffffff}, {n: 'Kara Alev', gem: 600, fx: 'mythic', a: 0x14101c, b: 0xb04aff, c: 0x7a2cff, d: 0xb04aff, e: 0xff6af0}]},
   penguin: {ic: '🐧', n: 'Buz Pengueni Pıt', price: 2500, build: buildPenguin, d: ['Dondurucu buz sarkıtı atar (yavaşlatır)', 'Daha sık atar', 'Buz hasarı +7', 'Üçlü buz', 'Uzun donma'],
-    skins: [{n: 'Kutup', price: 0, a: 0x1c2233, b: 0xf4f8ff, c: 0xffa21a, d: 0xe22511, e: 0x9fe8ff}, {n: 'Kraliyet', price: 900, a: 0x0a2a5e, b: 0xfff6dc, c: 0xffc20e, d: 0xffc20e, e: 0xffe08a}, {n: 'Pembe', price: 1400, a: 0x5a2a5e, b: 0xffe6f4, c: 0xff7ab8, d: 0x7ad8ff, e: 0xff9ad8}, {n: 'Kar Kralı', price: 4500, a: 0x2d6cff, b: 0xffffff, c: 0xffc20e, d: 0xffc20e, e: 0x9fe8ff}, {n: 'Aurora', gem: 600, fx: 'mythic', a: 0x1a3a5a, b: 0xd8fff0, c: 0x7dff6a, d: 0xff6af0, e: 0x7dffd8}]},
+    skins: [{n: 'Kutup', price: 0, a: 0x1c2233, b: 0xf4f8ff, c: 0xffa21a, d: 0xe22511, e: 0x9fe8ff}, {n: 'Kraliyet', price: 1000, a: 0x0a2a5e, b: 0xfff6dc, c: 0xffc20e, d: 0xffc20e, e: 0xffe08a}, {n: 'Pembe', price: 2500, a: 0x5a2a5e, b: 0xffe6f4, c: 0xff7ab8, d: 0x7ad8ff, e: 0xff9ad8}, {n: 'Kar Kralı', price: 15000, a: 0x2d6cff, b: 0xffffff, c: 0xffc20e, d: 0xffc20e, e: 0x9fe8ff}, {n: 'Aurora', gem: 600, fx: 'mythic', a: 0x1a3a5a, b: 0xd8fff0, c: 0x7dff6a, d: 0xff6af0, e: 0x7dffd8}]},
   turtle: {ic: '🐢', n: 'Tank Kaplumbağa Taş', price: 3000, build: buildTurtle, d: ['Kabuğuna girip kalabalığı biçer', 'Daha sık döner', 'Dönüş hasarı +10', 'Daha geniş dönüş', 'Uzun dönüş'],
-    skins: [{n: 'Orman', price: 0, a: 0x3f7d3e, b: 0x9ccf6a, c: 0xc8a050, d: 0xe22511, e: 0xffd23f}, {n: 'Lav', price: 900, a: 0x2a1a18, b: 0xd86a3a, c: 0xff6a1a, d: 0xffc20e, e: 0xff9a3a}, {n: 'Okyanus', price: 1400, a: 0x1f5a8a, b: 0x8ad8e8, c: 0x6fe8ff, d: 0xffffff, e: 0x6fe8ff}, {n: 'Kristal Kabuk', price: 4500, a: 0x7a5cff, b: 0xd8d0ff, c: 0xb8a8ff, d: 0xffffff, e: 0xd8b0ff}, {n: 'Magma Kalesi', gem: 600, fx: 'mythic', a: 0x2a0a0a, b: 0xff6a1a, c: 0xff4a10, d: 0xffc20e, e: 0xff9a3a}]},
+    skins: [{n: 'Orman', price: 0, a: 0x3f7d3e, b: 0x9ccf6a, c: 0xc8a050, d: 0xe22511, e: 0xffd23f}, {n: 'Lav', price: 1000, a: 0x2a1a18, b: 0xd86a3a, c: 0xff6a1a, d: 0xffc20e, e: 0xff9a3a}, {n: 'Okyanus', price: 2500, a: 0x1f5a8a, b: 0x8ad8e8, c: 0x6fe8ff, d: 0xffffff, e: 0x6fe8ff}, {n: 'Kristal Kabuk', price: 15000, a: 0x7a5cff, b: 0xd8d0ff, c: 0xb8a8ff, d: 0xffffff, e: 0xd8b0ff}, {n: 'Magma Kalesi', gem: 600, fx: 'mythic', a: 0x2a0a0a, b: 0xff6a1a, c: 0xff4a10, d: 0xffc20e, e: 0xff9a3a}]},
   lantern: {ic: '🏮', n: 'Fener Ruhu Lumi', price: 4000, build: buildLantern, d: ['Uçan fener: kristal çeker, ışık patlatır', 'Daha sık parlar', 'Işık hasarı +8', 'Uzun yavaşlatma', 'Her parlamada can verir'],
-    skins: [{n: 'Altın Işık', price: 0, a: 0x3a2a1a, b: 0xffe08a, e: 0xffd24a}, {n: 'Ruh Mavisi', price: 900, a: 0x1a2a3a, b: 0x9fe8ff, e: 0x6fe8ff}, {n: 'Gül', price: 1400, a: 0x3a1a2a, b: 0xffb0d8, e: 0xff6ad8}, {n: 'Güneş Feneri', price: 4500, a: 0x8a3a0a, b: 0xffd23f, c: 0xffd23f, e: 0xffb040}, {n: 'Ay Ruhu', gem: 600, fx: 'mythic', a: 0x14102a, b: 0xd8d0ff, c: 0xd8d0ff, e: 0xb8a8ff}]}
+    skins: [{n: 'Altın Işık', price: 0, a: 0x3a2a1a, b: 0xffe08a, e: 0xffd24a}, {n: 'Ruh Mavisi', price: 1000, a: 0x1a2a3a, b: 0x9fe8ff, e: 0x6fe8ff}, {n: 'Gül', price: 2500, a: 0x3a1a2a, b: 0xffb0d8, e: 0xff6ad8}, {n: 'Güneş Feneri', price: 15000, a: 0x8a3a0a, b: 0xffd23f, c: 0xffd23f, e: 0xffb040}, {n: 'Ay Ruhu', gem: 600, fx: 'mythic', a: 0x14102a, b: 0xd8d0ff, c: 0xd8d0ff, e: 0xb8a8ff}]}
 };
 // world themes (bought in the store)
 const MAPS = {
@@ -1638,7 +1638,7 @@ const LOOK = {hero: null, hs: -1, comp: null, cs: -1, map: null};
 
 // costume rarity: common → godlike (godlike is hero-only and very expensive)
 const RAR = {common: {n: 'Common', c: '#8f98ab'}, rare: {n: 'Rare', c: '#2f86ff'}, epic: {n: 'Epic', c: '#a24bff'}, legendary: {n: 'Legendary', c: '#ff9a12'}, mythic: {n: 'Mythic', c: '#ff2d6a'}, godlike: {n: 'Godlike', c: '#ffcf1a'}};
-function rarOf(sk, comp) { if (sk.fx) return sk.fx; if (sk.gem) return 'mythic'; const p = sk.price || 0; return comp ? (p >= 4500 ? 'legendary' : p >= 1800 ? 'epic' : p >= 900 ? 'rare' : 'common') : (p >= 7500 ? 'legendary' : p >= 2600 ? 'epic' : p >= 1500 ? 'rare' : 'common'); }
+function rarOf(sk, comp) { if (sk.fx) return sk.fx; if (sk.gem) return 'mythic'; const p = sk.price || 0; return comp ? (p >= 15000 ? 'legendary' : p >= 6000 ? 'epic' : p >= 2500 ? 'rare' : 'common') : (p >= 28000 ? 'legendary' : p >= 9000 ? 'epic' : p >= 3000 ? 'rare' : 'common'); }
 function own(cat, k) { return !!(save.own[cat] && save.own[cat][k]); }
 function grant(cat, k) { (save.own[cat] = save.own[cat] || {})[k] = 1; }
 function heroSkin(h) { return save.hskin[h] || 0; }
@@ -1720,7 +1720,7 @@ const PACKS = [
   {id: 'coins_40000', g: 'coin', n: '40.000 altın', ic: '🏦', coins: 40000, price: '19,99 $', tag: 'En iyi değer'}
 ];
 // in-game exchange: gems into gold
-const SWAPS = [{gems: 50, coins: 5000}, {gems: 200, coins: 22000}, {gems: 500, coins: 60000}];
+const SWAPS = [{gems: 50, coins: 1000}, {gems: 200, coins: 4400}, {gems: 500, coins: 12000}];
 const SHOP = {tab: 'hero', pv: null};
 function shopOpen(tab) { SHOP.tab = tab || SHOP.tab; SHOP.pv = {hero: save.hero, hs: heroSkin(save.hero), comp: save.comp, cs: compSkin(save.comp), map: save.map}; screen('shop'); shopDraw(); SFX.card(); }
 function shopClose() { lookSaved(); screen('menu'); updateMenu(); }
@@ -2906,6 +2906,8 @@ function gameOver(won) {
   $('overStats').innerHTML = `<span>Skor</span><b>${fmtN(G.score)}</b><span>${G.mode === 'boss' ? 'Patron' : G.mode === 'story' ? 'Seviye' : 'Dalga'}</span><b>${G.wave}</b><span>Flix</span><b>${G.flixGot}</b><span>Süre</span><b>${fmt(G.time)}</b><span>Güç</span><b>${G.level}</b><span>Yenilen düşman</span><b>${G.kills}</b><span>En uzun kombo</span><b>x${G.bestCombo || 0}</b>`;
   const gain = runReward(won) - (G.paid || 0); G.paid = (G.paid || 0) + gain; addCoins(gain); const gg = runGems(won) - (G.paidG || 0); G.paidG = (G.paidG || 0) + gg; addGems(gg); $('overCoins').textContent = '+🪙 ' + fmtN(gain) + (gg > 0 ? '  ·  +💎 ' + fmtN(gg) : '') + ' kazandın';
   $('bEndless').style.display = won && G.mode === 'story' && !G.endless ? '' : 'none';
+  const nx = nextSkin(); if (nx) { const need = nx.sk.price - (save.coins || 0), nm = HEROES[nx.h].n + ' · ' + nx.sk.n;
+    $('overCoins').insertAdjacentHTML('beforeend', `<span class="nextSkin">${need <= 0 ? '🎉 Yeni kostüm alabilirsin: ' + nm + '! Mağazaya bak.' : '🎯 Sıradaki kostüm: ' + nm + ' · ' + fmtN(need) + ' 🪙 kaldı'}</span>`); }
   screen('over'); updateMenu();
 }
 function victory() { if (G.mode === 'story') doomTarget(1); SFX.win(); confetti(G.px, 1, G.pz, 150, 2); if (G.mode === 'story' && !G.endless) comicShow('finale', startEpilogue, 'Devam ▶'); else gameOver(true); }
@@ -5038,8 +5040,17 @@ function qLabel() { diffLabel(); const s = save.q === 'ultra' ? '✨ 4K · 30 fp
 function toggleQ() { save.q = save.q === 'hi' ? 'ultra' : save.q === 'ultra' ? 'fast' : 'hi'; save.autoFast = 1; R.prScale = 1; R.gov = null; persist(); applyQuality(); qLabel(); toast(save.q === 'ultra' ? '4K · 30 fps: en keskin görüntü, sabit 30 kare' : save.q === 'hi' ? '2K · 60 fps: standart, akıcı ve keskin' : 'Hızlı: eski cihazlar için, efektler sade'); }
 
 /* ---------- menus ---------- */
+// the cheapest gold costume the player does not own yet (current hero first), to nudge them toward the shop
+function nextSkin() {
+  let best = null;
+  for (const h of [save.hero, ...Object.keys(HEROES).filter(k => k !== save.hero)]) { if (!own('h', h) && HEROES[h].price) continue;
+    HEROES[h].skins.forEach((sk, i) => { if (!i || sk.gem || !sk.price || own('hs', h + ':' + i)) return; if (!best || sk.price < best.sk.price || (h === save.hero && best.h !== save.hero && sk.price <= best.sk.price * 1.5)) best = {h, i, sk}; });
+    if (best && best.h === save.hero) break; }
+  return best;
+}
 function updateMenu() {
   const HH = curHero(), C = COMP[save.comp];
+  const nx = nextSkin(); $('bShop').classList.toggle('can', !!nx && (save.coins || 0) >= nx.sk.price);
   $('who').innerHTML = `<b>${HH.ic} ${HH.n} <span style="font-size:13px;color:var(--soft)">· ${HH.skins[heroSkin(save.hero)].n}</span></b><small>${C.ic} ${C.n} · ${MAPS[save.map].ic} ${MAPS[save.map].n}</small>`;
   let hp = ''; const jobs = []; for (const k in HEROES) { const H = HEROES[k], o = own('h', k), si = heroSkin(k); hp += `<button class="${save.hero === k ? 'on' : ''}${o ? '' : ' lock'}" data-h="${k}" aria-label="${H.n}">${thumbIc(k, si, H.ic, 1)}${o ? '' : '<i>🔒</i>'}</button>`;
     jobs.push({id: k, si, face: 1, fill: (u) => { const b = document.querySelector(`#heroPick button[data-h="${k}"]`); if (b) b.innerHTML = `<img src="${u}" alt="">` + (o ? '' : '<i>🔒</i>'); }}); }
