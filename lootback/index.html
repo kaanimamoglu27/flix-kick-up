@@ -1796,10 +1796,21 @@ function shopAct(a, isBtn) {
 // in-app purchases go through the native bridge (Capacitor app); on the web it is a clearly marked demo
 function buyPack(id) {
   const p = PACKS.find(q => q.id === id); if (!p || (p.once && own('iap', id))) return;
-  const done = () => { addCoins(p.coins || 0); addGems(p.gems || 0); packUnlocks(p); if (p.once) grant('iap', id); persist(); SFX.win(); toast(p.n + ' eklendi!'); shopDraw(); updateMenu(); };
-  if (window.FlixNative && FlixNative.buy) FlixNative.buy(id).then(ok => { if (ok) done(); }).catch(() => toast('Satın alma tamamlanmadı.'));
-  else done();
+  // in the app the bridge calls FlixGrant for every paid transaction (also ones that finish later, e.g. after a restart or "Ask to Buy")
+  if (window.FlixNative && FlixNative.buy) FlixNative.buy(id).then(ok => { if (!ok) toast('Satın alma tamamlanmadı.'); }).catch(() => toast('Satın alma tamamlanmadı.'));
+  else FlixGrant(id, 'web' + Date.now());
 }
+// gives a paid pack exactly once per App Store transaction (one-time packs only once ever)
+window.FlixGrant = function (id, tx) {
+  const p = PACKS.find(q => q.id === id); if (!p) return;
+  save.tx = save.tx || []; if (tx && save.tx.includes(tx)) return;
+  if (p.once && own('iap', id)) return;
+  if (tx) { save.tx.push(tx); if (save.tx.length > 300) save.tx.shift(); }
+  addCoins(p.coins || 0); addGems(p.gems || 0); packUnlocks(p); if (p.once) grant('iap', id); persist();
+  SFX.win(); toast(p.n + ' eklendi!'); if ($('shop').classList.contains('on')) shopDraw(); updateMenu();
+};
+// the App Store prices (in the player's own currency) arrive a moment after start: redraw the shop if it is open
+window.onStorePrices = function () { if ($('shop').classList.contains('on')) shopDraw(); };
 function packUnlocks(p) {
   if (p.hero) grant('h', p.hero); if (p.hero2) grant('h', p.hero2);
   for (const [h, i] of p.skins || []) { grant('h', h); grant('hs', h + ':' + i); }
