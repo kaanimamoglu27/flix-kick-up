@@ -35,6 +35,8 @@ Kimliklerin başında `kickup_` var, çünkü aynı Apple hesabındaki ARKANA'n�
 
 Oyun içi ekonomi: tüyler oyunda toplanır (her tüy 2 sayılır), her 10 puan tur sonunda 1 tüy olur, yıldızlar, bot ve kombo ödülleri de tüy verir. Tüylerle FLIX'ler, toplar, sahneler ve boru renkleri açılır. Altın FLIX ve Yıldız Sahne sadece rekorla açılır. Para yalnızca hızlandırır, hiçbir şey sadece parayla açılmaz.
 
+Satın alma güvenliği (1.3): tüyler Apple işlemi onaylanınca, işlem kimliğiyle bir kez eklenir. Ödeme sırasında uygulama kapanır, internet giderse ya da "Satın Alma İzni" (Ask to Buy) sonradan onaylanırsa tüyler oyun bir sonraki açılışta yine gelir, iki kez gelmez. Butona iki kez basmak iki ödeme açmaz.
+
 Not: satın alma şu an telefonun içinde onaylanıyor. İleride hileyi azaltmak için sunucu doğrulaması (ör. RevenueCat) eklenebilir.
 
 ## Görüntü ve hız
@@ -53,7 +55,7 @@ FLIX'i havada tut! Ekrana dokunarak tüylü FLIX'i sektir, direklerin arasından
 • Hareketleri art arda bağla, kombo yap, Şelale ve Füze gibi özel ikilileri yakala.
 • Klasik ve Dikey mod, 3 bota karşı yarış ve 4 meydan okuma: 20 Saniye, Akrobat, Mesafe, Tüy Avı.
 • 22 FLIX ve 5 top, Sıradandan Mitik'e: Kristal, Galaksi, Ateş Kuşu, Ejderha FLIX.
-• 12 sahne: İstanbul Akşamı, Boğaz, Kapadokya, Gece Maçı, Kar Tatili, Uzay ve animasyonlu Lunapark Gecesi.
+• 13 sahne: İstanbul Akşamı, Ankara Ayazı, Boğaz, Kapadokya, Gece Maçı, Kar Tatili, Uzay ve animasyonlu Lunapark Gecesi.
 • 11 boru rengi, süreli x2 ve x4 puan rozetleri.
 • Türkçe ve İngilizce. Reklam yok.
 
@@ -70,7 +72,7 @@ Keep FLIX in the air! Tap to kick the feathered FLIX, fly it through the gaps be
 • Chain tricks into combos and land special pairs like Waterfall and Missile.
 • Classic and Vertical modes, a race against 3 bots and 4 challenges: 20 Seconds, Acrobat, Distance, Feather Hunt.
 • 22 FLIX and 5 balls from Common to Mythic: Crystal, Galaxy, Firebird, Dragon FLIX.
-• 12 scenes: Istanbul Evening, the Bosphorus, Cappadocia, Night Match, Snow Holiday, Space and the animated Funfair Night.
+• 13 scenes: Istanbul Evening, Ankara Frost, the Bosphorus, Cappadocia, Night Match, Snow Holiday, Space and the animated Funfair Night.
 • 11 pipe colours, timed x2 and x4 score badges.
 • Turkish and English. No ads.
 
