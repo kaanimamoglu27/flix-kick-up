@@ -78,6 +78,13 @@ gh secret set ADMOB_APP_ID      -R kaanimamoglu27/Flix-Arkana -b "ca-app-pub-...
 gh secret set ADMOB_REWARDED_ID -R kaanimamoglu27/Flix-Arkana -b "ca-app-pub-.../..."
 ```
 
+Flix Kick Up'ta da reklam var (ödüllü reklam ve tur arası reklam). Gerçek reklam için AdMob'da Kick Up'a ayrı bir uygulama ve iki reklam birimi aç, sonra:
+```bash
+gh secret set KICKUP_ADMOB_APP_ID          -R kaanimamoglu27/flix-kick-up -b "ca-app-pub-...~..."
+gh secret set KICKUP_ADMOB_REWARDED_ID     -R kaanimamoglu27/flix-kick-up -b "ca-app-pub-.../..."
+gh secret set KICKUP_ADMOB_INTERSTITIAL_ID -R kaanimamoglu27/flix-kick-up -b "ca-app-pub-.../..."
+```
+
 ## 3. Yol B: kendi Mac'inde
 
 Bir kez kur: App Store'dan **Xcode** (bir kez açıp lisansı kabul et), sonra terminalde:
@@ -114,7 +121,7 @@ cd ../../../Flix-Arkana/app    && ./ios.sh yukle 1.0    # Flix Arkana
 
 Ürünler TestFlight'ta satın alma denemek için gerekir; oyun ürünler olmadan da açılır ve oynanır.
 
-**Flix Kick Up (7):** `kickup_starter` (tüketilemez, 2,99 $), `kickup_feathers_500`, `_1200`, `_3500`, `_8000`, `_18000`, `_50000` (tüketilebilir, 0,99-49,99 $). Ayrıntı: `app/README.md`.
+**Flix Kick Up (8):** `kickup_starter` ve `kickup_noads` (Reklamsız) (tüketilemez, 2,99 $), `kickup_feathers_500`, `_1200`, `_3500`, `_8000`, `_18000`, `_50000` (tüketilebilir, 0,99-49,99 $). Ayrıntı: `app/README.md`.
 
 **Flix Arkana (17):** liste `Flix-Arkana/app/README.md` içinde.
 
@@ -136,6 +143,6 @@ cd ../../../Flix-Arkana/app    && ./ios.sh yukle 1.0    # Flix Arkana
 ## 6. Mağaza sayfası için gerekenler
 
 - **Gizlilik politikası linki** (üç oyun için aynı): https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html
-- **Uygulama Gizliliği** anketi: Kick Up ve Direktör için "Veri toplanmıyor". Flix Arkana'da reklam olduğu için `Flix-Arkana/app/README.md`'deki seçimler.
+- **Uygulama Gizliliği** anketi: Direktör için "Veri toplanmıyor". Flix Kick Up ve Flix Arkana'da reklam olduğu için `Flix-Arkana/app/README.md`'deki seçimler (Kick Up'ta da aynısı).
 - **Yaş derecesi**: Kick Up ve Direktör 4+, Flix Arkana 9+ (hafif fantastik şiddet).
 - Ekran görüntüleri: Kick Up `app/store/screenshots/`, Flix Arkana `app/store/cizgi_roman/`. Direktör için ekran görüntüsü henüz yok; TestFlight'tan sonra hazırlayabilirim. (TestFlight için ekran görüntüsü gerekmez.)

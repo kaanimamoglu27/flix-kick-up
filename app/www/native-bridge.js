@@ -1,8 +1,10 @@
 /* FLIX Kick Up native bridge (Capacitor 8).
-   The game calls window.FlixNative.{buy, restore, price, haptic}.
+   The game calls window.FlixNative.{buy, restore, price, haptic, showRewardedAd, showInterstitial}.
    On the web this file does nothing and the store runs as a clearly marked demo.
    Inside the iOS / Android app it connects to:
      - cordova-plugin-purchase (CdvPurchase v13) for App Store / Google Play in-app purchases
+     - @capacitor-community/admob for ads: a rewarded ad the player chooses ("keep going" / "double feathers")
+       and an ad between runs every 3rd retry (not after the "No Ads" purchase)
      - @capacitor/haptics for kick and crash vibration
      - @capacitor/status-bar to hide the status bar */
 (function () {
@@ -13,7 +15,7 @@
 
   // Product ids must match App Store Connect and Google Play Console exactly.
   const CONSUMABLE = ['kickup_feathers_500', 'kickup_feathers_1200', 'kickup_feathers_3500', 'kickup_feathers_8000', 'kickup_feathers_18000', 'kickup_feathers_50000'];
-  const NON_CONSUMABLE = ['kickup_starter'];
+  const NON_CONSUMABLE = ['kickup_starter', 'kickup_noads'];
 
   let store = null; const pending = {}; const waiting = [];
   function settle(id, ok) { if (pending[id]) { pending[id](ok); delete pending[id]; } }
@@ -51,6 +53,42 @@
     H.impact({style: ms >= 80 ? 'HEAVY' : ms >= 25 ? 'MEDIUM' : 'LIGHT'}).catch(() => {});
   }
 
+  // AdMob. These are Google's public TEST ad units; tools/ios_setup.py swaps in the real ones from the
+  // ADMOB_REWARDED_ID / ADMOB_INTERSTITIAL_ID environment variables when the app is built for TestFlight.
+  const AD_REWARDED = ios ? 'ca-app-pub-3940256099942544/1712485313' : 'ca-app-pub-3940256099942544/5224354917';
+  const AD_INTER = ios ? 'ca-app-pub-3940256099942544/4411468910' : 'ca-app-pub-3940256099942544/1033173712';
+  const isTest = (id) => id.indexOf('3940256099942544') >= 0;
+  let rewardReady = null, interReady = null;
+  async function initAds() {
+    const A = P.AdMob; if (!A) return;
+    try {
+      await A.initialize({initializeForTesting: isTest(AD_REWARDED)});
+      if (ios) { try { await A.requestTrackingAuthorization(); } catch (e) {} }
+      try { const c = await A.requestConsentInfo(); if (c && c.isConsentFormAvailable && c.status === 'REQUIRED') await A.showConsentForm(); } catch (e) {}
+      prepReward(); prepInter();
+    } catch (e) { console.warn('admob init', e); }
+  }
+  function prepReward() { const A = P.AdMob; if (!A) return; rewardReady = A.prepareRewardVideoAd({adId: AD_REWARDED, isTesting: isTest(AD_REWARDED)}).then(() => true).catch(() => false); }
+  function prepInter() { const A = P.AdMob; if (!A) return; interReady = A.prepareInterstitial({adId: AD_INTER, isTesting: isTest(AD_INTER)}).then(() => true).catch(() => false); }
+  // true when the player earned the reward, or when no ad could be loaded (a missing ad never costs the player anything); false when closed early
+  async function showRewardedAd() {
+    const A = P.AdMob; if (!A) return true;
+    if (!rewardReady) prepReward();
+    const ok = await rewardReady; rewardReady = null;
+    if (!ok) { prepReward(); return true; }
+    let got = false; const h = await A.addListener('onRewardedVideoAdReward', () => { got = true; });
+    try { const r = await A.showRewardVideoAd(); if (r) got = true; } catch (e) { got = true; }
+    try { h.remove(); } catch (e) {}
+    prepReward(); return got;
+  }
+  async function showInterstitial() {
+    const A = P.AdMob; if (!A) return;
+    if (!interReady) { prepInter(); return; }
+    const ok = await interReady; interReady = null;
+    if (ok) { try { await A.showInterstitial(); } catch (e) {} }
+    prepInter();
+  }
+
   window.FlixNative = {
     buy(id) {
       return new Promise(res => {
@@ -71,9 +109,12 @@
     price(id) { const p = store && store.get(id); return p && p.pricing ? p.pricing.price : null; },
     // called by the game once __fkuGrant exists: delivers purchases that were approved before it loaded
     flush() { for (const t of waiting.splice(0)) if (deliver(t)) t.verify(); },
-    haptic
+    haptic,
+    showRewardedAd,
+    showInterstitial
   };
 
   document.addEventListener('deviceready', initStore, false);
+  initAds();
   if (P.StatusBar) P.StatusBar.hide().catch(() => {});
 })();

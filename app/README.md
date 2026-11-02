@@ -13,7 +13,9 @@ Bu klasör Flix Kick Up'ı iPhone (ve istersen Android) uygulamasına çeviren h
 
 ## Uygulamada web sürümünden farklı olanlar
 - Mağaza gerçek: satın alma Apple'ın kendi penceresiyle yapılır, fiyatlar mağazadan TL olarak okunur.
-- "Reklamsız" ürünü uygulamada yok. Oyunda reklam olmadığı için Apple incelemesinde sorun çıkarırdı. Başlangıç Paketi'ndeki üstü çizili "$9.99" fiyatı da uygulamada gösterilmiyor.
+- Reklamlar (1.4) Google AdMob ile: düşünce "Kaldığın yerden devam" ve "Tüyleri 2 katına çıkar" ödüllü reklamları (oyuncu isterse, tur başına bir kez), her 3 tekrarda bir tur arası reklam (ilk 90 saniye ve iki reklam arası 90 saniye boyunca yok). "Reklamsız" (kickup_noads) tur arası reklamları kapatır. Web sürümünde reklam ağı olmadığı için aynı yerlerde gerçek FLIX oyuncağının kendi reklamı çıkar (flixtoysofficial.com'a gider).
+- Gerçek reklam kimlikleri GitHub secret olarak girilir: KICKUP_ADMOB_APP_ID, KICKUP_ADMOB_REWARDED_ID, KICKUP_ADMOB_INTERSTITIAL_ID. Girilmezse Google'ın test reklamları çıkar. Uygulama açılışta iPhone'un takip izni sorusunu sorar.
+- Başlangıç Paketi'ndeki üstü çizili "$9.99" fiyatı uygulamada gösterilmiyor.
 - Online yarış uygulamada "Yakında" olarak görünüyor. Online şu an sadece claude.ai linkinde çalışıyor; uygulamaya gelmesi için bir sunucu (ör. Supabase) bağlamak gerekir.
 - Titreşim telefonun kendi titreşim motoruyla: vuruşta hafif, harekette orta, düşüşte güçlü.
 
@@ -24,6 +26,7 @@ Bütün adımlar ve terminal komutları: [../TESTFLIGHT_REHBERI.md](../TESTFLIGH
 | Kimlik | Tür | Fiyat | İçerik |
 |---|---|---|---|
 | kickup_starter | Tüketilemez | 2,99 $ | Başlangıç Paketi: 2.500 tüy + Kristal FLIX (tek sefer, geri yüklenebilir) |
+| kickup_noads | Tüketilemez | 2,99 $ | Reklamsız: tur arası reklamları kaldırır (geri yüklenebilir) |
 | kickup_feathers_500 | Tüketilebilir | 0,99 $ | 500 tüy (Avuç) |
 | kickup_feathers_1200 | Tüketilebilir | 1,99 $ | 1.200 tüy (Kese) |
 | kickup_feathers_3500 | Tüketilebilir | 4,99 $ | 3.500 tüy (Sandık) |
@@ -57,7 +60,7 @@ FLIX'i havada tut! Ekrana dokunarak tüylü FLIX'i sektir, direklerin arasından
 • 22 FLIX ve 5 top, Sıradandan Mitik'e: Kristal, Galaksi, Ateş Kuşu, Ejderha FLIX.
 • 13 sahne: İstanbul Akşamı, Ankara Ayazı, Boğaz, Kapadokya, Gece Maçı, Kar Tatili, Uzay ve animasyonlu Lunapark Gecesi.
 • 11 boru rengi, süreli x2 ve x4 puan rozetleri.
-• Türkçe ve İngilizce. Reklam yok.
+• Türkçe ve İngilizce.
 
 **Anahtar kelimeler:** flix, kick up, sektirme, tüy, jianzi, refleks, arcade, rekor, futbol, oyuncak
 
@@ -74,14 +77,17 @@ Keep FLIX in the air! Tap to kick the feathered FLIX, fly it through the gaps be
 • 22 FLIX and 5 balls from Common to Mythic: Crystal, Galaxy, Firebird, Dragon FLIX.
 • 13 scenes: Istanbul Evening, Ankara Frost, the Bosphorus, Cappadocia, Night Match, Snow Holiday, Space and the animated Funfair Night.
 • 11 pipe colours, timed x2 and x4 score badges.
-• Turkish and English. No ads.
+• Turkish and English.
 
 **Keywords:** flix, kick up, keepy uppy, shuttlecock, jianzi, reflex, arcade, high score, football, toy
 
 ## Gizlilik politikası (yayınlanacak metin)
-Flix Kick Up (Flix) hesap oluşturmaz; ad, e-posta, konum veya reklam kimliği toplamaz. Oyun ilerlemesi yalnızca cihazınızda saklanır. Uygulama içi satın alımlar Apple App Store tarafından işlenir; ödeme bilgilerinizi görmeyiz. Oyunda reklam ve analiz aracı yoktur. İletişim: flixtoysofficial.com.
+Flix Kick Up (Flix) hesap oluşturmaz; ad, e-posta veya konum istemez. Oyun ilerlemesi yalnızca cihazınızda saklanır. Uygulama içi satın alımlar Apple App Store tarafından işlenir; ödeme bilgilerinizi görmeyiz. Oyundaki reklamları Google AdMob gösterir; AdMob reklam kimliğini (izin verirsen), yaklaşık konumu ve tanılama verilerini kullanabilir. Tam metin: https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html. İletişim: flixtoysofficial.com.
 
-App Store "Uygulama Gizliliği" bölümünde: **Veri toplanmıyor** seçilebilir.
+App Store "Uygulama Gizliliği" bölümünde (AdMob nedeniyle, ARKANA ile aynı) şunları işaretle:
+- **Tanımlayıcılar > Cihaz Kimliği**: Üçüncü taraf reklamcılık, kullanıcıya bağlı değil, takip için kullanılıyor.
+- **Konum > Yaklaşık Konum**: Üçüncü taraf reklamcılık, kullanıcıya bağlı değil.
+- **Kullanım Verileri > Reklam Verileri** ve **Tanılama > Kilitlenme / Performans Verileri**: Üçüncü taraf reklamcılık / Analiz, kullanıcıya bağlı değil.
 
 ## Lisanslar
 Rubik yazı tipi (SIL Open Font License), ticari kullanıma açık. Oyunun geri kalanı Flix'e ait.

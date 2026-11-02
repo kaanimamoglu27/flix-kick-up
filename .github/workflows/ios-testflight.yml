@@ -53,6 +53,10 @@ jobs:
         env:
           APP_VERSION: ${{ inputs.version }}
           BUILD_NUMBER: ${{ github.run_number }}
+          # Kick Up ads (AdMob). Without these secrets the build uses Google's test ads.
+          ADMOB_APP_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_APP_ID || '' }}
+          ADMOB_REWARDED_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_REWARDED_ID || '' }}
+          ADMOB_INTERSTITIAL_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_INTERSTITIAL_ID || '' }}
         run: python3 tools/ios_setup.py
       - name: App Store Connect key
         env:
