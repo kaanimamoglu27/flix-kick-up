@@ -1,4 +1,5 @@
 // Flix Direktör canlı bülten: Avrupa liglerinin fikstür, skor ve maç özetlerini çeker.
+// Haftalık takip: son 8 günün biten maçları kadro ve olaylarıyla saklanır, oyunda "Bu haftanın maçları" bunlardan kurulur.
 // Takım ve oyuncu isimleri oyundaki gibi çakma isimlere çevrilir (son ünlü değişir).
 import fs from 'fs';
 const OUT=process.argv[2], DEBUG=process.env.DEBUG==='1';
@@ -17,14 +18,14 @@ let prev={}; try{ prev=JSON.parse(fs.readFileSync(OUT,'utf8')); }catch(e){}
 const out={t:Date.now(),ev:[],sum:{}}; let nsum=0, dbg=!DEBUG;
 for(const lg of LG){
   let j=null;
-  { const all=[]; for(let k=-4;k<=8;k++){ const d=await get(`${B}${lg}/scoreboard?dates=${day(k)}`); if(d&&d.events)all.push(...d.events); } if(!all.length){ const d=await get(`${B}${lg}/scoreboard`); if(d&&d.events)all.push(...d.events); } j={events:all}; }
+  { const all=[]; for(let k=-8;k<=7;k++){ const d=await get(`${B}${lg}/scoreboard?dates=${day(k)}`); if(d&&d.events)all.push(...d.events); } if(!all.length){ const d=await get(`${B}${lg}/scoreboard`); if(d&&d.events)all.push(...d.events); } j={events:all}; }
   if(!j.events.length)j=null; if(!j||!j.events){ console.log('no events',lg); continue; } console.log(lg,j.events.length);
   for(const e of j.events){ const c=(e.competitions||[])[0]; if(!c)continue; const hm=c.competitors.find(x=>x.homeAway==='home'), aw=c.competitors.find(x=>x.homeAway==='away'); if(!hm||!aw)continue;
     const st=c.status||e.status||{}, ty=st.type||{};
     const E={id:e.id,lg,d:e.date,st:ty.state||'pre',det:ty.shortDetail||'',clk:st.displayClock||'',h:team(hm),a:team(aw)}; out.ev.push(E);
-    if(E.st!=='post'||Date.now()-Date.parse(E.d)>4*864e5)continue;
+    if(E.st!=='post'||Date.now()-Date.parse(E.d)>9*864e5)continue;
     if(prev.sum&&prev.sum[e.id]){ out.sum[e.id]=prev.sum[e.id]; continue; }
-    if(nsum>=60)continue; nsum++;
+    if(nsum>=120)continue; nsum++;
     const S=await get(`${B}${lg}/summary?event=${e.id}`); if(!S)continue;
     if(!dbg){ dbg=true; console.log('SUMMARY KEYS',Object.keys(S)); const r=(S.rosters||[])[0]; console.log('ROSTER0',JSON.stringify(r&&{...r,roster:(r.roster||[]).slice(0,2)}).slice(0,2500));
       console.log('KEYEVENTS',JSON.stringify((S.keyEvents||[]).slice(0,8)).slice(0,4000)); console.log('HEADER',JSON.stringify(S.header&&S.header.competitions&&S.header.competitions[0]&&S.header.competitions[0].competitors&&S.header.competitions[0].competitors.map(x=>({ha:x.homeAway,id:x.id,team:x.team&&x.team.id}))).slice(0,600)); }
