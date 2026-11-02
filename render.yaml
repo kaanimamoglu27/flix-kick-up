@@ -1,0 +1,18 @@
+# Render Blueprint for the Flix Kick Up online server (server/). Render > New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: flix-kick-up-online
+    runtime: node
+    rootDir: server
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health
+    # free sleeps after ~15 min without traffic and the first player then waits ~1 min; use starter for the App Store build
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # the iOS app connects from capacitor://localhost, the web build from GitHub Pages
+      - key: ALLOWED_ORIGINS
+        value: capacitor://localhost,https://kaanimamoglu27.github.io,http://localhost:8000

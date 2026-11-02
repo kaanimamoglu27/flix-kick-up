@@ -78,12 +78,20 @@ gh secret set ADMOB_APP_ID      -R kaanimamoglu27/Flix-Arkana -b "ca-app-pub-...
 gh secret set ADMOB_REWARDED_ID -R kaanimamoglu27/Flix-Arkana -b "ca-app-pub-.../..."
 ```
 
-Flix Kick Up'ta da reklam var (ödüllü reklam ve tur arası reklam). Gerçek reklam için AdMob'da Kick Up'a ayrı bir uygulama ve iki reklam birimi aç, sonra:
+Flix Kick Up'ta da reklam var (ödüllü reklam ve tur arası reklam, isteğe bağlı banner). Gerçek reklam için AdMob'da Kick Up'a ayrı bir iOS uygulaması ve reklam birimleri (Ödüllü, Geçiş, istersen Banner) aç. Kimlikleri ya `app/www/ads-config.js` içindeki `IOS_*` alanlarına yaz ya da secret olarak gir (secret dosyadakini ezer):
 ```bash
 gh secret set KICKUP_ADMOB_APP_ID          -R kaanimamoglu27/flix-kick-up -b "ca-app-pub-...~..."
 gh secret set KICKUP_ADMOB_REWARDED_ID     -R kaanimamoglu27/flix-kick-up -b "ca-app-pub-.../..."
 gh secret set KICKUP_ADMOB_INTERSTITIAL_ID -R kaanimamoglu27/flix-kick-up -b "ca-app-pub-.../..."
+gh secret set KICKUP_ADMOB_BANNER_ID       -R kaanimamoglu27/flix-kick-up -b "ca-app-pub-.../..."   # sadece banner açacaksan
 ```
+Hiçbiri girilmezse Google'ın test reklamları çıkar. Biçimi yanlış bir uygulama kimliği girilirse derleme uyarı verir ve test kimliğine düşer (yanlış kimlik uygulamayı açılışta çökertirdi).
+
+Flix Kick Up'ın online modu için önce sunucuyu Render'a kur (`server/README.md`), sonra adresini ya repo kökündeki `online-config.js` içine `ONLINE_SERVER_URL` olarak yaz ya da GitHub değişkeni olarak gir (secret değil, değişken):
+```bash
+gh variable set KICKUP_ONLINE_SERVER_URL -R kaanimamoglu27/flix-kick-up -b "wss://<servis-adı>.onrender.com/ws"
+```
+Adres `wss://` ile başlamalı (iOS düz `ws://` adresini engeller). Adres yoksa uygulamada online düğmesi görünmez.
 
 ## 3. Yol B: kendi Mac'inde
 

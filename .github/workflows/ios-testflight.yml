@@ -53,10 +53,13 @@ jobs:
         env:
           APP_VERSION: ${{ inputs.version }}
           BUILD_NUMBER: ${{ github.run_number }}
-          # Kick Up ads (AdMob). Without these secrets the build uses Google's test ads.
+          # Kick Up ads (AdMob). These override the ids in app/www/ads-config.js; with neither the build uses Google's test ads.
           ADMOB_APP_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_APP_ID || '' }}
           ADMOB_REWARDED_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_REWARDED_ID || '' }}
           ADMOB_INTERSTITIAL_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_INTERSTITIAL_ID || '' }}
+          ADMOB_BANNER_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_BANNER_ID || '' }}
+          # Kick Up online server (repository variable, not a secret). Overrides ONLINE_SERVER_URL in online-config.js.
+          ONLINE_SERVER_URL: ${{ inputs.app == 'kickup' && vars.KICKUP_ONLINE_SERVER_URL || '' }}
         run: python3 tools/ios_setup.py
       - name: App Store Connect key
         env:

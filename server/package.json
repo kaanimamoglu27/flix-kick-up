@@ -1,0 +1,18 @@
+{
+  "name": "flix-kick-up-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Flix Kick Up online 1v1 server (WebSocket)",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
