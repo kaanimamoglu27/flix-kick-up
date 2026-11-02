@@ -22,7 +22,7 @@ on:
         default: '1.0'
 jobs:
   upload:
-    runs-on: macos-latest
+    runs-on: macos-15-intel
     timeout-minutes: 90
     defaults:
       run:
