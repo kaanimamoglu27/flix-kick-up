@@ -2,10 +2,10 @@
 # Run it from the Actions tab ("iOS TestFlight" > Run workflow) or from any terminal:
 #   gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=kickup -f version=1.0
 # Needs these repository secrets (Settings > Secrets and variables > Actions), the same values as in Flix-Arkana:
-#   ASC_KEY_ID        App Store Connect API key id (Users and Access > Integrations > App Store Connect API, Admin role)
-#   ASC_ISSUER_ID     Issuer id shown on the same page
-#   ASC_KEY_P8        the full text of the downloaded AuthKey_XXXX.p8 file
-#   APPLE_TEAM_ID     10-character Team ID (developer.apple.com > Membership)
+#   APP_STORE_CONNECT_KEY_ID       App Store Connect API key id (Users and Access > Integrations > App Store Connect API, Admin role)
+#   APP_STORE_CONNECT_ISSUER_ID    Issuer id shown on the same page
+#   APP_STORE_CONNECT_PRIVATE_KEY  the full text of the downloaded AuthKey_XXXX.p8 file
+#   APPLE_TEAM_ID                  10-character Team ID (developer.apple.com > Membership)
 name: iOS TestFlight
 run-name: TestFlight ${{ inputs.app }} ${{ inputs.version }}
 on:
@@ -28,14 +28,14 @@ jobs:
       run:
         working-directory: ${{ inputs.app == 'direktor' && 'direktor/app' || 'app' }}
     env:
-      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
     steps:
       - name: Check secrets
         run: |
-          for v in ASC_KEY_ID ASC_ISSUER_ID APPLE_TEAM_ID; do [ -n "${!v}" ] || { echo "::error::Secret $v is missing (Settings > Secrets and variables > Actions)"; exit 1; }; done
-          [ -n "${{ secrets.ASC_KEY_P8 }}" ] || { echo "::error::Secret ASC_KEY_P8 is missing"; exit 1; }
+          for v in ASC_KEY_ID ASC_ISSUER_ID APPLE_TEAM_ID; do [ -n "${!v}" ] || { echo "::error::Secret for $v is missing (APP_STORE_CONNECT_KEY_ID / APP_STORE_CONNECT_ISSUER_ID / APPLE_TEAM_ID) (Settings > Secrets and variables > Actions)"; exit 1; }; done
+          [ -n "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" ] || { echo "::error::Secret APP_STORE_CONNECT_PRIVATE_KEY is missing"; exit 1; }
         working-directory: .
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -63,7 +63,7 @@ jobs:
         run: python3 tools/ios_setup.py
       - name: App Store Connect key
         env:
-          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_P8: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
         run: |
           mkdir -p "$RUNNER_TEMP/keys"
           printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8"
