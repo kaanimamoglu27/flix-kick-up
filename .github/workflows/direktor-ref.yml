@@ -1,0 +1,34 @@
+name: Direktör referans görselleri
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: App Store uygulama numarası
+        required: true
+permissions:
+  contents: write
+jobs:
+  ref:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Görselleri indir
+        env:
+          APPID: ${{ github.event.inputs.id }}
+        run: |
+          mkdir -p ref && cd ref
+          curl -sL "https://itunes.apple.com/lookup?id=$APPID&country=us&entity=software" -o lookup.json
+          python3 - <<'PY'
+          import json,urllib.request
+          d=json.load(open('lookup.json'))['results'][0]
+          urls=d.get('screenshotUrls',[])+d.get('ipadScreenshotUrls',[])
+          open('info.txt','w').write(d.get('description','')+'\n\n'+'\n'.join(urls))
+          for i,u in enumerate(urls[:12]):
+            u=u.replace('392x696bb','600x0w')
+            urllib.request.urlretrieve(u,f's{i}.jpg')
+          PY
+          ls -la
+      - name: Dala yükle
+        run: |
+          git config user.name "flix-bot"; git config user.email "flix-bot@users.noreply.github.com"
+          git checkout --orphan direktor-ref; git rm -rfq --cached .; git add -f ref; git commit -qm "referans"; git push -fq origin HEAD:direktor-ref
