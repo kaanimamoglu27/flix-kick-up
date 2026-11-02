@@ -17,12 +17,14 @@
   const NON_CONSUMABLE = ['kickup_starter', 'kickup_noads'];
 
   let store = null; const pending = {}; const waiting = [];
+  // products waiting for Ask to Buy approval: buy(id) answers 'pending' for them instead of ordering again
+  const deferred = new Set();
   function settle(id, ok) { if (pending[id]) { pending[id](ok); delete pending[id]; } }
   // Hands an approved purchase to the game (window.__fkuGrant, once per transaction id) and only then lets it be finished.
   // A transaction that arrives before the game is ready waits; unfinished transactions come back on the next launch.
   function deliver(t) {
     const grant = window.__fkuGrant; if (!grant) return false;
-    for (const p of t.products) { grant(p.id, t.transactionId || null); settle(p.id, true); }
+    for (const p of t.products) { deferred.delete(p.id); grant(p.id, t.transactionId || null); settle(p.id, true); }
     return true;
   }
   let priceTimer = 0;
@@ -44,6 +46,8 @@
     // Receipts are checked on the device. For stronger anti-cheat add a server validator (e.g. RevenueCat or iaptic) via S.validator.
     S.when()
       .approved(t => { if (deliver(t)) t.verify(); else waiting.push(t); })
+      // Ask to Buy: the order is waiting for a parent; release the buy() call now, the goods come later through approved()
+      .pending(t => { for (const p of t.products) { deferred.add(p.id); settle(p.id, 'pending'); } })
       .verified(r => r.finish())
       .productUpdated(() => { clearTimeout(priceTimer); priceTimer = setTimeout(() => window.dispatchEvent(new Event('flixprices')), 300); syncOwned(); })
       .receiptUpdated(syncOwned);
@@ -61,8 +65,10 @@
   }
 
   window.FlixNative = {
+    // resolves true (bought), false (cancelled / failed / store unavailable) or 'pending' (waiting for Ask to Buy approval)
     buy(id) {
       return new Promise(res => {
+        if (deferred.has(id)) return res('pending');
         if (!store) return res(false);
         const prod = store.get(id), offer = prod && prod.getOffer();
         if (!offer) return res(false);

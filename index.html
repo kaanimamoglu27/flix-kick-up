@@ -788,7 +788,7 @@ svg { display: block; }
   document.documentElement.lang = lang;
   // legal texts are written in both languages; show the one that matches
   document.querySelectorAll("[data-only]").forEach((el) => { el.hidden = el.dataset.only !== lang; });
-  Object.assign(EN, { "Gizlilik Politikası": "Privacy Policy", "Kullanım Koşulları": "Terms of Service", "Lisanslar ve Teşekkürler": "Licenses & Acknowledgements", "Hakkında": "About" });
+  Object.assign(EN, { "Onay bekleniyor. Onaylanınca ürün kendiliğinden eklenir.": "Purchase approval pending. It will be added automatically once approved.", "Satın alma onaylandı.": "Purchase approved.", "Gizlilik Politikası": "Privacy Policy", "Kullanım Koşulları": "Terms of Service", "Lisanslar ve Teşekkürler": "Licenses & Acknowledgements", "Hakkında": "About" });
   function localize(root) {
     if (lang !== "en") return;
     const fix = (n) => {
@@ -3042,15 +3042,21 @@ svg { display: block; }
     const fn = buying; buying = null; $("buyModal").hidden = true; if (fn) bought(fn);
   });
   // App Store product ids (must match App Store Connect); the web build shows a demo confirm instead
-  const priceOf = (pid, n) => (window.FlixNative && FlixNative.price && FlixNative.price(pid)) || usd(n);
+  // in the app only the App Store's localized price is shown ("…" until it loads); the USD prices are for the web demo
+  const priceOf = (pid, n) => (window.FlixNative && FlixNative.price && FlixNative.price(pid)) || (NATIVE_APP ? "…" : usd(n));
   // grant: adds the goods; thanks: the toast. In the app the goods arrive through __fkuGrant (once per Apple transaction),
   // so a purchase that finishes after a crash, a lost connection or an Ask to Buy approval is never lost or given twice.
   let paying = false;
+  const awaitingApproval = new Set();   // Ask to Buy: products waiting for a parent's approval
   function pay(pid, what, n, grant, thanks) {
     if (window.FlixNative && FlixNative.buy) {
       if (paying) return toast(L("Satın alma sürüyor..."));
       paying = true;
-      const done = (ok) => { paying = false; if (ok) bought(() => toast(thanks)); else toast(L("Satın alma tamamlanmadı.")); };
+      const done = (ok) => {
+        paying = false;
+        if (ok === "pending") { awaitingApproval.add(pid); toast(L("Onay bekleniyor. Onaylanınca ürün kendiliğinden eklenir.")); }
+        else if (ok) bought(() => toast(thanks)); else toast(L("Satın alma tamamlanmadı."));
+      };
       FlixNative.buy(pid).then(done, () => done(false)); return;
     }
     askBuy(what, usd(n), () => { grant(); toast(thanks); });
@@ -3064,6 +3070,7 @@ svg { display: block; }
     else if (pid === "kickup_noads") grantNoAds();
     else { const pk = PACKS.find((p) => p.pid === pid); if (!pk) return false; addCoins(pk.n); }
     if (tx) { seen.push(tx); store.set("fku4.tx", seen.slice(-300)); }
+    if (awaitingApproval.delete(pid)) { toast(L("Satın alma onaylandı.")); jingle(); }
     refreshHome(); if (sheetOpen === "store") buildStore(); return true;
   };
   if (NATIVE_APP) {
