@@ -781,6 +781,59 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
 .g2foot{display:flex;justify-content:space-between;gap:8px;background:#111;color:#fff;font-size:10px;font-weight:700;padding:5px 10px;text-transform:uppercase;}
 .mdl{display:flex;flex-direction:column;gap:8px;} .mdc{display:flex;gap:12px;align-items:center;text-align:left;padding:12px;border:3px solid transparent;} .mdc.on{border-color:var(--yellow);}
 .mdc>span{font-size:34px;} .mdc b{display:block;font-family:var(--display);font-style:italic;font-weight:900;font-size:24px;text-transform:uppercase;line-height:1;} .mdc small{display:block;font-size:12.5px;color:var(--mute);line-height:1.3;margin-top:3px;}
+/* ---------- v22: sade tema (lacivert zemin, kırmızı ve sarı sadece vurgu), üstte canlı saha, altta kararlar ---------- */
+:root{--bg:#0f1a4b;}
+body,#home{background:var(--bg);}
+.hticket::before,.hticket::after{background:var(--bg);}
+.hpitch{stroke:rgba(255,255,255,.05);} .hpitch .f{fill:rgba(255,255,255,.03);}
+.sheet{background:rgba(5,9,30,.6);}
+.sheet .in{background:#16225e;}
+#match{gap:6px;padding-top:6px;}
+#match>.board{order:0;padding:5px 10px;border-radius:12px;background:#16225e;border:0;}
+#match>.pitch{order:1;} #match>.sitrow{order:2;} #match>.hint{order:3;} #match>.hand{order:4;} #match>.feed{order:5;} #match>.tacbar{order:6;} #match>.act{order:7;}
+#match .pitch{flex:none;aspect-ratio:105/72;max-height:38vh;min-height:150px;border:0;border-radius:12px;background:#24713a;perspective:none;box-shadow:0 0 0 2px rgba(255,255,255,.1);overflow:hidden;}
+#match .pitch::before,#match .pitch::after{display:none;}
+.pitch canvas.lpc{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:pointer;}
+.lpcap{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);background:rgba(12,20,64,.8);color:#fff;font-size:11.5px;font-weight:700;padding:3px 11px;border-radius:999px;white-space:nowrap;pointer-events:none;max-width:88%;overflow:hidden;text-overflow:ellipsis;z-index:2;}
+.lpcap:empty{display:none;}
+.lpcap.pop{animation:lpp .25s ease-out;}
+@keyframes lpp{from{transform:translateX(-50%) scale(.82);opacity:.3}}
+#match .feed{flex:1;min-height:0;flex-direction:column;overflow-y:auto;overflow-x:hidden;gap:5px;}
+#match .ev{white-space:normal;font-size:13px;line-height:1.3;padding:7px 11px;background:rgba(255,255,255,.07);border-radius:10px;}
+#match .ev b{color:var(--yellow);min-width:26px;}
+#match .ev.goal{background:var(--yellow);color:var(--navy);} #match .ev.goal b{color:var(--navy);}
+#match .ev.me{background:rgba(255,199,44,.16);}
+#match .hand.idle{flex:none;}
+#match .hand.idle .pcard.live{background:#16225e;color:#fff;border:0;box-shadow:none;}
+#match .hand.idle .pcard.live .txt{color:#dfe3ff;}
+#match.dec .hand{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:8px;overflow-y:auto;overflow-x:hidden;padding:4px 2px 8px;scroll-snap-type:none;}
+#match.dec .pcard{width:auto;min-height:112px;transform:none;border-width:2px;box-shadow:0 3px 0 rgba(0,0,0,.3);padding:9px;}
+#match.dec .pcard.on{transform:none;background:#fff;outline:0;box-shadow:0 0 0 3px var(--yellow),0 3px 0 rgba(0,0,0,.3);}
+#match.dec .pcard.make{grid-column:1/-1;min-height:54px;flex-direction:row;gap:10px;border-color:rgba(255,255,255,.5);}
+#match.dec .pcard.make .big{font-size:18px;margin:0;white-space:nowrap;}
+#match .sitrow .chip{background:#16225e;}
+#match .tacbar{background:#16225e;}
+#hub{padding-bottom:0;}
+.htabs{display:grid;grid-template-columns:repeat(5,1fr);margin:2px calc(-1*max(16px,env(safe-area-inset-left,0px))) 0;padding:6px 6px max(8px,env(safe-area-inset-bottom,0px));background:#0a1236;border-top:1px solid rgba(255,255,255,.08);}
+.htabs button{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;font-size:11px;font-weight:700;color:#c9cff0;border-radius:10px;}
+.htabs button:active{background:rgba(255,255,255,.08);}
+.htabs svg{width:24px;height:24px;fill:none;stroke:var(--yellow);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.htabs svg circle{fill:var(--yellow);stroke:none;}
+.htabs button i{position:absolute;top:2px;right:calc(50% - 18px);width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px #0a1236;}
+.hsum{display:flex;flex-direction:column;background:#16225e;border-radius:14px;overflow:hidden;}
+.hsum button{display:grid;grid-template-columns:90px 1fr auto;align-items:center;gap:8px;text-align:left;padding:11px 14px;border-top:1px solid rgba(255,255,255,.07);}
+.hsum button:first-child{border-top:0;}
+.hsum b{font-family:var(--display);font-style:italic;font-weight:800;font-size:17px;text-transform:uppercase;color:var(--yellow);}
+.hsum span{font-size:12.5px;color:#dfe3ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hsum em{font-style:normal;opacity:.6;}
+#hub .kpi{background:#16225e;}
+#hub .panel{background:#16225e;border:0;}
+#hub .twin{background:#16225e;border-color:transparent;}
+#hub .twin.open{border-color:var(--yellow);}
+#match.dec .hand{grid-auto-rows:max-content;}
+.lpban{position:absolute;left:-6%;right:-6%;top:50%;z-index:4;transform:translateY(-50%) rotate(-4deg);background:var(--yellow);border-top:4px solid var(--navy);border-bottom:4px solid var(--navy);text-align:center;padding:6px 0 4px;pointer-events:none;animation:lpb 1.7s ease-in-out both;}
+.lpban b{font-size:46px;color:var(--navy);letter-spacing:.02em;}
+@keyframes lpb{0%{transform:translateY(-50%) rotate(-4deg) translateX(-110%)}18%,82%{transform:translateY(-50%) rotate(-4deg) translateX(0)}100%{transform:translateY(-50%) rotate(-4deg) translateX(110%)}}
 </style>
 
 <div id="app">
@@ -820,6 +873,7 @@ i.ban{background:#ff3b3b;border-radius:2px;width:9px!important;border:1px solid 
         <button class="back" id="fullTbl" style="font-size:13px">Tüm tabloyu gör</button></div>
     </div>
     <div class="foot"><button class="btn ghost" id="hubSim">Hızlı sonuç</button><button class="btn" id="hubPlay">Maça çık</button></div>
+    <nav class="htabs" id="hubTabs"></nav>
   </section>
 
   <section class="screen" id="match" hidden>
@@ -1244,7 +1298,7 @@ function playMatch(o,onEnd){
   const M=newMatch(o); M.dec=[]; M.live=true; crowd.start();
   LIVE={M,onEnd,mode:'play',sel:null,custom:null,outSel:null,opts:[],timer:null,run:null,fast:false,react:false};
   show('match'); $('#feed').innerHTML=''; evChip(0,'Başlama düdüğü'); whistle();
-  drawAll(); ffTo(MOMENTS[0]);
+  drawAll(); lpBanner('Maç günü'); ffTo(MOMENTS[0]);
 }
 function nextTarget(m){ return (LIVE&&LIVE.moments||MOMENTS).find(x=>x>m+(LIVE&&LIVE.real?1:0))||(LIVE&&LIVE.real?92:90); }
 function ffTo(target){
@@ -1256,19 +1310,19 @@ function ffTo(target){
       const S=e.s&&M.sides[e.s]; if(you)rateTick(M,you,e);
       if(e.t==='goal'){ M.scorers.push({m:M.m,s:e.s,n:e.p.short,id:e.p.id}); const mm=M.m, sc=`${M.gh}-${M.ga}`, es=e.s, nm=e.p.short, anim=!L.fast&&!shot;
         const reveal=()=>{ if(LIVE!==L)return; L.lag[es]=Math.max(0,L.lag[es]-1); evChip(mm,`<span class="ico ball"></span>${cshort(S.c)} gol: ${esc(nm)} (${sc})`,'goal',true);
-          goalFx(S.c,nm,es===you); L.wpBefore=null; es===you?crowd.roar():crowd.groan(); coachSay(es===you?'ecstatic':'angry'); drawCoach(); drawBoard(); buzz(es===you?[40,40,80]:120); };
+          goalFx(S.c,nm,es===you); L.wpBefore=null; es===you?crowd.roar():crowd.groan(); coachSay(es===you?'ecstatic':'angry'); drawCoach(); drawBoard(); if(!anim&&LP.on&&!LP.cel)lpKick(es==='h'?'a':'h'); buzz(es===you?[40,40,80]:120); };
         if(anim){ L.lag[es]++; shot=true; setTimeout(()=>shotFx(M,es,'goal',nm),0); setTimeout(()=>crowd.ooh(),900); setTimeout(reveal,1650); pause=Math.max(pause,4000); } else { reveal(); pause=Math.max(pause,2300); } scored=true;
         if((!L.real||L.alt)&&!L.duel&&you&&e.s!==you&&M.m>=50&&M.m<=86&&!M.reactUsed&&!(L.moments||MOMENTS).some(d=>d>=M.m&&d-M.m<6)){M.reactUsed=true;L.react=true;} }
       else if(e.t==='card'){ evChip(M.m,`<span class="ico ${e.c==='y'?'yc':'rc'}"></span>${cshort(S.c)}: ${esc(e.p.short)}${e.c==='yr'?' (2. sarı)':''}`,e.c==='y'?'':'goal',true); if(e.c!=='y'){cardFx(true,e.p.short);pause=1800;e.s===you?crowd.boo(.07):crowd.cheer();coachSay(e.s===you?'shocked':'happy');} else if(e.s===you)crowd.boo(.025); }
       else if(e.t==='chance'){ if(!L.fast&&!shot){ shot=true; const es=e.s,nm=e.p.short,k=Math.random()<.55?'save':'miss'; setTimeout(()=>shotFx(M,es,k,nm),0); setTimeout(()=>{ if(LIVE===L){ crowd.ooh(); if(es===you)coachSay('worried'); } },1300); pause=Math.max(pause,2000); } else crowd.ooh(); }
       else if(e.t==='inj'){ injFx(e.p.short); crowd.worry(); evChip(M.m,`<span class="ico inj">+</span>${cshort(S.c)}: ${esc(e.p.short)} sakatlandı`,'goal',true); pause=Math.max(pause,1300); if(e.s===you)coachSay('shocked'); }
       else if(e.t==='act'){ const a=e.a; if(a.k==='red')continue; if(!L.fast){ if(a.k==='sub'){ subFx(S.c,S.P[a.o],S.P[a.i]); pause=Math.max(pause,1500); } else if(a.k==='form'||a.k==='plan'||a.k==='tac'){ tacFx(cshort(S.c),actText(S,a)); pause=Math.max(pause,1200); } } evChip(M.m,a.k==='sub'?`<span class="ico sub">⇅</span>${cshort(S.c)}: ${esc(S.P[a.i].short)} girdi, ${esc(S.P[a.o].short)} çıktı`:a.k==='tac'?`${cshort(S.c)} ${a.v===1?'hücuma geçti':a.v===-1?'kapandı':'dengeye döndü'}`:`${cshort(S.c)}: ${esc(actText(S,a))}`,'',true); }
-      else if(e.t==='ht'){ evChip(45,`İlk yarı ${M.gh}-${M.ga}`,'',false); whistle(); applause(1.6,.1); pause=Math.max(pause,500); }
+      else if(e.t==='ht'){ evChip(45,`İlk yarı ${M.gh}-${M.ga}`,'',false); whistle(); if(LP.on){ lpKick(M.o.you==='a'?'h':'a'); lpBanner('Devre arası'); } applause(1.6,.1); pause=Math.max(pause,500); }
     }
     if(you){ rateMinute(M,you); crowd.level(((you==='h'?M.lh:M.la)||0)*25); }
     drawBoard(); drawPitch(); moveBall(); drawHand(); drawAct(); drawCoach();
     if(M.pendInj&&!M.done){ L.mode='inj'; setTimeout(()=>{ if(LIVE===L)injSheet(L,()=>{ if(LIVE===L){ drawAll(); ffTo(L.target); } }); },pause||300); return; }
-    if(M.done){ evChip(90,`Maç bitti ${M.gh}-${M.ga}`,'',false); whistle(); { const dd=you==='h'?M.gh-M.ga:M.ga-M.gh; setTimeout(()=>{ dd>0?crowd.cheer():dd<0?crowd.boo(.04):applause(1.5,.1); },400); setTimeout(()=>crowd.stop(),2200); } setTimeout(()=>{ if(LIVE===L){ LIVE=null; L.onEnd(M); } },1200); return; }
+    if(M.done){ evChip(90,`Maç bitti ${M.gh}-${M.ga}`,'',false); whistle(); lpBanner('Maç bitti'); { const dd=you==='h'?M.gh-M.ga:M.ga-M.gh; setTimeout(()=>{ dd>0?crowd.cheer():dd<0?crowd.boo(.04):applause(1.5,.1); },400); setTimeout(()=>crowd.stop(),2200); } setTimeout(()=>{ if(LIVE===L){ LIVE=null; L.onEnd(M); } },1200); return; }
     if(M.m>=L.target-(L.real?1:0)||L.react){ const t=L.react?'Gol yedik!':L.target===46?'Devre arası':`${L.target}. dakika`; L.react=false; setTimeout(()=>{ if(LIVE!==L)return; if(L.target===46&&!L.talked&&t==='Devre arası')talkSheet(L,()=>{ if(LIVE===L)moment(t); }); else moment(t); },pause||300); return; }
     L.run=setTimeout(tickF,pause||(L.fast?15:TICK));
   };
@@ -1322,24 +1376,7 @@ const sur=p=>{ const s=p.short.replace(/^[A-ZÇĞİÖŞÜ]\.\s*/,''); return s.l
 function fitPitch(){ const P=$('#pitch'); if(!P)return; const h=P.clientHeight,w=P.clientWidth; P.style.setProperty('--ts',Math.max(.62,Math.min(1,h/330,w/340)).toFixed(3)); }
 if(window.ResizeObserver)new ResizeObserver(fitPitch).observe($('#pitch')); else addEventListener('resize',fitPitch);
 function drawPitch(){
-  const L=LIVE,M=L.M,s=M.o.you,S=M.sides[s];
-  const sel=L.mode==='dec'&&L.sel&&L.sel.k==='sub'?L.sel:null;
-  const sg=[L.mode,S.form,sel?sig(sel):'',L.outSel,S.xi.join(),S.xi.map(id=>id?Math.round(staOf(S,id,M.m)/4)+':'+Math.round(rtOf(M,id)*10)+(S.yc[id]?'y':''):'').join(),situation(),M.m>=L.wpUntil].join('|');
-  if(L.pitchSig===sg&&$('#pitch').firstChild)return; L.pitchSig=sg;
-  let h=`<div class="adb"><span>FLIX · KICK IT · FLICK IT · FLIX IT · FLIX SEN OLSAYDIN · </span><span>FLIX · KICK IT · FLICK IT · FLIX IT · FLIX SEN OLSAYDIN · </span></div><div class="pf"><svg class="lines" viewBox="0 0 100 150" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width=".8" opacity=".85">
-    <rect x="4" y="4" width="92" height="142"/><line x1="4" y1="75" x2="96" y2="75"/><circle cx="50" cy="75" r="12"/>
-    <rect x="24" y="4" width="52" height="20"/><rect x="38" y="4" width="24" height="8"/><rect x="24" y="126" width="52" height="20"/><rect x="38" y="138" width="24" height="8"/><circle cx="50" cy="75" r=".9" fill="#fff"/></g><g fill="none" stroke="#fff" stroke-width="1.4"><path d="M42 4 V1 H58 V4"/><path d="M42 146 V149 H58 V146"/></g></svg></div><div class="pl">`; $('#sit').innerHTML=situation();
-  PH=Math.max(120,($('#pitch').clientHeight||300)-22); const FS=fslots(S.form); S.xi.forEach((id,k)=>{ if(!id)return; let p=S.P[id],cls=''; const [, ,x,y]=FS[k];
-    if(sel&&sel.o===id){p=S.P[sel.i];cls=' in';} if(L.outSel===id)cls=' sel';
-    const sta=sel&&sel.o===id?100:staOf(S,id,M.m);
-    const rt=rtOf(M,p.id), rc=rt>=7.5?'hi':rt<6?'lo':''; if(rt<5.6&&!cls)cls=' rbad';
-    const [px,py,ps]=pproj(x,y); h+=`<button class="tok${cls}" style="left:${px}%;top:${py}%;--ps:${ps}" data-id="${id}" aria-label="${esc(p.name)}">${kit(S.c,p.num)}${M.m>=10&&!(sel&&sel.o===id)?`<span class="rt ${rc}">${rt.toFixed(1)}</span>`:''}${S.yc[p.id]?'<span class="ycd"></span>':''}
-      <span class="nm">${esc(sur(p))}</span><span class="sta"><i class="${sta<60?'low':''}" style="width:${sta}%"></i></span></button>`; });
-  h+=`<i class="mom" id="pMom"></i><span class="pball" id="pBall" style="left:${(L.bp||[50,75])[0]}%;top:${(L.bp||[50,75])[1]}%"></span></div>`;
-  [...$('#pitch').children].forEach(k=>{ if(!k.matches('.shot,.subfx,.tacfx'))k.remove(); }); $('#pitch').insertAdjacentHTML('afterbegin',h);
-  const np={}; $('#pitch').querySelectorAll('.tok').forEach(b=>{ b.onclick=()=>playerSheet(b.dataset.id); const id=b.dataset.id, x=b.style.left, y=b.style.top; np[id]=[x,y];
-    const o=L.pp&&L.pp[id]; if(o&&(o[0]!==x||o[1]!==y)){ b.style.left=o[0]; b.style.top=o[1]; b.offsetWidth; b.classList.add('mv'); b.style.left=x; b.style.top=y; } });
-  L.pp=np; moveBall();
+  const L=LIVE; if(!L)return; const st=situation(); if(L.sitH!==st){ L.sitH=st; $('#sit').innerHTML=st; } lpInit();
 }
 function cardHTML(d,tag){
   const M=LIVE.M,s=M.o.you,S=M.sides[s],tm=tag?`<i>${tag}</i>`:'';
@@ -1364,8 +1401,10 @@ function drawHand(){
   list.forEach(d=>{ const el=document.createElement('button'); el.type='button'; el.className='pcard'+(L.sel&&sig(L.sel)===sig(d)?' on':'');
     el.innerHTML=cardHTML(d,d.mine?'Senin':''); el.onclick=()=>{ L.sel=L.sel&&sig(L.sel)===sig(d)?null:d; beep(L.sel?620:400,.05); buzz(8); drawHand(); drawPitch(); drawAct(); }; box.appendChild(el); });
   if(S.subs>0){ const mk=document.createElement('button'); mk.type='button'; mk.className='pcard make';
-    mk.innerHTML='<div class="big">Kendi kartın</div><div class="txt">Sahadan bir oyuncuya dokun, yerine kimin gireceğini seç.</div>';
-    mk.onclick=()=>{ $('#hint').textContent='Çıkacak oyuncuya dokun.'; $('#pitch').animate([{transform:'scale(1)'},{transform:'scale(1.02)'},{transform:'scale(1)'}],{duration:300}); };
+    mk.innerHTML='<div class="big">Kendi değişikliğin</div><div class="txt">Çıkacak oyuncuyu seç, yerine gireni sen belirle.</div>';
+    mk.onclick=()=>{ beep(560,.04); const FS=fslots(S.form), sh=sheetOpen('Kim çıksın?',`<div class="note">Kondisyonu düşük ve reytingi kötü olanlar kırmızı.</div>${S.xi.map((id,k)=>{ if(!id)return ''; const p=S.P[id], st=Math.round(staOf(S,id,M.m)), rt=rtOf(M,id);
+        return `<button class="bp" data-o="${id}">${kit(S.c,p.num)}<div><div style="font-weight:700">${esc(p.short)}</div><small>${FS[k][0]} · kondisyon <span style="font-weight:800;color:${st<60?'#d81e27':'inherit'}">%${st}</span> · reyting <span style="font-weight:800;color:${rt<6?'#d81e27':'inherit'}">${rt.toFixed(1)}</span></small></div><b>${p.ovr}</b></button>`; }).join('')}`);
+      sh.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{ sh.remove(); playerSheet(b.dataset.o); }); };
     box.appendChild(mk); }
   $('#hint').textContent=L.sel?'Kartın seçili. Kararı ver.':L.tip?'Yardımcın: '+L.tip:'Bir kart seç ya da oyuncuya dokunup kendi değişikliğini yap.';
 }
@@ -1544,6 +1583,7 @@ const money=v=>(Math.round(v*10)/10).toLocaleString('tr-TR')+' M€';
 const priceOf=p=>{ const a=ageOf(p), f=a<=21?1.5:a<=24?1.25:a<=28?1:a<=31?.75:.5, pb=a<=23?1+Math.max(0,potOf(p)-p.ovr)*.025:1; return Math.max(.3,Math.round(1.6*Math.pow(1.19,p.ovr-70)*f*pb*10)/10); };
 const sellOf=p=>Math.round(priceOf(p)*.85*10)/10;
 let HUBMORE=false;
+const HICO={sq:'<svg viewBox="0 0 24 24"><path d="M8 3l-5 3 2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/></svg>',tk:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.6"/><circle cx="16" cy="8" r="1.6"/><circle cx="12" cy="13" r="1.6"/><circle cx="8" cy="17" r="1.6"/><circle cx="16" cy="17" r="1.6"/></svg>',tr:'<svg viewBox="0 0 24 24"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>',tb:'<svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg>',more:'<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>'};
 function hubMenu(){
   const T=scorerTable()[0], tl=trLeft(), yk=ST.week<2?'y':(ST.week>=18&&ST.week<21)?'d':'', ya=yk&&!(ST.ya||{})[yk];
   const nx=fixtures(ST.season)[ST.week], nm=nx&&nx.find(([h,a])=>h===ST.team||a===ST.team), pos=table().findIndex(r=>r.c===ST.team)+1;
@@ -1555,11 +1595,13 @@ function hubMenu(){
   if(!SADE())more[3][1].push(['md','Oyun tarzı','Menajer: her şey senin elinde']);
   if(SADE()){ more.splice(0,more.length,['Lig',more[2][1]],['Kulüp',[more[1][1][1],['nw','Gazete',`${(ST.news||[]).length} haber`,(ST.nUnread||0)>0],['md','Oyun tarzı','Teknik direktör: kulüp işleri otomatik']]]); }
   const dotMore=more.some(([,L])=>L.some(x=>x[3]));
-  $('#hubMenu').innerHTML=`<div class="hmain">${main.map(([k,n,s,dot])=>`<button class="card htile" data-k="${k}"><b>${n}</b><small>${esc(s)}</small>${dot?'<i></i>':''}</button>`).join('')}</div>
-    <button class="hmore" data-more>${HUBMORE?'Daha az':'Daha fazla'} <span>${HUBMORE?'▴':'▾'}</span>${dotMore&&!HUBMORE?'<i></i>':''}</button>
-    ${HUBMORE?`<div class="hml">${more.map(([g,L])=>`<div class="hmg">${g}</div>${L.map(([k,n,s,dot])=>`<button class="hmr" data-k="${k}"><b>${n}</b><small>${esc(s)}</small>${dot?'<i></i>':''}<em>›</em></button>`).join('')}`).join('')}</div>`:''}`;
-  $('#hubMenu').querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ beep(540,.05); ({fx:fixtureSheet,tb:()=>$('#fullTbl').click(),gk:scorersSheet,sq:squadSheet,fn:finSheet,tr:marketSheet,dv:trainCenter,cp:capSheet,ad:sponsorAd,fc:facSheet,by:boardSheet,tk:()=>preTacSheet(hubMenu),kt:()=>kitSheet(ST.team,hub),co:coachDevSheet,nw:newsSheet,md:()=>modeSheet(m=>{ ST.mode=m; saveStory(); hub(); },ST.mode)})[b.dataset.k](); });
-  $('#hubMenu').querySelector('[data-more]').onclick=()=>{ HUBMORE=!HUBMORE; beep(500,.04); hubMenu(); };
+  const act=k=>{ beep(540,.05); ({fx:fixtureSheet,tb:()=>$('#fullTbl').click(),gk:scorersSheet,sq:squadSheet,fn:finSheet,tr:marketSheet,dv:trainCenter,cp:capSheet,ad:sponsorAd,fc:facSheet,by:boardSheet,tk:()=>preTacSheet(hubMenu),kt:()=>kitSheet(ST.team,hub),co:coachDevSheet,nw:newsSheet,md:()=>modeSheet(m=>{ ST.mode=m; saveStory(); hub(); },ST.mode)})[k](); };
+  const tabs=[['sq','Kadro',main[0][3]],['tk','Taktik'],['tr','Transfer',main[2][3]],['tb','Lig'],['more','Daha',dotMore]];
+  $('#hubTabs').innerHTML=tabs.map(([k,n,dot])=>`<button ${k==='more'?'data-more':`data-k="${k}"`} aria-label="${n}">${HICO[k]}<span>${n}</span>${dot?'<i></i>':''}</button>`).join('');
+  $('#hubMenu').innerHTML=`<div class="hsum">${main.slice(0,3).map(([k,n,sub])=>`<button data-k="${k}"><b>${n}</b><span>${esc(sub)}</span><em>›</em></button>`).join('')}</div>`;
+  document.querySelectorAll('#hubTabs [data-k],#hubMenu [data-k]').forEach(b=>b.onclick=()=>act(b.dataset.k));
+  $('#hubTabs [data-more]').onclick=()=>{ beep(500,.04); const sh=sheetOpen('Daha fazla',`<div class="hml">${more.map(([g,L])=>`<div class="hmg">${g}</div>${L.map(([k,n,s,dot])=>`<button class="hmr" data-k="${k}"><b>${n}</b><small>${esc(s)}</small>${dot?'<i></i>':''}<em>›</em></button>`).join('')}`).join('')}</div>`);
+    sh.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ sh.remove(); act(b.dataset.k); }); };
 }
 function hub(){
   KITOV={}; initRoster(); show('hub'); const fx=fixtures(ST.season), total=fx.length;
@@ -1576,7 +1618,7 @@ function hub(){
   $('#hubTr').innerHTML=`<div><b>Transfer</b><span>${win?(done?`${win}: işini bitirdin`:`${win}: 3 teklif kartı seni bekliyor`):'Yaz döneminde ve devre arasında teklif kartları gelir'} · Bütçe ${money(ST.budget)}</span></div><i>${win&&!done?'›':''}</i>`;
   { const tl=trLeft(), T=$('#hubTr'); T.hidden=false; T.className='twin '+(tl.open?(tl.n<=1?'hot':'open'):'');
     T.innerHTML=`<span>${tl.open?'🔓':'🔒'}</span><div><b>${tl.open?trWindow():'Transfer dönemi kapalı'}</b><small>${trLeftTxt(tl)}${tl.open?' · Bütçe '+money(ST.budget):''}</small></div><em>${tl.open?tl.n:''}</em>`; }
-  $('#hubTable').parentElement.style.display='none'; hubMenu();
+  hubMenu();
   if(ST.ntf){ const t=ST.ntf; ST.ntf=null; saveStory(); setTimeout(()=>{ if(!$('#hub').hidden)toast(t); },350); }
   if(ST.fired||(brdOf()<=10&&ST.week<total)){ setTimeout(()=>{ if(!$('#hub').hidden&&!document.querySelector('.sheet,.adfx'))firedSheet(); },450); return; }
   if((ST.ev||ST.boardQ||ST.bid||(ST.perkQ||[]).length)&&ST.week<total)setTimeout(()=>{ if($('#hub').hidden||document.querySelector('.sheet,.adfx'))return; if(ST.ev)eventSheet(); else if(ST.boardQ)orderSheet(); else if(ST.bid)bidSheet(); else perkSheet(); },450);
@@ -2776,18 +2818,158 @@ const scCoach=(sc,you)=>{ const m=/20(\d\d)-(\d\d)/.exec(sc.sub||''), w=/(\d+)\.
 
 /* ---------- v20 animasyonlar ---------- */
 let PH=300; function pproj(x,y){ const t=.314,d=800,h=(1-y/100)*PH, k=d/(d+h*Math.sin(t)); return [+(50+(x-50)*k).toFixed(2), +(100-h*Math.cos(t)*k/PH*100).toFixed(2), +(0.8+0.2*k).toFixed(3)]; }
-function moveBall(){ const b=$('#pBall'), L=LIVE; if(!b||!L||!L.M)return; const M=L.M, m=M.m;
-  if(L.bk!==m||!L.bp){ L.bk=m; const r=Math.random(), toks=[...document.querySelectorAll('#pitch .tok')];
-    let x,y; if(r<.5&&toks.length){ const t=toks[(Math.random()*toks.length)|0]; x=parseFloat(t.style.left)+(Math.random()*6-3); y=parseFloat(t.style.top)+3; }
-    else { [x,y]=pproj(18+Math.random()*64, 6+Math.random()*58); }
-    L.bp=[Math.max(6,Math.min(94,x)),Math.max(4,Math.min(94,y))]; }
-  b.style.left=L.bp[0]+'%'; b.style.top=L.bp[1]+'%';
-  const mo=$('#pMom'); if(mo){ const up=L.bp[1]<55; mo.className='mom '+(up?'att':'def'); } }
+function moveBall(){}
 function subFx(c,o,i){ const P=$('#pitch'); if(!P||!o||!i)return; const {a,b}=teamCols(c); const d=document.createElement('div'); d.className='subfx';
   d.innerHTML=`<div class="led" style="--a:${a};--b:${b}"><div class="lr out"><b>${o.num||''}</b><span>${esc(sur(o))}</span><i>▼</i></div><div class="lr inn"><b>${i.num||''}</b><span>${esc(sur(i))}</span><i>▲</i></div></div>`;
   P.appendChild(d); setTimeout(()=>d.remove(),1700); }
 function tacFx(who,t){ const P=$('#pitch'); if(!P||!t)return; const d=document.createElement('div'); d.className='tacfx';
   d.innerHTML=`<span class="tw">${esc(who)}</span><span class="tt">${esc(t)}</span>`; P.appendChild(d); setTimeout(()=>d.remove(),1500); }
+
+/* ---------- v22 canlı saha: üstten iki takım koşar, top pas pas ilerler, şut ve gol sahada oynanır ---------- */
+const LPW=105, LPH=68, LP={on:false,M:null,pl:{},raf:0};
+function lpCol(c){ const [ ,c1,c2,n]=kitDef(c); let a=c1,b=c2; if(cdist(a,'#2f8a45')<95){ a=c2; b=c1; } if(cdist(a,'#2f8a45')<95)a='#f4f2ec'; return {a,b,n:lumC(a)>.6?'#15215c':'#ffffff'}; }
+function lpInit(){
+  const L=LIVE; if(!L||!L.M)return; const M=L.M, P=$('#pitch'); if(!P)return;
+  let cv=P.querySelector('canvas.lpc');
+  if(!cv){ P.innerHTML=''; cv=document.createElement('canvas'); cv.className='lpc'; P.appendChild(cv); const cap=document.createElement('div'); cap.className='lpcap'; cap.id='lpCap'; P.appendChild(cap); cv.onclick=lpTap; }
+  if(LP.M!==M){ const you=M.o.you||'h';
+    Object.assign(LP,{M,pl:{},R:you,ball:{x:52.5,y:34,z:0},st:'own',car:null,tm:0,fly:null,ev:null,net:null,cel:null,trail:[],t:0,cap:'',capT:0,col:{h:lpCol(M.sides.h.c),a:lpCol(M.sides.a.c)}});
+    if(cdist(LP.col.h.a,LP.col.a.a)<120){ const o=LP.col.a; LP.col.a=cdist(LP.col.h.a,o.b)>=120?{a:o.b,b:o.a,n:lumC(o.b)>.6?'#15215c':'#ffffff'}:{a:lumC(LP.col.h.a)>.6?'#15215c':'#f4f2ec',b:o.a,n:lumC(LP.col.h.a)>.6?'#ffffff':'#15215c'}; }
+    lpSync(true); lpKick(M.o.you==='a'?'a':'h'); }
+  LP.cv=cv; lpSync(false); LP.on=true; if(!LP.raf){ LP.ts=0; LP.raf=requestAnimationFrame(lpFrame); }
+}
+const lpDir=s=>s===LP.R?1:-1; /* sağa hücum eden taraf +1 */
+const lpF=(s,x,y)=>s===LP.R?[x,y]:[LPW-x,LPH-y]; /* takımın kendi çerçevesinden sahaya */
+function lpSync(fresh){
+  const M=LP.M, seen={};
+  for(const s of ['h','a']){ const S=M.sides[s], FS=fslots(S.form);
+    S.xi.forEach((id,k)=>{ if(!id)return; seen[id]=1; const sl=FS[k], gk=sl[0]==='KL';
+      const hx=gk?3.2:(91.5-sl[3])/76.5*60, hy=5+sl[2]/100*58;
+      let p=LP.pl[id]; if(!p){ const [x,y]=fresh?lpF(s,hx,hy):[52.5,s===LP.R?-1.5:LPH+1.5]; p=LP.pl[id]={id,s,x,y,ph:Math.random()*6.28,sp:.9+Math.random()*.25}; }
+      const q=S.P[id]; Object.assign(p,{k,hx,hy,gk,num:q.num||'',nm:sur(q),g:q.g}); }); }
+  for(const id in LP.pl)if(!seen[id]){ if(LP.car===LP.pl[id])LP.car=null; delete LP.pl[id]; }
+  if(!LP.car&&LP.st==='own')lpKeeperBall(LP.poss||'h');
+}
+const lpTeam=s=>Object.values(LP.pl).filter(p=>p.s===s);
+const lpFwd=(s,p)=>s===LP.R?p.x:LPW-p.x; /* takımın hücum yönünde ne kadar ileride */
+function lpGive(p,st='own'){ LP.car=p; LP.poss=p.s; LP.st=st; LP.tm=.35+Math.random()*.75; LP.fly=null; if(!LP.ev)lpCapt(p); }
+function lpKick(s){ const T=lpTeam(s); if(!T.length)return; LP.poss=s; LP.ball={x:52.5,y:34,z:0}; LP.net=null; LP.cel=null;
+  const c=T.filter(p=>!p.gk).sort((a,b)=>lpFwd(s,b)-lpFwd(s,a))[0]||T[0]; lpGive(c); LP.tm=.9; }
+function lpKeeperBall(s){ const k=lpTeam(s).find(p=>p.gk)||lpTeam(s)[0]; if(!k)return; LP.ball.x=k.x; LP.ball.y=k.y; LP.ball.z=0; lpGive(k); LP.tm=.8; }
+function lpCapt(p){ const M=LP.M, you=M.o.you, c=M.sides[p.s].c; LP.cap=(p.s===you?'':cshort(c)+' · ')+(p.gk?'Kaleci ':'')+p.nm; }
+function lpPass(to,dur,h,x,y){ const b=LP.ball; LP.st='fly'; LP.fly={x0:b.x,y0:b.y,x1:x??to.x,y1:y??to.y,t:0,d:dur,h:h||0,to}; LP.car=null; }
+function lpTurnP(s){ const M=LP.M, a=s==='h'?(M.lh||.015):(M.la||.015), b=s==='h'?(M.la||.015):(M.lh||.015), sh=a/(a+b); return clamp(.2-(sh-.5)*.28,.08,.32); }
+function lpDecide(){ /* top ayağında: pas, orta ya da top kaybı */
+  const p=LP.car, s=p.s, o=s==='h'?'a':'h', fw=lpFwd(s,p), T=lpTeam(s).filter(q=>q!==p), O=lpTeam(o); if(!T.length)return;
+  const box=fw>84, turn=Math.random()<lpTurnP(s)+(box?.22:0);
+  if(box&&Math.random()<.55){ /* ceza sahasına orta: kaleci ya da defans uzaklaştırır */
+    const gx=s===LP.R?99:6, gy=24+Math.random()*20, tgt=T.filter(q=>!q.gk).sort((a,b)=>Math.hypot(a.x-gx,a.y-gy)-Math.hypot(b.x-gx,b.y-gy))[0];
+    const keep=O.find(q=>q.gk), cl=O.filter(q=>!q.gk).sort((a,b)=>Math.hypot(a.x-gx,a.y-gy)-Math.hypot(b.x-gx,b.y-gy))[0];
+    const r=Math.random(), rec=r<.35?keep:r<.75?cl:tgt; if(rec)lpPass(rec,.75,3.2,gx,gy); return; }
+  if(turn&&O.length){ const mx=p.x+lpDir(s)*8, rec=O.filter(q=>!q.gk).sort((a,b)=>Math.hypot(a.x-mx,a.y-p.y)-Math.hypot(b.x-mx,b.y-p.y))[0]; if(rec){ lpPass(rec,.45,0); return; } }
+  const sc=T.map(q=>{ const d=Math.hypot(q.x-p.x,q.y-p.y), g=lpFwd(s,q)-fw; return [q,g*.9+Math.random()*14-(d>30?(d-30)*2.2:0)-(q.gk?18:0)-(d<6?10:0)]; }).sort((a,b)=>b[1]-a[1]);
+  const q=sc[0][0], d=Math.hypot(q.x-p.x,q.y-p.y), lead=lpDir(s)*2; lpPass(q,clamp(d/26,.28,1.1),d>24?2.2:0,q.x+lead,q.y);
+}
+function lpTarget(p,dt){
+  const s=p.s, inP=LP.poss===s, b=LP.ball, d=lpDir(s), ev=LP.ev&&LP.ev.s===s;
+  const bx=s===LP.R?b.x:LPW-b.x, by=s===LP.R?b.y:LPH-b.y;
+  let X,Y;
+  if(LP.cel){ const c=LP.cel; if(s===c.s&&!p.gk){ X=c.x+Math.cos(p.ph)*2.6; Y=c.y+Math.sin(p.ph)*2.6; return [X,Y,1.4]; } const [hx,hy]=lpF(s,p.gk?3.2:26+p.hx*.4,p.hy); return [hx,hy,.6]; }
+  if(p.gk){ X=3.2+clamp((bx-25)*.07,0,6); Y=34+(by-34)*.22; }
+  else { X=inP?bx*.55+p.hx*.65+4+(ev?12:0):bx*.5+p.hx*.5+2; X=clamp(X,4,ev?97:94); Y=inP?p.hy+(by-34)*.15:34+(p.hy-34)*.78+(by-34)*.3;
+    X+=Math.sin(LP.t*.8+p.ph)*1.8; Y+=Math.cos(LP.t*.6+p.ph*1.3)*1.5; }
+  let [fx,fy]=lpF(s,X,Y), v=1;
+  if(LP.car===p&&LP.st==='own'){ fx=p.x+d*(LP.ev?0:3.5); fy=p.y+(34-p.y)*.15; v=.75; }
+  else if(!inP&&LP.car&&!p.gk&&LP.st==='own'&&!LP.ev){ const near=lpTeam(s).filter(q=>!q.gk).sort((a,c)=>Math.hypot(a.x-b.x,a.y-b.y)-Math.hypot(c.x-b.x,c.y-b.y)); if(near[0]===p){ fx=b.x-d*1.8; fy=b.y; v=1.15; } else if(near[1]===p){ fx=b.x-d*5; fy=b.y+(b.y<34?4:-4); v=1.05; } }
+  if(p.gk&&p.dive!=null){ fy=p.dive; v=2.4; }
+  if(LP.fly&&LP.fly.to===p){ fx=LP.fly.x1; fy=LP.fly.y1; v=1.3; }
+  return [fx,fy,v];
+}
+function lpStep(dt,raw){
+  LP.t+=raw; if(LP.capT>0)LP.capT-=raw;
+  const run=dt>0, spd=(LP.ev?20:9.5);
+  for(const id in LP.pl){ const p=LP.pl[id], [tx,ty,v]=lpTarget(p,raw), dx=tx-p.x, dy=ty-p.y, dd=Math.hypot(dx,dy), mv=Math.min(dd,spd*v*p.sp*(run?1:.25)*raw);
+    if(dd>.01){ p.x+=dx/dd*mv; p.y+=dy/dd*mv; p.mv=mv/raw; } else p.mv=0; }
+  const b=LP.ball;
+  if(LP.net){ LP.net.t+=raw; }
+  if(LP.cel){ LP.cel.t+=raw; if(LP.cel.t>2.3){ const s=LP.cel.k; LP.cel=null; lpKick(s); } return; }
+  if(!run&&!LP.ev)return;
+  if(LP.st==='own'&&LP.car){ const p=LP.car; b.x=p.x+lpDir(p.s)*1.1; b.y=p.y+.5; b.z=0; if(LP.ev)return lpEvStep(raw); LP.tm-=dt; if(LP.tm<=0)lpDecide(); }
+  else if(LP.st==='fly'&&LP.fly){ const f=LP.fly; f.t+=LP.ev?raw:dt; const u=Math.min(1,f.t/f.d), e=f.sh?u:u*(2-u)*.5+u*.5;
+    b.x=f.x0+(f.x1-f.x0)*e; b.y=f.y0+(f.y1-f.y0)*e; b.z=f.h*4*u*(1-u); if(f.sh){ LP.trail.push([b.x,b.y,b.z]); if(LP.trail.length>9)LP.trail.shift(); }
+    if(u>=1){ if(f.end)return f.end(); const to=f.to; if(to&&LP.pl[to.id])lpGive(to); else { const s=LP.poss||'h'; lpKeeperBall(s); } if(LP.ev)lpEvStep(0); } }
+  else if(LP.st==='dead'){ LP.tm-=raw; if(LP.tm<=0&&LP.after){ const a=LP.after; LP.after=null; a(); } }
+}
+/* gerçek pozisyon: maç motorundaki gol ve kaçan fırsatlar sahada pas pas oynanır (yaklaşık 1,6 sn sonra top kaleye ulaşır) */
+function lpEvent(side,kind,name){
+  if(!LP.on||!LP.M)return; const S=LP.M.sides[side], T=lpTeam(side).filter(p=>!p.gk); if(!T.length)return;
+  const sh=T.find(p=>S.P[p.id]&&S.P[p.id].short===name)||T.sort((a,b)=>lpFwd(side,b)-lpFwd(side,a))[0];
+  LP.cel=null; LP.net=null; LP.trail=[]; LP.poss=side; LP.ev={s:side,kind,sh,ph:0,t:0};
+  const set=T.filter(p=>p!==sh).sort((a,b)=>lpFwd(side,b)-lpFwd(side,a))[0]||sh;
+  LP.cap=cshort(S.c)+' atakta'; if(LP.st==='own'&&LP.car&&LP.car.s===side&&LP.car!==sh){ LP.ev.ph=1; lpPass(set===LP.car?sh:set,.5,set===LP.car?0:2.4); }
+  else { const b=LP.ball; LP.ev.ph=1; LP.st='fly'; LP.fly={x0:b.x,y0:b.y,x1:set.x+lpDir(side)*3,y1:set.y,t:0,d:.55,h:3,to:set}; LP.car=null; }
+}
+function lpEvStep(){
+  const E=LP.ev; if(!E)return; const s=E.s, d=lpDir(s), sh=E.sh;
+  if(E.ph===1){ E.ph=2; const [ax,ay]=lpF(s,86+Math.random()*5,22+Math.random()*24); if(LP.car===sh){ LP.tm=.15; E.ph=3; lpEvStep(); return; } LP.cap=LP.car?LP.car.nm+' › '+sh.nm:sh.nm; lpPass(sh,.42,0,ax,ay); sh.x+= (ax-sh.x)*.35; sh.y+=(ay-sh.y)*.35; return; }
+  if(E.ph===2||E.ph===3){ E.ph=4; const k=E.kind, gy=k==='goal'?(Math.random()<.5?31.2+Math.random()*1.6:35.2+Math.random()*1.6):k==='miss'?(Math.random()<.5?28.6-Math.random()*2:39.4+Math.random()*2):30.8+Math.random()*6.4;
+    const gx=d>0?(k==='goal'?LPW+1.4:k==='miss'?LPW+3.5:LPW-1.2):(k==='goal'?-1.4:k==='miss'?-3.5:1.2);
+    LP.cap=sh.nm+(k==='goal'?' şut... ':' şut!'); const b=LP.ball; LP.trail=[];
+    LP.st='fly'; LP.car=null; LP.fly={x0:b.x,y0:b.y,x1:gx,y1:gy,t:0,d:.42,h:k==='miss'&&Math.random()<.5?2.6:.8,sh:1,to:null,end:()=>lpShotEnd(k,gx,gy)};
+    const o=s==='h'?'a':'h', kp=lpTeam(o).find(p=>p.gk); if(kp){ kp.dive=k==='save'?gy:(gy<34?gy+5:gy-5); } return; }
+}
+function lpShotEnd(k,gx,gy){
+  const E=LP.ev, s=E.s, o=s==='h'?'a':'h', kp=lpTeam(o).find(p=>p.gk); LP.ev=null; LP.fly=null; if(kp)kp.dive=null;
+  if(k==='goal'){ LP.net={s:o,t:0,x:gx,y:gy}; LP.st='dead'; LP.cap='GOL! '+E.sh.nm; LP.ball.z=0;
+    const [cx,cy]=lpF(s,LPW-4,E.sh.y<34===(s===LP.R)?3:LPH-3); LP.tm=.5; LP.after=()=>{ LP.cel={s,k:o,t:0,x:cx,y:cy}; }; return; }
+  if(k==='save'&&kp){ LP.cap='Kaleci kurtardı'; kp.x=gx-lpDir(s)*.6; kp.y=gy; lpGive(kp); LP.tm=1.1; return; }
+  LP.cap='Az farkla dışarı'; LP.st='dead'; LP.tm=.6; LP.after=()=>lpKeeperBall(o);
+}
+function lpBanner(t){ const P=$('#pitch'); if(!P)return; const d=document.createElement('div'); d.className='lpban'; d.innerHTML=`<b class="disp">${esc(t)}</b>`; P.appendChild(d); setTimeout(()=>d.remove(),1700); }
+function lpTap(e){ const L=LIVE; if(!L||!LP.on)return; const r=LP.cv.getBoundingClientRect(), k=LP.k||1, x=(e.clientX-r.left-LP.ox)/k, y=(e.clientY-r.top-LP.oy)/k, you=L.M.o.you; if(!you)return;
+  const p=lpTeam(you).map(p=>[p,Math.hypot(p.x-x,p.y-y)]).sort((a,b)=>a[1]-b[1])[0]; if(p&&p[1]<7){ beep(560,.04); playerSheet(p[0].id); } }
+function lpFrame(ts){
+  LP.raf=0; const L=LIVE; if(!LP.on||!L||L.M!==LP.M||$('#match').hidden){ LP.on=false; return; }
+  const raw=Math.min(.05,LP.ts?(ts-LP.ts)/1000:.016); LP.ts=ts; const run=L.mode==='play'&&!L.M.done;
+  lpStep(run?raw*(L.fast?2.2:1):0,raw); lpDraw(); LP.raf=requestAnimationFrame(lpFrame);
+}
+function lpDraw(){
+  const cv=LP.cv; if(!cv)return; const W=cv.clientWidth, H=cv.clientHeight; if(!W||!H)return; const dpr=Math.min(2,window.devicePixelRatio||1);
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
+  const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0);
+  const k=Math.min((W-8)/(LPW+5),(H-8)/(LPH+2)), ox=(W-LPW*k)/2, oy=(H-LPH*k)/2; LP.k=k; LP.ox=ox; LP.oy=oy;
+  const X=x=>ox+x*k, Y=y=>oy+y*k;
+  c.fillStyle='#24713a'; c.fillRect(0,0,W,H);
+  for(let i=0;i<14;i++){ c.fillStyle=i%2?'#2b7f41':'#2f8a47'; c.fillRect(X(i*LPW/14),Y(0)-6,LPW/14*k+.5,LPH*k+12); }
+  c.strokeStyle='rgba(255,255,255,.82)'; c.lineWidth=Math.max(1,.32*k); c.beginPath();
+  c.rect(X(0),Y(0),LPW*k,LPH*k); c.moveTo(X(52.5),Y(0)); c.lineTo(X(52.5),Y(LPH));
+  c.moveTo(X(52.5)+9.15*k,Y(34)); c.arc(X(52.5),Y(34),9.15*k,0,6.283);
+  for(const sgn of [0,1]){ const x0=sgn?LPW-16.5:0, x1=sgn?LPW-5.5:0; c.rect(X(x0),Y(13.85),16.5*k,40.3*k); c.rect(X(x1),Y(24.85),5.5*k,18.3*k);
+    const px=sgn?LPW-11:11; c.moveTo(X(px)+(sgn?-1:1)*9.15*k*Math.cos(.93),Y(34)-9.15*k*Math.sin(.93)); c.arc(X(px),Y(34),9.15*k,sgn?Math.PI+.93:-.93,sgn?Math.PI-.93:.93,!!sgn); }
+  c.stroke();
+  c.fillStyle='rgba(255,255,255,.85)'; for(const x of [11,52.5,LPW-11]){ c.beginPath(); c.arc(X(x),Y(34),Math.max(1,.35*k),0,6.283); c.fill(); }
+  /* kaleler ve file */
+  for(const sgn of [0,1]){ const gx=sgn?X(LPW):X(0)-2.2*k, gy=Y(30.34), gw=2.2*k, gh=7.32*k, hit=LP.net&&LP.net.t<1.6&&((sgn===1)===(LP.net.x>50));
+    c.fillStyle=hit?`rgba(255,240,170,${.55+.35*Math.sin(LP.net.t*18)})`:'rgba(255,255,255,.22)'; c.fillRect(gx,gy,gw,gh);
+    c.strokeStyle='rgba(255,255,255,.5)'; c.lineWidth=.6; c.beginPath(); for(let i=1;i<6;i++){ c.moveTo(gx,gy+gh*i/6); c.lineTo(gx+gw,gy+gh*i/6); } c.stroke();
+    c.strokeStyle='#fff'; c.lineWidth=Math.max(1.5,.45*k); c.strokeRect(gx,gy,gw,gh); }
+  if(LP.net&&LP.net.t<1.2){ const r=(4+LP.net.t*26)*k*.4; c.strokeStyle=`rgba(255,215,60,${1-LP.net.t/1.2})`; c.lineWidth=3; c.beginPath(); c.arc(X(LP.net.x),Y(LP.net.y),r,0,6.283); c.stroke(); }
+  const you=LP.M.o.you, R=Math.max(4.6,1.55*k), fs=Math.max(7,R*1.15);
+  const pls=Object.values(LP.pl).sort((a,b)=>a.y-b.y);
+  for(const p of pls){ c.fillStyle='rgba(0,0,0,.22)'; c.beginPath(); c.ellipse(X(p.x)+1,Y(p.y)+R*.75,R*.95,R*.42,0,0,6.283); c.fill(); }
+  for(const p of pls){ const col=LP.col[p.s], px=X(p.x), py=Y(p.y), bob=p.mv>2?Math.abs(Math.sin(LP.t*11+p.ph))*1.4:0;
+    if(LP.car===p){ c.strokeStyle='#ffc72c'; c.lineWidth=2; c.beginPath(); c.arc(px,py-bob,R+3,0,6.283); c.stroke(); }
+    c.fillStyle=p.gk?(p.s===you?'#ffc72c':'#9be15d'):col.a; c.strokeStyle=p.gk?'#15215c':col.b; c.lineWidth=Math.max(1.4,R*.3);
+    c.beginPath(); c.arc(px,py-bob,R,0,6.283); c.fill(); c.stroke();
+    c.fillStyle=p.gk?'#15215c':col.n; c.font=`800 ${fs*.82}px system-ui,sans-serif`; c.textAlign='center'; c.textBaseline='middle'; c.fillText(p.num,px,py-bob+.5);
+    if(p.s===you||LP.car===p){ c.font=`700 ${Math.max(8,fs*.92)}px system-ui,sans-serif`; const w=c.measureText(p.nm).width+6, ty=py+R+6.5;
+      c.fillStyle=p.s===you?'rgba(12,20,64,.78)':'rgba(120,10,16,.8)'; c.fillRect(px-w/2,ty-5.5,w,11); c.fillStyle='#fff'; c.fillText(p.nm,px,ty+.5); } }
+  const b=LP.ball, bx=X(b.x), by=Y(b.y), br=Math.max(2.8,.8*k);
+  for(let i=0;i<LP.trail.length;i++){ const t=LP.trail[i]; c.fillStyle=`rgba(255,255,255,${.08+i*.05})`; c.beginPath(); c.arc(X(t[0]),Y(t[1])-t[2]*k*.7,br*(.5+i*.05),0,6.283); c.fill(); }
+  c.fillStyle='rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(bx+1,by+1.5,br*1.05,br*.55,0,0,6.283); c.fill();
+  const bz=by-b.z*k*.7; c.fillStyle='#fff'; c.strokeStyle='#15215c'; c.lineWidth=1.2; c.beginPath(); c.arc(bx,bz,br*(1+b.z*.06),0,6.283); c.fill(); c.stroke();
+  const cap=$('#lpCap'); if(cap&&cap.dataset.t!==LP.cap){ cap.dataset.t=LP.cap; cap.textContent=LP.cap; cap.classList.remove('pop'); void cap.offsetWidth; cap.classList.add('pop'); }
+}
 
 /* ---------- 3D hoca: karakter yaratma ekranında döndürülebilir kafa ve kozmetikler (Three.js, yüklenemezse düz çizim) ---------- */
 const TH_URLS=['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'];
@@ -3715,60 +3897,7 @@ function talkSheet(L,next){
 function snapM(M){ const C=cloneM(M); C.live=true; C.cards=M.cards.slice(); C.inj=(M.inj||[]).slice(); C.scorers=M.scorers.slice(); C.acts=M.acts.slice(); C.dec=(M.dec||[]).slice(); C.o={...M.o}; if(M.o.script)C.o.script={...M.o.script}; C.rt={...(M.rt||{})}; return C; }
 
 /* ---------- şut animasyonu: maç özetindeki gibi üstten saha, pas pas atak ve şut ---------- */
-function shotFx(M,side,kind,name){
-  const P=$('#pitch'); if(!P)return; const you=M.o.you, up=side===you, S=M.sides[side], O=M.sides[side==='h'?'a':'h'];
-  const hx=c=>{ c=c.replace('#',''); if(c.length===3)c=[...c].map(x=>x+x).join(''); return [0,2,4].map(i=>parseInt(c.substr(i,2),16)); }, cd=(x,y)=>{ const p=hx(x),q=hx(y); return Math.abs(p[0]-q[0])+Math.abs(p[1]-q[1])+Math.abs(p[2]-q[2]); };
-  let [, , ,a1,a2]=CLUB[S.c], [, , ,d1,d2]=CLUB[O.c]; const r=Math.random, Y=y=>up?y:150-y;
-  if(cd(a1,'#2f8f45')<120)[a1,a2]=[a2,a1];
-  if(cd(d1,'#2f8f45')<120)[d1,d2]=[d2,d1];
-  if(cd(a1,d1)<160){ [d1,d2]=cd(a1,d2)>=160&&cd(d2,'#2f8f45')>=120?[d2,d1]:cd(a1,'#ffffff')>=160?['#ffffff','#15215c']:['#15215c','#ffffff']; }
-  /* pozisyon türü: atan oyuncunun mevkiine göre */
-  const pl=Object.values(S.P).find(q=>q.short===name), g=pl?pl.g:'A', W={A:[['build',3],['cross',2.2],['counter',1.6],['one',1.4],['pen',.35]],M:[['long',2.6],['build',2],['free',1],['counter',.8],['pen',.25]],D:[['corner',3],['cross',1],['free',.6]],G:[['pen',1]]}[g]||[['build',1]];
-  let tw=W.reduce((a,x)=>a+x[1],0)*r(), type=W[0][0]; for(const [k,w] of W){ tw-=w; if(tw<=0){type=k;break;} }
-  const lft=r()<.5, wx=lft?1:-1;
-  let p0,p1,p2,ap,d0,air=-1;
-  if(type==='cross'){ p0=[lft?14:86,Y(62)]; p1=[lft?8:92,Y(16)]; p2=[44+r()*12,Y(15)]; air=1; d0=[[p2[0]-6,Y(13)],[p2[0]+7,Y(16)],[lft?16:84,Y(22)]]; }
-  else if(type==='counter'){ p0=[30+r()*40,Y(112)]; p1=[20+r()*60,Y(62)]; p2=[40+r()*20,Y(24)]; air=0; d0=[[p1[0]-10,Y(80)],[p1[0]+12,Y(84)],[50+wx*18,Y(40)]]; }
-  else if(type==='one'){ p0=[42+r()*16,Y(72)]; p1=[46+r()*8,Y(46)]; p2=[44+r()*12,Y(13)]; d0=[[p1[0]-8,Y(40)],[p1[0]+9,Y(44)],[60,Y(60)]]; }
-  else if(type==='long'){ p0=[20+r()*60,Y(72)]; p1=[30+r()*40,Y(50)]; p2=[30+r()*40,Y(34)]; d0=[[p2[0]-6,Y(28)],[p2[0]+8,Y(26)],[50,Y(18)]]; }
-  else if(type==='free'){ const bx=28+r()*44; p0=p1=p2=[bx,Y(31)]; ap=[[bx-6,Y(34)],[50-wx*14,Y(18)],[bx,Y(31)]]; const wxp=bx+(50-bx)*.3; d0=[[wxp-3.4,Y(24)],[wxp,Y(24)],[wxp+3.4,Y(24)]]; }
-  else if(type==='corner'){ p0=p1=[lft?5:95,Y(5)]; p2=[42+r()*16,Y(10)]; air=1; ap=[[lft?40:60,Y(20)],[lft?60:40,Y(22)],p2]; d0=[[p2[0]-4,Y(9)],[p2[0]+5,Y(12)],[50,Y(18)]]; }
-  else if(type==='pen'){ p0=p1=p2=[50,Y(17)]; ap=[[36,Y(27)],[64,Y(27)],[50,Y(19)]]; d0=[[30,Y(27)],[44,Y(28)],[70,Y(27)]]; }
-  else { const sx=20+r()*60; p0=[sx,Y(88+r()*10)]; p1=[15+r()*70,Y(58+r()*10)]; p2=[38+r()*24,Y(26+r()*6)]; }
-  if(!ap)ap=[p0,p1,p2]; if(!d0)d0=[[p1[0]+(r()*16-8),Y(46)],[p2[0]-14,Y(20)],[p2[0]+14,Y(22)]];
-  const post=kind==='miss'&&r()<.35, still=type==='pen'||type==='free';
-  const tx=post?(r()<.5?44.2:55.8):kind==='goal'?(r()<.5?45.5+r()*2.5:52+r()*2.5):kind==='miss'?(r()<.5?40+r()*2:58+r()*2):46+r()*8, tgt=[tx,Y(post?3.2:kind==='miss'?-2:2.2)];
-  const curl=type==='free'?wx*9:type==='long'?wx*3:0;
-  const LBL={build:'Şut',cross:'Kafa',counter:'Kontra',one:'Karşı karşıya',long:'Uzaktan şut',free:'Serbest vuruş',corner:'Korner',pen:'Penaltı'}[type];
-  const el=document.createElement('div'); el.className='shot'; el.setAttribute('aria-hidden','true'); const K=(P.clientWidth/100)/(P.clientHeight/150)||1, R=3, RY=(R*K).toFixed(2);
-  const gy=up?0.5:146, cap=kind==='goal'?'GOL':kind==='save'?'KURTARDI':post?'DİREK':'AUT';
-  el.innerHTML=`<svg viewBox="0 0 100 150" preserveAspectRatio="none"><g fill="none" stroke="#fff" stroke-width=".8" opacity=".85"><rect x="4" y="4" width="92" height="142"/><line x1="4" y1="75" x2="96" y2="75"/><circle cx="50" cy="75" r="12"/>
-    <rect x="24" y="4" width="52" height="20"/><rect x="38" y="4" width="24" height="8"/><rect x="24" y="126" width="52" height="20"/><rect x="38" y="138" width="24" height="8"/></g>
-    <rect x="44" y="${gy}" width="12" height="3.5" fill="#fff" fill-opacity=".25" stroke="#fff" stroke-width=".8"/>
-    <g class="trail"></g>
-    ${d0.map((d,i)=>`<ellipse class="df" data-i="${i}" cx="${d[0]}" cy="${d[1]}" rx="${R}" ry="${RY}" fill="${d1}" stroke="${d2}" stroke-width=".9"/>`).join('')}
-    <ellipse class="gk" cx="50" cy="${Y(5.5)}" rx="${R}" ry="${RY}" fill="#2fbf6a" stroke="#15215c" stroke-width=".7"/>
-    ${ap.map((p,i)=>`<ellipse class="at" data-i="${i}" cx="${p[0]}" cy="${p[1]}" rx="${R}" ry="${RY}" fill="${a1}" stroke="${a2}" stroke-width=".7"/>`).join('')}
-    <ellipse class="bl" cx="${p0[0]}" cy="${p0[1]}" rx="1.5" ry="${(1.5*K).toFixed(2)}" fill="#fff" stroke="#15215c" stroke-width=".5"/></svg>
-    <div class="scap"><span>${LBL} · ${esc(name)}</span><b class="disp" hidden>${cap}</b></div>`;
-  P.appendChild(el);
-  const bl=el.querySelector('.bl'), gk=el.querySelector('.gk'), ats=[...el.querySelectorAll('.at')], dfs=[...el.querySelectorAll('.df')], tr=el.querySelector('.trail');
-  const lerp=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t], ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2, set=(e,p)=>{e.setAttribute('cx',p[0].toFixed(2));e.setAttribute('cy',p[1].toFixed(2));};
-  const reb=post?[tx<50?tx-10:tx+10,Y(20)]:[tx<50?tx-14:tx+14,Y(14)], D=type==='pen'||type==='free'?1500:1750, t0=performance.now(); let shown=false, last=null;
-  const f=now=>{ if(!el.isConnected)return; const t=Math.min(1,(now-t0)/D); let b;
-    if(t<.3)b=lerp(p0,p1,ease(t/.3)); else if(t<.55)b=lerp(p1,p2,ease((t-.3)/.25)); else if(t<.62)b=p2;
-    else if(t<.82){ const k=(t-.62)/.2; b=kind==='save'?lerp(p2,[gkx(1),Y(5.5)],k):lerp(p2,tgt,k); if(curl)b=[b[0]+curl*Math.sin(Math.PI*k),b[1]]; }
-    else b=kind==='save'||post?lerp(kind==='save'?[gkx(1),Y(5.5)]:tgt,reb,Math.min(1,(t-.82)/.12)):tgt;
-    set(bl,b); { const sg=t<.3?0:t<.55?1:-1, k=sg===0?t/.3:(t-.3)/.25, rr=1.5*(sg===air?1+.9*Math.sin(Math.PI*Math.min(1,k)):1); bl.setAttribute('rx',rr.toFixed(2)); bl.setAttribute('ry',(rr*K).toFixed(2)); }
-    if(t>=.62&&t<.86){ if(last){ const l=document.createElementNS('http://www.w3.org/2000/svg','line'); l.setAttribute('x1',last[0]);l.setAttribute('y1',last[1]);l.setAttribute('x2',b[0]);l.setAttribute('y2',b[1]);l.setAttribute('stroke','#fff');l.setAttribute('stroke-width','.8');l.setAttribute('opacity','.7');tr.appendChild(l);} last=b; }
-    ats.forEach((a,i)=>{ const base=ap[i], mv=still?(i===2?0:4):type==='counter'?14:8; set(a,lerp(base,[base[0],base[1]+(up?-mv:mv)],Math.min(1,t*1.2))); });
-    dfs.forEach((d,i)=>set(d,type==='free'?(t>.62&&t<.7?[d0[i][0],d0[i][1]+(up?-1:1)]:d0[i]):lerp(d0[i],lerp(d0[i],b,type==='counter'?.25:.45),Math.min(1,t*1.4))));
-    set(gk,[t<.62?50+(b[0]-50)*.25:gkx(Math.min(1,(t-.62)/.2)),Y(5.5)]);
-    if(t>=.8&&!shown){ shown=true; const c=el.querySelector('.scap b'); c.hidden=false; c.className='disp '+kind; if(post)beep(1250,.05); }
-    if(t<1)requestAnimationFrame(f); };
-  function gkx(k){ const goal=kind==='save'?tx:kind==='goal'?50+(tx-50)*.35:50+(tx-50)*.2; return 50+(goal-50)*k; }
-  requestAnimationFrame(f); setTimeout(()=>el.remove(),D+350);
-}
+function shotFx(M,side,kind,name){ lpEvent(side,kind,name); }
 /* ---------- maç sonu: sen ve gerçek hoca karşılaştırma tablosu ---------- */
 function actsTxt(acts,S){ if(!acts.length)return 'Bekledi';
   return acts.map(a=>a.k==='sub'?`<i class="u">▲</i>${esc(sur(S.P[a.i]))} <i class="d">▼</i>${esc(sur(S.P[a.o]))}`:a.k==='tac'?TAC[a.v].n:'').filter(Boolean).join('<br>'); }
