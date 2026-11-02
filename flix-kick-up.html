@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,500;0,600;0,700;0,800;0,900;1,900&display=swap">
+<script src="online-config.js"></script>
+<script src="online.js"></script>
 <style>
 /* Look: clean and friendly. White cards, one warm orange, soft shadows, plain rounded type. The game world carries the colour.
    Layout: one play column (max 560px). Canvas world underneath; HUD, home, sheets and modals layered on top. */
@@ -193,6 +195,18 @@ svg { display: block; }
 .toggle[aria-pressed="true"] i { background: var(--orange); }
 .toggle[aria-pressed="true"] i::after { transform: translateX(20px); }
 .about { font-size: 12px; font-weight: 500; color: var(--text-2); line-height: 1.5; margin: 6px 2px; }
+/* Legal / About (opened from Ayarlar) */
+.toggle.link { margin-bottom: 8px; }
+.toggle.link svg { width: 18px; height: 18px; flex: none; }
+.legal { font-size: 14px; font-weight: 500; line-height: 1.55; }
+.legal h3 { margin: 18px 0 4px; font: 800 15px/1.2 var(--font-display); }
+.legal h3:first-child { margin-top: 4px; }
+.legal p, .legal ul { margin: 0 0 8px; }
+.legal ul { padding-left: 20px; }
+.legal small { display: block; color: var(--text-2); margin-bottom: 6px; }
+.legal .ext { color: var(--orange-dk); font-weight: 700; text-decoration: underline; cursor: pointer; overflow-wrap: anywhere; }
+.legal .credit { background: var(--soft); border-radius: 16px; padding: 14px; margin: 6px 0 12px; }
+.legal .credit p { margin: 0 0 4px; font-weight: 700; }
 
 /* Modes sheet */
 .modes, .online { display: flex; flex-direction: column; gap: 10px; }
@@ -495,6 +509,7 @@ svg { display: block; }
     <div class="hflix" id="hflix"><canvas id="hf" aria-label="FLIX, dokun ve sektir"></canvas></div>
     <div class="home-actions">
       <button class="btn big" id="play">OYNA</button>
+      <button class="btn alt" id="playOnline" hidden>ONLINE OYNA</button>
       <div class="tiles">
         <button class="tile" data-open="skin">
           <svg viewBox="0 0 32 32" fill="none" stroke="#1b1330" stroke-width="2.4" stroke-linejoin="round"><path d="M16 26c-4 0-7-1.6-7-3.6S12 19 16 19s7 1.4 7 3.4S20 26 16 26Z" fill="#e22511"/><path d="M13 19.5 9 6M16 19V4M19 19.5 23 6" stroke-linecap="round"/><path d="M9 6c-2 3 0 7 2.6 9M23 6c2 3 0 7-2.6 9M16 4c-2.4 3-2.4 8 0 11 2.4-3 2.4-8 0-11Z" fill="#ffc928"/></svg>
@@ -555,7 +570,126 @@ svg { display: block; }
         <button class="toggle" id="tSound" aria-pressed="true"><span>Ses</span><i></i></button>
         <button class="toggle" id="tVibe" aria-pressed="true"><span>Titreşim</span><i></i></button>
         <div class="langrow"><span>Dil</span><div class="seg two" id="langSeg"><button data-lang="tr">Türkçe</button><button data-lang="en">English</button></div></div>
-        <p class="about">Flix Kick Up, sürüm 1.4.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>flixtoysofficial.com</p>
+        <button class="toggle link" data-legal="privacy"><span>Gizlilik Politikası</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="toggle link" data-legal="terms"><span>Kullanım Koşulları</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="toggle link" data-legal="licenses"><span>Lisanslar ve Teşekkürler</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="toggle link" data-legal="about"><span>Hakkında</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        <p class="about">Flix Kick Up, sürüm 1.5.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>Developed by Kaan Imamoglu · Published by FLIX TOYS<br>© 2026 FLIX TOYS. All rights reserved.<br>flixtoysofficial.com</p>
+      </div>
+      <div class="legal" id="privacyPanel">
+        <div data-only="tr">
+          <small>Flix Kick Up · Son güncelleme: 2 Kasım 2026</small>
+          <h3>Kısaca</h3>
+          <p>Flix Kick Up'ı FLIX TOYS yayınlar. Oyun hesap açmanı istemez; adını, e-postanı, telefon numaranı ya da konumunu sormaz. Bu metin, oyunun hangi bilgileri neden kullandığını anlatır.</p>
+          <h3>Cihazında saklananlar</h3>
+          <p>Rekorların, tüylerin, açtığın FLIX'ler ve sahneler, ayarların (ses, titreşim, dil), online takma adın ve satın aldığın ürünlerin bilgisi yalnızca telefonunda saklanır. Bize gönderilmez. Uygulamayı silersen hepsi silinir.</p>
+          <h3>Online oyun</h3>
+          <p>Online oyun yalnızca sen "Online oyna"yı açtığında çalışır. O sırada telefonun şifreli bağlantıyla (wss) bizim oyun sunucumuza bağlanır. Sunucuya gidenler: seçtiğin takma ad (en fazla 16 karakter), maç içindeki puanın, hazır / tekrar oyna durumun, oda kodu ve yeniden bağlanabilmen için geçici bir oturum anahtarı. Bunlar rakibine maç sırasında gösterilir. Sunucu bu bilgileri yalnızca maç süresince bellekte tutar, veritabanına yazmaz. Sorunları çözmek için kısa süreli teknik kayıtlar (oda kodu, rastgele oyuncu numarası, skor) tutulabilir. Sunucu Render.com üzerinde çalışır; her internet bağlantısında olduğu gibi IP adresin barındırma sağlayıcısının kayıtlarında görünebilir. Takma adına gerçek adını ya da kişisel bilgini yazma.</p>
+          <h3>Reklamlar (Google AdMob)</h3>
+          <p>Oyundaki reklamları Google AdMob gösterir:</p>
+          <ul>
+            <li>Ödüllü reklamlar: yalnızca sen istersen izlenir (devam etmek ya da tüyleri ikiye katlamak için).</li>
+            <li>Tur arası reklamlar: birkaç turda bir, turlar arasında. Online maç sırasında reklam açılmaz.</li>
+            <li>Banner: açıksa yalnızca ana menünün altında görünür, oyun sırasında görünmez.</li>
+          </ul>
+          <p>AdMob reklam göstermek ve ölçmek için cihazın reklam kimliğini (yalnızca izin verirsen), yaklaşık konumunu (IP adresinden), reklam etkileşimlerini ve tanılama verilerini kullanabilir. Avrupa'da ve İngiltere'de önce Google'ın onay ekranı çıkar. iPhone sana "takip izni" sorusunu sorar; izin vermezsen reklamlar kişiselleştirilmeden gösterilir, oyun aynı şekilde çalışır. Ayrıntı: <a class="ext" data-url="https://policies.google.com/privacy">Google Gizlilik Politikası</a>.</p>
+          <h3>Satın almalar ve Reklamsız</h3>
+          <p>Uygulama içi satın almalar (tüy paketleri, Başlangıç Paketi ve Reklamsız) Apple App Store (StoreKit) üzerinden yapılır. Ödeme bilgilerin bize ulaşmaz; Apple yalnızca hangi ürünün alındığını uygulamaya bildirir. "Reklamsız" tur arası reklamları ve banner'ı kalıcı olarak kapatır; ödüllü reklamlar isteğe bağlı olarak kalır. Satın alımlarını Mağaza'daki "Satın alımları geri yükle" ile geri yükleyebilirsin.</p>
+          <h3>Çocuklar</h3>
+          <p>Oyun her yaşa uygundur. Çocuklardan bilerek kişisel bilgi toplamayız.</p>
+          <h3>Silme ve sorular</h3>
+          <p>Cihazındaki verileri silmek için uygulamayı silmen yeterli. Online maç bilgileri sunucuda saklanmadığı için ayrıca silinecek bir hesap yoktur. Bu politika değişirse bu sayfa güncellenir. Tam metin: <a class="ext" data-url="https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html">kaanimamoglu27.github.io/flix-kick-up/gizlilik.html</a>. İletişim: <a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
+        </div>
+        <div data-only="en">
+          <small>Flix Kick Up · Last updated: 2 November 2026</small>
+          <h3>In short</h3>
+          <p>Flix Kick Up is published by FLIX TOYS. The game does not ask you to create an account and does not ask for your name, email, phone number or location. This policy explains which information the game uses and why.</p>
+          <h3>Stored on your device</h3>
+          <p>Your records, feathers, unlocked FLIXes and scenes, settings (sound, vibration, language), online nickname and purchase status are stored only on your phone. They are not sent to us. Deleting the app deletes them.</p>
+          <h3>Online play</h3>
+          <p>Online play only runs when you open "Play online". Your phone then connects to our game server over an encrypted connection (wss). The server receives: the nickname you choose (up to 16 characters), your in-match score, your ready / rematch state, the room code and a temporary session key so you can reconnect. These are shown to your opponent during the match. The server keeps them in memory only for the match and does not write them to a database. Short-lived technical logs (room code, random player number, score) may be kept to fix problems. The server runs on Render.com; as with any internet connection, your IP address may appear in the hosting provider's logs. Do not use your real name or personal details as your nickname.</p>
+          <h3>Ads (Google AdMob)</h3>
+          <p>Ads in the game are shown by Google AdMob:</p>
+          <ul>
+            <li>Rewarded ads: only watched if you choose to (to keep going or double your feathers).</li>
+            <li>Interstitial ads: every few runs, between runs. No ads open during an online match.</li>
+            <li>Banner: if enabled, only at the bottom of the main menu, never during play.</li>
+          </ul>
+          <p>To show and measure ads, AdMob may use the device's advertising identifier (only if you allow it), approximate location (from the IP address), ad interactions and diagnostics. In the EEA and UK, Google's consent form is shown first. Your iPhone asks whether to allow tracking; if you decline, ads are not personalised and the game works the same. See the <a class="ext" data-url="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
+          <h3>Purchases and No Ads</h3>
+          <p>In-app purchases (feather packs, the Starter Pack and No Ads) are handled by Apple's App Store (StoreKit). We never receive your payment details; Apple only tells the app which product was bought. "No Ads" permanently turns off interstitial and banner ads; rewarded ads stay optional. You can restore purchases with "Restore purchases" in the Store.</p>
+          <h3>Children</h3>
+          <p>The game is suitable for all ages. We do not knowingly collect personal information from children.</p>
+          <h3>Deletion and questions</h3>
+          <p>To delete the data on your device, delete the app. Online match data is not stored on the server, so there is no account to delete. If this policy changes, this page will be updated. Full text: <a class="ext" data-url="https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html">kaanimamoglu27.github.io/flix-kick-up/gizlilik.html</a>. Contact: <a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
+        </div>
+      </div>
+      <div class="legal" id="termsPanel">
+        <div data-only="tr">
+          <small>Flix Kick Up · Son güncelleme: 2 Kasım 2026</small>
+          <h3>Kabul</h3>
+          <p>Flix Kick Up'ı indirip oynayarak bu koşulları kabul etmiş olursun. App Store'dan indirilen uygulamalar için Apple'ın <a class="ext" data-url="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Standart Lisans Sözleşmesi (EULA)</a> de geçerlidir.</p>
+          <h3>Kullanım lisansı</h3>
+          <p>FLIX TOYS sana oyunu kişisel ve ticari olmayan amaçla kullanman için devredilemez, sınırlı bir lisans verir. Oyunu kopyalamak, değiştirmek, tersine mühendislik yapmak ya da yeniden satmak yasaktır.</p>
+          <h3>Tüyler ve satın almalar</h3>
+          <p>Tüyler ve oyun içi ürünler yalnızca oyunda kullanılır; gerçek para değeri yoktur ve paraya çevrilemez. Ödemeler ve iadeler Apple tarafından, Apple'ın kurallarına göre yapılır. "Reklamsız" tur arası reklamları ve banner'ı kapatır; isteğe bağlı ödüllü reklamlar kalır.</p>
+          <h3>Online oyun</h3>
+          <p>Takma adın başkalarına görünür. Küfürlü, saldırgan ya da başkasını taklit eden adlar kullanma; hile yapma ve sunucuyu bozmaya çalışma. Bu kurallara uymayan oyuncular maçtan çıkarılabilir. Online oyun sunucusu ücretsiz bir hizmettir; kesintisiz çalışacağını garanti etmeyiz ve hizmeti değiştirebilir ya da durdurabiliriz. Tek oyunculu modlar internet olmadan da çalışır.</p>
+          <h3>Fikri mülkiyet</h3>
+          <p>Oyunun adı, FLIX karakterleri, grafikleri, sesleri ve kodu FLIX TOYS'a aittir.</p>
+          <h3>Sorumluluk</h3>
+          <p>Oyun "olduğu gibi" sunulur. Yasaların izin verdiği ölçüde, oyunun kullanımından doğan dolaylı zararlardan sorumlu değiliz.</p>
+          <h3>Değişiklikler ve iletişim</h3>
+          <p>Bu koşullar güncellenebilir; güncel hali her zaman bu ekrandadır. İletişim: <a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
+        </div>
+        <div data-only="en">
+          <small>Flix Kick Up · Last updated: 2 November 2026</small>
+          <h3>Acceptance</h3>
+          <p>By downloading and playing Flix Kick Up you agree to these terms. For apps downloaded from the App Store, Apple's <a class="ext" data-url="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Standard License Agreement (EULA)</a> also applies.</p>
+          <h3>License</h3>
+          <p>FLIX TOYS grants you a limited, non-transferable license to use the game for personal, non-commercial purposes. You may not copy, modify, reverse engineer or resell the game.</p>
+          <h3>Feathers and purchases</h3>
+          <p>Feathers and in-game items can only be used in the game; they have no real-money value and cannot be exchanged for money. Payments and refunds are handled by Apple under Apple's rules. "No Ads" turns off interstitial and banner ads; optional rewarded ads remain.</p>
+          <h3>Online play</h3>
+          <p>Your nickname is visible to other players. Do not use offensive, abusive or impersonating names; do not cheat or try to disrupt the server. Players who break these rules may be removed from a match. The online server is a free service; we do not guarantee it will always be available and we may change or stop it. Single-player modes work without the internet.</p>
+          <h3>Intellectual property</h3>
+          <p>The game's name, FLIX characters, graphics, sounds and code belong to FLIX TOYS.</p>
+          <h3>Liability</h3>
+          <p>The game is provided "as is". To the extent permitted by law, we are not liable for indirect damages arising from its use.</p>
+          <h3>Changes and contact</h3>
+          <p>These terms may be updated; the current version is always on this screen. Contact: <a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
+        </div>
+      </div>
+      <div class="legal" id="licensesPanel">
+        <div data-only="tr"><p>Flix Kick Up aşağıdaki yazılımları, SDK'ları ve yazı tipini kullanır. Hepsine teşekkürler.</p></div>
+        <div data-only="en"><p>Flix Kick Up uses the following software, SDKs and font. Thank you to their authors.</p></div>
+        <h3>Rubik</h3>
+        <p>Copyright 2015 The Rubik Project Authors. SIL Open Font License 1.1.</p>
+        <h3>Capacitor (@capacitor/core, @capacitor/ios, @capacitor/haptics, @capacitor/status-bar)</h3>
+        <p>Copyright (c) Ionic. MIT License.</p>
+        <h3>@capacitor-community/admob</h3>
+        <p>Copyright (c) Capacitor Community contributors. MIT License.</p>
+        <h3>cordova-plugin-purchase</h3>
+        <p>Copyright (c) Jean-Christophe Hoelt / Fovea. MIT License.</p>
+        <h3>Google Mobile Ads SDK</h3>
+        <p>Copyright Google LLC. Google Mobile Ads SDK Terms.</p>
+        <h3>ws (online server)</h3>
+        <p>Copyright (c) Einar Otto Stangvik and contributors. MIT License.</p>
+        <h3>MIT License</h3>
+        <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+        <h3>SIL Open Font License 1.1</h3>
+        <p>The Rubik font is licensed under the SIL Open Font License, Version 1.1: <a class="ext" data-url="https://openfontlicense.org">openfontlicense.org</a></p>
+      </div>
+      <div class="legal" id="aboutPanel">
+        <div class="credit">
+          <p>Flix Kick Up</p>
+          <p>Developed by Kaan Imamoglu</p>
+          <p>Published by FLIX TOYS</p>
+          <p>© 2026 FLIX TOYS. All rights reserved.</p>
+        </div>
+        <div data-only="tr"><p>Sürüm 1.4. FLIX'i sektir, direklerin arasından uç, rekorunu kır; botlara, hayaletine ya da online rakiplere karşı yarış.</p></div>
+        <div data-only="en"><p>Version 1.4. Bounce the FLIX, fly between the posts and beat your record; race bots, your ghost or online rivals.</p></div>
+        <p><a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
       </div>
     </div>
     <footer id="sheetFoot">
@@ -647,11 +781,14 @@ svg { display: block; }
   try { lang = JSON.parse(localStorage.getItem("fku4.lang")) || "tr"; } catch {}
   if (lang !== "en") lang = "tr";
   const EN = {"Mağaza": "Store", "Tüy paketleri": "Feather packs", "Kampanya": "Special offer", "Başlangıç Paketi": "Starter Pack", "Tek seferlik: 2.500 tüy ve Kristal FLIX": "One time only: 2,500 feathers and the Crystal FLIX", "Bitiyor: ": "Ends in: ", "Reklamsız": "No Ads", "Reklamları ömür boyu kaldırır": "Removes ads forever", "Satın alındı": "Purchased", "Avuç": "Handful", "Kese": "Pouch", "Sandık": "Chest", "Hazine": "Treasure", "Dağ": "Mountain", "Ejderha Hazinesi": "Dragon Hoard", "EN POPÜLER": "MOST POPULAR", "EN İYİ DEĞER": "BEST VALUE", " bonus": " bonus", "Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak.": "Test build: no real payment is taken, feathers are added right away. In the App Store version payment goes through Apple.", "Satın al": "Buy", "Vazgeç": "Cancel", "Satın alımları geri yükle": "Restore purchases", "Geri yüklenecek bir şey yok (test sürümü).": "Nothing to restore (test build).", "Teşekkürler! ": "Thanks! ", "Bu test sürümünde gerçek ödeme alınmaz.": "No real payment is taken in this test build.", "Reklamlar kapandı": "Ads removed", "Kampanya bitti": "Offer ended", "Mesafe": "Distance", "30 saniyede en uzun yolu kat et": "Fly as far as you can in 30 seconds", "Orman": "Forest", "Çöl": "Desert", "Lunapark Gecesi": "Funfair Night", "Rastgele rakip": "Random rival", "RASTGELE YARIŞ": "RANDOM RACE", "ARKADAŞINLA YARIŞ": "RACE A FRIEND", "Rakip aranıyor. Biri gelince yarış kendiliğinden başlar.": "Looking for a rival. The race starts by itself when someone joins.", "Çevrimiçi oyuncu: ": "Players online: ", "Rastgele rakiple ya da arkadaşınla yarış": "Race a random rival or a friend", "Online oynayan herkesle eşleşirsin, en uzun uçan kazanır.": "You get matched with anyone playing online, longest flight wins.", "Aramayı bırak": "Stop searching", "direk": "posts", "sn": "s", "Yıldız başına ": "Per star ", "Sıradan": "Common", "Nadir": "Rare", "Epik": "Epic", "Efsane": "Legendary", "Mitik": "Mythic", "Turuncu": "Orange", "Sarı": "Yellow", "Beyaz": "White", "Kırmızı": "Red", "Gök Mavisi": "Sky Blue", "Çimen": "Grass", "Pamuk Şeker": "Cotton Candy", "Gece Moru": "Night Purple", "Türkiye": "Türkiye", "Siyah-Beyaz": "Black-White", "Sarı-Lacivert": "Yellow-Navy", "Sarı-Kırmızı": "Yellow-Red", "Lav": "Lava", "Okyanus": "Ocean", "Buz": "Ice", "Gün Batımı": "Sunset", "Neon": "Neon", "Kristal": "Crystal", "Altın FLIX": "Golden FLIX", "Galaksi": "Galaxy", "Ateş Kuşu": "Firebird", "Ejderha": "Dragon", "Futbol Topu": "Football", "Tenis Topu": "Tennis Ball", "Basketbol Topu": "Basketball", "Plaj Topu": "Beach Ball", "Voleybol Topu": "Volleyball", "İstanbul Akşamı": "Istanbul Evening", "Mahalle Arası": "Neighbourhood", "Yaz Plajı": "Summer Beach", "Gece Maçı": "Night Match", "Kar Tatili": "Snow Holiday", "Yıldız Sahne": "Star Stage", "Kapadokya Sabahı": "Cappadocia Morning", "Boğaz": "Bosphorus", "Uzay": "Space", "Sahne Rengi": "Scene Colour", "Klasik": "Classic", "Lacivert": "Navy", "Pamuk": "Candy", "Gece": "Night", "Altın": "Gold", "Gökkuşağı": "Rainbow", "tr-TR": "en-US", "Uzun tünellerde Sol vuruşla hızlan, içeride az zaman geçir.": "In long tunnels, kick Left to speed up and spend less time inside.", "Yüksek duvarların önünde Sağ vuruş: çok yükselir ama yavaşlatır.": "Before high walls, kick Right: it climbs a lot but slows you down.", "Boşluğun tam ortasından geçersen +5 bonus alırsın.": "Fly through the exact middle of a gap for a +5 bonus.", "Orta vuruş en güvenlisi. Panik anında ortaya dokun.": "The Middle kick is the safest. When in doubt, tap the middle.", "Hareketli boşluklarda acele etme, boşluğun sana gelmesini bekle.": "On moving gaps, don't rush. Let the gap come to you.", "Helikopter yaparken FLIX yavaş düşer. Uzun bir boşlukta tut, puanları topla.": "During a Helicopter the FLIX falls slowly. Hold it in a long gap and rack up points.", "Hareketleri art arda bağla: stil çarpanı x5'e kadar çıkar.": "Chain tricks back to back: the style multiplier goes up to x5.", "Direğe çok yakın geçmek 'Sıyırdın' bonusu verir.": "Passing very close to a post gives a 'Close shave' bonus.", "Dalış çift puan verir ama hızla düşersin. Yüksekten başla.": "A Dive gives double points but you drop fast. Start high.", "Tutarken parmağını kaydırıp hareket değiştir: her geçiş +10.": "While holding, swipe to switch tricks: each switch is +10.", "İki parmakla Kelebek yap: FLIX süzülür, uzun boşluklarda puan topla.": "Use two fingers for a Butterfly: the FLIX glides, great for long gaps.", "Her 10 puan tur sonunda 1 tüy olur. Stil puanı da sayılır.": "Every 10 points becomes 1 feather at the end of a run. Style points count too.", "10 Saniye": "10 Seconds", "20 Saniye": "20 Seconds", "20 saniyede en çok direkten geç": "Pass as many posts as you can in 20 seconds", "10 saniyede en çok direkten geç": "Pass as many posts as you can in 10 seconds", "Akrobat": "Acrobat", "Tek bir hareketi olabildiğince uzun sürdür": "Hold a single trick for as long as you can", "Tüy Avı": "Feather Hunt", "20 saniyede en çok tüy topla": "Collect as many feathers as you can in 20 seconds", "tüy": "feathers", "Bot (kolay)": "Bot (easy)", "Bot (orta)": "Bot (medium)", "Bot (zor)": "Bot (hard)", "Kartal": "Eagle", "Şimşek": "Bolt", "Zıpzıp": "Bouncy", "Oyuncu ": "Player ", "Oyuncu": "Player", "Tam ortadan +5": "Dead centre +5", "Kayan boşluklar!": "Sliding gaps!", " metre!": " metres!", "Sol": "Left", "Orta": "Middle", "Sağ": "Right", "Makas": "Scissors", "Helikopter": "Helicopter", "Geri takla": "Backflip", "Fırıldak": "Spinner", "Dalış": "Dive", "Roket": "Rocket", "Kırbaç": "Whip", "Kelebek": "Butterfly", " savuruş": " swings", " sn": " s", "Geçiş: ": "Switch: ", "Şelale": "Waterfall", "Füze": "Missile", "Uçan Halı": "Flying Carpet", "Kamçı": "Lash", "Havai Fişek": "Firework", "Paraşüt": "Parachute", "Yelpaze": "Fan", "Erken bıraktın": "Released too early", " kombosu! +40": " combo! +40", "Kombo x": "Combo x", " bitti": " ended", "Sıyırdın! +10": "Close shave! +10", "Hareketli boşluklar!": "Moving gaps!", "Yüksek duvarlar!": "High walls!", "Tüneller!": "Tunnels!", " direk!": " posts!", "Süre doldu!": "Time's up!", "Hareket yarıda kaldı": "Trick cut short", "KOMBO x": "COMBO x", "Hazır ol...": "Get ready...", ". Dokun ve başla": ". Tap to start", "3 botla yarış, en uzun uçan kazanır. Dokun ve başla": "Race 3 bots, longest flight wins. Tap to start", "Dokun ve yukarı tırman. Sol ve sağ yön verir": "Tap to climb. Left and right steer", "Kendi hayaletinle yarış. Dokun ve başla": "Race your own ghost. Tap to start", "Dokun ve başla": "Tap to start", "Sola": "Left", "Düz yukarı": "Straight up", "SAĞ": "RIGHT", "Sağa": "Right", "Hızlı atak": "Fast dash", "Dengeli": "Balanced", "Yüksek, fren": "High, brakes", "SÜRE <b>": "TIME <b>", "/3 bot uçuyor": "/3 bots flying", "YÜKSEKLİK <b>": "HEIGHT <b>", " direk": " posts", " rakip uçuyor": " rivals flying", " tüy": " feathers", " · toplam ": " · total ", "YENİ EN İYİ!": "NEW BEST!", "SÜRE DOLDU": "TIME'S UP", "DÜŞTÜN!": "YOU FELL!", " toplandı, ": " collected, ", " puandan": " from points", " yıldızdan": " from stars", " kombodan": " from combo", "YENİ REKOR!": "NEW RECORD!", "En iyi ": "Best ", "Yeni yıldız": "New star", "Sen": "You", "Bot ": "Bot ", "KAZANDIN!": "YOU WON!", ". OLDUN": ". PLACE", " sıralamadan": " from placing", "90+ sn": "90+ s", "YENİ DİKEY REKOR!": "NEW CLIMB RECORD!", "Yükseklik": "Height", " m": " m", "Dikey rekor": "Climb record", " puan": " points", "HAYALETİ GEÇTİN!": "YOU BEAT THE GHOST!", "HAYALET KAZANDI": "GHOST WINS", "Hayaletin": "Your ghost", "ODAYA DÖN": "BACK TO ROOM", "Kilit açıldı: ": "Unlocked: ", "Alabilirsin: ": "You can buy: ", "Sonraki: ": "Next: ", "Dolap": "Wardrobe", "Sahneler": "Scenes", "Borular": "Pipes", "Modlar": "Modes", "Kullanılıyor": "In use", "Senin": "Yours", "Seç": "Select", "Rekor ": "Record ", " yap": " needed", "Al · ": "Buy · ", " tüy daha": " more feathers", "Toplar": "Balls", "FLIX'ler": "FLIXes", "Şu an bunu kullanıyorsun": "You are using this", "Senin, seçmek için dokun": "Yours, tap to select", "Rekorun ": "Your record is ", " yapınca kendiliğinden açılır.": " unlocks it automatically.", "Kilitli · ": "Locked · ", " tüy, sende ": " feathers, you have ", " var": "", "Oyna": "Play", "Online yarış": "Online race", "Nasıl oynanır": "How to play", "Ayarlar": "Settings", "Yarış": "Race", "Direklerin arasından uç, rekorunu kır. Rekor: ": "Fly between the posts and beat your record. Record: ", "Dikey": "Climb", "FLIX'i yukarı sektir, sağa sola yön ver, çubuklara çarpma. Rekor: ": "Bounce the FLIX upward, steer left and right, avoid the bars. Record: ", "Botlara karşı": "Versus bots", "3 botla aynı haritada yarış, en uzun süre uçan kazanır": "Race 3 bots on the same map, longest flight wins", "Kolay": "Easy", "Zor": "Hard", "Hayaletinle yarış": "Race your ghost", "En iyi turun (": "Your best run (", " direk) aynı haritada seninle uçar": " posts) flies the same map with you", "Önce bir Klasik tur oyna, en iyi turun hayaletin olur": "Play a Classic run first, your best run becomes your ghost", "Oda kur ya da arkadaşının koduyla katıl, en uzun uçan kazanır": "Create a room or join a friend's code, longest flight wins", "Meydan okumalar": "Challenges", ". En iyi: ": ". Best: ", " · yıldız başına ": " · per star ", "Oda kodu en az 3 harf olmalı.": "Room code needs at least 3 letters.", "Odaya bağlanıyor...": "Connecting to room...", "Odaya bağlanılamadı (": "Couldn't join the room (", "). Biraz sonra tekrar dene.": "). Try again in a moment.", "hâlâ uçuyor": "still flying", "SEN DÜŞTÜN, YARIŞ SÜRÜYOR": "YOU FELL, RACE GOES ON", ", 60 birincilikten": ", 60 for first place", "Herkes aynı haritada aynı anda başlar. Rakiplerin yarı saydam görünür. En uzun süre uçan kazanır.": "Everyone starts the same map at the same time. Rivals appear see-through. Longest flight wins.", " (sen)": " (you)", "yarışta": "racing", "hazır": "ready", "bekliyor": "waiting", "Rakip bekleniyor. Arkadaşın oyunu açıp Online yarış'tan bu kodla katılsın.": "Waiting for a rival. Ask your friend to open the game and join from Online race with this code.", "Hazırım ✓ (iptal)": "Ready ✓ (cancel)", "Hazırım": "I'm ready", "Herkes hazır olunca yarış 3 saniye içinde başlar.": "When everyone is ready, the race starts in 3 seconds.", "Rakip gelince ve hazır olunca başlar.": "Starts when a rival joins and is ready.", "Odadan çık": "Leave room", "BAŞLA!": "GO!", "REKOR": "RECORD", "TÜY": "FEATHERS", "STİL": "STYLE", "SOL": "LEFT", "TUT: MAKAS": "HOLD: SCISSORS", "ORTA": "MIDDLE", "TUT: HELİKOPTER": "HOLD: HELICOPTER", "TUT: GERİ TAKLA": "HOLD: BACKFLIP", "OYNA": "PLAY", "YENİ": "NEW", "Nasıl?": "How?", "NEREDEN VURURSAN ÖYLE UÇAR": "WHERE YOU KICK DECIDES HOW IT FLIES", "Alçak ve hızlı, uzun boşluklar için": "Low and fast, for long gaps", "Düz yukarı, kontrollü": "Straight up, controlled", "Çok yüksek ama yavaşlatır": "Very high but slows you down", "Basılı tut:": "Hold:", "FLIX havada hareket yapar, stil puanı toplar. Tutarken vuramazsın, zamanında bırak!": "the FLIX does a trick in the air and earns style points. You can't kick while holding, let go in time!", "HAVADA HAREKETLER": "AIR TRICKS", "↑ Kaydır": "↑ Swipe", "Fırıldak: döner ve yükselir": "Spinner: spins and rises", "↓ Kaydır": "↓ Swipe", "Dalış: hızlı düşer, çift puan": "Dive: drops fast, double points", "→ Kaydır": "→ Swipe", "Roket: ileri fırlar": "Rocket: shoots forward", "← Kaydır": "← Swipe", "Kırbaç: kuyruk savurur": "Whip: swings the tail", "İki parmak": "Two fingers", "Kelebek: süzülür, saniye başına puan": "Butterfly: glides, points per second", "Tutarken yön değiştir": "Switch while holding", "Geçiş: hareketleri bağla, her geçiş +10": "Switch: link tricks, +10 per switch", "Kombo": "Combo", "Hareketleri 2,5 saniye içinde art arda yap, her biri +5 daha fazla verir. FLIX'in üstündeki çubuk bitmeden devam et. Fırıldak sonra Dalış (Şelale) ya da Makas sonra Roket (Füze) gibi özel ikililer +40.": "Do tricks within 2.5 seconds of each other and each one gives +5 more. Keep going before the bar above the FLIX runs out. Special pairs like Spinner then Dive (Waterfall) or Scissors then Rocket (Missile) give +40.", "TÜY VE KİLİTLER": "FEATHERS AND UNLOCKS", "Boşluklardaki altın tüyleri topla. Tur sonunda her 10 puan da 1 tüy olur. Tüylerle Dolap'tan yeni FLIX'ler ve toplar, Sahneler'den yeni arka planlar al. Bazıları sadece rekorla açılır.": "Collect the golden feathers in the gaps (each is worth 2). Every 10 points also becomes 1 feather at the end of a run. Spend feathers on new FLIXes and balls in the Wardrobe, scenes and pipe colours. Some only unlock with a record.", "Ses": "Sound", "Titreşim": "Vibration", "Dil": "Language", "Klavye: A / S / D veya ← ↑ →, P ile mola.": "Keyboard: A / S / D or ← ↑ →, P to pause.", "MOLA": "PAUSED", "DEVAM": "RESUME", "Baştan": "Restart", "Menü": "Menu", "Rekor": "Record", "Direk": "Posts", "En iyi kombo": "Best combo", "TEKRAR": "AGAIN", "Flix Kick Up oyun alanı": "Flix Kick Up play area", "Duraklat": "Pause", "FLIX logosu, dokun ve sektir": "FLIX logo, tap to bounce", "Geri": "Back", "SEÇİLİ": "EQUIPPED", "BAŞLA": "START", "AÇ": "OPEN", "ADIN": "YOUR NAME", "Oda kur": "Create room", "YA DA KODLA KATIL": "OR JOIN WITH A CODE", "Katıl": "Join", "ODA KODU, ARKADAŞINA SÖYLE": "ROOM CODE, TELL YOUR FRIEND", "Tek başına": "Solo", "Rekorunu kır": "Beat your record", "Direklerin arasından uç": "Fly between the posts", "Yukarı tırman": "Climb up", "Botlara ya da arkadaşına karşı": "Against bots or a friend", "Yıldız topla, yıldız başına ": "Earn stars, per star ", "En iyi: ": "Best: ", "PUAN": "POINTS", " puan, ": " points, ", " saniye!": " seconds!", "Süreli çarpan! ": "Timed multiplier! ", "Flix Kick Up, prototip sürüm 11.": "Flix Kick Up, prototype version 11.", "Türkçe": "Türkçe", "English": "English", "SÜRE": "TIME"};
-  Object.assign(EN, { "Ankara Ayazı": "Ankara Frost", "Yakında": "Soon", "Online yarış yakında geliyor": "Online racing is coming soon", "Satın alma tamamlanmadı.": "Purchase not completed.", "Ödemeler Apple hesabın üzerinden yapılır.": "Payments are made through your Apple account.", "Satın alımlar geri yüklendi.": "Purchases restored.", "Flix Kick Up, sürüm 1.4.": "Flix Kick Up, version 1.4.", "Satın alma sürüyor...": "Purchase in progress...", "TEK SEFER": "ONE TIME", "▶ REKLAM": "▶ AD", "REKLAM": "AD", "Kaldığın yerden devam": "Keep going", "Tüyleri 2 katına çıkar": "Double your feathers", "Gerçek FLIX'i dene!": "Try the real FLIX!", "Ayağınla sektir, arkadaşlarınla oyna. Kick it, Flick it, Flix it!": "Kick it with your foot, play with friends. Kick it, Flick it, Flix it!", "FLIX'i incele": "See FLIX", "Kapat": "Close", "Dokun ve devam et": "Tap to keep going", " reklamdan": " from the ad", "Ara reklamları kaldırır, ödüllü reklamlar isteğe bağlı kalır": "Removes the ads between runs; reward ads stay optional" });
+  Object.assign(EN, { "ONLINE OYNA": "PLAY ONLINE", "Online oyna": "Play online", "Hızlı eşleşme ya da arkadaşınla özel oda, 60 saniyelik maç": "Quick match or a private room with a friend, 60-second match", "Online oyun şu an kullanılamıyor. Tek oyunculu modlar her zaman çalışır.": "Online play isn't available right now. Single player modes always work.", "Sunucuya bağlanıyor...": "Connecting to the server...", "Sunucuya ulaşılamadı. İnternetini kontrol et ya da biraz sonra tekrar dene.": "Couldn't reach the server. Check your internet or try again in a moment.", "HIZLI EŞLEŞME": "QUICK MATCH", "Hızlı eşleşme": "Quick match", "Online oynayan biriyle eşleşirsin.": "You get paired with someone playing online.", "ÖZEL ODA": "PRIVATE ROOM", "Oda oluştur": "Create room", "ODA KODUYLA KATIL": "JOIN WITH A ROOM CODE", "Rakip aranıyor...": "Looking for an opponent...", "Aramayı bırak": "Stop searching", "ODA KODU, ARKADAŞINA SÖYLE": "ROOM CODE, TELL YOUR FRIEND", "Rakip bekleniyor. Arkadaşın Online oyna > Oda koduyla katıl'dan bu kodu girsin.": "Waiting for an opponent. Your friend enters this code under Play online > Join with a room code.", "Rakip bulundu!": "Opponent found!", "bağlantı bekleniyor": "reconnecting", "İkiniz de hazır olunca maç 3 saniye içinde başlar. 60 saniyede en çok puanı yapan kazanır, düşersen kaldığın yerden devam edersin.": "When you're both ready the match starts in 3 seconds. Most points in 60 seconds wins; if you fall you carry on where you were.", "Oda bulunamadı. Kodu kontrol et.": "Room not found. Check the code.", "Oda dolu.": "The room is full.", "Oda kodu 6 haneli olmalı.": "The room code has 6 digits.", "Zaten bir odadasın.": "You're already in a room.", "Rakip artık odada değil.": "Your opponent isn't in the room any more.", "Rakip oyundan ayrıldı": "Your opponent left the game", "Bağlantı kesildi": "Connection lost", "BAĞLANTI KESİLDİ": "CONNECTION LOST", "Yeniden bağlanıyor...": "Reconnecting...", "● bağlı": "● online", "Bağlantı: ": "Connection: ", "çevrimiçi": "online", "bağlanıyor": "connecting", "kopuk": "offline", "SEN": "YOU", "Rakip": "Opponent", "KAYBETTİN": "YOU LOST", "BERABERE": "DRAW", "TEKRAR OYNA": "PLAY AGAIN", "RAKİP BEKLENİYOR...": "WAITING FOR OPPONENT...", "RAKİP AYRILDI": "OPPONENT LEFT", "Rakip tekrar oynamak istiyor!": "Your opponent wants a rematch!", "Rakip tekrar oynamak istiyor mu, bekleniyor.": "Waiting to see if your opponent wants a rematch.", "Sonuç alınamadı.": "No result received.", "oyundan ayrıldı": "left the game", "Online menü": "Online menu", ", 60 galibiyetten": ", 60 for the win", "Yakında": "Soon", "Online yarış yakında geliyor": "Online racing is coming soon", "Satın alma tamamlanmadı.": "Purchase not completed.", "Ödemeler Apple hesabın üzerinden yapılır.": "Payments are made through your Apple account.", "Satın alımlar geri yüklendi.": "Purchases restored.", "Flix Kick Up, sürüm 1.5.": "Flix Kick Up, version 1.5.", "Satın alma sürüyor...": "Purchase in progress...", "TEK SEFER": "ONE TIME", "▶ REKLAM": "▶ AD", "REKLAM": "AD", "Kaldığın yerden devam": "Keep going", "Tüyleri 2 katına çıkar": "Double your feathers", "Tüyleri {n} katına çıkar": "Multiply your feathers x{n}", "Reklam yükleniyor...": "Loading the ad...", "Reklam şu an hazır değil, biraz sonra tekrar dene.": "No ad is ready right now, try again in a moment.", "Ödül için reklamı sonuna kadar izle.": "Watch the ad to the end to get the reward.", "Geri yüklenecek bir satın alım bulunamadı.": "No purchases to restore.", "Mağazaya şu an ulaşılamıyor.": "The store can't be reached right now.", "Gerçek FLIX'i dene!": "Try the real FLIX!", "Ayağınla sektir, arkadaşlarınla oyna. Kick it, Flick it, Flix it!": "Kick it with your foot, play with friends. Kick it, Flick it, Flix it!", "FLIX'i incele": "See FLIX", "Kapat": "Close", "Dokun ve devam et": "Tap to keep going", " reklamdan": " from the ad", "Ara reklamları kaldırır, ödüllü reklamlar isteğe bağlı kalır": "Removes the ads between runs; reward ads stay optional" });
   // inside the iPhone app (Capacitor) real purchases and haptics go through native-bridge.js
   const NATIVE_APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   const L = (s) => lang === "en" && EN[s] != null ? EN[s] : s;
   document.documentElement.lang = lang;
+  // legal texts are written in both languages; show the one that matches
+  document.querySelectorAll("[data-only]").forEach((el) => { el.hidden = el.dataset.only !== lang; });
+  Object.assign(EN, { "Onay bekleniyor. Onaylanınca ürün kendiliğinden eklenir.": "Purchase approval pending. It will be added automatically once approved.", "Satın alma onaylandı.": "Purchase approved.", "Gizlilik Politikası": "Privacy Policy", "Kullanım Koşulları": "Terms of Service", "Lisanslar ve Teşekkürler": "Licenses & Acknowledgements", "Hakkında": "About" });
   function localize(root) {
     if (lang !== "en") return;
     const fix = (n) => {
@@ -1827,7 +1964,7 @@ svg { display: block; }
   const KICKS = [
     { vy: -0.68, boost: +0.42, spin: +9, name: L("Sol") },
     { vy: -0.9, boost: 0, spin: 0, name: L("Orta") },
-    { vy: -1.14, boost: -0.3, spin: -9, name: L("Sağ") },
+    { vy: -1.08, boost: -0.22, spin: -9, name: L("Sağ") },
   ];
   const TRICKS = {
     makas:    { name: L("Makas"),       kind: "spin", spin: 15,  grav: 0.85, push: 0.12,  per: 5 },
@@ -1917,27 +2054,37 @@ svg { display: block; }
     const c = $("styleChip");
     if (hot) { c.classList.add("hot"); setTimeout(() => c.classList.remove("hot"), 400); }
   }
-  function press(zone) {
+  function press(zone, aim) {
     if (S.mode === "ready") { if (S.run.goAt) return; S.mode = "play"; $("ready").hidden = true; }
     if (S.mode === "ready2") { S.mode = "play"; $("ready").hidden = true; }
     if (S.mode !== "play") return;
     if (S.trick && touches.size <= 1) landTrick();
     S.holding = true; S.holdZone = zone; S.holdStart = S.t;
-    kick(zone);
+    kick(zone, aim);
   }
   function release() {
     S.holding = false;
     if (S.trick) landTrick();
   }
-  function kick(zone) {
+  function kick(zone, aim) {
     if (S.mode !== "play") return;
     const vert = S.run.kind === "dikey";
     if (S.t - S.lastKick < (vert ? 0.13 : 0.09)) return;
+    const gap = S.t - S.lastKick;
     S.lastKick = S.t;
     const k = KICKS[zone];
-    if (vert) { S.vy = -1.03 * U; S.vx = zone === 1 ? S.vx * 0.3 : (zone === 0 ? -0.56 : 0.56) * U; }
-    else { S.vy = k.vy * U; S.boost = Math.max(-0.28 * U, Math.min(0.62 * U, S.boost * 0.4 + k.boost * U)); }
-    S.av += k.spin;
+    // keyboard gives the three fixed kicks, touch and mouse blend smoothly between them
+    const a = aim == null ? zone - 1 : Math.sign(aim) * Math.abs(aim) ** 1.15;
+    if (vert) { S.vy = -1.03 * U; S.vx = Math.abs(a) < 0.12 ? S.vx * 0.3 : a * 0.6 * U; }
+    else {
+      const L0 = KICKS[0], M = KICKS[1], R0 = KICKS[2], t = Math.abs(a), E = a < 0 ? L0 : R0;
+      let vy = M.vy + (E.vy - M.vy) * t, b = M.boost + (E.boost - M.boost) * t;
+      // braking tires: high kicks in quick succession brake less and lift less
+      if (b < 0) { S.brakeHeat = Math.max(0, (S.brakeHeat || 0) - gap * 1.6) + t; const f = 1 / (1 + Math.max(0, S.brakeHeat - 1) * 0.9); b *= f; vy = M.vy + (vy - M.vy) * f; }
+      else S.brakeHeat = Math.max(0, (S.brakeHeat || 0) - gap * 1.6);
+      S.vy = vy * U; S.boost = Math.max(-0.16 * U, Math.min(0.62 * U, S.boost * 0.4 + b * U));
+    }
+    S.av += vert ? k.spin : KICKS[1].spin + (a < 0 ? KICKS[0].spin : KICKS[2].spin) * Math.abs(a);
     S.sqv = zone === 1 ? -7 : -5;
     const el = $("z" + zone);
     el.classList.add("hit"); setTimeout(() => el.classList.remove("hit"), 140);
@@ -1945,6 +2092,11 @@ svg { display: block; }
     burst(sx + (zone === 0 ? -8 : zone === 2 ? 8 : 0), S.y - S.camY + R() * 0.6, reduce ? 3 : 7, curSkin().f, zone === 0 ? 1 : zone === 2 ? -1 : 0);
     beep([480, 560, 680][zone], 0.08, "triangle", 0.13); buzz(8);
   }
+  // aim: -1 (left edge) .. 0 (middle) .. +1 (right edge). The kick changes smoothly with where you touch, like moving a mouse.
+  const aimOf = (clientX) => {
+    const rc = cv.getBoundingClientRect();
+    return Math.max(-1, Math.min(1, ((clientX - rc.left) / rc.width - 0.5) * 2.2));
+  };
   const zoneOf = (clientX) => {
     const rc = cv.getBoundingClientRect();
     const fx = (clientX - rc.left) / rc.width;
@@ -1955,12 +2107,12 @@ svg { display: block; }
     if (!live()) { if (S.mode === "menu" && !sheetOpen) menuKick(true); return; }
     e.preventDefault();
     try { cv.setPointerCapture(e.pointerId); } catch {}
-    const zone = zoneOf(e.clientX);
+    const zone = zoneOf(e.clientX), aim = aimOf(e.clientX);
     const second = touches.size >= 1 && S.holding;
     touches.set(e.pointerId, { zone, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY });
     lastPointer = e.pointerId;
     if (second) return;
-    press(zone);
+    press(zone, aim);
   });
   cv.addEventListener("pointermove", (e) => {
     const p = touches.get(e.pointerId);
@@ -2187,6 +2339,7 @@ svg { display: block; }
     burst(S.x - S.camX, S.y - S.camY, reduce ? 8 : 22, curSkin().f.concat([PAPER]));
     beep(200, 0.4, "sawtooth", 0.12, 0.5); buzz([40, 40, 90]);
     setTimeout(() => { S.slow = 1; }, 450);
+    if (S.run.kind === "online") { setTimeout(() => { if (S.mode === "dying" && S.run.kind === "online") respawn(); }, 950); return; }
     setTimeout(showOver, 950);
   }
 
@@ -2297,10 +2450,6 @@ svg { display: block; }
     if (S.mode === "menu") return;
     if (S.bots) for (const B of S.bots) drawRival(B.x, B.y, B.ang, byId(SKINS, B.skin), B.name, cam);
     if (S.gh) { const g = ghostAt(S.gh, S.rt); if (g) drawRival(g.x, g.y, g.ang, byId(SKINS, S.gh.skin), "HAYALET", cam); }
-    if (S.run.kind === "online" && net.room) for (const p of net.room.peers()) {
-      const q = p.presence; if (p.sameTab || !q || q.race !== S.run.goAt || q.x == null) continue;
-      drawRival(q.x / 1000 * U, q.y / 1000 * U, (q.a || 0) / 100, byId(SKINS, q.sk), String(q.nick || L("Oyuncu")).slice(0, 14), cam);
-    }
   }
   function drawMeter(x, y, r) {
     if (S.mode !== "play") return;
@@ -2342,14 +2491,14 @@ svg { display: block; }
     const seed = run.seed ?? Math.floor(Math.random() * 2 ** 31);
     run = { ...run, seed };
     lv = mulberry(seed);
-    closeSheet(true);
+    closeSheet(true); adScreen("game");
     Object.assign(S, {
       run, mode: "ready", slow: 1, camX: -W * 0.3, x: 0, y: groundY * 0.42, vy: -0.4 * U, boost: 0,
       ang: Math.PI, av: 0, sq: 0, sqv: 0, score: 0, gates: 0, style: 0, mult: 1, lastTrick: -10, perfect: 0, got: 0, lastKick: -1,
       holding: false, trick: null, combo: 0, comboT: -10, lastKey: null, bestCombo: 0, rt: 0, spawned: 0, longest: 0, timeUp: false,
       rec: [], recNext: 0, gateTimes: [], pmul: 1, pmulEnd: -1, pmulDur: 1, lastPow: -99, cdLast: -1,
       bots: run.kind === "bot" ? BOT_SET[run.level || "orta"].map((lvl, i) => newBot(lvl, i)) : null,
-      camY: 0, pcamY: 0, vx: 0, climb: 0, nextBarY: groundY - U * 0.55, deathT: 0, paid: 0, revived: false, doubled: false,
+      camY: 0, pcamY: 0, vx: 0, climb: 0, nextBarY: groundY - U * 0.55, deathT: 0, paid: 0, revived: false, doubled: false, brakeHeat: 0,
       gh: run.kind === "ghost" ? ghost : null,
       obs: [], feathers: [], nextObsX: U * 0.75, parts: [], texts: [], trail: [], shake: 0,
     });
@@ -2368,6 +2517,16 @@ svg { display: block; }
     touches.clear();
     beep(660, 0.1);
   }
+  function paintCdown(rem, total) {
+    const sec = Math.ceil(rem), cd = $("cdown");
+    cd.hidden = false;
+    if (sec !== S.cdLast) {
+      S.cdLast = sec; $("cdNum").textContent = sec;
+      const warn = sec <= 3 && S.mode === "play";
+      cd.classList.remove("warn"); if (warn) { void cd.offsetWidth; cd.classList.add("warn"); if (sec > 0) beep(sec === 1 ? 990 : 760, 0.09, "square", 0.08, 1); }
+    }
+    $("cdBar").style.width = (rem / total * 100).toFixed(1) + "%";
+  }
   function updateRaceHud() {
     const rc = $("raceChip"), tc = $("timeChip"), run = S.run || {};
     const C = run.ch && CH[run.ch];
@@ -2375,27 +2534,20 @@ svg { display: block; }
     if (C) {
       const v = C.val();
       race = C.name.toLocaleUpperCase(L("tr-TR")) + " <b>" + v + "</b> " + C.unit;
-      if (C.time) {
-        const rem = Math.max(0, C.time - S.rt), sec = Math.ceil(rem), cd = $("cdown");
-        cd.hidden = false;
-        if (sec !== S.cdLast) {
-          S.cdLast = sec; $("cdNum").textContent = sec;
-          const warn = sec <= 3 && S.mode === "play";
-          cd.classList.remove("warn"); if (warn) { void cd.offsetWidth; cd.classList.add("warn"); if (sec > 0) beep(sec === 1 ? 990 : 760, 0.09, "square", 0.08, 1); }
-        }
-        $("cdBar").style.width = (rem / C.time * 100).toFixed(1) + "%";
-      }
+      if (C.time) paintCdown(Math.max(0, C.time - S.rt), C.time);
     } else if (S.bots) {
       const fly = S.bots.filter((B) => !B.dead).length;
       race = L("SÜRE <b>") + S.rt.toFixed(1) + "</b> sn · " + fly + L("/3 bot uçuyor");
     } else if (run.kind === "dikey") race = L("YÜKSEKLİK <b>") + Math.round(S.climb / U * 10) + "</b> m";
     else if (S.gh) { const g = ghostAt(S.gh, S.rt); race = "HAYALET <b>" + (g ? g.gates : 0) + "</b> / " + S.gh.gates + L(" direk"); }
-    else if (run.kind === "online" && net.room) {
-      const others = net.room.peers().filter((p) => !p.sameTab && p.presence && p.presence.race === run.goAt);
-      const fly = others.filter((p) => p.presence.st === "race").length;
-      race = L("SÜRE <b>") + S.rt.toFixed(1) + "</b> sn · " + fly + L(" rakip uçuyor");
+    else if (run.kind === "online") {
+      const o = net.opp;
+      race = L("SEN") + " <b>" + S.score + "</b> · " + escH(o ? o.name : L("Rakip")) + " <b>" + (o ? net.scores[o.id] || 0 : 0) + "</b>";
+      time = netStatusText();
     }
-    if (!(C && C.time)) $("cdown").hidden = true;
+    const onlineClock = run.kind === "online" && run.endAt && S.mode !== "ready";
+    if (onlineClock) paintCdown(Math.max(0, (run.endAt - Date.now()) / 1000), (run.endAt - run.goAt) / 1000);
+    if (!(C && C.time) && !onlineClock) $("cdown").hidden = true;
     const pc = $("powChip");
     if (S.pmulEnd > S.rt && S.mode === "play") { $("powT").textContent = (S.pmulEnd - S.rt).toFixed(1); $("powBar").style.width = ((S.pmulEnd - S.rt) / S.pmulDur * 100).toFixed(1) + "%"; }
     else if (!pc.hidden) pc.hidden = true;
@@ -2423,7 +2575,8 @@ svg { display: block; }
     $("oEarnSub").textContent = S.earnNote + L(" · toplam ") + fmt(coins);
   }
   function showOver() {
-    S.mode = "over";
+    S.mode = "over"; adScreen("over");
+    if (!S.revived) ADS.runs++;  // a revived run counts once
     $("powChip").hidden = true; $("cdown").hidden = true;
     const run = S.run, C = run.ch && CH[run.ch];
     let starBonus = 0, chNote = "";
@@ -2435,7 +2588,7 @@ svg { display: block; }
       chNote = v > prev && v > 0 ? L("YENİ EN İYİ!") : S.timeUp ? L("SÜRE DOLDU") : L("DÜŞTÜN!");
     }
     // keep the best non-challenge run as your ghost
-    if (!C && S.gates > 0 && S.score > (ghost ? ghost.score : -1)) {
+    if (!C && run.kind !== "online" && S.gates > 0 && S.score > (ghost ? ghost.score : -1)) {
       ghost = { seed: run.seed, score: S.score, gates: S.gates, skin: skinId, fr: S.rec, gt: S.gateTimes };
       store.set("fku4.ghost", ghost);
     }
@@ -2445,7 +2598,7 @@ svg { display: block; }
     S.earnNote = S.got * 2 + L(" toplandı, ") + fromScore + L(" puandan") + (starBonus ? ", " + starBonus + L(" yıldızdan") : "") + (comboBonus ? ", " + comboBonus + L(" kombodan") : "");
     const before = new Set([...SKINS, ...SCENES].filter(isOwned).map((it) => it.id));
     coins += earned - S.paid; S.paid = earned; store.set("fku2.coins", coins);
-    const isBest = run.kind !== "dikey" && !C && S.score > best;
+    const isBest = run.kind !== "dikey" && run.kind !== "online" && !C && S.score > best;
     if (isBest) { best = S.score; store.set("fku3.best", best); }
     const fresh = [...SKINS, ...SCENES].filter((it) => isOwned(it) && !before.has(it.id));
     fresh.forEach((it) => owned.add(it.id)); saveOwned();
@@ -2480,10 +2633,10 @@ svg { display: block; }
       const b = S.gh.gates, res = S.gates > b ? L("HAYALETİ GEÇTİN!") : S.gates === b ? "BERABERE" : L("HAYALET KAZANDI");
       title.textContent = res; title.classList.toggle("gold", S.gates > b);
       rankRows([{ name: L("Sen"), val: S.gates + L(" direk"), me: true }, { name: L("Hayaletin"), val: b + L(" direk") }].sort((a, c) => parseInt(c.val) - parseInt(a.val)));
-    } else if (run.kind === "online") {
-      netDead(); onlineRank();
     }
-    $("again").textContent = run.kind === "online" ? L("ODAYA DÖN") : L("TEKRAR");
+    $("again").disabled = false;
+    $("again").textContent = L("TEKRAR");
+    if (run.kind === "online") onlineResult();
     $("oBest").textContent = run.kind === "dikey" ? vbest : best; $("oGates").textContent = S.gates; $("oStyle").textContent = "x" + (S.bestCombo || 0);
     paintEarn();
     const un = $("oUnlocked");
@@ -2505,11 +2658,13 @@ svg { display: block; }
       requestAnimationFrame(() => requestAnimationFrame(() => { $("oGoalBar").style.width = Math.min(100, coins / it.price * 100) + "%"; }));
     }
     $("oShop").textContent = ({ skin: L("Dolap"), scene: L("Sahneler"), pipe: L("Borular") })[S.overShop];
-    if (run.kind !== "classic") { S.overShop = run.kind === "online" ? "online" : "mode"; $("oShop").textContent = L("Modlar"); }
+    if (run.kind !== "classic") { S.overShop = run.kind === "online" ? "online" : "mode"; $("oShop").textContent = run.kind === "online" ? L("Online menü") : L("Modlar"); }
     $("oTip").textContent = TIPS[Math.floor(Math.random() * TIPS.length)];
-    const canRevive = !S.revived && (run.kind === "classic" || run.kind === "dikey") && S.gates >= 3;
+    const RW = AD_CFG.reward;
+    const canRevive = RW.revive.enabled && !S.revived && (run.kind === "classic" || run.kind === "dikey") && S.gates >= RW.revive.minGates;
     $("oRevive").hidden = !canRevive;
-    $("oDouble").hidden = S.doubled || S.earned < 5;
+    $("oDouble").hidden = !RW.double.enabled || S.doubled || S.earned < RW.double.minEarned;
+    $("oDouble").querySelector("span").textContent = RW.double.multiplier === 2 ? L("Tüyleri 2 katına çıkar") : L("Tüyleri {n} katına çıkar").replace("{n}", RW.double.multiplier);
     $("oAds").hidden = $("oRevive").hidden && $("oDouble").hidden;
     $("hud").hidden = true; $("over").hidden = false;
     if (fresh.length) jingle();
@@ -2536,7 +2691,7 @@ svg { display: block; }
     S.mode = "menu"; S.trick = null; S.obs = []; S.feathers = []; S.trail = []; S.parts = []; S.texts = [];
     S.y = H * 0.5;
     $("over").hidden = true; $("pause").hidden = true; $("hud").hidden = true; $("home").hidden = false;
-    refreshHome();
+    refreshHome(); adScreen("menu");
   }
   function refreshHome() {
     $("hBest").textContent = best; $("hCoins").textContent = fmt(coins); $("sCoins").textContent = fmt(coins);
@@ -2545,12 +2700,24 @@ svg { display: block; }
     S.menuY = sheetOpen ? 0.2 : 0.5;
   }
   $("play").addEventListener("click", () => { beep(600, 0.05); openSheet("mode"); });
-  $("again").addEventListener("click", () => { if (S.run.kind === "online") { toMenu(); netLobby(); openSheet("online"); } else maybeInterstitial().then(() => startGame()); });
+  $("again").addEventListener("click", () => { if (S.run.kind === "online") netRematch(); else leaveOver(() => startGame()); });
 
   // ---------- ads ----------
-  // In the app: Google AdMob through FlixNative (rewarded ads the player chooses, and an ad between runs every 3rd retry).
+  // In the app: Google AdMob through window.FlixAds (app/www/ads.js, ad unit ids in app/www/ads-config.js).
   // On the web there is no ad network, so the same spots show our own ad for the real FLIX toy.
-  const ADS = { retries: 0, lastInter: Date.now(), busy: false };
+  // AD_CFG is the one place for ad pacing and rewards.
+  const AD_CFG = {
+    interEveryRuns: 3,        // an ad between runs at most every 3rd finished run,
+    interFirstAfterRuns: 3,   // never before the 3rd finished run (so never right after the first),
+    interMinGapMs: 90000,     // and at most once per 90 s (none in the first 90 s after launch either)
+    rewardWaitMs: 5000,       // how long a reward button waits for an ad that is still loading
+    reward: {
+      revive: { enabled: true, minGates: 3 },                 // "Keep going": continue where you fell, once per run
+      double: { enabled: true, multiplier: 2, minEarned: 5 }  // feathers earned in the run x multiplier
+    }
+  };
+  const ADS = { runs: 0, lastInterRun: 0, lastInter: Date.now(), busy: false };
+  function adScreen(name) { try { if (window.FlixAds) FlixAds.setScreen(name); } catch {} }
   function houseAd(sec) {
     return new Promise((res) => {
       const m = $("houseAd"), b = $("hadClose"); let n = sec;
@@ -2561,20 +2728,34 @@ svg { display: block; }
     });
   }
   $("hadGo").addEventListener("click", () => { try { window.open("https://www.flixtoysofficial.com", "_blank", "noopener"); } catch {} });
-  const rewardedAd = () => (window.FlixNative && FlixNative.showRewardedAd ? FlixNative.showRewardedAd() : houseAd(5));
   function maybeInterstitial() {
-    // never after "No Ads", never in the first 90 seconds, then every 3rd retry and at most once per 90 seconds
-    if (iap.noads || ++ADS.retries % 3 || Date.now() - ADS.lastInter < 90000) return Promise.resolve();
-    ADS.lastInter = Date.now();
-    return window.FlixNative && FlixNative.showInterstitial ? FlixNative.showInterstitial().catch(() => {}) : houseAd(3);
+    // only while the result screen is up (never during a run) and never after "No Ads"
+    if (iap.noads || S.mode !== "over" || ADS.runs < AD_CFG.interFirstAfterRuns || ADS.runs - ADS.lastInterRun < AD_CFG.interEveryRuns || Date.now() - ADS.lastInter < AD_CFG.interMinGapMs) return Promise.resolve();
+    // in the app an ad that isn't loaded yet is skipped (tried again next time), it never makes the player wait
+    const shown = window.FlixAds ? FlixAds.showInterstitial() : NATIVE_APP ? false : houseAd(3);
+    return Promise.resolve(shown).then((ok) => { if (ok) { ADS.lastInterRun = ADS.runs; ADS.lastInter = Date.now(); } }, () => {});
   }
-  function withAd(fn) {
+  // leaving the result screen (again / menu / shop) is the only moment an ad between runs can show
+  function leaveOver(fn) {
     if (ADS.busy) return; ADS.busy = true;
-    Promise.resolve(rewardedAd()).then((ok) => { ADS.busy = false; if (ok && S.mode === "over") fn(); }, () => { ADS.busy = false; });
+    maybeInterstitial().then(() => { ADS.busy = false; fn(); });
+  }
+  // the reward is given only after the whole ad was watched (AdMob's reward callback)
+  function withAd(fn) {
+    if (ADS.busy || (S.run.kind === "online" && net.rematchVoted)) return; ADS.busy = true;
+    let p;
+    if (window.FlixAds) { if (!FlixAds.rewardedReady()) toast(L("Reklam yükleniyor...")); p = FlixAds.showRewarded(AD_CFG.rewardWaitMs); }
+    else p = NATIVE_APP ? "unavailable" : houseAd(5).then(() => "rewarded");
+    const end = (r) => {
+      ADS.busy = false;
+      if (r === "rewarded") { if (S.mode === "over") fn(); }
+      else toast(r === "closed" ? L("Ödül için reklamı sonuna kadar izle.") : L("Reklam şu an hazır değil, biraz sonra tekrar dene."));
+    };
+    Promise.resolve(p).then(end, () => end("unavailable"));
   }
   $("oDouble").addEventListener("click", () => withAd(() => {
     if (S.doubled) return;
-    const b = S.earned; S.doubled = true; coins += b; store.set("fku2.coins", coins);
+    const b = S.earned * (AD_CFG.reward.double.multiplier - 1); S.doubled = true; coins += b; store.set("fku2.coins", coins);
     S.earned += b; S.earnNote += ", " + b + L(" reklamdan"); paintEarn();
     $("oDouble").hidden = true; $("oAds").hidden = $("oRevive").hidden;
     jingle(); buzz(30); refreshHome();
@@ -2583,6 +2764,9 @@ svg { display: block; }
   function revive() {
     if (S.revived) return;
     S.revived = true;
+    respawn();
+  }
+  function respawn() {
     const r = R(), x = S.crashX ?? S.x, y = S.crashY ?? S.y;
     if (S.run.kind === "dikey") {
       // clear the bar you hit and the one after it, then hover a little below where you fell
@@ -2598,13 +2782,15 @@ svg { display: block; }
     }
     S.feathers = S.feathers.filter((f) => S.obs.includes(f.o));
     Object.assign(S, { y: S.reviveY, vy: 0, av: 0, slow: 1, shake: 0, sq: 0, sqv: 0, trick: null, holding: false, combo: 0, mode: "ready2" });
+    adScreen("game");
     S.px = S.x; S.py = S.y; S.pang = S.ang;
     touches.clear();
     $("readyText").textContent = L("Dokun ve devam et");
     $("over").hidden = true; $("hud").hidden = false; $("ready").hidden = false; $("trick").hidden = true;
   }
-  $("menu").addEventListener("click", toMenu);
-  $("oShop").addEventListener("click", () => { const k = S.overShop; if (k === "online") netLobby(); toMenu(); openSheet(k); });
+  // leaving an online result: leave the room first (the opponent is told at once), then the usual between-runs ad spot
+  $("menu").addEventListener("click", () => { if (S.run.kind === "online") netLeave(); leaveOver(toMenu); });
+  $("oShop").addEventListener("click", () => { const k = S.overShop; if (k === "online") netLeave(); leaveOver(() => { toMenu(); openSheet(k); }); });
   $("pauseBtn").addEventListener("click", pauseGame);
   $("resume").addEventListener("click", resumeGame);
   $("restart").addEventListener("click", () => startGame());
@@ -2723,13 +2909,17 @@ svg { display: block; }
   }
   const SHEETS = {
     mode: { title: L("Oyna"), panel: "modePanel", tall: true },
-    online: { title: L("Online yarış"), panel: "onlinePanel", tall: true },
+    online: { title: L("Online oyna"), panel: "onlinePanel", tall: true },
     skin: { title: L("Dolap"), panel: "gridSkin", foot: true },
     scene: { title: L("Sahneler"), panel: "gridScene", foot: true },
     pipe: { title: L("Borular"), panel: "gridPipe", foot: true },
     how: { title: L("Nasıl oynanır"), panel: "howPanel", tall: true },
     store: { title: L("Mağaza"), panel: "storePanel", tall: true },
     set: { title: L("Ayarlar"), panel: "setPanel" },
+    privacy: { title: L("Gizlilik Politikası"), panel: "privacyPanel", tall: true, back: "set" },
+    terms: { title: L("Kullanım Koşulları"), panel: "termsPanel", tall: true, back: "set" },
+    licenses: { title: L("Lisanslar ve Teşekkürler"), panel: "licensesPanel", tall: true, back: "set" },
+    about: { title: L("Hakkında"), panel: "aboutPanel", tall: true, back: "set" },
   };
   function openSheet(kind) {
     const D = SHEETS[kind]; sheetOpen = kind;
@@ -2750,6 +2940,7 @@ svg { display: block; }
   }
   function closeSheet(silent) {
     if (!sheetOpen) return;
+    if (sheetOpen === "online" && !silent) netLeave();   // backing out of the online screen leaves the room / queue
     sheetOpen = null; previewSkin = previewScene = previewPipe = null; sel = null;
     $("sheet").hidden = true;
     if (!silent) { $("home").hidden = false; refreshHome(); }
@@ -2757,7 +2948,10 @@ svg { display: block; }
   document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => { beep(600, 0.05); openSheet(b.dataset.open); }));
   $("logoBtn").addEventListener("click", () => { const b = $("logoBtn"); b.classList.remove("kick"); void b.offsetWidth; b.classList.add("kick"); beep(560, 0.08, "triangle", 0.12); setTimeout(() => beep(840, 0.1, "triangle", 0.1), 120); buzz(10); });
   $("openSettings").addEventListener("click", () => openSheet("set"));
-  $("sheetBack").addEventListener("click", () => closeSheet(false));
+  $("sheetBack").addEventListener("click", () => { const D = sheetOpen && SHEETS[sheetOpen]; if (D && D.back) { openSheet(D.back); return; } closeSheet(false); });
+  // legal / about pages (from Ayarlar): back returns to Ayarlar, links open in the browser
+  document.querySelectorAll("[data-legal]").forEach((b) => b.addEventListener("click", () => { beep(600, 0.05); openSheet(b.dataset.legal); $("sheet").querySelector(".sheet-body").scrollTop = 0; }));
+  document.querySelectorAll(".legal .ext").forEach((a) => { a.setAttribute("role", "link"); a.tabIndex = 0; const go = () => { try { window.open(a.dataset.url, "_blank", "noopener"); } catch {} }; a.addEventListener("click", go); a.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); }); });
   const syncToggles = () => { $("tSound").setAttribute("aria-pressed", String(settings.sound)); $("tVibe").setAttribute("aria-pressed", String(settings.vibe)); };
   $("tSound").addEventListener("click", () => { settings.sound = !settings.sound; store.set("fku4.settings", settings); syncToggles(); beep(700, 0.06); });
   $("tVibe").addEventListener("click", () => { settings.vibe = !settings.vibe; store.set("fku4.settings", settings); syncToggles(); buzz(25); });
@@ -2815,8 +3009,8 @@ svg { display: block; }
       seg.appendChild(sb);
     }
     bot.appendChild(seg); race.appendChild(bot);
-    if (NATIVE_APP) race.appendChild(modeRow(ICONS.online, L("Online yarış"), L("Online yarış yakında geliyor"), '<span class="go">' + L("Yakında") + '</span>', null, true));
-    else race.appendChild(modeRow(ICONS.online, L("Online yarış"), L("Rastgele rakiple ya da arkadaşınla yarış"), '<span class="go">AÇ</span>', () => openSheet("online")));
+    if (!OL) race.appendChild(modeRow(ICONS.online, L("Online oyna"), L("Online yarış yakında geliyor"), '<span class="go">' + L("Yakında") + '</span>', null, true));
+    else race.appendChild(modeRow(ICONS.online, L("Online oyna"), L("Hızlı eşleşme ya da arkadaşınla özel oda, 60 saniyelik maç"), '<span class="go">AÇ</span>', () => openSheet("online")));
 
     const ch = sec("s-ch", L("Meydan okumalar"), L("Yıldız başına ") + STAR_REWARD + L(" tüy"));
     const g = document.createElement("div"); g.className = "chgrid"; ch.appendChild(g);
@@ -2863,27 +3057,35 @@ svg { display: block; }
     const fn = buying; buying = null; $("buyModal").hidden = true; if (fn) bought(fn);
   });
   // App Store product ids (must match App Store Connect); the web build shows a demo confirm instead
-  const priceOf = (pid, n) => (window.FlixNative && FlixNative.price && FlixNative.price(pid)) || usd(n);
+  // in the app only the App Store's localized price is shown ("…" until it loads); the USD prices are for the web demo
+  const priceOf = (pid, n) => (window.FlixNative && FlixNative.price && FlixNative.price(pid)) || (NATIVE_APP ? "…" : usd(n));
   // grant: adds the goods; thanks: the toast. In the app the goods arrive through __fkuGrant (once per Apple transaction),
   // so a purchase that finishes after a crash, a lost connection or an Ask to Buy approval is never lost or given twice.
   let paying = false;
+  const awaitingApproval = new Set();   // Ask to Buy: products waiting for a parent's approval
   function pay(pid, what, n, grant, thanks) {
     if (window.FlixNative && FlixNative.buy) {
       if (paying) return toast(L("Satın alma sürüyor..."));
       paying = true;
-      const done = (ok) => { paying = false; if (ok) bought(() => toast(thanks)); else toast(L("Satın alma tamamlanmadı.")); };
+      const done = (ok) => {
+        paying = false;
+        if (ok === "pending") { awaitingApproval.add(pid); toast(L("Onay bekleniyor. Onaylanınca ürün kendiliğinden eklenir.")); }
+        else if (ok) bought(() => toast(thanks)); else toast(L("Satın alma tamamlanmadı."));
+      };
       FlixNative.buy(pid).then(done, () => done(false)); return;
     }
     askBuy(what, usd(n), () => { grant(); toast(thanks); });
   }
-  const grantNoAds = () => { iap.noads = true; store.set("fku4.iap", iap); };
+  const grantNoAds = () => { iap.noads = true; store.set("fku4.iap", iap); if (window.FlixAds) FlixAds.setAdsRemoved(true); };
+  if (iap.noads && window.FlixAds) FlixAds.setAdsRemoved(true);
   const grantStarter = () => { if (!iap.starter) addCoins(2500); iap.starter = true; store.set("fku4.iap", iap); owned.add("kristal"); saveOwned(); };
   const grantPid = (pid, tx) => {
     const seen = store.get("fku4.tx", []); if (tx && seen.includes(tx)) return true;
-    if (pid === "kickup_starter") grantStarter();
-    else if (pid === "kickup_noads") grantNoAds();
+    if (pid === "kickup_starter_v2") grantStarter();
+    else if (pid === "kickup_noads_v2") grantNoAds();
     else { const pk = PACKS.find((p) => p.pid === pid); if (!pk) return false; addCoins(pk.n); }
     if (tx) { seen.push(tx); store.set("fku4.tx", seen.slice(-300)); }
+    if (awaitingApproval.delete(pid)) { toast(L("Satın alma onaylandı.")); jingle(); }
     refreshHome(); if (sheetOpen === "store") buildStore(); return true;
   };
   if (NATIVE_APP) {
@@ -2901,21 +3103,21 @@ svg { display: block; }
       h(L("Kampanya"));
       const c = document.createElement("div"); c.className = "camp";
       c.innerHTML = '<span class="tag">' + (NATIVE_APP ? L("TEK SEFER") : "-%70") + '</span><b></b><canvas width="168" height="168"></canvas><small></small><span class="tm"></span><span class="price"><button class="pbtn"></button>' + (NATIVE_APP ? "" : "<s>$9.99</s>") + "</span>";
-      c.querySelector(".pbtn").textContent = priceOf("kickup_starter", 2.99);
+      c.querySelector(".pbtn").textContent = priceOf("kickup_starter_v2", 2.99);
       c.querySelector("b").textContent = L("Başlangıç Paketi"); c.querySelector("small").textContent = L("Tek seferlik: 2.500 tüy ve Kristal FLIX");
       const cx = c.querySelector("canvas").getContext("2d"); drawFlix(cx, 84, 112, 0, 40, byId(SKINS, "kristal"), 0, 0.3);
       const tm = c.querySelector(".tm");
       const tick = () => { const ms = Math.max(0, iap.campEnd - Date.now()), hh = Math.floor(ms / 3600000), mm = Math.floor(ms / 60000) % 60, ss = Math.floor(ms / 1000) % 60; tm.textContent = L("Bitiyor: ") + hh + ":" + String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0"); if (!ms) buildStore(); };
       tick(); campTimer = setInterval(() => { if (sheetOpen !== "store") return clearInterval(campTimer); tick(); }, 1000);
-      c.querySelector(".pbtn").addEventListener("click", () => pay("kickup_starter", L("Başlangıç Paketi"), 2.99, grantStarter, L("Teşekkürler! ") + "+2.500 " + L("tüy") + " + Kristal FLIX"));
+      c.querySelector(".pbtn").addEventListener("click", () => pay("kickup_starter_v2", L("Başlangıç Paketi"), 2.99, grantStarter, L("Teşekkürler! ") + "+2.500 " + L("tüy") + " + Kristal FLIX"));
       el.appendChild(c);
     }
     if (!iap.noads) {
       const na = document.createElement("div"); na.className = "noads";
       na.innerHTML = '<span class="ic">AD</span><span class="tx"><b></b><small></small></span><button class="pbtn"></button>';
       na.querySelector("b").textContent = L("Reklamsız"); na.querySelector("small").textContent = L("Ara reklamları kaldırır, ödüllü reklamlar isteğe bağlı kalır");
-      na.querySelector(".pbtn").textContent = priceOf("kickup_noads", 2.99);
-      na.querySelector(".pbtn").addEventListener("click", () => pay("kickup_noads", L("Reklamsız"), 2.99, grantNoAds, L("Reklamlar kapandı")));
+      na.querySelector(".pbtn").textContent = priceOf("kickup_noads_v2", 2.99);
+      na.querySelector(".pbtn").addEventListener("click", () => pay("kickup_noads_v2", L("Reklamsız"), 2.99, grantNoAds, L("Reklamlar kapandı")));
       el.appendChild(na);
     }
     h(L("Tüy paketleri"));
@@ -2934,119 +3136,209 @@ svg { display: block; }
     const rs = document.createElement("button"); rs.className = "restore"; rs.textContent = L("Satın alımları geri yükle");
     rs.addEventListener("click", () => {
       if (!(window.FlixNative && FlixNative.restore)) return toast(L("Geri yüklenecek bir şey yok (test sürümü)."));
-      FlixNative.restore().then((ids) => { if ((ids || []).includes("kickup_starter")) grantStarter(); if ((ids || []).includes("kickup_noads")) grantNoAds(); toast(L("Satın alımlar geri yüklendi.")); refreshHome(); buildStore(); }, () => toast(L("Satın alma tamamlanmadı.")));
+      FlixNative.restore().then((ids) => { ids = ids || []; if (ids.includes("kickup_starter_v2")) grantStarter(); if (ids.includes("kickup_noads_v2")) grantNoAds(); toast(ids.length ? L("Satın alımlar geri yüklendi.") : L("Geri yüklenecek bir satın alım bulunamadı.")); refreshHome(); buildStore(); }, () => toast(L("Mağazaya şu an ulaşılamıyor.")));
     });
     el.appendChild(rs);
     const fine = document.createElement("p"); fine.className = "fine"; fine.textContent = window.FlixNative ? L("Ödemeler Apple hesabın üzerinden yapılır.") : L("Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak."); el.appendChild(fine);
   }
   $("openStore").addEventListener("click", () => { beep(600, 0.05); openSheet("store"); });
 
-  // ---------- online: live race in a shared room (presence only) ----------
-  const net = { api: null, room: null, code: null, ready: false, lastGo: 0, status: "", unsub: null, tick: null };
-  try { (window.claude && window.claude.use ? window.claude.use("room") : Promise.resolve(null)).then((r) => { net.api = r; if (sheetOpen === "online") renderOnline(); }, () => {}); } catch {}
-  const roomName = (c) => "fku-" + c.toLowerCase();
-  async function netJoin(code, quick) {
-    code = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
-    if (code.length < 3) { net.status = L("Oda kodu en az 3 harf olmalı."); renderOnline(); return; }
-    if (!net.api) return;
-    net.status = L("Odaya bağlanıyor..."); renderOnline();
-    try {
-      if (net.room) await netLeave();
-      net.room = await net.api.join(roomName(code)); net.code = code; net.quick = !!quick; net.ready = !!quick; net.status = "";
-      net.room.presence({ nick, sk: skinId, st: "lobby", rdy: !!quick, go: null, race: null });
-      net.unsub = net.room.onPeers(() => { if (sheetOpen === "online") renderOnline(); netCheckGo(); if (S.mode === "over" && S.run.kind === "online") onlineRank(); });
-      net.tick = setInterval(netCheckGo, 500);
-    } catch (e) { net.room = null; net.status = L("Odaya bağlanılamadı (") + (e && e.code || "hata") + L("). Biraz sonra tekrar dene."); }
-    renderOnline();
+  // ---------- online: 1v1 match on the Flix Kick Up server (online.js, address in online-config.js) ----------
+  // The server owns rooms, quick match, ready, the 3-2-1 countdown, the 60 s clock, the winner and rematch;
+  // this side only flies the run and reports its own score. Without a server none of this runs.
+  const OL = window.FlixOnline && window.FlixOnline.available ? window.FlixOnline : null;
+  const net = { status: "", opp: null, scores: {}, result: null, oppLeft: false, rematchVoted: false, endWait: 0 };
+  const escH = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const NET_ERR = { not_found: "Oda bulunamadı. Kodu kontrol et.", full: "Oda dolu.", bad_code: "Oda kodu 6 haneli olmalı.", in_room: "Zaten bir odadasın.", opponent_gone: "Rakip artık odada değil." };
+  const inMatch = () => S.run && S.run.kind === "online" && S.mode !== "over" && S.mode !== "menu";
+  const meId = () => (OL && OL.me ? OL.me.id : null);
+  $("playOnline").hidden = !OL;
+  $("playOnline").addEventListener("click", () => { beep(600, 0.05); openSheet("online"); });
+
+  function netStatusText() {
+    const st = OL ? OL.status : "offline";
+    return st === "online" ? L("● bağlı") : st === "connecting" || st === "reconnecting" ? L("Yeniden bağlanıyor...") : L("Bağlantı kesildi");
   }
-  async function netLeave() {
-    if (net.unsub) net.unsub(); if (net.tick) clearInterval(net.tick);
-    const r = net.room; net.room = null; net.code = null; net.unsub = net.tick = null;
-    if (r) try { await r.leave(); } catch {}
+  async function netConnect() {
+    if (!OL) return false;
+    if (OL.status === "online") return true;
+    net.status = L("Sunucuya bağlanıyor..."); renderOnline();
+    const ok = await OL.connect(nick);
+    net.status = ok ? "" : L("Sunucuya ulaşılamadı. İnternetini kontrol et ya da biraz sonra tekrar dene.");
     renderOnline();
+    return ok;
   }
-  // random rivals share one public room where everyone is ready at once; friends use a private code
-  function netLobby() { if (net.room) { net.ready = !!net.quick; net.room.presence({ st: "lobby", rdy: net.ready, go: null, x: null }); } }
-  function netDead() { if (net.room) net.room.presence({ st: "dead", g: S.gates, sc: S.score, tm: Math.round(S.deathT * 10) / 10 }); }
-  function netCheckGo() {
-    const R0 = net.room; if (!R0) return;
-    const ps = R0.peers().filter((p) => p.kind === "viewer");
-    const me = ps.find((p) => p.sameTab);
-    const lobby = ps.filter((p) => p.presence && p.presence.st === "lobby");
-    // the ready player with the smallest label starts the race once everyone in the lobby is ready
-    if (net.ready && lobby.length >= 2 && lobby.every((p) => p.presence.rdy)) {
-      const host = lobby.slice().sort((a, b) => (a.peer < b.peer ? -1 : 1))[0];
-      if (host.sameTab && !(me && me.presence.go && me.presence.go.at > Date.now() - 5000)) R0.presence({ go: { seed: Math.floor(Math.random() * 2 ** 31), at: Date.now() + 3500 } });
+  // leave the room or queue and close the connection (the server tells the opponent right away)
+  function netLeave() {
+    if (!OL) return;
+    clearTimeout(net.endWait);
+    if (OL.status === "online") { if (OL.queued) OL.cancel(); OL.leave(); }
+    OL.disconnect();
+    Object.assign(net, { status: "", rematchVoted: false });
+  }
+  function netRematch() {
+    if (!OL || !OL.room || net.oppLeft) { toast(L("Rakip artık odada değil.")); return; }
+    OL.rematch(); net.rematchVoted = true;
+    $("oAds").hidden = true;
+    onlineOverButtons();
+  }
+
+  if (OL) OL.on((e) => {
+    switch (e.type) {
+      case "status": case "queued": case "unqueued": case "left":
+        if (sheetOpen === "online") renderOnline();
+        break;
+      case "room": {
+        const o = e.room.players.find((p) => p.id !== meId());
+        if (o) { net.opp = { id: o.id, name: o.name }; if (e.room.state === "lobby" && !net.scores[o.id]) net.scores[o.id] = 0; }
+        if (sheetOpen === "online") renderOnline();
+        if (S.mode === "over" && S.run.kind === "online") onlineOverButtons();
+        break;
+      }
+      case "countdown":
+        // also the start of a rematch; everyone gets the same map (seed) and the same start / end time
+        Object.assign(net, { scores: {}, result: null, oppLeft: false, rematchVoted: false });
+        clearTimeout(net.endWait);
+        if (OL.room) { const o = OL.room.players.find((p) => p.id !== meId()); if (o) net.opp = { id: o.id, name: o.name }; }
+        startGame({ kind: "online", seed: e.seed, goAt: e.startAt, endAt: e.endAt });
+        break;
+      case "score": net.scores[e.id] = e.score; break;
+      case "end":
+        net.result = e.result;
+        if (e.result.reason === "opponent_left") net.oppLeft = true;
+        if (S.mode === "done" && S.run.kind === "online") { clearTimeout(net.endWait); setTimeout(() => { if (S.mode === "done") showOver(); }, 700); }
+        else if (inMatch()) netStop(e.result.reason === "opponent_left" ? L("Rakip oyundan ayrıldı") : L("Süre doldu!"));
+        else if (S.mode === "over" && S.run.kind === "online") { clearTimeout(net.endWait); showOver(); }
+        break;
+      case "opponent_left":
+        net.oppLeft = true;
+        if (!inMatch()) toast(L("Rakip oyundan ayrıldı"));
+        if (sheetOpen === "online") renderOnline();
+        if (S.mode === "over" && S.run.kind === "online") onlineOverButtons();
+        break;
+      case "lost":
+        // the server could not be reached again: an unfinished match ends here, single player is untouched
+        if (inMatch()) netStop(L("Bağlantı kesildi"), true);
+        else if (e.hadRoom || sheetOpen === "online") toast(L("Bağlantı kesildi"));
+        net.oppLeft = true;
+        if (sheetOpen === "online") renderOnline();
+        if (S.mode === "over" && S.run.kind === "online") onlineOverButtons();
+        break;
+      case "error":
+        net.status = L(NET_ERR[e.code] || "Sunucuya ulaşılamadı. İnternetini kontrol et ya da biraz sonra tekrar dene.");
+        if (sheetOpen === "online") renderOnline(); else toast(net.status);
+        break;
     }
-    if (!net.ready || S.mode !== "menu") return;
-    for (const p of ps) {
-      const go = p.presence && p.presence.go;
-      if (go && go.at > net.lastGo && go.at > Date.now() - 1500) {
-        net.lastGo = go.at; net.ready = false;
-        R0.presence({ st: "race", rdy: false, race: go.at, g: 0, sc: 0, sk: skinId, nick });
-        startGame({ kind: "online", seed: go.seed, goAt: go.at });
-        return;
+  });
+
+  // every frame of an online run: own score to the server, and the server's end time
+  function netFrame() {
+    const run = S.run;
+    if (S.mode === "play" || S.mode === "ready2" || S.mode === "dying") {
+      OL && OL.score(S.score);
+      if (run.endAt && Date.now() >= run.endAt) netStop(L("Süre doldu!"));
+    }
+  }
+  // the run stops; the result screen waits for the server's verdict (a few seconds at most)
+  function netStop(text, now) {
+    if (S.mode === "done" || S.mode === "over") return;
+    S.deathT = S.rt;
+    if (S.trick) landTrick();
+    S.holding = false; touches.clear();
+    S.mode = "done"; S.timeUp = true; $("ready").hidden = true;
+    banner(text); beep(880, 0.2, "triangle", 0.12, 1);
+    clearTimeout(net.endWait);
+    if (net.result || now) setTimeout(() => { if (S.mode === "done") showOver(); }, 700);
+    else net.endWait = setTimeout(() => { if (S.mode === "done") showOver(); }, 6000);
+  }
+  function onlineResult() {
+    const r = net.result, title = $("oTitle");
+    if (!r) {
+      title.textContent = L("BAĞLANTI KESİLDİ"); title.classList.remove("gold");
+      $("oScore").textContent = S.score;
+      rankRows([{ name: L("Sen"), val: String(S.score), me: true }, { name: L("Sonuç alınamadı."), val: "" }]);
+    } else {
+      const id = meId(), me = r.players.find((p) => p.id === id) || { score: S.score }, opp = r.players.find((p) => p.id !== id);
+      const win = !r.draw && r.winner === id;
+      title.textContent = r.draw ? L("BERABERE") : win ? L("KAZANDIN!") : L("KAYBETTİN");
+      title.classList.toggle("gold", win);
+      $("oScore").textContent = me.score;
+      const rows = [{ name: L("Sen"), val: String(me.score), me: true, sc: me.score }];
+      if (opp) rows.push({ name: opp.name, sub: r.reason === "opponent_left" ? L("oyundan ayrıldı") : "", val: String(opp.score), sc: opp.score });
+      rows.sort((a, b) => b.sc - a.sc);
+      rankRows(rows);
+      if (win && !S.netPaid) {
+        S.netPaid = true; coins += 60; store.set("fku2.coins", coins);
+        S.earned += 60; S.earnNote += L(", 60 galibiyetten"); paintEarn(); refreshHome();
       }
     }
+    onlineOverButtons();
   }
-  function onlineRank() {
-    if (!net.room) return;
-    const rows = net.room.peers().filter((p) => p.presence && p.presence.race === S.run.goAt).map((p) => ({
-      name: (p.sameTab ? L("Sen") : String(p.presence.nick || L("Oyuncu")).slice(0, 16)), me: p.sameTab,
-      tm: p.sameTab ? S.deathT : p.presence.tm || 0, flying: !p.sameTab && p.presence.st === "race",
-    }));
-    rows.sort((a, b) => (b.flying - a.flying) || b.tm - a.tm);
-    const allDone = rows.every((r) => !r.flying);
-    rankRows(rows.map((r) => ({ name: r.name, sub: r.flying ? L("hâlâ uçuyor") : "", val: r.flying ? "..." : r.tm.toFixed(1) + L(" sn"), me: r.me })));
-    $("oScore").textContent = S.deathT.toFixed(1) + L(" sn");
-    const pos = rows.findIndex((r) => r.me) + 1;
-    const title = $("oTitle");
-    title.textContent = !allDone ? L("SEN DÜŞTÜN, YARIŞ SÜRÜYOR") : pos === 1 && rows.length > 1 ? L("KAZANDIN!") : pos + L(". OLDUN");
-    title.classList.toggle("gold", allDone && pos === 1);
-    if (allDone && pos === 1 && rows.length > 1 && !S.netPaid) {
-      S.netPaid = true; coins += 60; store.set("fku2.coins", coins);
-      S.earned += 60; S.earnNote += L(", 60 birincilikten"); paintEarn(); refreshHome();
-    }
+  function onlineOverButtons() {
+    const again = $("again"), room = OL && OL.room, them = room && room.players.find((p) => p.id !== meId());
+    const gone = !room || net.oppLeft || !them;
+    again.disabled = gone || net.rematchVoted;
+    again.textContent = gone ? L("RAKİP AYRILDI") : net.rematchVoted ? L("RAKİP BEKLENİYOR...") : L("TEKRAR OYNA");
+    if (!gone && them.rematch && !net.rematchVoted) $("oTip").textContent = L("Rakip tekrar oynamak istiyor!");
+    else if (net.rematchVoted && !gone) $("oTip").textContent = L("Rakip tekrar oynamak istiyor mu, bekleniyor.");
   }
+
   function renderOnline() {
     const el = $("onlinePanel"); if (!el) return; el.innerHTML = "";
     const msg = (t) => { const p = document.createElement("p"); p.className = "msg"; p.textContent = t; el.appendChild(p); };
-    if (!net.api) { msg(lang === "en" ? "Online race can't open in this view. Open the game on claude.ai while signed in. Your friend also needs access to the game link (add them from the Share menu). Bot mode always works." : "Online yarış bu görünümde açılamadı. Oyunu claude.ai'da giriş yapmış olarak aç. Arkadaşının da oyun linkine erişimi olmalı (Paylaş menüsünden ekleyebilirsin). Bot modu her zaman çalışır."); return; }
-    if (!net.room) {
-      el.insertAdjacentHTML("beforeend", '<label for="nickIn">ADIN</label><input id="nickIn" maxlength="16" autocomplete="off">' +
-        '<p class="sec-h">RASTGELE YARIŞ</p><button class="btn gold" id="quickRoom">Rastgele rakip</button><p class="msg">' + L("Online oynayan herkesle eşleşirsin, en uzun uçan kazanır.") + '</p><p class="sec-h">ARKADAŞINLA YARIŞ</p>' +
-        '<button class="btn" id="mkRoom">Oda kur</button><label for="codeIn">YA DA KODLA KATIL</label><div class="join"><input id="codeIn" maxlength="6" autocomplete="off" placeholder="ABCD" style="text-transform:uppercase"><button class="btn alt" id="joinRoom">Katıl</button></div>');
-      const ni = $("nickIn"); ni.value = nick;
-      ni.addEventListener("change", () => { nick = ni.value.trim().slice(0, 16) || nick; store.set("fku4.nick", nick); });
-      $("mkRoom").addEventListener("click", () => { nick = ni.value.trim().slice(0, 16) || nick; store.set("fku4.nick", nick); const A = "ABCDEFGHJKLMNPRSTUVYZ23456789"; netJoin(Array.from({ length: 4 }, () => A[Math.floor(Math.random() * A.length)]).join("")); });
-      $("quickRoom").addEventListener("click", () => { nick = ni.value.trim().slice(0, 16) || nick; store.set("fku4.nick", nick); netJoin("HERKES", true); });
-      $("joinRoom").addEventListener("click", () => { nick = ni.value.trim().slice(0, 16) || nick; store.set("fku4.nick", nick); netJoin($("codeIn").value); });
+    const btn = (cls, text, fn) => { const b = document.createElement("button"); b.className = "btn" + (cls ? " " + cls : ""); b.textContent = text; b.addEventListener("click", fn); el.appendChild(b); return b; };
+    const conn = () => { const st = OL ? OL.status : "offline"; msg(L("Bağlantı: ") + (st === "online" ? L("çevrimiçi") : st === "connecting" || st === "reconnecting" ? L("bağlanıyor") : L("kopuk"))); };
+    if (!OL) { msg(L("Online oyun şu an kullanılamıyor. Tek oyunculu modlar her zaman çalışır.")); return; }
+    const room = OL.status === "online" || OL.status === "reconnecting" ? OL.room : null;
+
+    if (room) {
+      if (room.quick) el.insertAdjacentHTML("beforeend", '<p class="sec-h">HIZLI EŞLEŞME</p>');
+      else { el.insertAdjacentHTML("beforeend", '<div class="code"><span>ODA KODU, ARKADAŞINA SÖYLE</span><b></b></div>'); el.querySelector(".code b").textContent = room.code; }
+      const list = document.createElement("div"); list.className = "players"; el.appendChild(list);
+      for (const p of room.players) {
+        const d = document.createElement("div"); d.innerHTML = "<span></span><em></em>";
+        d.querySelector("span").textContent = p.id === meId() ? nick + L(" (sen)") : p.name;
+        const em = d.querySelector("em");
+        em.textContent = !p.connected ? L("bağlantı bekleniyor") : p.ready ? L("hazır") : L("bekliyor"); if (p.ready && p.connected) em.className = "ok";
+        list.appendChild(d);
+      }
+      const me = room.players.find((p) => p.id === meId()) || {};
+      if (room.players.length < 2) msg(L("Rakip bekleniyor. Arkadaşın Online oyna > Oda koduyla katıl'dan bu kodu girsin."));
+      if (room.state === "lobby") {
+        btn(me.ready ? "alt" : "", me.ready ? L("Hazırım ✓ (iptal)") : L("Hazırım"), () => { OL.ready(!me.ready); beep(600, 0.05); });
+        msg(L("İkiniz de hazır olunca maç 3 saniye içinde başlar. 60 saniyede en çok puanı yapan kazanır, düşersen kaldığın yerden devam edersin."));
+      }
       if (net.status) msg(net.status);
-      msg(L("Herkes aynı haritada aynı anda başlar. Rakiplerin yarı saydam görünür. En uzun süre uçan kazanır."));
+      btn("alt", L("Odadan çık"), () => { OL.leave(); net.status = ""; renderOnline(); });
+      conn();
       return;
     }
-    if (net.quick) el.insertAdjacentHTML("beforeend", '<p class="sec-h">RASTGELE YARIŞ</p><div class="players" id="plist"></div>');
-    else { el.insertAdjacentHTML("beforeend", '<div class="code"><span>ODA KODU, ARKADAŞINA SÖYLE</span><b></b></div><div class="players" id="plist"></div>'); el.querySelector(".code b").textContent = net.code; }
-    const list = $("plist"), ps = net.room.peers().filter((p) => p.kind === "viewer");
-    for (const p of ps) {
-      const d = document.createElement("div"); d.innerHTML = "<span></span><em></em>";
-      d.querySelector("span").textContent = (p.sameTab ? nick + L(" (sen)") : String((p.presence && p.presence.nick) || L("Oyuncu")).slice(0, 16));
-      const q = p.presence || {}, em = d.querySelector("em");
-      em.textContent = q.st === "race" ? L("yarışta") : q.rdy ? L("hazır") : L("bekliyor"); if (q.rdy) em.className = "ok";
-      list.appendChild(d);
-    }
-    if (net.quick) {
-      msg(L("Çevrimiçi oyuncu: ") + ps.length);
-      msg(L("Rakip aranıyor. Biri gelince yarış kendiliğinden başlar."));
-      const lb = document.createElement("button"); lb.className = "btn alt"; lb.textContent = L("Aramayı bırak"); lb.addEventListener("click", netLeave); el.appendChild(lb);
+    if (OL.queued && OL.status !== "offline") {
+      el.insertAdjacentHTML("beforeend", '<p class="sec-h">HIZLI EŞLEŞME</p>');
+      msg(L("Rakip aranıyor..."));
+      btn("alt", L("Aramayı bırak"), () => { OL.cancel(); });
+      conn();
       return;
     }
-    if (ps.length < 2) msg(L("Rakip bekleniyor. Arkadaşın oyunu açıp Online yarış'tan bu kodla katılsın."));
-    const rb = document.createElement("button"); rb.className = "btn" + (net.ready ? " alt" : ""); rb.textContent = net.ready ? L("Hazırım ✓ (iptal)") : L("Hazırım");
-    rb.addEventListener("click", () => { net.ready = !net.ready; net.room.presence({ rdy: net.ready, st: "lobby", go: null }); renderOnline(); netCheckGo(); });
-    el.appendChild(rb);
-    if (net.ready) msg(ps.length >= 2 ? L("Herkes hazır olunca yarış 3 saniye içinde başlar.") : L("Rakip gelince ve hazır olunca başlar."));
-    const lb = document.createElement("button"); lb.className = "btn alt"; lb.textContent = L("Odadan çık"); lb.addEventListener("click", netLeave); el.appendChild(lb);
+    el.insertAdjacentHTML("beforeend", '<label for="nickIn">ADIN</label><input id="nickIn" maxlength="16" autocomplete="off">');
+    const ni = $("nickIn"); ni.value = nick;
+    const saveNick = () => { const v = ni.value.trim().slice(0, 16); if (v) { nick = v; store.set("fku4.nick", nick); if (OL.status === "online") OL.setName(nick); } };
+    ni.addEventListener("change", saveNick);
+    const go = (fn) => async () => { saveNick(); net.status = ""; if (await netConnect()) fn(); };
+    el.insertAdjacentHTML("beforeend", '<p class="sec-h">HIZLI EŞLEŞME</p>');
+    btn("gold", L("Hızlı eşleşme"), go(() => OL.quick()));
+    msg(L("Online oynayan biriyle eşleşirsin."));
+    el.insertAdjacentHTML("beforeend", '<p class="sec-h">ÖZEL ODA</p>');
+    btn("", L("Oda oluştur"), go(() => OL.create()));
+    el.insertAdjacentHTML("beforeend", '<label for="codeIn">ODA KODUYLA KATIL</label><div class="join"><input id="codeIn" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="123456"><button class="btn alt" id="joinRoom">Katıl</button></div>');
+    $("codeIn").addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6); });
+    $("joinRoom").addEventListener("click", () => {
+      const code = $("codeIn").value;
+      if (!/^\d{6}$/.test(code)) { net.status = L("Oda kodu 6 haneli olmalı."); renderOnline(); return; }
+      go(() => OL.join(code))();
+    });
+    if (net.status) msg(net.status);
+    if (OL.status !== "idle") conn();
   }
 
   // ---------- home FLIX: your equipped FLIX or ball keeps kicking itself up; tap to kick it higher ----------
@@ -3107,8 +3399,8 @@ svg { display: block; }
       if ($("readyText").textContent !== txt) { $("readyText").textContent = txt; beep(left > 0 ? 520 : 880, 0.1, "triangle", 0.1, 1); }
       if (left <= 0) { S.mode = "play"; S.vy = -0.6 * U; $("ready").hidden = true; }
     }
-    if (S.run && S.run.kind === "online" && net.room && (S.mode === "play" || S.mode === "ready") && now - (net.lastPos || 0) > 90 && (net.lastPos = now)) net.room.presence({ x: Math.round(S.x / U * 1000), y: Math.round(S.y / U * 1000), a: Math.round(S.ang * 100), g: S.gates, sc: S.score });
-    if (S.mode === "play" || S.mode === "ready") updateRaceHud();
+    if (S.run && S.run.kind === "online") netFrame();
+    if (S.mode === "play" || S.mode === "ready" || (S.run && S.run.kind === "online" && (S.mode === "ready2" || S.mode === "dying"))) updateRaceHud();
     const idle = (S.mode === "paused" || S.mode === "over") && !S.parts.length && !S.texts.length;
     if (!idle || now - lastDraw > 66) { lastDraw = now; drawScene(S.mode === "paused" ? 1 : alpha); }
     requestAnimationFrame(frame);
