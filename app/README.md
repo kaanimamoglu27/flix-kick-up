@@ -14,7 +14,7 @@ Bu klasör Flix Kick Up'ı iPhone (ve istersen Android) uygulamasına çeviren h
 
 ## Uygulamada web sürümünden farklı olanlar
 - Mağaza gerçek: satın alma Apple'ın kendi penceresiyle yapılır, fiyatlar mağazadan TL olarak okunur.
-- Reklamlar Google AdMob ile (`www/ads.js` servisi): düşünce "Kaldığın yerden devam" ve "Tüyleri 2 katına çıkar" ödüllü reklamları. Bunlar sadece oyuncu basarsa açılır, ödül yalnızca reklam sonuna kadar izlenince verilir, reklam hazır değilse mesaj çıkar. Tur arası reklam en erken 3. bitmiş oyundan sonra, sonra her 3 oyunda bir ve en fazla 90 saniyede bir çıkar; sadece sonuç ekranından çıkarken (Tekrar / Menü / Mağaza) gösterilir, oyun sırasında asla. Hazır değilse beklemeden atlanır. "Reklamsız" (kickup_noads) tur arası reklamı ve banner'ı tamamen kapatır, ödüllü reklamlar isteğe bağlı kalır. Web sürümünde reklam ağı olmadığı için aynı yerlerde gerçek FLIX oyuncağının kendi reklamı çıkar (flixtoysofficial.com'a gider).
+- Reklamlar Google AdMob ile (`www/ads.js` servisi): düşünce "Kaldığın yerden devam" ve "Tüyleri 2 katına çıkar" ödüllü reklamları. Bunlar sadece oyuncu basarsa açılır, ödül yalnızca reklam sonuna kadar izlenince verilir, reklam hazır değilse mesaj çıkar. Tur arası reklam en erken 3. bitmiş oyundan sonra, sonra her 3 oyunda bir ve en fazla 90 saniyede bir çıkar; sadece sonuç ekranından çıkarken (Tekrar / Menü / Mağaza) gösterilir, oyun sırasında asla. Hazır değilse beklemeden atlanır. "Reklamsız" (kickup_noads_v2) tur arası reklamı ve banner'ı tamamen kapatır, ödüllü reklamlar isteğe bağlı kalır. Web sürümünde reklam ağı olmadığı için aynı yerlerde gerçek FLIX oyuncağının kendi reklamı çıkar (flixtoysofficial.com'a gider).
 - Reklam tempo ve ödül ayarları oyunda tek yerde: `AD_CFG` (`../flix-kick-up.html`, "ads" bölümü). Reklam kimlikleri, test/gerçek seçimi, banner ve takip izni anahtarı: `www/ads-config.js`. Kimlikler GitHub secret olarak da girilebilir: KICKUP_ADMOB_APP_ID, KICKUP_ADMOB_REWARDED_ID, KICKUP_ADMOB_INTERSTITIAL_ID, KICKUP_ADMOB_BANNER_ID. Boş ya da biçimi yanlış kimlik yerine Google'ın test reklamı çıkar. Takip izni sorusu (`requestTracking`) Google'ın onay penceresinden sonra bir kez sorulur.
 - Banner desteği hazır ama kapalı (`bannerEnabled: false`), çünkü ana ekranın alt butonları banner'ın yerinde duruyor. Açılırsa sadece ana ekranda görünür.
 - "Reklamsız" ve "Başlangıç Paketi" cihazda saklanır. Uygulama her açılışta mağazanın bildirdiği sahipliği de tekrar okur. "Satın alımları geri yükle" bulduğunu verir; bir şey yoksa ya da mağazaya ulaşılamıyorsa bunu söyler.
@@ -28,8 +28,8 @@ Bütün adımlar ve terminal komutları: [../TESTFLIGHT_REHBERI.md](../TESTFLIGH
 ## Uygulama içi ürünler
 | Kimlik | Tür | Fiyat | İçerik |
 |---|---|---|---|
-| kickup_starter | Tüketilemez | 2,99 $ | Başlangıç Paketi: 2.500 tüy + Kristal FLIX (tek sefer, geri yüklenebilir) |
-| kickup_noads | Tüketilemez | 2,99 $ | Reklamsız: tur arası reklamları kaldırır (geri yüklenebilir) |
+| kickup_starter_v2 | Tüketilemez | 2,99 $ | Başlangıç Paketi: 2.500 tüy + Kristal FLIX (tek sefer, geri yüklenebilir) |
+| kickup_noads_v2 | Tüketilemez | 2,99 $ | Reklamsız: tur arası reklamları kaldırır (geri yüklenebilir) |
 | kickup_feathers_500 | Tüketilebilir | 0,99 $ | 500 tüy (Avuç) |
 | kickup_feathers_1200 | Tüketilebilir | 1,99 $ | 1.200 tüy (Kese) |
 | kickup_feathers_3500 | Tüketilebilir | 4,99 $ | 3.500 tüy (Sandık) |

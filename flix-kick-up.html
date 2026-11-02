@@ -3066,8 +3066,8 @@ svg { display: block; }
   const grantStarter = () => { if (!iap.starter) addCoins(2500); iap.starter = true; store.set("fku4.iap", iap); owned.add("kristal"); saveOwned(); };
   const grantPid = (pid, tx) => {
     const seen = store.get("fku4.tx", []); if (tx && seen.includes(tx)) return true;
-    if (pid === "kickup_starter") grantStarter();
-    else if (pid === "kickup_noads") grantNoAds();
+    if (pid === "kickup_starter_v2") grantStarter();
+    else if (pid === "kickup_noads_v2") grantNoAds();
     else { const pk = PACKS.find((p) => p.pid === pid); if (!pk) return false; addCoins(pk.n); }
     if (tx) { seen.push(tx); store.set("fku4.tx", seen.slice(-300)); }
     if (awaitingApproval.delete(pid)) { toast(L("Satın alma onaylandı.")); jingle(); }
@@ -3088,21 +3088,21 @@ svg { display: block; }
       h(L("Kampanya"));
       const c = document.createElement("div"); c.className = "camp";
       c.innerHTML = '<span class="tag">' + (NATIVE_APP ? L("TEK SEFER") : "-%70") + '</span><b></b><canvas width="168" height="168"></canvas><small></small><span class="tm"></span><span class="price"><button class="pbtn"></button>' + (NATIVE_APP ? "" : "<s>$9.99</s>") + "</span>";
-      c.querySelector(".pbtn").textContent = priceOf("kickup_starter", 2.99);
+      c.querySelector(".pbtn").textContent = priceOf("kickup_starter_v2", 2.99);
       c.querySelector("b").textContent = L("Başlangıç Paketi"); c.querySelector("small").textContent = L("Tek seferlik: 2.500 tüy ve Kristal FLIX");
       const cx = c.querySelector("canvas").getContext("2d"); drawFlix(cx, 84, 112, 0, 40, byId(SKINS, "kristal"), 0, 0.3);
       const tm = c.querySelector(".tm");
       const tick = () => { const ms = Math.max(0, iap.campEnd - Date.now()), hh = Math.floor(ms / 3600000), mm = Math.floor(ms / 60000) % 60, ss = Math.floor(ms / 1000) % 60; tm.textContent = L("Bitiyor: ") + hh + ":" + String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0"); if (!ms) buildStore(); };
       tick(); campTimer = setInterval(() => { if (sheetOpen !== "store") return clearInterval(campTimer); tick(); }, 1000);
-      c.querySelector(".pbtn").addEventListener("click", () => pay("kickup_starter", L("Başlangıç Paketi"), 2.99, grantStarter, L("Teşekkürler! ") + "+2.500 " + L("tüy") + " + Kristal FLIX"));
+      c.querySelector(".pbtn").addEventListener("click", () => pay("kickup_starter_v2", L("Başlangıç Paketi"), 2.99, grantStarter, L("Teşekkürler! ") + "+2.500 " + L("tüy") + " + Kristal FLIX"));
       el.appendChild(c);
     }
     if (!iap.noads) {
       const na = document.createElement("div"); na.className = "noads";
       na.innerHTML = '<span class="ic">AD</span><span class="tx"><b></b><small></small></span><button class="pbtn"></button>';
       na.querySelector("b").textContent = L("Reklamsız"); na.querySelector("small").textContent = L("Ara reklamları kaldırır, ödüllü reklamlar isteğe bağlı kalır");
-      na.querySelector(".pbtn").textContent = priceOf("kickup_noads", 2.99);
-      na.querySelector(".pbtn").addEventListener("click", () => pay("kickup_noads", L("Reklamsız"), 2.99, grantNoAds, L("Reklamlar kapandı")));
+      na.querySelector(".pbtn").textContent = priceOf("kickup_noads_v2", 2.99);
+      na.querySelector(".pbtn").addEventListener("click", () => pay("kickup_noads_v2", L("Reklamsız"), 2.99, grantNoAds, L("Reklamlar kapandı")));
       el.appendChild(na);
     }
     h(L("Tüy paketleri"));
@@ -3121,7 +3121,7 @@ svg { display: block; }
     const rs = document.createElement("button"); rs.className = "restore"; rs.textContent = L("Satın alımları geri yükle");
     rs.addEventListener("click", () => {
       if (!(window.FlixNative && FlixNative.restore)) return toast(L("Geri yüklenecek bir şey yok (test sürümü)."));
-      FlixNative.restore().then((ids) => { ids = ids || []; if (ids.includes("kickup_starter")) grantStarter(); if (ids.includes("kickup_noads")) grantNoAds(); toast(ids.length ? L("Satın alımlar geri yüklendi.") : L("Geri yüklenecek bir satın alım bulunamadı.")); refreshHome(); buildStore(); }, () => toast(L("Mağazaya şu an ulaşılamıyor.")));
+      FlixNative.restore().then((ids) => { ids = ids || []; if (ids.includes("kickup_starter_v2")) grantStarter(); if (ids.includes("kickup_noads_v2")) grantNoAds(); toast(ids.length ? L("Satın alımlar geri yüklendi.") : L("Geri yüklenecek bir satın alım bulunamadı.")); refreshHome(); buildStore(); }, () => toast(L("Mağazaya şu an ulaşılamıyor.")));
     });
     el.appendChild(rs);
     const fine = document.createElement("p"); fine.className = "fine"; fine.textContent = window.FlixNative ? L("Ödemeler Apple hesabın üzerinden yapılır.") : L("Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak."); el.appendChild(fine);

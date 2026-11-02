@@ -14,7 +14,7 @@
 
   // Product ids must match App Store Connect and Google Play Console exactly.
   const CONSUMABLE = ['kickup_feathers_500', 'kickup_feathers_1200', 'kickup_feathers_3500', 'kickup_feathers_8000', 'kickup_feathers_18000', 'kickup_feathers_50000'];
-  const NON_CONSUMABLE = ['kickup_starter', 'kickup_noads'];
+  const NON_CONSUMABLE = ['kickup_starter_v2', 'kickup_noads_v2'];
 
   let store = null; const pending = {}; const waiting = [];
   // products waiting for Ask to Buy approval: buy(id) answers 'pending' for them instead of ordering again

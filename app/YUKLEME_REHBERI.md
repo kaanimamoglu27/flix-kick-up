@@ -30,7 +30,7 @@ Terminal komutları: [../TESTFLIGHT_REHBERI.md](../TESTFLIGHT_REHBERI.md).
    - Dil: Türkçe
    - Paket kimliği: **com.flixtoys.kickup**
    - SKU: `kickup1`
-2. **Uygulama İçi Satın Almalar**: `app/README.md` içindeki tablodaki 7 ürünü **aynı kimliklerle** oluştur (ör. `kickup_feathers_500`, `kickup_starter`).
+2. **Uygulama İçi Satın Almalar**: `app/README.md` içindeki tablodaki 7 ürünü **aynı kimliklerle** oluştur (ör. `kickup_feathers_500`, `kickup_starter_v2`).
    - Türleri tabloda yazıyor: tüketilebilir ya da tüketilemez.
    - Fiyatları tablodaki dolar seviyelerinden seç. Türkiye fiyatını Apple TL'ye kendisi çevirir.
    - Her ürüne bir ekran görüntüsü ister (inceleme için). `store/screenshots/` içinden mağaza ekranı yerine dolap görüntüsünü kullanabilirsin.

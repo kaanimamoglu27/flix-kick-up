@@ -129,7 +129,7 @@ cd ../../../Flix-Arkana/app    && ./ios.sh yukle 1.0    # Flix Arkana
 
 Ürünler TestFlight'ta satın alma denemek için gerekir; oyun ürünler olmadan da açılır ve oynanır.
 
-**Flix Kick Up (8):** `kickup_starter` ve `kickup_noads` (Reklamsız) (tüketilemez, 2,99 $), `kickup_feathers_500`, `_1200`, `_3500`, `_8000`, `_18000`, `_50000` (tüketilebilir, 0,99-49,99 $). Ayrıntı: `app/README.md`.
+**Flix Kick Up (8):** `kickup_starter_v2` ve `kickup_noads_v2` (Reklamsız) (tüketilemez, 2,99 $), `kickup_feathers_500`, `_1200`, `_3500`, `_8000`, `_18000`, `_50000` (tüketilebilir, 0,99-49,99 $). Ayrıntı: `app/README.md`.
 
 **Flix Arkana (17):** liste `Flix-Arkana/app/README.md` içinde.
 
