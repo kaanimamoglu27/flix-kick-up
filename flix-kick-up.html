@@ -195,6 +195,18 @@ svg { display: block; }
 .toggle[aria-pressed="true"] i { background: var(--orange); }
 .toggle[aria-pressed="true"] i::after { transform: translateX(20px); }
 .about { font-size: 12px; font-weight: 500; color: var(--text-2); line-height: 1.5; margin: 6px 2px; }
+/* Legal / About (opened from Ayarlar) */
+.toggle.link { margin-bottom: 8px; }
+.toggle.link svg { width: 18px; height: 18px; flex: none; }
+.legal { font-size: 14px; font-weight: 500; line-height: 1.55; }
+.legal h3 { margin: 18px 0 4px; font: 800 15px/1.2 var(--font-display); }
+.legal h3:first-child { margin-top: 4px; }
+.legal p, .legal ul { margin: 0 0 8px; }
+.legal ul { padding-left: 20px; }
+.legal small { display: block; color: var(--text-2); margin-bottom: 6px; }
+.legal .ext { color: var(--orange-dk); font-weight: 700; text-decoration: underline; cursor: pointer; overflow-wrap: anywhere; }
+.legal .credit { background: var(--soft); border-radius: 16px; padding: 14px; margin: 6px 0 12px; }
+.legal .credit p { margin: 0 0 4px; font-weight: 700; }
 
 /* Modes sheet */
 .modes, .online { display: flex; flex-direction: column; gap: 10px; }
@@ -558,7 +570,126 @@ svg { display: block; }
         <button class="toggle" id="tSound" aria-pressed="true"><span>Ses</span><i></i></button>
         <button class="toggle" id="tVibe" aria-pressed="true"><span>Titreşim</span><i></i></button>
         <div class="langrow"><span>Dil</span><div class="seg two" id="langSeg"><button data-lang="tr">Türkçe</button><button data-lang="en">English</button></div></div>
-        <p class="about">Flix Kick Up, sürüm 1.4.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>flixtoysofficial.com</p>
+        <button class="toggle link" data-legal="privacy"><span>Gizlilik Politikası</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="toggle link" data-legal="terms"><span>Kullanım Koşulları</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="toggle link" data-legal="licenses"><span>Lisanslar ve Teşekkürler</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button class="toggle link" data-legal="about"><span>Hakkında</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        <p class="about">Flix Kick Up, sürüm 1.4.<br>Klavye: A / S / D veya ← ↑ →, P ile mola.<br>Developed by Kaan Imamoglu · Published by FLIX TOYS<br>© 2026 FLIX TOYS. All rights reserved.<br>flixtoysofficial.com</p>
+      </div>
+      <div class="legal" id="privacyPanel">
+        <div data-only="tr">
+          <small>Flix Kick Up · Son güncelleme: 2 Kasım 2026</small>
+          <h3>Kısaca</h3>
+          <p>Flix Kick Up'ı FLIX TOYS yayınlar. Oyun hesap açmanı istemez; adını, e-postanı, telefon numaranı ya da konumunu sormaz. Bu metin, oyunun hangi bilgileri neden kullandığını anlatır.</p>
+          <h3>Cihazında saklananlar</h3>
+          <p>Rekorların, tüylerin, açtığın FLIX'ler ve sahneler, ayarların (ses, titreşim, dil), online takma adın ve satın aldığın ürünlerin bilgisi yalnızca telefonunda saklanır. Bize gönderilmez. Uygulamayı silersen hepsi silinir.</p>
+          <h3>Online oyun</h3>
+          <p>Online oyun yalnızca sen "Online oyna"yı açtığında çalışır. O sırada telefonun şifreli bağlantıyla (wss) bizim oyun sunucumuza bağlanır. Sunucuya gidenler: seçtiğin takma ad (en fazla 16 karakter), maç içindeki puanın, hazır / tekrar oyna durumun, oda kodu ve yeniden bağlanabilmen için geçici bir oturum anahtarı. Bunlar rakibine maç sırasında gösterilir. Sunucu bu bilgileri yalnızca maç süresince bellekte tutar, veritabanına yazmaz. Sorunları çözmek için kısa süreli teknik kayıtlar (oda kodu, rastgele oyuncu numarası, skor) tutulabilir. Sunucu Render.com üzerinde çalışır; her internet bağlantısında olduğu gibi IP adresin barındırma sağlayıcısının kayıtlarında görünebilir. Takma adına gerçek adını ya da kişisel bilgini yazma.</p>
+          <h3>Reklamlar (Google AdMob)</h3>
+          <p>Oyundaki reklamları Google AdMob gösterir:</p>
+          <ul>
+            <li>Ödüllü reklamlar: yalnızca sen istersen izlenir (devam etmek ya da tüyleri ikiye katlamak için).</li>
+            <li>Tur arası reklamlar: birkaç turda bir, turlar arasında. Online maç sırasında reklam açılmaz.</li>
+            <li>Banner: açıksa yalnızca ana menünün altında görünür, oyun sırasında görünmez.</li>
+          </ul>
+          <p>AdMob reklam göstermek ve ölçmek için cihazın reklam kimliğini (yalnızca izin verirsen), yaklaşık konumunu (IP adresinden), reklam etkileşimlerini ve tanılama verilerini kullanabilir. Avrupa'da ve İngiltere'de önce Google'ın onay ekranı çıkar. iPhone sana "takip izni" sorusunu sorar; izin vermezsen reklamlar kişiselleştirilmeden gösterilir, oyun aynı şekilde çalışır. Ayrıntı: <a class="ext" data-url="https://policies.google.com/privacy">Google Gizlilik Politikası</a>.</p>
+          <h3>Satın almalar ve Reklamsız</h3>
+          <p>Uygulama içi satın almalar (tüy paketleri, Başlangıç Paketi ve Reklamsız) Apple App Store (StoreKit) üzerinden yapılır. Ödeme bilgilerin bize ulaşmaz; Apple yalnızca hangi ürünün alındığını uygulamaya bildirir. "Reklamsız" tur arası reklamları ve banner'ı kalıcı olarak kapatır; ödüllü reklamlar isteğe bağlı olarak kalır. Satın alımlarını Mağaza'daki "Satın alımları geri yükle" ile geri yükleyebilirsin.</p>
+          <h3>Çocuklar</h3>
+          <p>Oyun her yaşa uygundur. Çocuklardan bilerek kişisel bilgi toplamayız.</p>
+          <h3>Silme ve sorular</h3>
+          <p>Cihazındaki verileri silmek için uygulamayı silmen yeterli. Online maç bilgileri sunucuda saklanmadığı için ayrıca silinecek bir hesap yoktur. Bu politika değişirse bu sayfa güncellenir. Tam metin: <a class="ext" data-url="https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html">kaanimamoglu27.github.io/flix-kick-up/gizlilik.html</a>. İletişim: <a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
+        </div>
+        <div data-only="en">
+          <small>Flix Kick Up · Last updated: 2 November 2026</small>
+          <h3>In short</h3>
+          <p>Flix Kick Up is published by FLIX TOYS. The game does not ask you to create an account and does not ask for your name, email, phone number or location. This policy explains which information the game uses and why.</p>
+          <h3>Stored on your device</h3>
+          <p>Your records, feathers, unlocked FLIXes and scenes, settings (sound, vibration, language), online nickname and purchase status are stored only on your phone. They are not sent to us. Deleting the app deletes them.</p>
+          <h3>Online play</h3>
+          <p>Online play only runs when you open "Play online". Your phone then connects to our game server over an encrypted connection (wss). The server receives: the nickname you choose (up to 16 characters), your in-match score, your ready / rematch state, the room code and a temporary session key so you can reconnect. These are shown to your opponent during the match. The server keeps them in memory only for the match and does not write them to a database. Short-lived technical logs (room code, random player number, score) may be kept to fix problems. The server runs on Render.com; as with any internet connection, your IP address may appear in the hosting provider's logs. Do not use your real name or personal details as your nickname.</p>
+          <h3>Ads (Google AdMob)</h3>
+          <p>Ads in the game are shown by Google AdMob:</p>
+          <ul>
+            <li>Rewarded ads: only watched if you choose to (to keep going or double your feathers).</li>
+            <li>Interstitial ads: every few runs, between runs. No ads open during an online match.</li>
+            <li>Banner: if enabled, only at the bottom of the main menu, never during play.</li>
+          </ul>
+          <p>To show and measure ads, AdMob may use the device's advertising identifier (only if you allow it), approximate location (from the IP address), ad interactions and diagnostics. In the EEA and UK, Google's consent form is shown first. Your iPhone asks whether to allow tracking; if you decline, ads are not personalised and the game works the same. See the <a class="ext" data-url="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
+          <h3>Purchases and No Ads</h3>
+          <p>In-app purchases (feather packs, the Starter Pack and No Ads) are handled by Apple's App Store (StoreKit). We never receive your payment details; Apple only tells the app which product was bought. "No Ads" permanently turns off interstitial and banner ads; rewarded ads stay optional. You can restore purchases with "Restore purchases" in the Store.</p>
+          <h3>Children</h3>
+          <p>The game is suitable for all ages. We do not knowingly collect personal information from children.</p>
+          <h3>Deletion and questions</h3>
+          <p>To delete the data on your device, delete the app. Online match data is not stored on the server, so there is no account to delete. If this policy changes, this page will be updated. Full text: <a class="ext" data-url="https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html">kaanimamoglu27.github.io/flix-kick-up/gizlilik.html</a>. Contact: <a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
+        </div>
+      </div>
+      <div class="legal" id="termsPanel">
+        <div data-only="tr">
+          <small>Flix Kick Up · Son güncelleme: 2 Kasım 2026</small>
+          <h3>Kabul</h3>
+          <p>Flix Kick Up'ı indirip oynayarak bu koşulları kabul etmiş olursun. App Store'dan indirilen uygulamalar için Apple'ın <a class="ext" data-url="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Standart Lisans Sözleşmesi (EULA)</a> de geçerlidir.</p>
+          <h3>Kullanım lisansı</h3>
+          <p>FLIX TOYS sana oyunu kişisel ve ticari olmayan amaçla kullanman için devredilemez, sınırlı bir lisans verir. Oyunu kopyalamak, değiştirmek, tersine mühendislik yapmak ya da yeniden satmak yasaktır.</p>
+          <h3>Tüyler ve satın almalar</h3>
+          <p>Tüyler ve oyun içi ürünler yalnızca oyunda kullanılır; gerçek para değeri yoktur ve paraya çevrilemez. Ödemeler ve iadeler Apple tarafından, Apple'ın kurallarına göre yapılır. "Reklamsız" tur arası reklamları ve banner'ı kapatır; isteğe bağlı ödüllü reklamlar kalır.</p>
+          <h3>Online oyun</h3>
+          <p>Takma adın başkalarına görünür. Küfürlü, saldırgan ya da başkasını taklit eden adlar kullanma; hile yapma ve sunucuyu bozmaya çalışma. Bu kurallara uymayan oyuncular maçtan çıkarılabilir. Online oyun sunucusu ücretsiz bir hizmettir; kesintisiz çalışacağını garanti etmeyiz ve hizmeti değiştirebilir ya da durdurabiliriz. Tek oyunculu modlar internet olmadan da çalışır.</p>
+          <h3>Fikri mülkiyet</h3>
+          <p>Oyunun adı, FLIX karakterleri, grafikleri, sesleri ve kodu FLIX TOYS'a aittir.</p>
+          <h3>Sorumluluk</h3>
+          <p>Oyun "olduğu gibi" sunulur. Yasaların izin verdiği ölçüde, oyunun kullanımından doğan dolaylı zararlardan sorumlu değiliz.</p>
+          <h3>Değişiklikler ve iletişim</h3>
+          <p>Bu koşullar güncellenebilir; güncel hali her zaman bu ekrandadır. İletişim: <a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
+        </div>
+        <div data-only="en">
+          <small>Flix Kick Up · Last updated: 2 November 2026</small>
+          <h3>Acceptance</h3>
+          <p>By downloading and playing Flix Kick Up you agree to these terms. For apps downloaded from the App Store, Apple's <a class="ext" data-url="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Standard License Agreement (EULA)</a> also applies.</p>
+          <h3>License</h3>
+          <p>FLIX TOYS grants you a limited, non-transferable license to use the game for personal, non-commercial purposes. You may not copy, modify, reverse engineer or resell the game.</p>
+          <h3>Feathers and purchases</h3>
+          <p>Feathers and in-game items can only be used in the game; they have no real-money value and cannot be exchanged for money. Payments and refunds are handled by Apple under Apple's rules. "No Ads" turns off interstitial and banner ads; optional rewarded ads remain.</p>
+          <h3>Online play</h3>
+          <p>Your nickname is visible to other players. Do not use offensive, abusive or impersonating names; do not cheat or try to disrupt the server. Players who break these rules may be removed from a match. The online server is a free service; we do not guarantee it will always be available and we may change or stop it. Single-player modes work without the internet.</p>
+          <h3>Intellectual property</h3>
+          <p>The game's name, FLIX characters, graphics, sounds and code belong to FLIX TOYS.</p>
+          <h3>Liability</h3>
+          <p>The game is provided "as is". To the extent permitted by law, we are not liable for indirect damages arising from its use.</p>
+          <h3>Changes and contact</h3>
+          <p>These terms may be updated; the current version is always on this screen. Contact: <a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
+        </div>
+      </div>
+      <div class="legal" id="licensesPanel">
+        <div data-only="tr"><p>Flix Kick Up aşağıdaki yazılımları, SDK'ları ve yazı tipini kullanır. Hepsine teşekkürler.</p></div>
+        <div data-only="en"><p>Flix Kick Up uses the following software, SDKs and font. Thank you to their authors.</p></div>
+        <h3>Rubik</h3>
+        <p>Copyright 2015 The Rubik Project Authors. SIL Open Font License 1.1.</p>
+        <h3>Capacitor (@capacitor/core, @capacitor/ios, @capacitor/haptics, @capacitor/status-bar)</h3>
+        <p>Copyright (c) Ionic. MIT License.</p>
+        <h3>@capacitor-community/admob</h3>
+        <p>Copyright (c) Capacitor Community contributors. MIT License.</p>
+        <h3>cordova-plugin-purchase</h3>
+        <p>Copyright (c) Jean-Christophe Hoelt / Fovea. MIT License.</p>
+        <h3>Google Mobile Ads SDK</h3>
+        <p>Copyright Google LLC. Google Mobile Ads SDK Terms.</p>
+        <h3>ws (online server)</h3>
+        <p>Copyright (c) Einar Otto Stangvik and contributors. MIT License.</p>
+        <h3>MIT License</h3>
+        <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+        <h3>SIL Open Font License 1.1</h3>
+        <p>The Rubik font is licensed under the SIL Open Font License, Version 1.1: <a class="ext" data-url="https://openfontlicense.org">openfontlicense.org</a></p>
+      </div>
+      <div class="legal" id="aboutPanel">
+        <div class="credit">
+          <p>Flix Kick Up</p>
+          <p>Developed by Kaan Imamoglu</p>
+          <p>Published by FLIX TOYS</p>
+          <p>© 2026 FLIX TOYS. All rights reserved.</p>
+        </div>
+        <div data-only="tr"><p>Sürüm 1.4. FLIX'i sektir, direklerin arasından uç, rekorunu kır; botlara, hayaletine ya da online rakiplere karşı yarış.</p></div>
+        <div data-only="en"><p>Version 1.4. Bounce the FLIX, fly between the posts and beat your record; race bots, your ghost or online rivals.</p></div>
+        <p><a class="ext" data-url="https://flixtoysofficial.com">flixtoysofficial.com</a></p>
       </div>
     </div>
     <footer id="sheetFoot">
@@ -655,6 +786,9 @@ svg { display: block; }
   const NATIVE_APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   const L = (s) => lang === "en" && EN[s] != null ? EN[s] : s;
   document.documentElement.lang = lang;
+  // legal texts are written in both languages; show the one that matches
+  document.querySelectorAll("[data-only]").forEach((el) => { el.hidden = el.dataset.only !== lang; });
+  Object.assign(EN, { "Gizlilik Politikası": "Privacy Policy", "Kullanım Koşulları": "Terms of Service", "Lisanslar ve Teşekkürler": "Licenses & Acknowledgements", "Hakkında": "About" });
   function localize(root) {
     if (lang !== "en") return;
     const fix = (n) => {
@@ -2767,6 +2901,10 @@ svg { display: block; }
     how: { title: L("Nasıl oynanır"), panel: "howPanel", tall: true },
     store: { title: L("Mağaza"), panel: "storePanel", tall: true },
     set: { title: L("Ayarlar"), panel: "setPanel" },
+    privacy: { title: L("Gizlilik Politikası"), panel: "privacyPanel", tall: true, back: "set" },
+    terms: { title: L("Kullanım Koşulları"), panel: "termsPanel", tall: true, back: "set" },
+    licenses: { title: L("Lisanslar ve Teşekkürler"), panel: "licensesPanel", tall: true, back: "set" },
+    about: { title: L("Hakkında"), panel: "aboutPanel", tall: true, back: "set" },
   };
   function openSheet(kind) {
     const D = SHEETS[kind]; sheetOpen = kind;
@@ -2795,7 +2933,10 @@ svg { display: block; }
   document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => { beep(600, 0.05); openSheet(b.dataset.open); }));
   $("logoBtn").addEventListener("click", () => { const b = $("logoBtn"); b.classList.remove("kick"); void b.offsetWidth; b.classList.add("kick"); beep(560, 0.08, "triangle", 0.12); setTimeout(() => beep(840, 0.1, "triangle", 0.1), 120); buzz(10); });
   $("openSettings").addEventListener("click", () => openSheet("set"));
-  $("sheetBack").addEventListener("click", () => closeSheet(false));
+  $("sheetBack").addEventListener("click", () => { const D = sheetOpen && SHEETS[sheetOpen]; if (D && D.back) { openSheet(D.back); return; } closeSheet(false); });
+  // legal / about pages (from Ayarlar): back returns to Ayarlar, links open in the browser
+  document.querySelectorAll("[data-legal]").forEach((b) => b.addEventListener("click", () => { beep(600, 0.05); openSheet(b.dataset.legal); $("sheet").querySelector(".sheet-body").scrollTop = 0; }));
+  document.querySelectorAll(".legal .ext").forEach((a) => { a.setAttribute("role", "link"); a.tabIndex = 0; const go = () => { try { window.open(a.dataset.url, "_blank", "noopener"); } catch {} }; a.addEventListener("click", go); a.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); }); });
   const syncToggles = () => { $("tSound").setAttribute("aria-pressed", String(settings.sound)); $("tVibe").setAttribute("aria-pressed", String(settings.vibe)); };
   $("tSound").addEventListener("click", () => { settings.sound = !settings.sound; store.set("fku4.settings", settings); syncToggles(); beep(700, 0.06); });
   $("tVibe").addEventListener("click", () => { settings.vibe = !settings.vibe; store.set("fku4.settings", settings); syncToggles(); buzz(25); });
