@@ -77,13 +77,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#bfe6ee;font-family:
 @keyframes tut{0%{transform:translateY(0) scale(.85);opacity:0}15%{opacity:1;transform:translateY(0) scale(1)}65%{transform:translateY(130px)}80%{opacity:1;transform:translateY(130px) scale(1.1)}100%{opacity:0;transform:translateY(130px) scale(1.1)}}
 button{touch-action:manipulation;cursor:pointer}
 button:active{transform:translateY(3px)}
+
+.bub{position:absolute;left:0;top:0;background:#fff;color:var(--navy);border:3px solid var(--navy);border-radius:14px;padding:5px 10px;font-family:'Barlow Condensed',Impact,sans-serif;font-style:italic;font-weight:900;font-size:20px;white-space:nowrap;pointer-events:none;box-shadow:0 3px 0 rgba(2,39,83,.25);will-change:transform}
+.bub:after{content:'';position:absolute;left:50%;bottom:-11px;margin-left:-7px;border:7px solid transparent;border-top-color:var(--navy)}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .3s}
 </style></head><body>
 @@INTRO@@
 <div id="gl"></div>
 <div class="layer" id="hud" hidden>
   <svg id="aimsvg"></svg>
-  <div class="tl"><div class="pill"><span>BÖLÜM <span id="lvN">1</span></span><span class="m" id="lvName">Çatı Katı</span></div><div class="stars" id="hudStars"></div></div>
+  <div class="tl"><div class="pill"><span>BÖLÜM <span id="lvN">1</span></span><span class="m" id="lvName">Fırın Önü</span></div><div class="stars" id="hudStars"></div></div>
   <div class="tr"><div class="pill d"><span style="font-size:12px;opacity:.8">ATIŞ</span><span class="big" style="font-size:24px" id="shots">1/3</span></div><button class="pause" id="pauseB" aria-label="Duraklat"><i></i><i></i></button></div>
   <div id="wind"><div class="pill" style="font-size:14px">Rüzgâr <span class="big" style="font-size:20px" id="windV">→ 8</span></div></div>
   <div id="tut" hidden></div><div id="hint" hidden>Geri çek, bırak</div>
@@ -102,7 +105,7 @@ button:active{transform:translateY(3px)}
   <button id="sndB">SES</button>
 </div>
 <div class="layer" id="levelsL" hidden>
-  <div class="sheet" id="levels"><h2 class="big">ÇATI KATI</h2><div class="pk">Mahalle 1 · 10 bölüm</div><div id="grid"></div>
+  <div class="sheet" id="levels"><h2 class="big">MAHALLE</h2><div class="pk">Sokak 1 · 10 bölüm</div><div id="grid"></div>
     <button id="back1">Geri</button></div>
 </div>
 <div class="layer" id="endL" hidden>
