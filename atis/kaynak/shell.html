@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Flix Atış</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,800;1,900&family=Rubik:wght@400;500;700;800&display=swap">
+<style>
+:root{--navy:#022753;--red:#e22511;--yel:#ffc20e;--ink:#1b1330;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#bfe6ee;font-family:Rubik,system-ui,sans-serif;color:var(--navy);touch-action:none;overscroll-behavior:none}
+#gl{position:fixed;inset:0}#gl canvas{display:block;width:100%!important;height:100%!important}
+.layer{position:fixed;inset:0;pointer-events:none}
+.layer>*{pointer-events:auto}
+[hidden]{display:none!important}
+.big{font-family:'Barlow Condensed',Impact,sans-serif;font-style:italic;font-weight:900;line-height:.9;letter-spacing:.3px}
+.pill{background:#fff;border-radius:16px;padding:8px 14px;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:15px;box-shadow:0 3px 0 rgba(2,39,83,.18)}
+.pill.d{background:var(--navy);color:#fff}
+.pill .m{font-weight:600;opacity:.6}
+.pause{width:46px;height:46px;border-radius:14px;background:var(--navy);display:flex;align-items:center;justify-content:center;gap:5px;border:0;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.pause i{display:block;width:6px;height:17px;background:#fff;border-radius:2px}
+#hud .tl{position:absolute;top:calc(var(--sat) + 12px);left:14px;pointer-events:none}
+#hud .tr{position:absolute;top:calc(var(--sat) + 12px);right:14px;display:flex;gap:8px;align-items:center}
+.stars{display:flex;gap:4px;margin-top:8px}
+.stars svg{width:28px;height:28px;transition:transform .2s}
+.stars svg.on{transform:scale(1.15)}
+#wind{position:absolute;top:calc(var(--sat) + 70px);right:14px;pointer-events:none}
+#hint{position:absolute;font-size:15px;font-weight:800;pointer-events:none;background:var(--navy);color:#fff;padding:8px 14px;border-radius:999px;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+#aimsvg{position:absolute;inset:0;pointer-events:none}
+.btn{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--navy);background:var(--yel);box-shadow:0 6px 0 #c78f00,0 10px 18px rgba(0,0,0,.22);border:3px solid var(--navy);font-family:Rubik,sans-serif;touch-action:none}
+.btn b{font-family:'Barlow Condensed',Impact,sans-serif;font-style:italic;font-weight:900;font-size:27px;line-height:1}
+.btn small{font-size:10px;font-weight:700;letter-spacing:.8px}
+.btn.down{transform:translateY(4px);box-shadow:0 2px 0 #c78f00,0 4px 8px rgba(0,0,0,.25)}
+.btn.off{filter:saturate(.25) brightness(1.05);opacity:.75}
+#tuy{right:18px;bottom:calc(var(--sab) + 26px);width:112px;height:112px}
+#tuyRing{position:absolute;inset:-9px;pointer-events:none}
+#toast{position:absolute;left:0;right:0;top:calc(var(--sat) + 150px);text-align:center;pointer-events:none}
+#toast .in{display:inline-block;animation:pop .9s ease-out forwards}
+@keyframes pop{0%{transform:scale(.6);opacity:0}15%{transform:scale(1.1);opacity:1}30%{transform:scale(1)}80%{opacity:1}100%{transform:translateY(-20px);opacity:0}}
+.call{font-family:'Barlow Condensed',Impact,sans-serif;font-style:italic;font-weight:900;font-size:44px;color:var(--yel);-webkit-text-stroke:2px var(--navy);paint-order:stroke fill;text-shadow:0 4px 0 var(--navy)}
+.tag{display:inline-block;background:var(--red);color:#fff;font-weight:800;font-size:13px;letter-spacing:1.4px;padding:5px 10px;border-radius:8px;transform:rotate(-3deg)}
+/* sheets */
+.sheet{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:calc(var(--sat) + 36px) 18px calc(var(--sab) + 26px)}
+#home .logo{width:180px;filter:drop-shadow(0 5px 0 rgba(2,39,83,.25))}
+#home h1{font-size:84px;color:#fff;-webkit-text-stroke:3px var(--navy);paint-order:stroke fill;text-shadow:0 6px 0 var(--navy);margin-top:-6px;letter-spacing:2px}
+#home .sub{margin-top:8px;background:var(--navy);color:#fff;font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px}
+#home .stats{display:flex;gap:8px;margin-top:12px}
+#play{right:18px;bottom:calc(var(--sab) + 26px);width:124px;height:124px}
+#play b{font-size:36px}
+#sndB{position:absolute;top:calc(var(--sat) + 12px);right:14px;height:40px;padding:0 12px;border-radius:12px;background:var(--navy);color:#fff;border:0;font-size:12px;font-weight:800}
+#levels{background:rgba(191,230,238,.92)}
+#levels h2{font-size:46px;margin-top:6px}
+#levels .pk{font-weight:700;opacity:.7;margin-top:4px}
+#grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:360px;margin-top:20px}
+.lv{background:#fff;border:3px solid var(--navy);border-radius:18px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 5px 0 rgba(2,39,83,.25);font-family:Rubik,sans-serif;color:var(--navy)}
+.lv b{font-family:'Barlow Condensed',Impact,sans-serif;font-style:italic;font-weight:900;font-size:38px;line-height:1}
+.lv span{font-size:10px;font-weight:700;opacity:.65;max-width:90%;text-align:center;line-height:1.1}
+.lv .st{display:flex;gap:2px}
+.lv .st svg{width:15px;height:15px}
+.lv.lock{opacity:.45;box-shadow:none}
+.lv.next{background:var(--yel)}
+#back1,#menu2,#menu3,#retryP,#retry3{position:absolute;left:18px;bottom:calc(var(--sab) + 40px);background:#fff;color:var(--navy);border:3px solid var(--navy);border-radius:16px;padding:12px 18px;font-weight:800;font-size:15px;font-family:Rubik,sans-serif;box-shadow:0 4px 0 #b9c2d0}
+#end{background:rgba(2,39,83,.45);justify-content:center}
+#end .card{background:#fff;border-radius:22px;padding:22px 20px 20px;width:100%;max-width:340px;text-align:center;box-shadow:0 8px 0 rgba(2,39,83,.3)}
+#end h2{font-size:50px;color:var(--red)}
+#end .why{font-size:14px;font-weight:600;opacity:.7;margin-top:6px}
+#endStars{display:flex;justify-content:center;gap:10px;margin-top:14px}
+#endStars svg{width:58px;height:58px;transform:scale(0);transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+#endStars svg.show{transform:scale(1)}
+#endFe{margin-top:14px;font-weight:800;font-size:16px}
+#next{right:18px;bottom:calc(var(--sab) + 26px);width:118px;height:118px}
+#next b{font-size:26px}
+#pauseS{background:rgba(2,39,83,.5);justify-content:center}
+#pauseS h2{font-size:60px;color:#fff}
+#resume{right:18px;bottom:calc(var(--sab) + 26px);width:112px;height:112px}
+#retryP,#retry3{bottom:calc(var(--sab) + 100px)}
+#tut{position:absolute;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.75);border:4px solid var(--navy);pointer-events:none;animation:tut 1.6s ease-in-out infinite}
+@keyframes tut{0%{transform:translateY(0) scale(.85);opacity:0}15%{opacity:1;transform:translateY(0) scale(1)}65%{transform:translateY(130px)}80%{opacity:1;transform:translateY(130px) scale(1.1)}100%{opacity:0;transform:translateY(130px) scale(1.1)}}
+button{touch-action:manipulation;cursor:pointer}
+button:active{transform:translateY(3px)}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .3s}
+</style></head><body>
+@@INTRO@@
+<div id="gl"></div>
+<div class="layer" id="hud" hidden>
+  <svg id="aimsvg"></svg>
+  <div class="tl"><div class="pill"><span>BÖLÜM <span id="lvN">1</span></span><span class="m" id="lvName">Çatı Katı</span></div><div class="stars" id="hudStars"></div></div>
+  <div class="tr"><div class="pill d"><span style="font-size:12px;opacity:.8">ATIŞ</span><span class="big" style="font-size:24px" id="shots">1/3</span></div><button class="pause" id="pauseB" aria-label="Duraklat"><i></i><i></i></button></div>
+  <div id="wind"><div class="pill" style="font-size:14px">Rüzgâr <span class="big" style="font-size:20px" id="windV">→ 8</span></div></div>
+  <div id="tut" hidden></div><div id="hint" hidden>Geri çek, bırak</div>
+  <div id="toast"></div>
+  <div class="btn off" id="tuy" role="button" aria-label="Tüy aç"><svg id="tuyRing" viewBox="0 0 130 130"><circle cx="65" cy="65" r="60" fill="none" stroke="rgba(2,39,83,.15)" stroke-width="7"/><circle id="tuyArc" cx="65" cy="65" r="60" fill="none" stroke="#2fa84f" stroke-width="7" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="0" transform="rotate(-90 65 65)"/></svg><b>TÜY AÇ</b><small>basılı tut</small></div>
+  <div id="flash"></div>
+</div>
+<div class="layer" id="homeL">
+  <div class="sheet" id="home">
+    <img class="logo" alt="FLIX" src="@@LOGO@@">
+    <h1 class="big">ATIŞ</h1>
+    <div class="sub">Parmağınla geri çek, bırak, kovaya at!</div>
+    <div class="stats"><div class="pill"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.6 5.7 21.1l1.5-7L2 9.3l7-.8z" fill="#ffc20e" stroke="#022753" stroke-width="2" stroke-linejoin="round"/></svg><span id="starsH">0</span></div><div class="pill"><svg width="16" height="16" viewBox="0 0 20 20"><path d="M10 19C4 13 5 5 10 1c5 4 6 12 0 18z" fill="#2fa84f" stroke="#022753" stroke-width="1.6"/></svg><span id="feH">0</span></div></div>
+    <button class="btn" id="play"><b>OYNA</b></button>
+  </div>
+  <button id="sndB">SES</button>
+</div>
+<div class="layer" id="levelsL" hidden>
+  <div class="sheet" id="levels"><h2 class="big">ÇATI KATI</h2><div class="pk">Mahalle 1 · 10 bölüm</div><div id="grid"></div>
+    <button id="back1">Geri</button></div>
+</div>
+<div class="layer" id="endL" hidden>
+  <div class="sheet" id="end"><div class="card">
+    <h2 class="big" id="endT">KOVADA!</h2><div class="why" id="endW"></div>
+    <div id="endStars"></div><div id="endFe"></div></div>
+    <button id="retry3">Tekrar</button><button id="menu3">Bölümler</button>
+    <button class="btn" id="next"><b>SONRAKİ</b></button></div>
+</div>
+<div class="layer" id="pauseL" hidden>
+  <div class="sheet" id="pauseS"><h2 class="big">MOLA</h2>
+    <button id="retryP">Yeniden başla</button><button id="menu2">Bölümler</button>
+    <button class="btn" id="resume"><b>DEVAM</b></button></div>
+</div>
+<script src="@@THREE@@"></script>
+<script>
+@@GAME@@
+</script>
+</body></html>

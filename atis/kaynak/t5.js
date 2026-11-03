@@ -1,0 +1,23 @@
+const {chromium,devices}=require('playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await b.newContext({...devices['iPhone 13'],deviceScaleFactor:1});const p=await ctx.newPage();
+p.on('pageerror',e=>console.log('ERR',e.message));
+await p.goto('file://'+__dirname+'/test.html');await p.waitForTimeout(1200);
+const cdp=await ctx.newCDPSession(p);
+const T=(type,x,y)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[{x,y,id:1}]});
+await p.tap('#play');await p.waitForTimeout(700);
+console.log('state',await p.evaluate(()=>__A.state()+' tut '+!document.getElementById('tut').hidden));
+await p.screenshot({path:'m_tut.png'});
+await T('touchStart',195,420);for(let i=1;i<=12;i++){await T('touchMove',195,420+i*14);await p.waitForTimeout(16)}
+await p.waitForTimeout(200);await p.screenshot({path:'m_aim.png'});
+console.log('aim',await p.evaluate(()=>document.getElementById('aimsvg').textContent));
+await T('touchEnd');await p.waitForTimeout(500);
+console.log('phase',await p.evaluate(()=>__A.P.phase));
+await T('touchStart',100,300);await p.waitForTimeout(300);
+console.log('open while hold',await p.evaluate(()=>__A.P.body&&__A.P.body.open));
+await p.screenshot({path:'m_glide.png'});
+await T('touchEnd');await p.waitForTimeout(100);
+console.log('open after release',await p.evaluate(()=>__A.P.body&&__A.P.body.open));
+await p.waitForTimeout(5000);console.log('end',await p.evaluate(()=>__A.state()+' '+__A.P.phase+' shot '+__A.P.shot));
+await p.screenshot({path:'m_after.png'});
+await b.close();})();

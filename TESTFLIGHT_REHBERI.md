@@ -7,6 +7,7 @@ Flix Kick Up, Flix Arkana ve Flix Sen Olsaydın artık gerçek iPhone uygulamas�
 | Flix Kick Up | `flix-kick-up` reposu, `app/` | `com.flixtoys.kickup` | iPhone, dikey |
 | Flix Sen Olsaydın | `flix-kick-up` reposu, `direktor/app/` (yakında kendi reposuna taşınacak) | `com.flixtoys.direktor` | iPhone, dikey |
 | Flix Arkana | `Flix-Arkana` reposu, `app/` | `com.flixtoys.arkana` | iPhone + iPad, yatay |
+| Flix Atış | `flix-kick-up` reposu, `atis/app/` | `com.flixtoys.atis` | iPhone, dikey |
 
 **Yayın sırası:** önce Flix Kick Up, sonra Flix Arkana, en son Flix Sen Olsaydın. Üçü de birbirinden bağımsız; birini yüklemek diğerlerini etkilemez.
 
@@ -154,3 +155,22 @@ cd ../../../Flix-Arkana/app    && ./ios.sh yukle 1.0    # Flix Arkana
 - **Uygulama Gizliliği** anketi: Direktör için "Veri toplanmıyor". Flix Kick Up ve Flix Arkana'da reklam olduğu için `Flix-Arkana/app/README.md`'deki seçimler (Kick Up'ta da aynısı).
 - **Yaş derecesi**: Kick Up ve Direktör 4+, Flix Arkana 9+ (hafif fantastik şiddet).
 - Ekran görüntüleri: Kick Up `app/store/screenshots/`, Flix Arkana `app/store/cizgi_roman/`. Direktör için ekran görüntüsü henüz yok; TestFlight'tan sonra hazırlayabilirim. (TestFlight için ekran görüntüsü gerekmez.)
+
+
+---
+
+## Flix Atış (yeni oyun, 2026-11-03)
+
+Flix Atış da aynı yolla yüklenir. Kick Up için girdiğin GitHub sırları (secrets) aynen kullanılır, yeniden girmen gerekmez.
+
+1. developer.apple.com > Identifiers > **+** > App IDs > App: Bundle ID **Explicit** `com.flixtoys.atis`.
+2. App Store Connect > Uygulamalar > **+** > Yeni Uygulama: ad **Flix Atış**, dil Türkçe, paket kimliği `com.flixtoys.atis`, SKU `atis1`.
+3. Yükle (Mac gerekmez): GitHub > `flix-kick-up` > Actions > **iOS TestFlight** > Run workflow > app: **atis**, version: **1.0**. Terminalden:
+
+```bash
+gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=atis -f version=1.0
+```
+
+Mac'ten: `cd atis/app && ./ios.sh yukle 1.0`.
+
+Flix Atış'ta uygulama içi satın alma ve reklam yok, bu yüzden "Ücretli Uygulamalar" anlaşması bu oyun için şart değil. Gizlilik sayfası diğer oyunlarla aynı: https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html

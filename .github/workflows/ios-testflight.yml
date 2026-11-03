@@ -1,4 +1,4 @@
-# Builds, signs and uploads FLIX Kick Up or Flix Direktör to App Store Connect (TestFlight). No Mac needed.
+# Builds, signs and uploads FLIX Kick Up, Flix Direktör or Flix Atış to App Store Connect (TestFlight). No Mac needed.
 # Run it from the Actions tab ("iOS TestFlight" > Run workflow) or from any terminal:
 #   gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=kickup -f version=1.0
 # Needs these repository secrets (Settings > Secrets and variables > Actions), the same values as in Flix-Arkana:
@@ -14,7 +14,7 @@ on:
       app:
         description: 'Which game'
         type: choice
-        options: [kickup, direktor]
+        options: [kickup, direktor, atis]
         default: kickup
       version:
         description: 'Version shown in the App Store (e.g. 1.0)'
@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 90
     defaults:
       run:
-        working-directory: ${{ inputs.app == 'direktor' && 'direktor/app' || 'app' }}
+        working-directory: ${{ inputs.app == 'direktor' && 'direktor/app' || inputs.app == 'atis' && 'atis/app' || 'app' }}
     env:
       ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
