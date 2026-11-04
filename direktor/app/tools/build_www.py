@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds app/www/index.html from the web game (../index.html, the GitHub Pages copy, by default).
+"""Builds app/www/index.html from the web game (../../flix-sen-olsaydin/index.html, the GitHub Pages copy, by default).
 - writes a real phone head (viewport, notch / home-bar safe areas) in place of the web page's head
 - swaps Google Fonts for the local copies in www/fonts and three.js for www/three.min.js,
   so the app opens without internet (App Review runs it that way)
@@ -7,7 +7,7 @@
 - loads native-bridge.js before the game and app.js (real Apple payments) after it"""
 import re, sys, pathlib
 app = pathlib.Path(__file__).resolve().parent.parent
-src = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else app.parent / 'index.html'
+src = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else app.parent.parent / 'flix-sen-olsaydin' / 'index.html'
 s = src.read_text()
 s = s[s.index('<title>'):]
 s = re.sub(r'<meta name="claude:[^>]*>\s*', '', s)
