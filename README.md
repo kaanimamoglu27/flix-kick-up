@@ -1,3 +1,11 @@
+## ⚽ Flix Sen Olsaydın (eski adı Flix Direktör)
+
+**Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/direktor/ · Kaynak ve iOS paketi: [`direktor/`](direktor/)
+
+Gerçek maçlarda hocanın yerine geç: üstte canlı maç, altta kararlar. Kariyer modu (2010'dan bugüne), her hafta kendiliğinden yenilenen gerçek Süper Lig maçları, canlı bülten ve skor tahmini.
+
+---
+
 **Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/
 
 Online oyna (hızlı eşleşme ve 6 haneli özel oda, 60 saniyelik 1'e 1 maç) kendi sunucumuzla çalışır: `server/` (Node.js + WebSocket, Render'a `render.yaml` ile kurulur), istemci `online.js`, sunucu adresi tek yerde `online-config.js` (`ONLINE_SERVER_URL`). Adres girilmemişse online düğmesi görünmez, oyunun geri kalanı aynen çalışır. claude.ai hesabı gerekmez. Mağaza web sürümünde test modundadır, gerçek ödeme alınmaz. (Aşağıdaki devir notlarında geçen claude.ai `room` tabanlı online yarışın yerini bu sistem aldı.)
