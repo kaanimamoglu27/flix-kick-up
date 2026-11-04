@@ -165,12 +165,37 @@ Flix Atış da aynı yolla yüklenir. Kick Up için girdiğin GitHub sırları (
 
 1. developer.apple.com > Identifiers > **+** > App IDs > App: Bundle ID **Explicit** `com.flixtoys.atis`.
 2. App Store Connect > Uygulamalar > **+** > Yeni Uygulama: ad **Flix Atış**, dil Türkçe, paket kimliği `com.flixtoys.atis`, SKU `atis1`.
-3. Yükle (Mac gerekmez): GitHub > `flix-kick-up` > Actions > **iOS TestFlight** > Run workflow > app: **atis**, version: **1.0**. Terminalden:
+3. Yükle (Mac gerekmez): GitHub > `flix-kick-up` > Actions > **iOS TestFlight** > Run workflow > app: **atis**, version: **1.1**. Terminalden:
 
 ```bash
-gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=atis -f version=1.0
+gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=atis -f version=1.1
 ```
 
 Mac'ten: `cd atis/app && ./ios.sh yukle 1.0`.
 
-Flix Atış'ta uygulama içi satın alma ve reklam yok, bu yüzden "Ücretli Uygulamalar" anlaşması bu oyun için şart değil. Gizlilik sayfası diğer oyunlarla aynı: https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html
+Flix Atış 1.1'de **uygulama içi satın alma ve reklam var**, bu yüzden "Ücretli Uygulamalar" anlaşması (bölüm 1, madde 2) şart.
+
+**Satın alma ürünleri** (App Store Connect > Flix Atış > Para Kazanma > Uygulama İçi Satın Almalar > **+**). Ürün kimlikleri birebir aynı yazılmalı:
+
+| Ürün kimliği | Tür | İçerik | Önerilen fiyat |
+|---|---|---|---|
+| `atis_feathers_500` | Tüketilebilir | 500 tüy | ₺39,99 |
+| `atis_feathers_1200` | Tüketilebilir | 1.200 tüy | ₺79,99 |
+| `atis_feathers_3500` | Tüketilebilir | 3.500 tüy | ₺199,99 |
+| `atis_feathers_8000` | Tüketilebilir | 8.000 tüy | ₺399,99 |
+| `atis_feathers_20000` | Tüketilebilir | 20.000 tüy | ₺799,99 |
+| `atis_starter` | Tüketilemez | Başlangıç Paketi: 2.500 tüy + Gece kostümü (tek sefer) | ₺119,99 |
+| `atis_noads` | Tüketilemez | Reklamsız (bölüm arası reklamlar kalkar) | ₺119,99 |
+
+Oyunda görünen fiyatlar App Store'dan gelir; tabloda yazanlar sadece mağaza yüklenene kadar görünür.
+
+**Reklamlar (AdMob)**: https://apps.admob.com > Uygulamalar > Uygulama ekle > iOS > **Flix Atış**. Sonra iki reklam birimi aç: **Ödüllü** (2x tüy, +2 atış, bedava tüy) ve **Geçiş** (her 3 bölümde bir, 3. bölümden sonra). Kimlikleri GitHub sırlarına gir:
+
+```bash
+R=kaanimamoglu27/flix-kick-up
+gh secret set ATIS_ADMOB_APP_ID          -R $R -b "ca-app-pub-...~..."
+gh secret set ATIS_ADMOB_REWARDED_ID     -R $R -b "ca-app-pub-.../..."
+gh secret set ATIS_ADMOB_INTERSTITIAL_ID -R $R -b "ca-app-pub-.../..."
+```
+
+Kimlik girilmezse uygulama Google'ın **test reklamlarını** gösterir (TestFlight'ta denemek için yeterli, gerçek para kazandırmaz). App Store Connect > Uygulama Gizliliği kısmında "Cihaz kimliği: reklam / takip" ve "Satın alımlar" işaretlenmeli (Kick Up'taki gibi). Gizlilik sayfası diğer oyunlarla aynı: https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html
