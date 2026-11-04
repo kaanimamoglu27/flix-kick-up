@@ -1,6 +1,12 @@
 Flix Atış kaynak dosyaları.
 
-v5 (güncel, 1.2): Kick Up tarzı ana menü, 20 bölüm (levels5.js; 11-20 Sokak 2 paketi: atis_sokak2 ya da 12.000 tüy), komik dükkân isimleri,
+v6 (güncel, 1.3): 4 dünya x 20 bölüm = 80 bölüm: Sokak (levels5.js, elle), Amerika, Avrupa, Uzay (worlds6.js: genLevel üretir, par = botun atış sayısı, GEN_PARS).
+Her dünya bir öncekinin 10. bölümü geçilince açılır; her dünyada 11-20 paketli (atis_sokak2 = Bölüm paketi, ₺119,99 ya da 20.000 tüy).
+Dünyaya göre kaplama, cephe (tuğla/taş/metal), çatı, gökyüzü (theme6.js); Uzay'da az yerçekimi (g 8.5), astronotlar ve yeşil uzaylılar.
+Ana menüde dünya seçimi, bölümler ekranında dünya sekmeleri (mkshell6.py). game6.js = game5.js + `python3 patch6.py`; shell6.html = shell5.html + `python3 mkshell6.py`; derleme `python3 build6.py <three.js yolu> <çıktı>`.
+Bot testi: t33.js (node t33.js 20,21,...).
+
+v5 (1.2): Kick Up tarzı ana menü, 20 bölüm (levels5.js; 11-20 Sokak 2 paketi: atis_sokak2 ya da 12.000 tüy), komik dükkân isimleri,
 insanlar FLIX'i sektirip rastgele şutlar (npc5.js: startJuggle/jugTick), insan ve hayvan skinleri (npc5.js), FLIX kovanın dibine düşüp durmadan bölüm bitmez,
 günlük hediye, yeni dükkân sekmeleri (shop5.js, mkshop5.py + shop5_pick.js + shop5_tail.js), kabartmalı ve yıpranmış kaplamalar (tex5.js).
 game5.js = game4.js + `python3 patch5.py`; shell5.html = shell4.html + `python3 mkshell5.py`; derleme `python3 build5.py <three.js yolu> <çıktı>`.

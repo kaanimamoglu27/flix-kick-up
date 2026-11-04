@@ -1,6 +1,6 @@
 {
   "name": "flix-atis",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "description": "Flix Atış by Flix - Capacitor 8 wrapper",
   "scripts": {
