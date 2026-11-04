@@ -1,5 +1,10 @@
 Flix Atış kaynak dosyaları.
 
+v5 (güncel, 1.2): Kick Up tarzı ana menü, 20 bölüm (levels5.js; 11-20 Sokak 2 paketi: atis_sokak2 ya da 12.000 tüy), komik dükkân isimleri,
+insanlar FLIX'i sektirip rastgele şutlar (npc5.js: startJuggle/jugTick), insan ve hayvan skinleri (npc5.js), FLIX kovanın dibine düşüp durmadan bölüm bitmez,
+günlük hediye, yeni dükkân sekmeleri (shop5.js, mkshop5.py + shop5_pick.js + shop5_tail.js), kabartmalı ve yıpranmış kaplamalar (tex5.js).
+game5.js = game4.js + `python3 patch5.py`; shell5.html = shell4.html + `python3 mkshell5.py`; derleme `python3 build5.py <three.js yolu> <çıktı>`.
+
 v4 (güncel, 1.1): dikey ekran, tüy parası, dükkân (10 kostüm, 6 uçuş izi, tüy paketleri), reklamlar ve satın almalar, yüksek kaliteli kaplamalar.
 game4.js, game3.js'e `python3 patch4.py` ile uygulanan yamalardır (tex4.js = kaplamalar, shop4.js = ekonomi/dükkân/reklam/ödeme).
 shell4.html, shell3.html'den `python3 mkshell4.py` ile üretilir. Derleme: `python3 build4.py <three.js yolu> <çıktı>`.
