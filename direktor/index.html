@@ -879,6 +879,21 @@ b,h1,h2,h3,.big,.sqr b,.osh b{font-style:normal!important;}
 .gfx .gbar em{font-style:normal;font-weight:800;font-size:17px;color:#fff;} .gfx .gbar small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#ffd6d8;}
 .gfx:not(.mine) .gbar{background:linear-gradient(90deg,transparent,rgba(21,33,92,.96) 18%,rgba(21,33,92,.96) 82%,transparent);}
 @keyframes gbar{0%{transform:scaleY(0);opacity:0}12%{transform:scaleY(1);opacity:1}85%{opacity:1}100%{opacity:0}}
+/* v24: sade ana ekran, nasıl oynanır, ipuçları */
+.hrow2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.hrow2 .mode{padding:12px;} .hrow2 .mode b{font-size:22px;}
+.hmini{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.hmini button{display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 4px;border-radius:10px;background:var(--paper);font-size:12px;font-weight:700;color:#dfe3ff;white-space:nowrap;}
+.hmini .ldot{width:7px;height:7px;}
+#home .hero h1{font-size:clamp(50px,15vw,80px);text-shadow:none;} #home .hero h1 small{text-shadow:none;}
+.howsh{background:rgba(5,9,30,.88);justify-content:center;}
+.howsh .in{border-radius:18px;margin:0 14px;border-top:0;max-height:94%;gap:10px;}
+.howtop{display:flex;justify-content:space-between;align-items:center;}
+.howart{width:100%;max-height:190px;background:#0e1640;border-radius:14px;padding:8px;box-sizing:border-box;}
+.howsh h3{font-size:30px;color:#fff;} .howp{margin:0;font-size:15px;line-height:1.5;color:#dfe3ff;min-height:4.5em;}
+.howdots{display:flex;gap:6px;justify-content:center;} .howdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);} .howdots i.on{background:var(--yellow);width:20px;border-radius:4px;}
+.tipb{position:absolute;left:12px;right:12px;bottom:118px;z-index:30;background:#ffc72c;color:#0b1231;border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.45);animation:in .25s ease-out;}
+.tipb .tt{display:block;font-weight:800;font-size:15px;margin-bottom:2px;} .tipb button{display:block;margin:8px 0 0 auto;background:#0b1231;color:#fff;font-weight:800;font-size:13px;padding:7px 14px;border-radius:999px;}
 </style>
 
 <div id="app">
@@ -890,13 +905,14 @@ b,h1,h2,h3,.big,.sqr b,.osh b{font-style:normal!important;}
       <p>Gerçek maçlarda hocanın yerine geç. Kararını ver, gerçekte ne olduğunu gör.</p></div>
     <div class="hbot">
       <button class="hticket" id="hTicket"></button>
-      <div class="hrow">
-        <button class="card mode sm" id="mStory"><b>Kariyer</b><span id="mStorySub">Bir sezon seç, şampiyon yap</span></button>
-        <button class="card mode sm" id="mOnline"><b>Online</b><span>Arkadaşına karşı</span></button>
-        <button class="card mode sm" id="mShop"><b>Mağaza</b><span>Kulüp, paketler</span></button>
+      <button class="btn wide hgo" id="mPlay">Hemen oyna <i>›</i></button>
+      <div class="hrow2">
+        <button class="card mode" id="mStory"><b>Kariyer</b><span id="mStorySub">Bir sezon seç, şampiyon yap</span></button>
+        <button class="card mode" id="mQuick"><b>Gerçek maçlar</b><span>Bu hafta ve efsane maçlar</span></button>
       </div>
-      <button class="card hlive" id="mLive"><span class="ldot"></span><b>Canlı bülten</b><small>Avrupa maçları · skor tahmini</small><em>›</em></button>
-      <button class="btn wide hgo" id="mQuick">Gerçek maçlar <i>›</i></button>
+      <div class="hmini">
+        <button id="mLive"><span class="ldot"></span>Bülten</button><button id="mOnline">Online</button><button id="mShop">Mağaza</button><button id="mHow">Nasıl oynanır?</button>
+      </div>
     </div>
   </section>
 
@@ -1343,7 +1359,7 @@ function playMatch(o,onEnd){
   const M=newMatch(o); M.dec=[]; M.live=true; crowd.start();
   LIVE={M,onEnd,mode:'play',sel:null,custom:null,outSel:null,opts:[],timer:null,run:null,fast:false,react:false};
   show('match'); $('#feed').innerHTML=''; evChip(0,'Başlama düdüğü'); whistle();
-  drawAll(); lpBanner('Maç günü'); ffTo(MOMENTS[0]);
+  drawAll(); lpBanner('Maç günü'); ffTo(MOMENTS[0]); { const LL=LIVE; setTimeout(()=>{ if(LIVE===LL)tipOnce('m1','<span class="tt">Maç başladı</span>Üstte maç oynanıyor. Belli dakikalarda oyun durur ve altta karar kartları açılır. Beklemek istemezsen <b>Atla</b> düğmesi seni karar anına götürür.'); },1900); }
 }
 function nextTarget(m){ return (LIVE&&LIVE.moments||MOMENTS).find(x=>x>m+(LIVE&&LIVE.real?1:0))||(LIVE&&LIVE.real?92:90); }
 function ffTo(target){
@@ -1466,6 +1482,7 @@ $('#bDecide').onclick=()=>{ const L=LIVE; if(!L)return; if(L.mode==='play'){ L.f
 function moment(title){
   const L=LIVE,M=L.M,s=M.o.you; $('#shouts').hidden=true; L.mode='dec'; L.sel=null; L.custom=null; L.outSel=null; L.title=title;
   L.opts=choices(M,s); L.no=(L.no||0)+1; L.tip=assistTip(M,s);
+  tipOnce('m2','<span class="tt">Karar anı</span>Bir kart seç, sonra sağ alttaki <b>Kararı ver</b> düğmesine bas. Kartın altındaki yüzdeler gol şansını ve gol yeme riskini gösterir. Süre biterse <b>Devam</b> seçilir.');
   beep(520,.1); buzz(30); toast(title==='Gol yedik!'?'Gol yedik':(L.real?L.target:M.m)+"'"); drawAll(); $('#hand').scrollLeft=0;
   clearInterval(L.timer); let left=decSec(); const T=$('#tbar');
   T.style.transition='none'; T.style.transform='scaleX(1)'; void T.offsetWidth; T.style.transition=`transform ${decSec()}s linear`; T.style.transform='scaleX(0)';
@@ -4177,6 +4194,7 @@ function coachScreen(first){
 
 /* ---------- ana ekran ---------- */
 function home(){
+  if(!store.get('fdHow',0)&&!document.querySelector('.howsh'))setTimeout(()=>{ if(!store.get('fdHow',0)&&!document.querySelector('.howsh'))howSheet(true); },250);
   if(!store.get('fdCoach',null))return coachScreen(true);
   crowd.stop(); show('home'); stopWatch(); $('#hStreak').textContent=store.get('fdStreak',0); $('#hName').textContent=COACH.name; $('#hFace').innerHTML=coachSVG(COACH,'happy');
   const s=slotGet(CSLOT), nS=[1,2,3].filter(n=>slotGet(n)).length;
@@ -4193,6 +4211,29 @@ $('#mStory').onclick=()=>{beep(520); slotSheet();};
 $('#coachFace').onclick=shoutMenu;
 $('#hCoach').onclick=()=>{beep(520);coachScreen(false);};
 $('#mQuick').onclick=()=>{beep(520);realList();};
+$('#mPlay').onclick=()=>$('#hTicket').click();
+$('#mHow').onclick=()=>{beep(520);howSheet(false);};
+/* nasıl oynanır: ilk açılışta bir kez, sonra ana ekrandan */
+const HOW=[
+ ['Hocanın yerine geç','Gerçek Süper Lig maçlarını sen yönet. Takımını seç, maç başlasın.','<rect x="10" y="14" width="100" height="62" rx="6" fill="#2b7d40"/><line x1="60" y1="14" x2="60" y2="76" stroke="#fff" stroke-width="1.5" opacity=".7"/><circle cx="60" cy="45" r="11" fill="none" stroke="#fff" stroke-width="1.5" opacity=".7"/><circle cx="38" cy="36" r="4" fill="#fff"/><circle cx="46" cy="56" r="4" fill="#fff"/><circle cx="80" cy="40" r="4" fill="#d81e27"/><circle cx="74" cy="58" r="4" fill="#d81e27"/><circle cx="60" cy="45" r="2.4" fill="#ffc72c"/>'],
+ ['Maçı izle, kararını ver','Üstte maç canlı oynanır. Bazı dakikalarda oyun durur ve altta kartlar açılır: oyuncu değiştir, hücuma geç ya da kapan. Bir kart seç, sonra Kararı ver düğmesine bas.','<rect x="8" y="10" width="104" height="34" rx="5" fill="#2b7d40"/><rect x="10" y="50" width="31" height="34" rx="4" fill="#18224f" stroke="#ffc72c" stroke-width="2"/><rect x="45" y="50" width="31" height="34" rx="4" fill="#18224f" stroke="#3a4a9a"/><rect x="80" y="50" width="31" height="34" rx="4" fill="#18224f" stroke="#3a4a9a"/><text x="25.5" y="71" font-size="9" fill="#ffc72c" text-anchor="middle" font-weight="800">⇅</text><text x="60.5" y="71" font-size="8" fill="#fff" text-anchor="middle" font-weight="800">HÜC</text><text x="95.5" y="71" font-size="8" fill="#fff" text-anchor="middle" font-weight="800">BEKLE</text>'],
+ ['Golü sen at','Takımın karşı karşıya kalınca nişangah çıkar. Nişangah kalecinin uzağındaki boş köşedeyken ekrana dokun.','<rect x="22" y="22" width="76" height="40" fill="none" stroke="#fff" stroke-width="3"/><rect x="52" y="34" width="16" height="28" rx="4" fill="#9be15d"/><circle cx="34" cy="38" r="7" fill="#fff" stroke="#d81e27" stroke-width="3"/><path d="M30 80 q8-10 16 0" fill="none" stroke="#ffc72c" stroke-width="2"/>'],
+ ['Gerçek hocayı geç','Maç bitince skorun gerçekteki skorla karşılaştırılır. Daha iyi sonuç alırsan ekstra yıldız ve Flix Coin kazanırsın.','<rect x="14" y="26" width="40" height="34" rx="6" fill="#18224f"/><text x="34" y="49" font-size="15" fill="#fff" text-anchor="middle" font-weight="800">2-1</text><rect x="66" y="26" width="40" height="34" rx="6" fill="#ffc72c"/><text x="86" y="49" font-size="15" fill="#15215c" text-anchor="middle" font-weight="800">1-1</text><text x="60" y="80" font-size="16" fill="#ffc72c" text-anchor="middle">★ ★ ★</text>'],
+ ['Nereden başlamalı?','Hemen oyna: bu haftanın gerçek maçı. Kariyer: bir sezon boyunca takımını yönet. Bülten: maç skorlarını tahmin et, coin kazan.','<rect x="16" y="14" width="88" height="20" rx="6" fill="#d81e27"/><text x="60" y="28" font-size="9" fill="#fff" text-anchor="middle" font-weight="800">HEMEN OYNA</text><rect x="16" y="40" width="42" height="20" rx="6" fill="#18224f"/><rect x="62" y="40" width="42" height="20" rx="6" fill="#18224f"/><text x="37" y="54" font-size="7.5" fill="#fff" text-anchor="middle" font-weight="700">KARİYER</text><text x="83" y="54" font-size="7.5" fill="#fff" text-anchor="middle" font-weight="700">GERÇEK MAÇ</text><rect x="16" y="66" width="88" height="14" rx="5" fill="#18224f" opacity=".7"/>']];
+function howSheet(first){
+  let i=0; const sh=document.createElement('div'); sh.className='sheet howsh';
+  const draw=()=>{ const [t,d,svg]=HOW[i]; sh.innerHTML=`<div class="in"><div class="howtop"><span class="lbl">Nasıl oynanır · ${i+1}/${HOW.length}</span><button class="back" data-x>${first?'Geç':'Kapat'}</button></div>
+    <svg class="howart" viewBox="0 0 120 90" aria-hidden="true">${svg}</svg><h3 class="disp">${t}</h3><p class="howp">${d}</p>
+    <div class="howdots">${HOW.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div>
+    <div class="foot">${i?'<button class="btn ghost" data-b>Geri</button>':'<span></span>'}<button class="btn" data-n>${i<HOW.length-1?'İleri':'Başla'}</button></div></div>`;
+    sh.querySelector('[data-n]').onclick=()=>{ beep(600,.05); if(i<HOW.length-1){ i++; draw(); } else close(); };
+    const b=sh.querySelector('[data-b]'); if(b)b.onclick=()=>{ i--; beep(500,.04); draw(); };
+    sh.querySelector('[data-x]').onclick=close; };
+  const close=()=>{ store.set('fdHow',1); sh.remove(); };
+  draw(); $('#app').appendChild(sh);
+}
+/* ilk maçta yol gösteren kısa ipuçları (her biri bir kez) */
+function tipOnce(k,html,where){ if(store.get('fdTip_'+k,0))return; store.set('fdTip_'+k,1); const P=$(where||'#match'); if(!P)return; const d=document.createElement('div'); d.className='tipb'; d.innerHTML=`${html}<button>Anladım</button>`; d.querySelector('button').onclick=()=>d.remove(); P.appendChild(d); setTimeout(()=>d.remove(),9000); }
 $('#mOnline').onclick=()=>{beep(520);online();};
 $('#mLive').onclick=()=>{beep(560);bulScreen();};
 $('#mShop').onclick=()=>{beep(520);shopScreen();};
