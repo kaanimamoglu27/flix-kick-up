@@ -894,6 +894,32 @@ b,h1,h2,h3,.big,.sqr b,.osh b{font-style:normal!important;}
 .howdots{display:flex;gap:6px;justify-content:center;} .howdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);} .howdots i.on{background:var(--yellow);width:20px;border-radius:4px;}
 .tipb{position:absolute;left:12px;right:12px;bottom:118px;z-index:30;background:#ffc72c;color:#0b1231;border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.45);animation:in .25s ease-out;}
 .tipb .tt{display:block;font-weight:800;font-size:15px;margin-bottom:2px;} .tipb button{display:block;margin:8px 0 0 auto;background:#0b1231;color:#fff;font-weight:800;font-size:13px;padding:7px 14px;border-radius:999px;}
+/* ---------- v26: şans kutusu, oyuncu oyu, canlı panel ---------- */
+.pcard .odds{margin-top:auto;display:flex;flex-direction:column;gap:3px;width:100%;}
+.pcard .odds small{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.6;}
+.pcard .od{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 6px;font-size:10.5px;font-weight:800;line-height:1.15;}
+.pcard .od b{font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.pcard .od em{font-style:normal;font-size:10px;margin-left:3px;padding:0 3px;border-radius:4px;}
+.pcard .od em.ok{color:#0b6b33;background:#c9f0d6;} .pcard .od em.bad{color:#9b0f17;background:#fbd2d5;}
+.pcard .od i{grid-column:1/3;height:5px;border-radius:3px;background:rgba(127,127,127,.25);overflow:hidden;display:block;}
+.pcard .od i u{display:block;height:100%;border-radius:3px;}
+.pcard .od.at i u{background:#22b35e;} .pcard .od.ye i u{background:#e23a44;}
+.pcard .od.at span{color:#15964b;} .pcard .od.ye span{color:#d0313b;}
+.pcard .cvote{margin-left:auto;font-style:normal;background:var(--navy);color:var(--yellow);border-radius:20px;padding:1px 7px;font-size:10px;font-weight:800;}
+.crowd2{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,210,63,.45);border-radius:12px;padding:10px 12px;margin:8px 0;}
+.crowd2 .c2h{font-weight:800;font-size:14px;color:var(--yellow);margin-bottom:6px;} .crowd2 .c2h small{font-weight:600;color:var(--ink);opacity:.6;font-size:11px;}
+.c2bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.1);}
+.c2bar i,.c2leg i{display:block;} .c2bar .me,.c2leg i.me{background:var(--yellow);} .c2bar .co,.c2leg i.co{background:#7d93ff;} .c2bar .ot,.c2leg i.ot{background:rgba(255,255,255,.25);}
+.c2leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;margin-top:6px;} .c2leg span{display:flex;align-items:center;gap:5px;} .c2leg i{width:10px;height:10px;border-radius:3px;}
+.c2v{font-size:14px;margin-top:6px;} .c2v b{color:var(--yellow);}
+.hand.idle .pcard.lpan{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:8px 12px;}
+.lpan .lp1{display:flex;align-items:center;gap:10px;} .lpan .lp1 .big{font-size:26px;margin:0;} .lpan .lp1 .txt{font-size:13px;}
+.momw .mtn{display:flex;justify-content:space-between;font-size:11px;font-weight:800;opacity:.85;} .momw .mtn small{opacity:.6;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+svg.mgr{width:100%;height:46px;display:block;} svg.mgr line{stroke:rgba(255,255,255,.3);stroke-width:.3;} svg.mgr line.hl{stroke-dasharray:1 1;}
+svg.mgr .mh{fill:var(--yellow);} svg.mgr .ma{fill:#7d93ff;} svg.mgr .mg{font-size:4px;fill:#fff;text-anchor:middle;}
+.lst{display:grid;gap:2px;} .lsr{display:grid;grid-template-columns:44px 1fr 44px;font-size:12px;align-items:center;} .lsr span{text-align:center;opacity:.7;} .lsr b:last-child{text-align:right;} .lsr b{font-variant-numeric:tabular-nums;}
+.feed .ev.cm{opacity:.75;font-weight:500;}
+.lpan>*{flex:none;} .momw{height:62px;} svg.mgr{height:46px;min-height:46px;background:rgba(255,255,255,.04);border-radius:4px;}
 </style>
 
 <div id="app">
@@ -1277,10 +1303,17 @@ function choices(M,s){
   return out.slice(-3);
 }
 function effect(M,s,act){
-  if(act.k==='wait')return null;
-  const o=s==='h'?'a':'h', l0=lam(M,s,M.m+5), r0=lam(M,o,M.m+5);
-  const C=cloneM(M); applyAct(C,s,act);
-  return {g:Math.round((lam(C,s,C.m+5)/l0-1)*100),r:Math.round((lam(C,o,C.m+5)/r0-1)*100)};
+  const o=s==='h'?'a':'h', l0=lam(M,s,M.m+5), r0=lam(M,o,M.m+5), W=15, P=l=>Math.round(100*(1-Math.exp(-l*W)));
+  if(act.k==='wait')return {g:0,r:0,g0:P(l0),g1:P(l0),r0:P(r0),r1:P(r0),wait:1};
+  const C=cloneM(M); applyAct(C,s,act); const l1=lam(C,s,C.m+5), r1=lam(C,o,C.m+5);
+  return {g:Math.round((l1/l0-1)*100),r:Math.round((r1/r0-1)*100),g0:P(l0),g1:P(l1),r0:P(r0),r1:P(r1)};
+}
+/* kart üstü şans kutusu: gol atma hep yeşil, gol yeme hep kırmızı. Ok rengi iyi mi kötü mü */
+function oddsHTML(fx){
+  if(!fx)return '';
+  const row=(cls,ic,lbl,a,b,good)=>{ const d=b-a, ar=d===0?'':`<em class="${good?'ok':'bad'}">${d>0?'▲':'▼'}${Math.abs(d)}</em>`;
+    return `<div class="od ${cls}"><span>${ic} ${lbl}</span><b>%${b}${ar}</b><i><u style="width:${Math.min(100,b*2)}%"></u></i></div>`; };
+  return `<div class="odds"><small>Sonraki 15 dk</small>${row('at','⚽','Gol atma',fx.g0,fx.g1,fx.g1>=fx.g0)}${row('ye','🥅','Gol yeme',fx.r0,fx.r1,fx.r1<=fx.r0)}</div>`;
 }
 /* yapay zekâ hocası */
 function aiActs(M,s){
@@ -1367,7 +1400,8 @@ function ffTo(target){
   const you=L.M.o.you;
   const tickF=()=>{
     if(LIVE!==L||L.mode!=='play')return; const M=L.M; let pause=0, scored=false, shot=false; L.lag=L.lag||{h:0,a:0};
-    for(const e of (L.real&&!L.alt?realStep(M,L.real):step(M))){
+    const EVS=(L.real&&!L.alt?realStep(M,L.real):step(M));
+    for(const e of EVS){
       const S=e.s&&M.sides[e.s]; if(you)rateTick(M,you,e);
       if(e.t==='goal'){ M.scorers.push({m:M.m,s:e.s,n:e.p.short,id:e.p.id}); const mm=M.m, sc=`${M.gh}-${M.ga}`, es=e.s, nm=e.p.short, anim=!L.fast&&!shot;
         const reveal=()=>{ if(LIVE!==L)return; L.lag[es]=Math.max(0,L.lag[es]-1); evChip(mm,`<span class="ico ball"></span>${cshort(S.c)} gol: ${esc(nm)} (${sc})`,'goal',true);
@@ -1381,6 +1415,7 @@ function ffTo(target){
       else if(e.t==='act'){ const a=e.a; if(a.k==='red')continue; if(!L.fast){ if(a.k==='sub'){ subFx(S.c,S.P[a.o],S.P[a.i]); pause=Math.max(pause,1500); } else if(a.k==='form'||a.k==='plan'||a.k==='tac'){ tacFx(cshort(S.c),actText(S,a)); pause=Math.max(pause,1200); } } evChip(M.m,a.k==='sub'?`<span class="ico sub">⇅</span>${cshort(S.c)}: ${esc(S.P[a.i].short)} girdi, ${esc(S.P[a.o].short)} çıktı`:a.k==='tac'?`${cshort(S.c)} ${a.v===1?'hücuma geçti':a.v===-1?'kapandı':'dengeye döndü'}`:`${cshort(S.c)}: ${esc(actText(S,a))}`,'',true); }
       else if(e.t==='ht'){ evChip(45,`İlk yarı ${M.gh}-${M.ga}`,'',false); whistle(); if(LP.on){ lpKick(M.o.you==='a'?'h':'a'); lpBanner('Devre arası'); } applause(1.6,.1); pause=Math.max(pause,500); }
     }
+    if(!M.done){ const c=commLine(L,M,EVS,scored||shot||L.fast||L.mode!=='play'); if(c&&LP.on){ shotFx(M,c.s,c.k,c.n); pause=Math.max(pause,1500); } }
     if(you){ rateMinute(M,you); crowd.level(((you==='h'?M.lh:M.la)||0)*25); }
     drawBoard(); drawPitch(); moveBall(); drawHand(); drawAct(); drawCoach();
     if(L.mode==='shot')return;
@@ -1390,6 +1425,35 @@ function ffTo(target){
     L.run=setTimeout(tickF,pause||(L.fast?15:TICK));
   };
   L.run=setTimeout(tickF,350);
+}
+/* canlı anlatım, baskı grafiği ve maç istatistikleri (görsel; skoru değiştirmez) */
+function commLine(L,M,EVS,busy){
+  const C=L.cs=L.cs||{sh:{h:0,a:0},so:{h:0,a:0},co:{h:0,a:0},ps:{h:0,a:0},mom:[]};
+  const lh=lam(M,'h',M.m), la=lam(M,'a',M.m), ph=lh/(lh+la||1); let mv=(ph-.5)*1.6+(Math.random()-.5)*.7;
+  for(const e of EVS){ if(e.t==='goal'){ C.sh[e.s]++; C.so[e.s]++; mv=e.s==='h'?1:-1; } else if(e.t==='chance'){ C.sh[e.s]++; if(Math.random()<.6)C.so[e.s]++; mv+=e.s==='h'?.7:-.7; } }
+  const q=clamp(.5+(ph-.5)*.9+(Math.random()-.5)*.25,.2,.8); C.ps.h+=q; C.ps.a+=1-q;
+  const cmo=clamp(mv,-1,1); C.mom.push({m:M.m,v:cmo});
+  if(busy||Math.random()>.5)return null;
+  const s=Math.random()<ph?'h':'a', S=M.sides[s], xi=S.xi.filter(Boolean), pick=g=>{ const A=xi.map(id=>S.P[id]).filter(p=>p&&(!g||p.g===g)); return (A[Math.floor(Math.random()*A.length)]||S.P[xi[0]]).short; };
+  const tn=cshort(S.c), r=Math.random(); let txt,k=null,n=null;
+  if(r<.16){ n=pick('A'); txt=`${n} uzaktan vurdu, top auta gitti`; C.sh[s]++; k='miss'; C.mom[C.mom.length-1].v=clamp(cmo+(s==='h'?.5:-.5),-1,1); }
+  else if(r<.3){ n=pick('M'); txt=`${n} şut çekti, kaleci yakaladı`; C.sh[s]++; C.so[s]++; k='save'; C.mom[C.mom.length-1].v=clamp(cmo+(s==='h'?.6:-.6),-1,1); }
+  else if(r<.45){ txt=`${tn} korner kazandı`; C.co[s]++; }
+  else if(r<.6){ txt=`${pick('M')} ceza sahasına ortaladı, defans uzaklaştırdı`; }
+  else if(r<.72){ txt=`${pick('D')} sert girdi, hakem faul dedi`; }
+  else if(r<.86){ txt=`${tn} kanattan hızlı geliyor, ${pick('A')} koşuda`; }
+  else { txt=`${tn} topu ayağında tutuyor, pas pas oynuyor`; }
+  evChip(M.m,esc(txt),'cm',true); if(LP.on)LP.cap=txt; L.lastCm=txt;
+  return k&&!L.real?{k,s,n}:k&&Math.random()<.6?{k,s,n}:null;
+}
+function livePanel(L,M,txt){
+  const C=L.cs||{sh:{h:0,a:0},so:{h:0,a:0},co:{h:0,a:0},ps:{h:1,a:1},mom:[]}, h=M.sides.h, a=M.sides.a, pt=C.ps.h+C.ps.a||1, ph=Math.round(100*C.ps.h/pt);
+  const bars=C.mom.map(x=>{ const v=Math.sqrt(Math.abs(x.v))*14, y=x.v>0?15-v:15; return `<rect x="${x.m-1}" y="${y.toFixed(1)}" width=".82" height="${Math.max(.6,v).toFixed(1)}" class="${x.v>0?'mh':'ma'}"/>`; }).join('');
+  const goals=(M.scorers||[]).map(g=>`<text x="${g.m-1}" y="${g.s==='h'?4:29}" class="mg">●</text>`).join('');
+  const row=(l,x,y)=>`<div class="lsr"><b>${x}</b><span>${l}</span><b>${y}</b></div>`;
+  return `<div class="pcard live lpan"><div class="lp1"><b class="big">${M.m}'</b><span class="txt">${txt}</span></div>
+    <div class="momw"><div class="mtn"><span>${esc(cshort(h.c))}</span><small>Baskı</small><span>${esc(cshort(a.c))}</span></div><svg class="mgr" viewBox="0 0 90 30" preserveAspectRatio="none"><line x1="0" y1="15" x2="90" y2="15"/><line x1="45" y1="0" x2="45" y2="30" class="hl"/>${bars}${goals}</svg></div>
+    <div class="lst">${row('Topla oynama','%'+ph,'%'+(100-ph))}${row('Şut',C.sh.h,C.sh.a)}${row('İsabetli şut',C.so.h,C.so.a)}${row('Korner',C.co.h,C.co.a)}</div></div>`;
 }
 function evChip(m,html,cls='',live=true){
   const f=$('#feed'),d=document.createElement('div'); d.className='ev '+cls; d.innerHTML=`<b>${m}'</b>${html}`;
@@ -1443,20 +1507,20 @@ function drawPitch(){
 }
 function cardHTML(d,tag){
   const M=LIVE.M,s=M.o.you,S=M.sides[s],tm=tag?`<i>${tag}</i>`:'';
-  const fx=effect(M,s,d), fxh=fx?`<div class="fx"><span class="${fx.g>=0?'up':'dn'}">Gol şansı ${fx.g>=0?'+':''}${fx.g}%</span><span class="${fx.r<=0?'up':'dn'}">Yeme riski ${fx.r>=0?'+':''}${fx.r}%</span></div>`:'';
+  const fx=effect(M,s,d), fxh=oddsHTML(fx), crowdP=LIVE.vote?LIVE.vote[sig(d)]:null, ctag=crowdP!=null?`<span class="cvote">👥 %${crowdP}</span>`:'';
   if(d.k==='sub'){ const o=S.P[d.o],i=S.P[d.i];
-    return `<div class="kind">${esc(d.t)}${tm}</div>
+    return `<div class="kind">${esc(d.t)}${tm}${ctag}</div>
       <div class="prow"><span class="arr dn">▼</span>${kit(S.c,o.num)}<div class="pn">${esc(o.short)}<small>${flag(o)} ${o.pos} · %${Math.round(staOf(S,o.id,M.m))}</small></div></div>
       <div class="prow"><span class="arr up">▲</span>${kit(S.c,i.num)}<div class="pn">${esc(i.short)}<small>${flag(i)} ${i.pos} · Güç ${i.ovr}</small></div></div>${fxh}`; }
-  if(d.k==='wait')return `<div class="kind">Bekle${tm}</div><div class="big">Devam</div><div class="txt">Değişiklik yok. Takım böyle devam etsin.</div>`;
-  if(d.k==='form')return `<div class="kind">Formasyon${tm}</div><div class="fcard">${formMini(d.v)}<div><div class="big">${esc(d.t)}</div><div class="txt">${esc(d.d)}</div></div></div>${fxh}`;
-  return `<div class="kind">Taktik${tm}</div><div class="big">${esc(d.t)}</div><div class="txt">${esc(d.d)}</div>${fxh}`;
+  if(d.k==='wait')return `<div class="kind">Bekle${tm}${ctag}</div><div class="big">Devam</div><div class="txt">Değişiklik yok. Takım böyle devam etsin.</div>${fxh}`;
+  if(d.k==='form')return `<div class="kind">Formasyon${tm}${ctag}</div><div class="fcard">${formMini(d.v)}<div><div class="big">${esc(d.t)}</div><div class="txt">${esc(d.d)}</div></div></div>${fxh}`;
+  return `<div class="kind">Taktik${tm}${ctag}</div><div class="big">${esc(d.t)}</div><div class="txt">${esc(d.d)}</div>${fxh}`;
 }
 function drawHand(){
   const L=LIVE,M=L.M,S=M.sides[M.o.you],box=$('#hand'); $('#match').classList.toggle('dec',L.mode==='dec');
   if(L.mode!=='dec'){
     const nx=L.target||90;
-    box.classList.add('idle'); box.innerHTML=`<div class="pcard live make"><div class="big">${M.m}'</div><div class="txt">${L.mode==='wait'?'Kararın gönderildi. Rakibin kararı bekleniyor.':M.done?'Maç bitti':L.real&&!L.alt?(nx>=90?'Gerçekteki gibi bitiyor':`Gerçekteki gibi akıyor. Sonraki karar ${nx}'`):nx>=90?'Son dakikalar oynanıyor':`Maç oynanıyor. Sonraki karar ${nx}'`}</div></div>`;
+    const itx=(L.mode==='wait'?'Kararın gönderildi. Rakibin kararı bekleniyor.':M.done?'Maç bitti':L.real&&!L.alt?(nx>=90?'Gerçekteki gibi bitiyor':`Gerçekteki gibi akıyor. Sonraki karar ${nx}'`):nx>=90?'Son dakikalar oynanıyor':`Maç oynanıyor. Sonraki karar ${nx}'`); box.innerHTML=livePanel(L,M,itx);
     $('#hint').textContent=''; return;
   }
   box.classList.remove('idle'); box.innerHTML='';
@@ -1469,7 +1533,7 @@ function drawHand(){
         return `<button class="bp" data-o="${id}">${kit(S.c,p.num)}<div><div style="font-weight:700">${esc(p.short)}</div><small>${FS[k][0]} · kondisyon <span style="font-weight:800;color:${st<60?'#d81e27':'inherit'}">%${st}</span> · reyting <span style="font-weight:800;color:${rt<6?'#d81e27':'inherit'}">${rt.toFixed(1)}</span></small></div><b>${p.ovr}</b></button>`; }).join('')}`);
       sh.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{ sh.remove(); playerSheet(b.dataset.o); }); };
     box.appendChild(mk); }
-  $('#hint').textContent=L.sel?'Kartın seçili. Kararı ver.':L.tip?'Yardımcın: '+L.tip:'Bir kart seç ya da oyuncuya dokunup kendi değişikliğini yap.';
+  $('#hint').textContent=L.sel?'Kartın seçili. Kararı ver.':(L.vote?(L.voteEst?'👥 Kartlardaki yüzde: oyuncuların tahmini seçimi. ':'👥 Kartlardaki yüzde: bu anda diğer oyuncuların seçimi. '):'')+(L.tip?'Yardımcın: '+L.tip:'Bir kart seç ya da oyuncuya dokunup kendi değişikliğini yap.');
 }
 function drawAct(){
   const L=LIVE,b=$('#bDecide');
@@ -1481,7 +1545,7 @@ function drawAct(){
 $('#bDecide').onclick=()=>{ const L=LIVE; if(!L)return; if(L.mode==='play'){ L.fast=true; beep(500,.05); drawAct(); } else if(L.mode==='dec')decide(); };
 function moment(title){
   const L=LIVE,M=L.M,s=M.o.you; $('#shouts').hidden=true; L.mode='dec'; L.sel=null; L.custom=null; L.outSel=null; L.title=title;
-  L.opts=choices(M,s); L.no=(L.no||0)+1; L.tip=assistTip(M,s);
+  L.opts=choices(M,s); L.no=(L.no||0)+1; L.tip=assistTip(M,s); voteCalc(L,M,s);
   tipOnce('m2','<span class="tt">Karar anı</span>Bir kart seç, sonra sağ alttaki <b>Kararı ver</b> düğmesine bas. Kartın altındaki yüzdeler gol şansını ve gol yeme riskini gösterir. Süre biterse <b>Devam</b> seçilir.');
   beep(520,.1); buzz(30); toast(title==='Gol yedik!'?'Gol yedik':(L.real?L.target:M.m)+"'"); drawAll(); $('#hand').scrollLeft=0;
   clearInterval(L.timer); let left=decSec(); const T=$('#tbar');
@@ -1489,6 +1553,15 @@ function moment(title){
   const lbl=()=>$('#tlbl').textContent=`${title} · ${left} sn`; lbl();
   L.timer=setInterval(()=>{ if(LIVE!==L){clearInterval(L.timer);return;} left--; lbl(); if(left<=5&&left>0)beep(880,.05);
     if(left<=0){ clearInterval(L.timer); if(!L.sel)L.sel=L.opts[L.opts.length-1]; decide(); } },1000);
+}
+/* diğer oyuncular ne seçti: gerçek oylar (online kayıtlar), azsa kartların etkisine göre tahmin */
+function voteCalc(L,M,s){
+  L.vote=null; if(!L.real||L.duel)return; const k=L.decs.length, P=(L.plays||[]).filter(p=>p.d&&p.d[k]), n=P.length, V={};
+  const opts=L.opts.map(d=>sig(d));
+  if(n>=10){ for(const p of P)V[p.d[k]]=(V[p.d[k]]||0)+1; for(const x in V)V[x]=Math.round(100*V[x]/n); L.voteEst=false; }
+  else { const u=L.opts.map(d=>{ const f=effect(M,s,d); return (f.g1-f.g0)-(f.r1-f.r0)*1.1+(d.k==='wait'?2.5:0)+((hash(L.real.id+k+sig(d))%7)-3)*.6; }), e=u.map(x=>Math.exp(x/4)), t=e.reduce((a,b)=>a+b,0);
+    opts.forEach((x,i)=>V[x]=Math.round(88*e[i]/t)); L.voteEst=true; }
+  L.vote=V; L.voteN=n;
 }
 /* kararın değeri: aynı rastgele sayılarla her kart için maçın kalanı 120 kez oynanır */
 function mc(M,s,d,n=120){
@@ -3240,7 +3313,7 @@ const BUL={data:null,at:0,err:null,lg:null,timer:null,busy:false};
 const PREDCAP=100, PRED_X=25, PRED_R=5;
 const preds=()=>store.get('fdPred',{});
 function liveUrls(){ const t='?t='+Math.floor(Date.now()/60000), u=[];
-  if(/github\.io$/.test(location.hostname))u.push((location.pathname.includes('/direktor/')?'':'../direktor/')+'live.json'+t);
+  if(/github\.io$/.test(location.hostname)&&/\/flix-kick-up\//.test(location.pathname))u.push((location.pathname.includes('/direktor/')?'':'../direktor/')+'live.json'+t);
   u.push(LIVEPAGE+'live.json'+t,'https://raw.githubusercontent.com/kaanimamoglu27/flix-kick-up/gh-pages/direktor/live.json'+t); return u; }
 async function liveFetch(force){
   if(BUL.busy)return BUL.data; if(!force&&BUL.data&&Date.now()-BUL.at<55000)return BUL.data; BUL.busy=true; BUL.err=null;
@@ -3695,6 +3768,17 @@ function userCardHTML(acts,S,utac){
   if(!sub&&!tac)h+=`<div class="big">Devam</div><div class="txt">Değişiklik yok.</div>`;
   return h;
 }
+/* karar sonrası: sen, hoca ve diğer oyuncular yan yana */
+function crowdShow(L,uSig,cSig,n,pMe,pCo,same){
+  let me=pMe, co=pCo, est=n<10;
+  if(est&&L.vote){ me=L.vote[uSig]!=null?L.vote[uSig]:4; co=same?me:(L.vote[cSig]!=null?L.vote[cSig]:9); }
+  else if(est){ return '<div class="crowd2"><div class="c2h">👥 Diğer oyuncular</div><div class="note">Bu maçta bu kararı ilk veren sensin.</div></div>'; }
+  const other=Math.max(0,100-(same?me:me+co)), verdict=same?`Hocayla aynı düşündün. Oyuncuların <b>%${me}</b>'i de böyle.`:me>=co?`Oyuncuların çoğu <b>seninle</b>: %${me}, hocayla %${co}.`:`Oyuncuların çoğu <b>hocayla</b>: %${co}, seninle %${me}.`;
+  return `<div class="crowd2"><div class="c2h">👥 Diğer oyuncular ne dedi?${est?' <small>tahmini</small>':` <small>${n} kişi</small>`}</div>
+    <div class="c2bar">${same?`<i class="me" style="width:${me}%"></i>`:`<i class="me" style="width:${me}%"></i><i class="co" style="width:${co}%"></i>`}<i class="ot" style="width:${other}%"></i></div>
+    <div class="c2leg"><span><i class="me"></i>${same?'Sen ve hoca':'Senin gibi'} %${me}</span>${same?'':`<span><i class="co"></i>Hoca gibi %${co}</span>`}<span><i class="ot"></i>Başka %${other}</span></div>
+    <div class="c2v">${verdict}</div></div>`;
+}
 function decideReal(){
   const L=LIVE,M=L.M,sc=L.real,you=L.you,opp=you==='h'?'a':'h',S=M.sides[you],t=M.m+1, wasAlt=!!L.alt;
   const k=L.decs.length, nx=Math.min(92,nextTarget(M.m));
@@ -3723,7 +3807,7 @@ function decideReal(){
     <div class="lbl" style="opacity:.8">Maçın kalanında kazanma ihtimali</div>
     <div class="prob mine"><span>Senin kararınla</span><span class="bar"><i style="width:${pct(u.w)}%"></i></span><b>%${pct(u.w)}</b></div>
     <div class="prob"><span>Hocanın kararıyla</span><span class="bar"><i style="width:${pct(c.w)}%"></i></span><b>%${pct(c.w)}</b></div>
-    <div class="crowd">${n?`Bu anda oynayanların <b>%${pc(likeMe)}</b>'i senin gibi, <b>%${pc(likeCoach)}</b>'i hoca gibi karar verdi <small>(${n} kişi)</small>`:'Bu maçta bu kararı ilk veren sensin.'}</div>
+    ${crowdShow(L,uSig,cSig,n,pc(likeMe),pc(likeCoach),same)}
     <div class="lbl" style="opacity:.8">Gerçek maçta ${t}'–${Math.min(nx,91)-1}' arası</div>
     <div class="evlist">${real.map(e=>`<div class="ev"><b>${e[0]}'</b>${evTxt(e)}</div>`).join('')||'<div class="ev">Önemli bir olay olmadı.</div>'}</div>
     <div class="total"><span class="lbl">Karar puanı</span><b>${pts}</b></div>
