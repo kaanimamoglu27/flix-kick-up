@@ -14,7 +14,7 @@
 
   // Product ids must match App Store Connect and Google Play Console exactly.
   const CONSUMABLE = ['atis_feathers_500', 'atis_feathers_1200', 'atis_feathers_3500', 'atis_feathers_8000', 'atis_feathers_20000'];
-  const NON_CONSUMABLE = ['atis_starter', 'atis_noads', 'atis_sokak2'];
+  const NON_CONSUMABLE = ['atis_starter', 'atis_noads'];
 
   let store = null; const pending = {}; const waiting = [];
   // products waiting for Ask to Buy approval: buy(id) answers 'pending' for them instead of ordering again

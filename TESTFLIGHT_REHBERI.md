@@ -165,15 +165,15 @@ Flix Atış da aynı yolla yüklenir. Kick Up için girdiğin GitHub sırları (
 
 1. developer.apple.com > Identifiers > **+** > App IDs > App: Bundle ID **Explicit** `com.flixtoys.atis`.
 2. App Store Connect > Uygulamalar > **+** > Yeni Uygulama: ad **Flix Atış**, dil Türkçe, paket kimliği `com.flixtoys.atis`, SKU `atis1`.
-3. Yükle (Mac gerekmez): GitHub > `flix-kick-up` > Actions > **iOS TestFlight** > Run workflow > app: **atis**, version: **1.3**. Terminalden:
+3. Yükle (Mac gerekmez): GitHub > `flix-kick-up` > Actions > **iOS TestFlight** > Run workflow > app: **atis**, version: **1.4**. Terminalden:
 
 ```bash
-gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=atis -f version=1.3
+gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=atis -f version=1.4
 ```
 
 Mac'ten: `cd atis/app && ./ios.sh yukle 1.0`.
 
-Flix Atış 1.3'te **uygulama içi satın alma ve reklam var** (8 ürün), bu yüzden "Ücretli Uygulamalar" anlaşması (bölüm 1, madde 2) şart.
+Flix Atış 1.4'te **uygulama içi satın alma ve reklam var** (7 ürün), bu yüzden "Ücretli Uygulamalar" anlaşması (bölüm 1, madde 2) şart.
 
 **Satın alma ürünleri** (App Store Connect > Flix Atış > Para Kazanma > Uygulama İçi Satın Almalar > **+**). Ürün kimlikleri birebir aynı yazılmalı:
 
@@ -186,7 +186,6 @@ Flix Atış 1.3'te **uygulama içi satın alma ve reklam var** (8 ürün), bu y�
 | `atis_feathers_20000` | Tüketilebilir | 20.000 tüy | ₺799,99 |
 | `atis_starter` | Tüketilemez | Başlangıç Paketi: 2.500 tüy + Gece kostümü (tek sefer) | ₺119,99 |
 | `atis_noads` | Tüketilemez | Reklamsız (bölüm arası reklamlar kalkar) | ₺119,99 |
-| `atis_sokak2` | Tüketilemez | Bölüm paketi: 4 dünyada (Sokak, Amerika, Avrupa, Uzay) 11-20. bölümler, toplam 40 bölüm (oyunda 20.000 tüyle de açılır) | ₺119,99 |
 
 Oyunda görünen fiyatlar App Store'dan gelir; tabloda yazanlar sadece mağaza yüklenene kadar görünür.
 

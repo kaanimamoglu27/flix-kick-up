@@ -1,6 +1,13 @@
 Flix Atış kaynak dosyaları.
 
-v6 (güncel, 1.3): 4 dünya x 20 bölüm = 80 bölüm: Sokak (levels5.js, elle), Amerika, Avrupa, Uzay (worlds6.js: genLevel üretir, par = botun atış sayısı, GEN_PARS).
+v7 (güncel, 1.4): 9 harita x 20 = 180 bölüm: Sokak, Türkiye, Amerika, Avrupa, Asya, Avustralya, Afrika, Antarktika, Uzay.
+Ücretli bölüm yok: bir sonraki harita, öncekinin 10. bölümü geçilince tüyle açılır (WORLDS[].cost; SAVE.wOwn). Para sadece kozmetik için.
+Her haritada yol kenarı süsleri (deco7.js: genDeco/decoProp, kendi rastgele sayılarıyla, bölüm yerleşimini değiştirmez), bitişin arkasında simge yapı (landmark),
+yerel hayvan (LOCAL_ANI). Yeni haritaların kaplama/cephe/çatı/gökyüzü theme7.js (mktheme7.py), bölüm adları ve parlar worlds7.js (mkworlds7.py).
+Kamera binaya girmez: önce yükselir, sonra yaklaşır (camBlock). Dükkân: 20 FLIX, 10 iz, 12 insan, 12 hayvan, nadirlik etiketleri, kürsü.
+v6 kayıtları otomatik yeni numaralara taşınır (SAVE.v7). game7.js = game6.js + `python3 patch7.py`; shell7.html = shell6.html + `python3 mkshell7.py`; derleme `python3 build7.py`.
+
+v6 (1.3): 4 dünya x 20 bölüm = 80 bölüm: Sokak (levels5.js, elle), Amerika, Avrupa, Uzay (worlds6.js: genLevel üretir, par = botun atış sayısı, GEN_PARS).
 Her dünya bir öncekinin 10. bölümü geçilince açılır; her dünyada 11-20 paketli (atis_sokak2 = Bölüm paketi, ₺119,99 ya da 20.000 tüy).
 Dünyaya göre kaplama, cephe (tuğla/taş/metal), çatı, gökyüzü (theme6.js); Uzay'da az yerçekimi (g 8.5), astronotlar ve yeşil uzaylılar.
 Ana menüde dünya seçimi, bölümler ekranında dünya sekmeleri (mkshell6.py). game6.js = game5.js + `python3 patch6.py`; shell6.html = shell5.html + `python3 mkshell6.py`; derleme `python3 build6.py <three.js yolu> <çıktı>`.
