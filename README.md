@@ -1,6 +1,6 @@
 ## ⚽ Flix Sen Olsaydın (eski adı Flix Direktör)
 
-**Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/direktor/ · Kaynak ve iOS paketi: [`direktor/`](direktor/)
+**Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/direktor/ · Kaynak, nasıl oynanır ve iOS paketi: [`direktor/`](direktor/README.md)
 
 Gerçek maçlarda hocanın yerine geç: üstte canlı maç, altta kararlar. Kariyer modu (2010'dan bugüne), her hafta kendiliğinden yenilenen gerçek Süper Lig maçları, canlı bülten ve skor tahmini.
 
