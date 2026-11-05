@@ -173,7 +173,7 @@ gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=atis -f
 
 Mac'ten: `cd atis/app && ./ios.sh yukle 1.0`.
 
-Flix Atış 1.4'te **uygulama içi satın alma ve reklam var** (7 ürün), bu yüzden "Ücretli Uygulamalar" anlaşması (bölüm 1, madde 2) şart.
+Flix Atış 1.5'te **uygulama içi satın alma ve reklam var** (7 ürün), bu yüzden "Ücretli Uygulamalar" anlaşması (bölüm 1, madde 2) şart.
 
 **Satın alma ürünleri** (App Store Connect > Flix Atış > Para Kazanma > Uygulama İçi Satın Almalar > **+**). Ürün kimlikleri birebir aynı yazılmalı:
 

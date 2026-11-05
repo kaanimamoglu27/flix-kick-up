@@ -1,6 +1,14 @@
 Flix Atış kaynak dosyaları.
 
-v7 (güncel, 1.4): 9 harita x 20 = 180 bölüm: Sokak, Türkiye, Amerika, Avrupa, Asya, Avustralya, Afrika, Antarktika, Uzay.
+v8 (güncel, 1.5): adil bölümler (fairLevel: kova binaya değiyorsa rotada geri kayar; kovanın/başlangıcın üstündeki ip, araba, büfe vb. kaldırılır),
+kamera ile FLIX arasındaki binalar saydamlaşır (OCC/fadeOcc), kamera sadece bir şeyin içine düşecekse yaklaşır/yükselir. Tam çekiş daha güçlü (VMAX 19.5),
+sekme 0.32 -> 0.45. Her bölümde 8 atış hakkı, par 2-3 (pars8.js = botun atışı, 2-3 arası). Yıldız: par = 3, par+2'ye kadar 2, sonrası 1.
+Bölümler daha çeşitli (worlds8.js: meydan + anıt, kanal + iki köprü, merdiven); açık dünyalarda (Afrika, Antarktika, Avustralya, Uzay) dükkan duvarı yerine
+kulübe/iglo/palmiye/kubbe (look8.js themedLot), şehirlerde cumba, pagoda saçağı, yangın merdiveni, çiçek saksısı (facadeExtra). extra8.js: anıtlar, su, yerel arabalar, ipe asılı süsler.
+FLIX skinleri desenli, tüy baskılı, aksesuarlı (skin8.js); dükkân kartlarında gerçek 3D resimler. game8.js = game7.js + `python3 patch8.py`; derleme `python3 build8.py`.
+Bot: `node t51.js 0,1,2` (NZ=1 ortalama oyuncu, NZ=2 yeni oyuncu gibi nişan hatası ekler).
+
+v7 (1.4): 9 harita x 20 = 180 bölüm: Sokak, Türkiye, Amerika, Avrupa, Asya, Avustralya, Afrika, Antarktika, Uzay.
 Ücretli bölüm yok: bir sonraki harita, öncekinin 10. bölümü geçilince tüyle açılır (WORLDS[].cost; SAVE.wOwn). Para sadece kozmetik için.
 Her haritada yol kenarı süsleri (deco7.js: genDeco/decoProp, kendi rastgele sayılarıyla, bölüm yerleşimini değiştirmez), bitişin arkasında simge yapı (landmark),
 yerel hayvan (LOCAL_ANI). Yeni haritaların kaplama/cephe/çatı/gökyüzü theme7.js (mktheme7.py), bölüm adları ve parlar worlds7.js (mkworlds7.py).
