@@ -1,7 +1,7 @@
-// Flix Fabrika 1.2 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
+// Flix Fabrika 1.3 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
 import { SFX } from './sfx.js';
 import { UPS, STAFF, SUPS, COS, IAP, AD, COLS, BONUS, bonusTxt } from './config.js';
-import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel, bonusOn, bonusLeft, addBonus, setMenu, cosB } from './game.js';
+import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel, bonusOn, bonusLeft, addBonus, setMenu, cosB, ENDGAME, setEndgame } from './game.js';
 import { PADS } from './config.js';
 
 const $ = (s) => document.querySelector(s);
@@ -9,7 +9,8 @@ const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && windo
 export function haptic(ms) { if (window.FlixNative && window.FlixNative.haptic) window.FlixNative.haptic(ms); }
 export function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => el.classList.remove('show'), 2400); }
 const upCost = (u, l) => Math.round(u.base * Math.pow(u.mult, l));
-const clock = (ms) => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0');
+const clock = (ms) => ms > 864e5 ? '∞' : _clock(ms);
+const _clock = (ms) => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0');
 const mins = (ms) => { const s = Math.ceil(ms / 1000); return s >= 60 ? Math.ceil(s / 60) + ' dk' : s + ' sn'; };
 
 // ---------------- ads ----------------
@@ -74,8 +75,8 @@ function render() {
   } else if (cur === 'dolap') {
     T.textContent = 'Dolap'; const t = tab.dolap || 'skin'; const names = { skin: 'Kostüm', acc: 'Aksesuar', floor: 'Zemin' };
     TB.innerHTML = Object.keys(names).map(k => `<button class="tb ${t === k ? 'on' : ''}" data-t="${k}">${names[k]}</button>`).join('');
-    for (const c of COS[t]) { const own = SV.cos.own.includes(c.id), on = SV.cos[t] === c.id; const sw = t === 'floor' ? (c.wood ? 'linear-gradient(90deg,#c98a4e,#e0a86a)' : c.rainbow ? 'linear-gradient(90deg,#f88,#fd8,#8f8,#8df,#d8f)' : `linear-gradient(135deg,${c.a} 50%,${c.b2} 50%)`) : null;
-      const icon = t === 'floor' ? `<i class="sw" style="background:${sw}"></i>` : t === 'skin' ? `<i class="sw" style="background:${{ kraliyet: '#e22511', buzul: '#2f8fe0', ejder: '#1a9a4a', neon: '#ff2d9a', altin: '#ffb81a' }[c.id]}"></i>` : { yok: '➖', gozluk: '🕶️', kulak: '🎧', pelerin: '🦸', tac: '👑' }[c.id];
+    for (const c of COS[t]) { const own = SV.cos.own.includes(c.id), on = SV.cos[t] === c.id; const sw = t === 'floor' ? (c.wood ? 'linear-gradient(90deg,#c98a4e,#e0a86a)' : c.marble ? 'linear-gradient(135deg,#f4f4f6,#d8d8e2 50%,#f4f4f6)' : c.rainbow ? 'linear-gradient(90deg,#f88,#fd8,#8f8,#8df,#d8f)' : `linear-gradient(135deg,${c.a} 50%,${c.b2} 50%)`) : null;
+      const icon = t === 'floor' ? `<i class="sw" style="background:${sw}"></i>` : t === 'skin' ? `<i class="sw" style="background:${c.sw}"></i>` : c.ic;
       const price = c.gem ? c.gem + ' 💎' : 'Ücretsiz'; const can = c.gem ? SV.gems >= c.gem : true; const bt = bonusTxt(c.b || {});
       h += row({ icon, name: c.name, desc: (bt ? `<i class="bon">${bt}</i>` : '<i class="bon off">Bonus yok</i>') + (own ? (on ? ' Giyili' : ' Senin') : ''), btn: on ? 'GİYİLİ' : own ? 'GİY' : price, btnCls: on ? 'max' : own ? 'alt' : can ? 'gem' : 'no', act: 'cos:' + t + ':' + c.id, dis: on }); }
     const cb = cosB(); h += `<p class="note">Giydiklerinden gelen toplam bonus: <b>${bonusTxt(cb) || 'yok'}</b></p>`;
@@ -86,7 +87,7 @@ function render() {
     h += '<p class="note">Bonuslar üst üste eklenir. Elmasları mağazadan alabilirsin.</p>';
   } else if (cur === 'menu') {
     T.textContent = 'Ayarlar';
-    h += `<div class="set col"><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button><button data-a="home">🏠 Ana menüye dön</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : ''}</div><p class="note">Flix Fabrika · FLIX TOYS</p>`;
+    h += `<div class="set col"><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button><button data-a="home">🏠 Ana menüye dön</button><button data-a="endg">${ENDGAME ? '↩ Normal oyuna dön' : '🧪 Endgame modu (test)'}</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : ''}</div><p class="note">Flix Fabrika · FLIX TOYS</p>`;
   } else if (cur === 'shop') {
     T.textContent = 'Mağaza'; const g = gemAdState();
     h += `<div class="row free"><div class="ic">▶</div><div class="mid"><b>Reklam izle: +${AD.gemsPerAd} 💎</b><span>${g.left <= 0 ? 'Bugünlük bitti' : g.wait > 0 ? mins(g.wait) + ' sonra' : 'Bugün ' + g.left + ' hak'}</span></div><button class="buy" data-a="adgem" ${g.left <= 0 || g.wait > 0 ? 'disabled' : ''}>İZLE</button></div>`;
@@ -108,6 +109,7 @@ async function onAct(a) {
   else if (k === 'snd') setSound(!soundOn());
   else if (k === 'bad') { const b = BONUS.find(q => q.id === x); const r = await adRewarded(); if (r === 'rewarded') { addBonus(x, b.min); SFX.milestone(); toast(b.name + ' · ' + b.min + ' dakika!'); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
   else if (k === 'bgem') { const b = BONUS.find(q => q.id === x); if (SV.gems < b.gem) { toast('Elmas yetmiyor'); openPanel('shop'); return; } SV.gems -= b.gem; addBonus(x, b.min); SFX.milestone(); toast(b.name + ' · ' + b.min + ' dakika!'); }
+  else if (k === 'endg') { confirmBox(ENDGAME ? '<b>Normal oyuna dönülsün mü?</b><br><small>Endgame kaydı saklanır.</small>' : '<b>Endgame test modu</b><br><small>Her şey açık, tüm geliştirmeler en üstte, tüm bonuslar kalıcı. Normal kaydın ayrı saklanır.</small>', ENDGAME ? 'Normal oyuna dön' : 'Endgame modunu aç', () => setEndgame(!ENDGAME)); return; }
   else if (k === 'home') { closePanel(); showMenu(true); return; }
   else if (k === 'restore') { try { const ids = await window.FlixNative.restore(); toast(ids.length ? 'Satın alımlar geri yüklendi' : 'Geri yüklenecek satın alım yok'); } catch { toast('Mağazaya ulaşılamadı'); } }
   refreshHUD(); if (cur) render();
@@ -116,11 +118,11 @@ async function onAct(a) {
 // ---------------- HUD ----------------
 export function refreshHUD() {
   $('#gems b').textContent = fmt(SV.gems);
-  const act = BONUS.filter(q => bonusOn(q.id)); $('#bon').innerHTML = act.map(q => `<span style="--bc:${q.col}">${q.icon}<b>${clock(bonusLeft(q.id))}</b></span>`).join('');
+  const act = BONUS.filter(q => bonusOn(q.id)); $('#bon').innerHTML = act.map(q => { const l = bonusLeft(q.id); return `<span style="--bc:${q.col}">${q.icon}${l > 864e5 ? '' : `<b>${clock(l)}</b>`}</span>`; }).join('');
   $('#boostB').classList.toggle('on', act.length > 0); $('#boostB small').textContent = act.length ? act.length + ' aktif' : 'Bonus';
   for (const id of ['#boostB', '#shopB', '#menuB']) $(id).style.display = tutDone() ? '' : 'none';
   document.querySelectorAll('[data-bl]').forEach(e => { const l = bonusLeft(e.dataset.bl); e.hidden = !l; e.textContent = clock(l); e.closest('.row').classList.toggle('act', !!l); });
-  $('#vipTag').style.display = SV.vip ? '' : 'none';
+  $('#vipTag').style.display = SV.vip ? '' : 'none'; $('#vipTag').textContent = ENDGAME ? 'ENDGAME · TEST' : 'VIP · 2x';
   const fl = factoryLevel(), tot = PADS.length + 1; $('#lvl').innerHTML = 'Fabrika Sv ' + fl + ' <i><u style="width:' + Math.round(fl / tot * 100) + '%"></u></i>'; $('#lvl').style.display = tutDone() ? '' : 'none';
 }
 function confirmBox(html, okTxt, ok, alt) {
@@ -136,7 +138,7 @@ export function offlinePopup() {
   confirmBox(`<div class="big">💤</div><b>Sen yokken elemanların çalıştı</b><br><small>${Math.round(away)} dakika · fabrika kazancı</small><div class="amt">₺${fmt(earn)}</div>`, 'Al', () => { SV.money += earn; bumpMoney(); save(); },
     { txt: '▶ 2 katı al', fn: async () => { const r = await adRewarded(); SV.money += r === 'rewarded' ? earn * 2 : earn; bumpMoney(); save(); toast(r === 'rewarded' ? '2 kat kazanç alındı!' : 'Kazanç alındı'); } });
 }
-export function showMenu(on) { document.body.classList.toggle('menu', on); setMenu(on); if (on) { closePanel(); $('#mmLv').textContent = 'Fabrika Sv ' + factoryLevel(); $('#mmMoney').textContent = '₺' + fmt(SV.money); $('#mmGems').textContent = fmt(SV.gems) + ' 💎'; $('#mmPlay b').textContent = SV.tut ? 'DEVAM' : 'OYNA'; } if (window.FlixAds) window.FlixAds.setScreen(on ? 'menu' : 'game'); }
+export function showMenu(on) { document.body.classList.toggle('menu', on); setMenu(on); if (on) { closePanel(); $('#mmLv').textContent = 'Fabrika Sv ' + factoryLevel(); $('#mmMoney').textContent = '₺' + fmt(SV.money); $('#mmGems').textContent = fmt(SV.gems) + ' 💎'; $('#mmEnd').style.display = ENDGAME ? '' : 'none'; $('#mmPlay b').textContent = SV.tut ? 'DEVAM' : 'OYNA'; } if (window.FlixAds) window.FlixAds.setScreen(on ? 'menu' : 'game'); }
 export function initUI() {
   $('#sheet').addEventListener('click', (e) => { const t = e.target.closest('[data-t]'); if (t) { tab[cur] = t.dataset.t; render(); return; } const b = e.target.closest('[data-a]'); if (b && !b.disabled) onAct(b.dataset.a); });
   $('#shX').onclick = () => closePanel();
@@ -144,6 +146,7 @@ export function initUI() {
   $('#boostB').onclick = () => { SFX.unlock(); if (cur === 'bonus') closePanel(); else openPanel('bonus'); };
   $('#menuB').onclick = () => { SFX.unlock(); if (cur === 'menu') closePanel(); else openPanel('menu'); };
   $('#mmPlay').onclick = () => { SFX.unlock(); showMenu(false); };
+  $('#mmEnd').onclick = () => openPanel('menu');
   document.querySelectorAll('#mm [data-p]').forEach(b => b.onclick = () => { SFX.unlock(); openPanel(b.dataset.p); });
   showMenu(true);
   window.__fabGrant = grant; if (window.FlixNative && window.FlixNative.flush) setTimeout(() => window.FlixNative.flush(), 0);

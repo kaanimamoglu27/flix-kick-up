@@ -67,14 +67,14 @@ body.panel .fab,body.panel #hint{opacity:0;pointer-events:none}
 #adX{position:absolute;right:16px;top:calc(var(--st) + 12px);width:42px;height:42px;border-radius:21px;background:rgba(0,0,0,.35);font-weight:800;font-size:16px}
 .bub.call{background:#e22511;color:#fff;animation:pulse .7s infinite alternate}.bub.call::after{border-top-color:#e22511}.bub.call b{font-size:15px}
 @keyframes pulse{to{transform:scale(1.08)}}
-#hint{position:fixed;left:0;right:0;bottom:calc(var(--sb) + 26px);text-align:center;font-weight:700;font-size:13px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35);opacity:.9;pointer-events:none;transition:opacity .5s}
+#hint{position:fixed;left:0;right:90px;bottom:calc(var(--sb) + 26px);text-align:center;font-weight:700;font-size:13px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35);opacity:.9;pointer-events:none;transition:opacity .5s}
 body.moved #hint{opacity:0}
 
 /* ===== 1.2 tasarım dili: kırmızı başlık, krem panel, kalın kenarlı kartlar, alt gölgeli butonlar ===== */
 :root{--red:#e22511;--cream:#fff7e8;--line:#ecdcc0}
 #money,#gems,#lvl{background:rgba(11,31,63,.62);border:2px solid rgba(255,255,255,.85);box-shadow:0 3px 0 rgba(0,0,0,.18)}
 #lvl{top:calc(var(--st) + 92px)}#lvl i u{background:linear-gradient(90deg,#ffd84a,#ff9a1a)}
-#bon{position:fixed;left:14px;top:calc(var(--st) + 124px);display:flex;flex-direction:column;gap:5px;pointer-events:none}
+#bon{position:fixed;left:14px;top:calc(var(--st) + 124px);display:flex;flex-wrap:wrap;gap:5px;max-width:170px;pointer-events:none}
 #bon span{display:flex;align-items:center;gap:5px;padding:2px 9px 2px 4px;border-radius:12px;background:var(--bc);border:2px solid #fff;font-size:14px;box-shadow:0 3px 0 rgba(0,0,0,.18);animation:bpop .3s}
 #bon b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:16px}
 @keyframes bpop{from{transform:scale(.6)}}
@@ -107,7 +107,7 @@ body.menu #toast{top:50%}
 @keyframes mmb{50%{transform:translateY(-6px) rotate(-3deg)}}
 #mm h1{font-family:var(--disp);font-style:italic;font-weight:900;font-size:64px;line-height:.9;letter-spacing:1px;color:#fff;text-shadow:0 4px 0 var(--red),0 8px 0 #7a0d05,0 12px 18px rgba(0,0,0,.35);margin-top:4px}
 #mm h2{font-size:13px;font-weight:700;opacity:.9;margin-top:10px;letter-spacing:.5px}
-#mmGap{flex:1}
+#mmGap{flex:1}#mmEnd{margin-top:12px;padding:6px 14px;border-radius:12px;background:#7a4fd8;border:2px solid #fff;font-weight:800;font-size:12px;letter-spacing:.5px}
 #mmStats{display:flex;gap:8px;margin-bottom:14px}#mmStats span{padding:6px 12px;border-radius:14px;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.5);font-weight:800;font-size:13px}
 #mmPlay{width:min(300px,86vw);height:76px;border-radius:26px;background:linear-gradient(#ffe066,#ffb40e);border:4px solid #fff;box-shadow:0 7px 0 #b9770c,0 14px 24px rgba(0,0,0,.35);color:#3b2508;display:flex;align-items:center;justify-content:center;gap:10px;animation:mmp 1.4s ease-in-out infinite}
 #mmPlay b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:40px;letter-spacing:1px}#mmPlay i{font-style:normal;font-size:26px}
@@ -130,7 +130,7 @@ body.menu #toast{top:50%}
 <button id="menuB" class="fab">⚙️</button>
 <button id="boostB" class="fab"><b>⚡</b><small>Bonus</small></button>
 <button id="shopB" class="fab"><b>🛒</b><small>Mağaza</small></button>
-<div id="mm"><img id="mmLogo" src="/*LOGO*/" alt=""><h1>FABRİKA</h1><h2>Hindi çiftliğinden oyuncakçıya FLIX üret</h2><div id="mmGap"></div>
+<div id="mm"><img id="mmLogo" src="/*LOGO*/" alt=""><h1>FABRİKA</h1><h2>Hindi çiftliğinden oyuncakçıya FLIX üret</h2><button id="mmEnd">🧪 ENDGAME TEST MODU</button><div id="mmGap"></div>
 <div id="mmStats"><span id="mmLv"></span><span id="mmMoney"></span><span id="mmGems"></span></div>
 <button id="mmPlay"><i>▶</i><b>OYNA</b></button>
 <div id="mmTiles"><button data-p="dolap"><i>👕</i><small>Dolap</small></button><button data-p="bonus"><i>⚡</i><small>Bonus</small></button><button data-p="shop"><i>🛒</i><small>Mağaza</small></button><button data-p="menu"><i>⚙️</i><small>Ayarlar</small></button></div></div>

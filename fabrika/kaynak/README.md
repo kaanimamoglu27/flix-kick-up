@@ -25,3 +25,11 @@ Three.js r170 + esbuild, tek HTML dosyası üretir: `python3 build.py` (yanında
 - Süreli bonuslar (reklam ya da 💎): 2x Kazanç, Turbo Hız, Çift Üretim, Müşteri Akını, Para Mıknatısı.
 - Kozmetikler yalnız 💎 ile alınır ve giyilince bonus verir (hız, taşıma, kâr).
 - Daha detaylı insanlar (yüz, saç, kıyafet desenleri, çocuklar), karo/ahşap zemin, makine panelleri, tezgâh üstleri.
+
+## 1.3 (2026-11-09)
+- Kamera sakinleşti: oyuncu etrafında ölü bölge, kare hızından bağımsız yumuşak takip, gölge kamerası adım adım (titreme yok).
+- Endgame test modu (Ayarlar → 🧪): ayrı kayıt (flix_fabrika_end), her alan açık, tüm geliştirmeler en üstte, 4 taşıyıcı + kasiyer, tüm kozmetikler, tüm bonuslar kalıcı. Normal kayda dokunmaz.
+- Her alanın pedinde ve açılış mesajında etkisi yazar; Yeni salon artık +%10 satış ve +2 müşteri verir. Salon/kamyon/top hattı daha ucuz (600/800/1800).
+- Kozmetikler: 10 kostüm, 10 aksesuar (baret, şapka, atkı, tüy kanat, ışık halesi eklendi), 9 zemin (çim, mermer, satranç, gece).
+- Hata: tutorialda tek tür hammaddeyle çanta dolup takılma düzeldi (tüy/taban en fazla kapasitenin yarısı).
+- Elemanlar kamyonu ve hediye paketini de besler.

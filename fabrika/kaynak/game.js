@@ -1,11 +1,11 @@
-// Flix Fabrika 1.2 — karakterle oynanan fabrika: renkli hindi çiftliği → pres → montaj → TEST → tezgâh / kamyon.
+// Flix Fabrika 1.3 — karakterle oynanan fabrika: renkli hindi çiftliği → pres → montaj → TEST → tezgâh / kamyon.
 // Yeni salon (genişleme): kamyon, FLIX Top hattı, hediye paketi, hindi sürüsü. Konveyör, fabrika seviyesi ve süslemeler.
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { hero, pose, leafGeo } from './hero.js';
 import { SFX } from './sfx.js';
-import { COLS, PADS, COS, PROD, BONUS } from './config.js';
+import { COLS, PADS, COS, PROD, BONUS, UPS, SUPS, STAFF } from './config.js';
 import { initUI, openPanel, closePanel, panelOpen, toast, refreshHUD, maybeInter, offlinePopup, haptic } from './ui.js';
 
 const $ = (s) => document.querySelector(s);
@@ -15,13 +15,22 @@ export const fmt = (n) => n < 10000 ? Math.floor(n).toLocaleString('tr-TR') : n 
 // ---------------- save ----------------
 const DEF = () => ({ v: 3, t2: 1, money: 0, gems: 0, unl: [], tut: 0, made: 0, up: {}, staff: { tas: 0, kas: 0 }, cos: { skin: 'kraliyet', acc: 'yok', floor: 'nane', own: ['kraliyet', 'yok', 'nane'] },
   noads: 0, vip: 0, starter: 0, boostUntil: 0, ads: { day: '', n: 0, last: 0 }, freeUpLast: 0, lastInter: 0, lastSeen: 0, ipm: 0, del: 0, paid: {}, txn: [], bonus: {} });
+// Endgame test modu (Kaan için): ayrı kayıt, her şey açık, tüm geliştirmeler en üstte, tüm bonuslar kalıcı
+export const ENDGAME = (() => { try { return localStorage.getItem('flix_fab_mode') === 'end'; } catch { return false; } })();
+const KEY = ENDGAME ? 'flix_fabrika_end' : 'flix_fabrika3';
+export function setEndgame(on) { try { localStorage.setItem('flix_fab_mode', on ? 'end' : 'normal'); } catch {} save(); location.reload(); }
+function endSave() { const d = DEF(), far = Date.now() + 3650 * 864e5; d.tut = 99; d.del = 1; d.money = 1e6; d.gems = 99999; d.unl = PADS.map(p => p.id);
+  for (const u of UPS.concat(SUPS)) d.up[u.id] = u.max; d.staff = { tas: STAFF.find(q => q.id === 'tas').max, kas: 1 };
+  d.cos = { skin: 'galaksi', acc: 'hale', floor: 'gece', own: Object.values(COS).flat().map(c => c.id) }; d.vip = 1; d.noads = 1; d.boostUntil = far; for (const b of BONUS) if (b.id !== 'x2') d.bonus[b.id] = far; return d; }
 export let SV = (() => { const d = DEF(); try {
-  const o = JSON.parse(localStorage.getItem('flix_fabrika3') || 'null');
+  const o = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (ENDGAME && !(o && o.v === 3)) return endSave();
   if (o && o.v === 3) { const s = { ...d, ...o, cos: { ...d.cos, ...o.cos }, staff: { ...d.staff, ...o.staff }, ads: { ...d.ads, ...o.ads } }; if (!o.t2) { if (s.tut >= 6) s.tut = 99; s.t2 = 1; } return s; }
+  if (ENDGAME) return endSave();
   const o2 = JSON.parse(localStorage.getItem('flix_fabrika2') || 'null');
   if (o2 && o2.v === 2) { d.money = (o2.money || 0) + 300; d.tut = (o2.tut || 0) >= 6 ? 99 : 0; d.made = o2.made || 0; d.del = o2.del || 0; if ((o2.unl || []).includes('asm2')) d.unl.push('ofis', 'mavi', 'asm2'); if ((o2.unl || []).includes('isci')) { d.unl.push('ik'); d.staff.tas = 1; } return d; }
 } catch {} return d; })();
-export const save = () => { try { SV.lastSeen = Date.now(); localStorage.setItem('flix_fabrika3', JSON.stringify(SV)); } catch {} };
+export const save = () => { try { SV.lastSeen = Date.now(); localStorage.setItem(KEY, JSON.stringify(SV)); } catch {} };
 export const lv = (id) => SV.up[id] || 0;
 const has = (id) => SV.unl.includes(id);
 export const factoryLevel = () => 1 + SV.unl.length;
@@ -74,10 +83,12 @@ export function setFloor(id) {
         c.strokeStyle = `hsla(25,55%,${l - 14}%,.35)`; c.lineWidth = 1.5; for (let k = 0; k < 7; k++) { const yy = y0 + 10 + k * 16 + Math.sin(k + j) * 4; c.beginPath(); c.moveTo(x0, yy); for (let x = 0; x <= 512; x += 32) c.lineTo(x0 + x, yy + Math.sin((x + k * 50 + j * 90) / 70) * 3); c.stroke(); }
         c.fillStyle = `hsla(25,50%,${l - 20}%,.4)`; c.beginPath(); c.ellipse(x0 + 150 + (j * 70) % 300, y0 + 64, 14, 6, 0, 0, 7); c.fill(); }
       noise(c, w, h, 0.05); c.strokeStyle = 'rgba(70,35,10,.5)'; c.lineWidth = 3; for (let j = 0; j <= 8; j++) { c.beginPath(); c.moveTo(0, j * T); c.lineTo(w, j * T); c.stroke(); for (let i = 0; i < 3; i++) { const x = (j % 2) * 256 + i * 512; c.beginPath(); c.moveTo(x, j * T); c.lineTo(x, j * T + T); c.stroke(); } } return; }
+    if (F.grass) { for (let j = 0; j < 8; j++) { c.fillStyle = j % 2 ? F.a : F.b2; c.fillRect(0, j * T, w, T); } for (let i = 0; i < 26000; i++) { c.fillStyle = `rgba(${Math.random() < 0.5 ? '20,80,20' : '200,255,160'},${Math.random() * 0.25})`; c.fillRect(Math.random() * w, Math.random() * h, 1.5, 4); } c.strokeStyle = F.l; c.lineWidth = 6; c.strokeRect(3, 3, w - 6, h - 6); return; }
     for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { const x = i * T, y = j * T; c.fillStyle = F.rainbow ? `hsl(${((i + j) * 40) % 360},70%,${(i + j) % 2 ? 80 : 72}%)` : (i + j) % 2 ? F.a : F.b2; c.fillRect(x, y, T, T);
       const g = c.createLinearGradient(x, y, x + T, y + T); g.addColorStop(0, 'rgba(255,255,255,.1)'); g.addColorStop(0.5, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,.06)'); c.fillStyle = g; c.fillRect(x, y, T, T);
       c.fillStyle = 'rgba(255,255,255,.2)'; c.fillRect(x + 3, y + 3, T - 6, 3); c.fillRect(x + 3, y + 3, 3, T - 6); c.fillStyle = 'rgba(0,0,0,.07)'; c.fillRect(x + 3, y + T - 6, T - 6, 3); c.fillRect(x + T - 6, y + 3, 3, T - 6); }
     noise(c, w, h, 0.035, 14000);
+    if (F.marble) { c.lineCap = 'round'; for (let k = 0; k < 40; k++) { c.strokeStyle = `rgba(110,110,130,${0.08 + Math.random() * 0.14})`; c.lineWidth = 0.8 + Math.random() * 2; let x = Math.random() * w, y = Math.random() * h; c.beginPath(); c.moveTo(x, y); for (let q = 0; q < 8; q++) { x += (Math.random() - 0.3) * 50; y += (Math.random() - 0.5) * 40; c.lineTo(x, y); } c.stroke(); } }
     c.strokeStyle = F.l || 'rgba(0,0,0,.15)'; c.lineWidth = 3; for (let i = 0; i <= 8; i++) { c.beginPath(); c.moveTo(i * T, 0); c.lineTo(i * T, h); c.stroke(); c.beginPath(); c.moveTo(0, i * T); c.lineTo(w, i * T); c.stroke(); }
   }, true); MT.floor.map.anisotropy = 8; MT.floor.map.repeat.set(1 / 4.32, 1 / 4.9); MT.floor.roughness = F.wood ? 0.6 : 0.62; MT.floor.needsUpdate = true;
 }
@@ -425,6 +436,11 @@ function makeHero(skin, acc, scale) {
   const h = hero(skin, { noCloak: acc !== 'pelerin', face: 'happy' }); h.g.scale.setScalar(scale);
   if (acc === 'gozluk') { const gm = M(0x111111, { roughness: 0.2, metalness: 0.3 }); for (const s of [-1, 1]) { const l = add(new THREE.CylinderGeometry(0.13, 0.13, 0.05, 20), gm, h.head, s * 0.16, 0.08, 0.42); l.rotation.x = Math.PI / 2; } add(new THREE.BoxGeometry(0.14, 0.03, 0.03), gm, h.head, 0, 0.1, 0.44); }
   if (acc === 'kulak') { const km = M(0x222a3a, { roughness: 0.4 }); add(new THREE.TorusGeometry(0.5, 0.045, 8, 24, Math.PI), km, h.head, 0, 0.05, 0); for (const s of [-1, 1]) { const c = add(new THREE.CylinderGeometry(0.16, 0.16, 0.14, 18), M(0xe22511, { roughness: 0.3 }), h.head, s * 0.5, 0.0, 0); c.rotation.z = Math.PI / 2; } }
+  if (acc === 'kask') { const km = M(0xffc20e, { roughness: 0.35 }); add(new THREE.SphereGeometry(0.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), km, h.head, 0, 0.22, 0); const br = add(new THREE.CylinderGeometry(0.62, 0.62, 0.05, 28), km, h.head, 0, 0.22, 0.04); rb(0.1, 0.12, 0.9, km, h.head, 0, 0.66, 0, 0.04); }
+  if (acc === 'sapka') { const sm = M(0xe22511, { roughness: 0.5 }); add(new THREE.SphereGeometry(0.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2.1), sm, h.head, 0, 0.24, 0); const v = add(new THREE.CylinderGeometry(0.4, 0.4, 0.04, 22, 1, false, -Math.PI / 2, Math.PI), M(0x0b2a5e, { roughness: 0.5 }), h.head, 0, 0.3, 0.32); v.rotation.x = 0.12; add(new THREE.SphereGeometry(0.06, 10, 8), M(0xffc20e), h.head, 0, 0.74, 0); }
+  if (acc === 'atki') { const sc = M(0xffc20e, { roughness: 0.7, map: tex(128, 32, (c, w, hh) => { for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? '#e22511' : '#0b2a5e'; c.fillRect(i * 16, 0, 16, hh); } }) }); const t = add(new THREE.TorusGeometry(0.42, 0.11, 10, 28), sc, h.head, 0, -0.42, 0); t.rotation.x = Math.PI / 2; const e = rb(0.22, 0.55, 0.08, sc, h.head, 0.2, -0.72, 0.36, 0.04); e.rotation.z = 0.15; }
+  if (acc === 'kanat') { const wg = new THREE.SphereGeometry(0.5, 16, 10); wg.scale(0.32, 1.25, 0.08); wg.translate(0, 0.55, 0); const cols = [0x2fa043, 0x2a80dc, 0xffc20e]; for (const sd of [-1, 1]) for (let k = 0; k < 3; k++) { const wm = add(wg, M(cols[k], { roughness: 0.45 }), h.g, sd * 0.35, 0.95, -0.35); wm.rotation.set(-0.35, 0, sd * -(0.7 + k * 0.38)); wm.scale.setScalar(1.25 - k * 0.15); } }
+  if (acc === 'hale') { const hm = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffc20e, emissiveIntensity: 1.4, roughness: 0.3 }); const t = add(new THREE.TorusGeometry(0.4, 0.05, 10, 32), hm, h.head, 0, 1.35, -0.1); t.rotation.x = Math.PI / 2; t.castShadow = false; h.halo2 = t; }
   if (acc === 'tac') { const tm = M(0xffcf3a, { roughness: 0.2, metalness: 0.8, side: THREE.DoubleSide }); const cr = add(new THREE.CylinderGeometry(0.3, 0.27, 0.2, 10, 1, true), tm, h.head, 0, 0.52, 0.22); cr.rotation.x = -0.3; for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; add(new THREE.ConeGeometry(0.06, 0.16, 6), tm, cr, Math.cos(a) * 0.28, 0.17, Math.sin(a) * 0.28); } }
   return h;
 }
@@ -444,7 +460,7 @@ function restack() { let h = 0; for (const o of P.stack) { o.position.set(0, h /
 // ---------------- unlock pads ----------------
 function padTex(p, paid) { return tex(256, 256, (c, w, h) => { c.fillStyle = 'rgba(255,255,255,.92)'; c.beginPath(); c.roundRect(8, 8, w - 16, h - 16, 36); c.fill(); c.strokeStyle = p.col ? COLS[p.col].f : p.big ? '#e22511' : '#0b2a5e'; c.lineWidth = 9; c.setLineDash([22, 14]); c.stroke(); c.setLineDash([]);
   c.fillStyle = '#37b24d'; c.beginPath(); c.roundRect(24, 24 + (h - 48) * (1 - paid / p.cost), w - 48, (h - 48) * paid / p.cost, 26); c.fill();
-  c.fillStyle = '#0b2a5e'; c.textAlign = 'center'; c.font = `italic 900 ${p.name.length > 11 ? 32 : 40}px BC`; c.fillText(p.name.toLocaleUpperCase('tr-TR'), w / 2, 100); c.font = 'italic 900 64px BC'; c.fillText('₺' + fmt(p.cost - paid), w / 2, 175); }); }
+  c.fillStyle = '#0b2a5e'; c.textAlign = 'center'; c.font = `italic 900 ${p.name.length > 11 ? 32 : 40}px BC`; c.fillText(p.name.toLocaleUpperCase('tr-TR'), w / 2, 100); c.font = 'italic 900 64px BC'; c.fillText('₺' + fmt(p.cost - paid), w / 2, 170); if (p.fx) { c.font = '700 21px R'; c.fillStyle = '#25a855'; c.fillText(p.fx, w / 2, 214); } }); }
 function refreshPads() {
   padObjs.forEach(o => scene.remove(o.mesh)); padObjs = [];
   for (const p of PADS) { if (has(p.id)) continue; const ok = p.req === 'tut' ? tutDone() : has(p.req); if (!ok) continue;
@@ -464,7 +480,7 @@ function actPad(p) {
   if (p.id === 'hediye') buildGift();
   if (p.id === 'konv') buildConveyor();
 }
-function unlock(p) { SV.unl.push(p.id); actPad(p); applyTiers(); SFX.milestone(); haptic(60); if (p.col) SV.gems += 5; toast(p.name + ' açıldı!' + (p.col ? ' +5 💎' : '')); confetti(new THREE.Vector3(p.x, 0.5, p.z)); stepDecor(true); save(); refreshPads(); refreshHUD(); setTimeout(maybeInter, 1500); }
+function unlock(p) { SV.unl.push(p.id); actPad(p); applyTiers(); SFX.milestone(); haptic(60); if (p.col) SV.gems += 5; toast(p.name + ' açıldı! ' + (p.fx || '') + (p.col ? ' · +5 💎' : '')); confetti(new THREE.Vector3(p.x, 0.5, p.z)); stepDecor(true); save(); refreshPads(); refreshHUD(); setTimeout(maybeInter, 1500); }
 
 // ---------------- staff ----------------
 export function spawnStaff() {
@@ -512,10 +528,10 @@ export const bonusOn = (id) => Date.now() < (id === 'x2' ? SV.boostUntil : (SV.b
 export const bonusLeft = (id) => Math.max(0, (id === 'x2' ? SV.boostUntil : (SV.bonus[id] || 0)) - Date.now());
 export function addBonus(id, min) { const now = Date.now(); if (id === 'x2') SV.boostUntil = Math.max(now, SV.boostUntil) + min * 60000; else SV.bonus[id] = Math.max(now, SV.bonus[id] || 0) + min * 60000; save(); }
 export function cosB() { const r = { spd: 0, cap: 0, kar: 0 }; for (const k of ['skin', 'acc', 'floor']) { const c = COS[k].find(q => q.id === SV.cos[k]); if (c && c.b) for (const x in c.b) r[x] += c.b[x]; } return r; }
-export const profitMult = () => (1 + lv('kar') * 0.1 + cosB().kar) * (SV.vip ? 2 : 1) * (bonusOn('x2') ? 2 : 1);
+export const profitMult = () => (1 + lv('kar') * 0.1 + cosB().kar + (has('genis') ? 0.1 : 0)) * (SV.vip ? 2 : 1) * (bonusOn('x2') ? 2 : 1);
 const canSell = () => SV.staff.kas > 0 || near(counter.zone, 1.9);
 function stepCustomers(dt) {
-  const L = factoryLevel(), qmax = Math.min(QUEUE.length, 4 + Math.floor(L / 3));
+  const L = factoryLevel(), qmax = Math.min(QUEUE.length, 4 + Math.floor(L / 3) + (has('genis') ? 2 : 0));
   custT -= dt; if (custT <= 0 && customers.length < qmax) { custT = rnd(2.2, 4.5) * Math.max(0.45, 1 - L * 0.04) * (bonusOn('musteri') ? 0.5 : 1); const o = personMesh(); o.position.set(30, 0, 14); scene.add(o);
     const want = tutDone() ? Math.min(7, 1 + Math.floor(rnd(0, 2 + L * 0.3)) + (bonusOn('musteri') ? 1 : 0)) : 1;
     const bub = document.createElement('div'); bub.className = 'bub'; document.body.appendChild(bub); customers.push({ o, want, got: 0, value: 0, bub, state: 'queue', t: 0, leave: null }); }
@@ -558,7 +574,7 @@ const TUT = [
   { t: 'Hazır FLIX’leri al', tgt: () => asm[0].out.zone, done: () => P.stack.some(o => o.userData.type === 'toy') },
   { t: 'Test alanına bırak', tgt: () => TS.inZone, done: () => TS.q.length > 0 || !!TS.cur || TS.out.n > 0 },
   { t: 'Testi geçen FLIX’leri al', tgt: () => TS.out.zone, done: () => P.stack.some(o => o.userData.ok) },
-  { t: 'Tezgâha götür, kasada dur', tgt: () => counter.zone, done: () => SV.del && cashPile.n > 0 || SV.money > 0 },
+  { t: 'Tezgâha bırak, müşteriler alsın', tgt: () => counter.zone, done: () => SV.del && cashPile.n > 0 || SV.money > 0 },
   { t: 'Kazandığın parayı topla', tgt: () => cashPile.pos, done: () => SV.money > 0 },
 ];
 export const tutDone = () => SV.tut >= TUT.length;
@@ -626,7 +642,7 @@ function interact() {
   if (TR && TR.state === 'dock' && near(TR.zone, 1.8) && TR.load.length < truckCap()) { const o = stackPop(tested); if (o) { loadTruck(o); return; } }
   if (P.stack.length >= cap) return;
   const hasProd = P.stack.some(isProd), hasRaw = P.stack.some(isRaw);
-  if (!hasProd) for (const pile of [farmPile, pressPile, rubberPile]) if (pile && near(pile.zone, 1.6) && pile.n) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
+  if (!hasProd) for (const pile of [farmPile, pressPile, rubberPile]) if (pile && near(pile.zone, 1.6) && pile.n && !(pile !== rubberPile && P.stack.filter(o => o.userData.type === pile.type).length >= Math.ceil(cap / 2))) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
   if (!hasRaw) for (const pile of asm.map(a => a.out).concat(TM ? [TM.out] : [], [TS.out], GS ? [GS.out] : [])) if (near(pile.zone, 1.6) && pile.n) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
 }
 // ---- worker AI: picks the most useful job each round ----
@@ -637,13 +653,13 @@ function pickTask(W) {
   const cap = wcap(), n = workers.length, role = n < 2 ? 'all' : W.id === 0 ? 'sell' : (W.id === 1 && n >= 3) ? 'line' : n === 2 ? 'mix' : 'feed';
   const truckOk = TR && TR.state === 'dock' && TR.load.length < truckCap();
   const sell = () => { const src = [TS.out, GS && GS.out].filter(p => p && p.n > 0).sort((a, b) => b.n - a.n)[0]; if (!src) return null;
-    if (!counter.full()) return { src: [src], dst: 'counter', max: cap }; if (truckOk) return { src: [src], dst: 'truck', max: cap }; return null; };
+    W.alt = !W.alt; if (truckOk && (W.alt || counter.full())) return { src: [src], dst: 'truck', max: cap }; if (!counter.full()) return { src: [src], dst: 'counter', max: cap }; return null; };
   const test = () => { const outs = (konv ? asm.slice(2) : asm).map(a => a.out).concat(TM ? [TM.out] : []).filter(p => p.n > 0).sort((a, b) => b.n - a.n);
     return outs.length && TS.q.length < 10 ? { src: [outs[0]], dst: 'test', max: cap } : null; };
-  const gift = () => GS && GS.inV.length < 3 && TS.out.n >= 2 && TS.out.items.some(o => o.userData.type === 'toy') ? { src: [TS.out], dst: 'gift', max: Math.min(cap, 3 - GS.inV.length), only: 'toy' } : null;
+  const gift = () => GS && GS.inV.length < 3 && (TS.out.n >= 2 || GS.inV.length > 0) && TS.out.n >= 1 && TS.out.items.some(o => o.userData.type === 'toy') ? { src: [TS.out], dst: 'gift', max: Math.min(cap, 3 - GS.inV.length), only: 'toy' } : null;
   const top = () => TM && rubberPile.n && TM.inR < 4 ? { src: [rubberPile], dst: 'top', max: cap } : null;
   const feed = () => { const f = asm.reduce((a, A) => a + A.inF.length, 0), b = asm.reduce((a, A) => a + A.inB, 0); if (f + b >= asm.length * 14) return null; if (f > b + 2 && pressPile.n) return { src: [pressPile], dst: 'asm', max: cap }; if (b > f + 2 && farmPile.n) return { src: [farmPile], dst: 'asm', max: cap }; return { src: [farmPile, pressPile], dst: 'asm', max: cap, half: true }; };
-  const order = { all: [sell, test, top, gift, feed], sell: [sell, test, gift, feed], line: [test, top, gift, sell, feed], mix: [feed, test, top, sell], feed: [feed, test, top, sell] }[role];
+  const order = { all: [sell, test, top, gift, feed], sell: [sell, test, gift, feed], line: [gift, test, top, sell, feed], mix: [feed, test, top, sell], feed: [feed, test, top, sell] }[role];
   for (const f of order) { const t = f(); if (t) return t; }
   return null;
 }
@@ -677,15 +693,15 @@ addEventListener('resize', resize);
 let last = performance.now(), saveT = 0, minT = 60, shownMoney = SV.money, hudT = 0, paused = false;
 export function setPaused(p) { paused = p; last = performance.now(); }
 document.addEventListener('visibilitychange', () => { if (document.hidden) { save(); SFX.suspend(true); } else { SFX.suspend(false); last = performance.now(); } });
-let SIM = 1;
+let SIM = 1; const sunAt = new THREE.Vector3(1e9, 0, 0);
 function stepTweens(dt) {
   for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; tw.t += dt / tw.dur; const e = Math.min(1, tw.t);
     if (tw.scale) tw.obj.scale.setScalar(Math.max(0.01, (1 + Math.sin(e * Math.PI) * 0.25) * e));
     else { tw.obj.position.lerpVectors(tw.from, tw.to, e); tw.obj.position.y += Math.sin(e * Math.PI) * tw.arc; }
     if (e >= 1) { if (tw.scale) tw.obj.scale.setScalar(1); tweens.splice(i, 1); tw.onEnd && tw.onEnd(); } }
 }
-const camOff = new THREE.Vector3(0, 24, 16), camLook = new THREE.Vector3();
-export let inMenu = false; let menuT = 0; export function setMenu(on) { inMenu = on; joy.x = joy.y = 0; }
+const camOff = new THREE.Vector3(0, 24, 16), camLook = new THREE.Vector3(), camGoal = new THREE.Vector3(); let camSettle = 0;
+export let inMenu = false; let menuT = 0; export function setMenu(on) { inMenu = on; joy.x = joy.y = 0; if (!on) { camSettle = 1.2; camGoal.set(P.o.position.x * 0.85, 0, P.o.position.z - 1.5); } }
 function frame(now) {
   requestAnimationFrame(frame); if (paused || document.hidden) { last = now; return; } const dt = Math.min(0.05, (now - last) / 1000); last = now; const T = now / 1000;
   let ix = inMenu ? 0 : joy.x, iz = inMenu ? 0 : joy.y; if (keys.ArrowLeft || keys.a) ix = -1; if (keys.ArrowRight || keys.d) ix = 1; if (keys.ArrowUp || keys.w) iz = -1; if (keys.ArrowDown || keys.s) iz = 1;
@@ -704,8 +720,12 @@ function frame(now) {
     arrow.position.copy(P.o.position).addScaledVector(d.normalize(), 1.6); arrow.position.y = 0; arrow.rotation.y = Math.atan2(d.x, d.z) + Math.PI; arrow.children[0].material.opacity = 0.7 + Math.sin(T * 6) * 0.25; }
   else { arrow.visible = false; beacon.visible = false; }
   if (inMenu) { menuT += dt * 0.12; const cx = has('genis') ? 8 : 1.5; camLook.lerp(new THREE.Vector3(cx, 0, -3), Math.min(1, dt * 2)); const R = has('genis') ? 34 : 28; camera.position.lerp(new THREE.Vector3(cx + Math.sin(menuT) * R * 0.55, 22, -3 + Math.cos(menuT) * R * 0.75), Math.min(1, dt * 2)); camera.lookAt(camLook); }
-  else { camLook.lerp(new THREE.Vector3(P.o.position.x * 0.85, 0, P.o.position.z - 1.5), Math.min(1, dt * 5)); camera.position.lerp(camLook.clone().add(camOff), Math.min(1, dt * 6)); camera.lookAt(camLook); }
-  sun.position.copy(camLook).add(new THREE.Vector3(-9, 22, 8)); sun.target.position.copy(camLook);
+  else { // calm follow: dead zone around the player + frame-rate independent damping, no double smoothing
+    const tx = P.o.position.x * 0.85, tz = P.o.position.z - 1.5, DX = 1.4, DZ = 1.1; const ex = tx - camGoal.x, ez = tz - camGoal.z;
+    if (Math.abs(ex) > DX) camGoal.x += ex - Math.sign(ex) * DX; if (Math.abs(ez) > DZ) camGoal.z += ez - Math.sign(ez) * DZ;
+    camLook.lerp(camGoal, 1 - Math.exp(-dt * 3.2)); const want = camLook.clone().add(camOff);
+    if (camSettle > 0) { camSettle -= dt; camera.position.lerp(want, 1 - Math.exp(-dt * 5)); } else camera.position.copy(want); camera.lookAt(camLook); }
+  { const st = 1.0; const sx = Math.round(camLook.x / st) * st, sz = Math.round(camLook.z / st) * st; if (sx !== sunAt.x || sz !== sunAt.z) { sunAt.set(sx, 0, sz); sun.position.copy(sunAt).add(new THREE.Vector3(-9, 22, 8)); sun.target.position.copy(sunAt); } }
   shownMoney += (SV.money - shownMoney) * Math.min(1, dt * 10); $('#money b').textContent = fmt(Math.round(shownMoney)); moneyBump = Math.max(0, moneyBump - dt * 4); $('#money').style.transform = `scale(${1 + Math.sin(moneyBump * Math.PI) * 0.12})`;
   const v = P.o.position.clone().add(new THREE.Vector3(0, 2.9 + P.stack.reduce((a, o) => a + hOf(o), 0) * 0.78, 0)).project(camera);
   P.lbl.style.transform = `translate(${(v.x + 1) / 2 * innerWidth}px,${(1 - v.y) / 2 * innerHeight}px) translate(-50%,-100%)`; P.lbl.textContent = P.stack.length >= capOf() ? 'DOLU' : ''; P.lbl.style.opacity = P.stack.length >= capOf() ? 1 : 0;
@@ -724,9 +744,9 @@ function resolve(x, z) { x = Math.max(BOUNDS.x0 + 0.5, Math.min(BOUNDS.x1 - 0.5,
   setFloor(SV.cos.floor);
   buildWorld(); buildPlayer(); for (const id of SV.unl) { const p = PADS.find(q => q.id === id); if (p) actPad(p); } spawnStaff(); applyTiers(); stepDecor(false); refreshPads(); resize();
   initUI();
-  camLook.set(P.o.position.x * 0.85, 0, P.o.position.z - 1.5); camera.position.copy(camLook).add(camOff); requestAnimationFrame(frame); document.body.classList.add('ready');
+  camLook.set(P.o.position.x * 0.85, 0, P.o.position.z - 1.5); camGoal.copy(camLook); camera.position.copy(camLook).add(camOff); requestAnimationFrame(frame); document.body.classList.add('ready');
   offlinePopup();
-  window.__fb = { get W() { return workers.map(w => ({ t: w.task && w.task.dst, si: w.si, n: w.stack.length, x: +w.H.g.position.x.toFixed(1), z: +w.H.g.position.z.toFixed(1) })); }, get SV() { return SV; }, get P() { return P; }, setMoney: m => { SV.money = m; }, tp: (x, z) => { P.o.position.set(x, 0, z); },
+  window.__fb = { get W() { return workers.map(w => ({ t: w.task && w.task.dst, si: w.si, n: w.stack.length, x: +w.H.g.position.x.toFixed(1), z: +w.H.g.position.z.toFixed(1) })); }, get SV() { return SV; }, get P() { return P; }, setMoney: m => { SV.money = m; }, tp: (x, z) => { P.o.position.set(x, 0, z); camGoal.set(x * 0.85, 0, z - 1.5); camLook.copy(camGoal); },
     get counter() { return counter.n; }, get cash() { return cashPile.n; }, get asm() { return asm.map(a => [a.inF.length, a.inB, a.out.n]); }, get test() { return [TS.q.length, !!TS.cur, TS.out.n]; }, get truck() { return TR && [TR.state, TR.load.length, TR.cash.n]; }, get top() { return TM && [rubberPile.n, TM.inR, TM.out.n]; }, get gift() { return GS && [GS.inV.length, GS.out.n]; },
     get tgt() { const s = TUT[SV.tut]; if (!s) return null; const v = s.tgt(); return [v.x, v.z]; },
     sim: (k) => { SIM = k; }, person: (x, z, kid) => { const o = personMesh(kid); o.position.set(x, 0, z); scene.add(o); }, testQ: (n) => { for (let i = 0; i < n; i++) TS.q.push(makeItem('toy', 'mavi', 8)); syncTestQ(); }, truckLoad: (n) => { for (let i = 0; i < n; i++) TR.load.push(8); },
