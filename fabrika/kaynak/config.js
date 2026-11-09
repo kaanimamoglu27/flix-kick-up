@@ -14,21 +14,28 @@ export const PADS = [
   { id: 'mavi', name: 'Mavi hindi', cost: 60, fx: 'FLIX değeri 5 → 8', x: -3.2, z: -10.9, req: 'tut', col: 'mavi' },
   { id: 'ik', name: 'İşe alım', cost: 120, fx: 'Eleman al, iş yürüsün', x: -8.2, z: 1.5, req: 'ofis' },
   { id: 'asm2', name: '2. Montaj', cost: 180, fx: 'Üretim 2 katı', x: -1.0, z: 3.4, req: 'mavi' },
+  { id: 'geri', name: 'Geri dönüşüm', cost: 250, fx: 'Hatalılar anahtarlık olur', x: -5.2, z: 10.2, req: 'ik' },
   { id: 'yesil', name: 'Yeşil hindi', cost: 350, fx: 'FLIX değeri 12', x: 0.0, z: -10.9, req: 'asm2', col: 'yesil' },
-  { id: 'genis', name: 'Yeni salon', cost: 900, fx: '+%10 satış · +2 müşteri', x: 11.9, z: 0.5, req: 'yesil', big: true },
-  { id: 'kamyon', name: 'Kamyon', cost: 1200, fx: 'Toplu satış 1,5 kat', x: 21.5, z: 9.6, req: 'genis' },
-  { id: 'sari', name: 'Sarı hindi', cost: 1500, fx: 'FLIX değeri 18', x: 3.2, z: -10.9, req: 'yesil', col: 'sari' },
-  { id: 'top', name: 'FLIX Top hattı', cost: 2500, fx: 'Yeni ürün: FLIX Top', x: 18.5, z: -4.5, req: 'kamyon' },
-  { id: 'suru', name: 'Hindi sürüsü', cost: 3000, fx: '+6 hindi · 2 kat tüy', x: 17.0, z: -12.5, req: 'genis' },
+  { id: 'kasa2', name: '2. Kasa', cost: 400, fx: 'Müşteri 2 katı', x: -3.0, z: 14.0, req: 'asm2', big: true },
+  { id: 'bant', name: 'Tüy bandı', cost: 500, fx: 'Tüy ve taban masaya akar', x: -4.4, z: -6.0, req: 'asm2' },
+  { id: 'genis', name: 'Yeni salon', cost: 600, fx: '+%10 satış · +1 müşteri', x: 11.9, z: 0.5, req: 'yesil', big: true },
+  { id: 'kamyon', name: 'Kamyon', cost: 800, fx: 'Toplu satış 1,5 kat', x: 22.6, z: 15.8, req: 'genis' },
+  { id: 'sari', name: 'Sarı hindi', cost: 1200, fx: 'FLIX değeri 18', x: 3.2, z: -10.9, req: 'yesil', col: 'sari' },
+  { id: 'top', name: 'FLIX Top hattı', cost: 1800, fx: 'Yeni ürün: FLIX Top', x: 18.5, z: -4.5, req: 'kamyon' },
+  { id: 'kasa3', name: '3. Kasa', cost: 2000, fx: 'Müşteri +%50', x: 13.6, z: 14.0, req: 'genis', big: true },
+  { id: 'suru', name: 'Hindi sürüsü', cost: 2200, fx: '+6 hindi · 2 kat tüy', x: 17.0, z: -12.5, req: 'genis' },
+  { id: 'pelus', name: 'Peluş atölyesi', cost: 2800, fx: 'Yeni ürün: Peluş FLIX', x: 17.5, z: 7.2, req: 'genis' },
   { id: 'asm3', name: '3. Montaj', cost: 3500, fx: 'Üretim +%50', x: -6.4, z: 6.4, req: 'sari' },
   { id: 'konv', name: 'Konveyör', cost: 4500, fx: 'Montaj kendi teste gider', x: 3.4, z: -4.8, req: 'top' },
   { id: 'kirmizi', name: 'Kırmızı hindi', cost: 5000, fx: 'FLIX değeri 26', x: -3.2, z: -14.2, req: 'sari', col: 'kirmizi' },
+  { id: 'ciftlik', name: 'Büyük çiftlik', cost: 6000, fx: '+8 hindi · 2. tüy sandığı', x: 1.0, z: -18.0, req: 'sari', big: true },
   { id: 'hediye', name: 'Hediye paketi', cost: 7000, fx: '3 FLIX = 1,6 kat set', x: 18.5, z: 2.5, req: 'top' },
+  { id: 'kasa4', name: '4. Kasa', cost: 9000, fx: 'Müşteri +%33', x: 19.2, z: 14.0, req: 'kasa3', big: true },
   { id: 'mor', name: 'Mor hindi', cost: 12000, fx: 'FLIX değeri 38', x: 0.0, z: -14.2, req: 'kirmizi', col: 'mor' },
   { id: 'altin', name: 'Altın hindi', cost: 25000, fx: 'FLIX değeri 60', x: 3.2, z: -14.2, req: 'mor', col: 'altin' },
 ];
 // Ürünler (satış fiyatı ₺). FLIX'in fiyatı tüy rengine göre (COLS.v), hediye paketi = içindeki 3 FLIX x 1,6
-export const PROD = { top: 30, giftMult: 1.6, truckMult: 1.5 };
+export const PROD = { top: 30, giftMult: 1.6, truckMult: 1.5, plushMult: 0.6, keyMult: 0.5 };
 // Ofis geliştirmeleri (para). cost = base * mult^lv
 export const UPS = [
   { id: 'spd', grp: 'Patron', name: 'Yürüme hızı', icon: '👟', max: 6, base: 40, mult: 1.9, desc: (l) => '+' + (l * 12) + '% hız' },
@@ -37,14 +44,15 @@ export const UPS = [
   { id: 'pres', grp: 'Fabrika', name: 'Pres hızı', icon: '⚙️', max: 8, base: 50, mult: 1.8, desc: (l) => (1.6 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/taban' },
   { id: 'mont', grp: 'Fabrika', name: 'Montaj hızı', icon: '🤖', max: 8, base: 60, mult: 1.8, desc: (l) => (1.4 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/FLIX' },
   { id: 'kumes', grp: 'Fabrika', name: 'Kümes verimi', icon: '🦃', max: 8, base: 50, mult: 1.8, desc: (l) => '+' + Math.round((1 / Math.pow(0.85, l) - 1) * 100) + '% tüy' },
-  { id: 'test', grp: 'Fabrika', name: 'Test çocuğu', icon: '🧒', max: 6, base: 70, mult: 1.9, desc: (l) => (l >= 3 ? 2 : 3) + ' sektirme · ' + ((l >= 3 ? 2 : 3) * 0.55 * Math.pow(0.88, l)).toFixed(1).replace('.', ',') + ' sn · %' + Math.max(0, 8 - l * 2) + ' hatalı' },
+  { id: 'bant', grp: 'Fabrika', name: 'Tüy bandı hızı', icon: '🛤️', max: 6, base: 300, mult: 1.9, desc: (l) => (1.1 * Math.pow(0.8, l)).toFixed(2).replace('.', ',') + ' sn/parça' },
+  { id: 'test', grp: 'Fabrika', name: 'Test çocuğu', icon: '🧒', max: 6, base: 70, mult: 1.9, desc: (l) => (l >= 3 ? 2 : 3) + ' sektirme · ' + ((l >= 3 ? 2 : 3) * 0.55 * Math.pow(0.88, l)).toFixed(1).replace('.', ',') + ' sn · %' + Math.max(1, Math.round(10 - l * 1.5)) + ' hatalı' },
   { id: 'truck', grp: 'Fabrika', name: 'Kamyon', icon: '🚚', max: 5, base: 300, mult: 2.0, desc: (l) => (10 + l * 4) + ' kutu · ' + Math.round(30 * Math.pow(0.85, l)) + ' sn yol' },
   { id: 'tez', grp: 'Fabrika', name: 'Tezgâh rafı', icon: '🧺', max: 4, base: 80, mult: 2.2, desc: (l) => (12 + l * 4) + ' FLIX' },
 ];
 // İşe alım (para)
 export const STAFF = [
-  { id: 'tas', name: 'Taşıyıcı', icon: '🧑‍🏭', desc: 'Tüy ve taban taşır, FLIX’leri tezgâha dizer', costs: [150, 700, 2600, 8000], max: 4 },
-  { id: 'kas', name: 'Kasiyer', icon: '🧾', desc: 'Kasada durur, satışı 3 kat hızlandırır', costs: [250], max: 1 },
+  { id: 'tas', name: 'Taşıyıcı', icon: '🧑‍🏭', desc: 'Tüy ve taban taşır, FLIX’leri tezgâha dizer', costs: [150, 700, 2600, 8000, 15000, 26000, 42000, 65000], max: 8 },
+  { id: 'kas', name: 'Kasiyer', icon: '🧾', desc: 'Her kasaya bir kasiyer: satış 3 kat hızlı', costs: [250, 900, 2500, 6000], max: 4 },
 ];
 export const SUPS = [
   { id: 'wspd', name: 'Eleman hızı', icon: '⚡', max: 5, base: 120, mult: 2.0, desc: (l) => '+' + (l * 15) + '% hız' },

@@ -1,4 +1,4 @@
-// Flix Fabrika 1.3 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
+// Flix Fabrika 1.4 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
 import { SFX } from './sfx.js';
 import { UPS, STAFF, SUPS, COS, IAP, AD, COLS, BONUS, bonusTxt } from './config.js';
 import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel, bonusOn, bonusLeft, addBonus, setMenu, cosB, ENDGAME, setEndgame } from './game.js';

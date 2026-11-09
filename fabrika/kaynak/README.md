@@ -33,3 +33,13 @@ Three.js r170 + esbuild, tek HTML dosyası üretir: `python3 build.py` (yanında
 - Kozmetikler: 10 kostüm, 10 aksesuar (baret, şapka, atkı, tüy kanat, ışık halesi eklendi), 9 zemin (çim, mermer, satranç, gece).
 - Hata: tutorialda tek tür hammaddeyle çanta dolup takılma düzeldi (tüy/taban en fazla kapasitenin yarısı).
 - Elemanlar kamyonu ve hediye paketini de besler.
+
+## 1.4 (2026-11-09)
+- Harita büyüdü: ön bölge genişledi (kasalar, yol, kamyon rampası öne taşındı), 4 kasa (Kasa 2/3/4 alanları), Büyük çiftlik (göl, saman, 8 yeni hindi, ikinci tüy kasası).
+- Tüy bandı: çiftlikten montaj masalarına ve presten masalara havadan taşıyan bant; "Tüy bandı hızı" geliştirmesi (6 seviye).
+- Test: onaylanmayan (hatalı) Flix'ler kırmızı X ile HATALI yığınına gider; Geri dönüşüm makinesi onları Flix anahtarlığına çevirir.
+- Peluş atölyesi: tüyden Peluş Flix yapar. Yeni ürünler: peluş, anahtarlık.
+- Elemanlar: en fazla 8 taşıyıcı, her kasaya bir kasiyer (4). Izgara üzerinde yol bulma (A*), hızlanıp yavaşlayarak dönme, birbirinden kaçınma, takılınca yeniden plan; işler paylaşılıyor, iki eleman aynı yığına koşmuyor; boşta oyuncuya bakıyor.
+- Müşteriler kaldırımdan gelip en kısa kuyruğu seçiyor; kasiyersiz kasada oyuncu yanındayken satış.
+- Test kuyruğu uzayınca test çocuğu hızlanır; test seviyesi 5+ tek sektirme.
+- Hata: 1.3'te yazılan ucuz ped fiyatları uygulanmıyordu; düzeltildi. Tüm pedler yeniden fiyatlandı.
