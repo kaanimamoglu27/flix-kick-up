@@ -1,4 +1,4 @@
-# Builds, signs and uploads FLIX Kick Up, Flix Direktör or Flix Atış to App Store Connect (TestFlight). No Mac needed.
+# Builds, signs and uploads FLIX Kick Up, Flix Direktör, Flix Atış or Flix Fabrika to App Store Connect (TestFlight). No Mac needed.
 # Run it from the Actions tab ("iOS TestFlight" > Run workflow) or from any terminal:
 #   gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=kickup -f version=1.0
 # Needs these repository secrets (Settings > Secrets and variables > Actions), the same values as in Flix-Arkana:
@@ -14,7 +14,7 @@ on:
       app:
         description: 'Which game'
         type: choice
-        options: [kickup, direktor, atis]
+        options: [kickup, direktor, atis, fabrika]
         default: kickup
       version:
         description: 'Version shown in the App Store (e.g. 1.0)'
@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 90
     defaults:
       run:
-        working-directory: ${{ inputs.app == 'direktor' && 'direktor/app' || inputs.app == 'atis' && 'atis/app' || 'app' }}
+        working-directory: ${{ inputs.app == 'direktor' && 'direktor/app' || inputs.app == 'atis' && 'atis/app' || inputs.app == 'fabrika' && 'fabrika/app' || 'app' }}
     env:
       ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -54,10 +54,10 @@ jobs:
           APP_VERSION: ${{ inputs.version }}
           BUILD_NUMBER: ${{ github.run_number }}
           # Kick Up ads (AdMob). These override the ids in app/www/ads-config.js; with neither the build uses Google's test ads.
-          ADMOB_APP_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_APP_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_APP_ID || '' }}
-          ADMOB_REWARDED_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_REWARDED_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_REWARDED_ID || '' }}
-          ADMOB_INTERSTITIAL_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_INTERSTITIAL_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_INTERSTITIAL_ID || '' }}
-          ADMOB_BANNER_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_BANNER_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_BANNER_ID || '' }}
+          ADMOB_APP_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_APP_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_APP_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_APP_ID || '' }}
+          ADMOB_REWARDED_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_REWARDED_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_REWARDED_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_REWARDED_ID || '' }}
+          ADMOB_INTERSTITIAL_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_INTERSTITIAL_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_INTERSTITIAL_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_INTERSTITIAL_ID || '' }}
+          ADMOB_BANNER_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_BANNER_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_BANNER_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_BANNER_ID || '' }}
           # Kick Up online server (repository variable, not a secret). Overrides ONLINE_SERVER_URL in online-config.js.
           ONLINE_SERVER_URL: ${{ inputs.app == 'kickup' && vars.KICKUP_ONLINE_SERVER_URL || '' }}
         run: python3 tools/ios_setup.py

@@ -1,0 +1,131 @@
+// Flix Fabrika v3 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
+import { SFX } from './sfx.js';
+import { UPS, STAFF, SUPS, COS, IAP, AD, COLS } from './config.js';
+import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult } from './game.js';
+
+const $ = (s) => document.querySelector(s);
+const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+export function haptic(ms) { if (window.FlixNative && window.FlixNative.haptic) window.FlixNative.haptic(ms); }
+export function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => el.classList.remove('show'), 2400); }
+const upCost = (u, l) => Math.round(u.base * Math.pow(u.mult, l));
+const mins = (ms) => { const s = Math.ceil(ms / 1000); return s >= 60 ? Math.ceil(s / 60) + ' dk' : s + ' sn'; };
+
+// ---------------- ads ----------------
+let adBusy = false;
+function webAd(kind) { // web/demo: our own FLIX ad card so the flow can be tried
+  return new Promise((res) => { const L = $('#adL'), sec = kind === 'rewarded' ? 5 : 3; let left = sec; L.classList.add('show'); $('#adKind').textContent = kind === 'rewarded' ? 'ÖDÜLLÜ REKLAM · DEMO' : 'REKLAM · DEMO';
+    const x = $('#adX'); x.disabled = true; x.textContent = left;
+    const t = setInterval(() => { left--; if (left > 0) x.textContent = left; else { clearInterval(t); x.disabled = false; x.textContent = '✕'; } }, 1000);
+    x.onclick = () => { if (x.disabled) return; L.classList.remove('show'); res(kind === 'rewarded' ? 'rewarded' : true); }; });
+}
+async function adRewarded() { if (adBusy) return 'busy'; adBusy = true; setPaused(true); SFX.suspend(true);
+  try { return window.FlixAds ? await window.FlixAds.showRewarded(4000) : await webAd('rewarded'); } finally { adBusy = false; setPaused(false); SFX.suspend(false); } }
+async function adInter() { if (SV.noads || SV.vip || adBusy) return false; adBusy = true; setPaused(true); SFX.suspend(true);
+  try { return window.FlixAds ? await window.FlixAds.showInterstitial() : await webAd('inter'); } finally { adBusy = false; setPaused(false); SFX.suspend(false); } }
+// ara reklam: eğitimden sonra, en sık AD.interEveryMin dakikada bir, sadece doğal molalarda (panel kapanınca, alan açılınca)
+export function maybeInter() { if (!tutDone() || SV.noads || SV.vip || panelOpen()) return; const now = Date.now(); if (!SV.lastInter) { SV.lastInter = now; return; } if (now - SV.lastInter < AD.interEveryMin * 60000) return; SV.lastInter = now; save(); adInter(); }
+function gemAdState() { const d = new Date().toDateString(); if (SV.ads.day !== d) { SV.ads.day = d; SV.ads.n = 0; } return { left: AD.gemAdsPerDay - SV.ads.n, wait: Math.max(0, SV.ads.last + AD.gemAdCooldownMin * 60000 - Date.now()) }; }
+const freeUpWait = () => Math.max(0, SV.freeUpLast + AD.freeUpCooldownMin * 60000 - Date.now());
+
+// ---------------- purchases ----------------
+function grant(id, txn) {
+  if (txn) { if (SV.txn.includes(txn)) return; SV.txn.push(txn); if (SV.txn.length > 60) SV.txn.shift(); }
+  const p = IAP.find(q => q.id === id); if (!p) return;
+  if (p.kind === 'gems') { SV.gems += p.n; toast('+' + p.n + ' 💎 eklendi'); }
+  else if (p.kind === 'noads') { if (SV.noads) return; SV.noads = 1; toast('Reklamlar kapandı, teşekkürler!'); }
+  else if (p.kind === 'vip') { if (SV.vip) return; SV.vip = 1; SV.noads = 1; toast('VIP Fabrika: satışlar 2 kat!'); }
+  else if (p.kind === 'starter') { if (SV.starter) return; SV.starter = 1; SV.gems += 150; SV.money += 2000; if (!SV.cos.own.includes('altin')) SV.cos.own.push('altin'); toast('Başlangıç paketi eklendi!'); bumpMoney(); }
+  if (window.FlixAds && (SV.noads || SV.vip)) window.FlixAds.setAdsRemoved(true);
+  SFX.milestone(); save(); refreshHUD(); if (cur === 'shop') render();
+}
+const priceOf = (p) => (window.FlixNative && window.FlixNative.price(p.id)) || p.price;
+async function buy(p) {
+  if (NATIVE && window.FlixNative) { const r = await window.FlixNative.buy(p.id); if (r === 'pending') toast('Onay bekleniyor, gelince eklenecek'); else if (!r) toast('Satın alma tamamlanmadı'); return; }
+  // web: gerçek ödeme yok, açıkça demo
+  confirmBox(`<b>${p.name}</b><br><small>Bu web sürümünde gerçek ödeme yok. Demo olarak eklensin mi?</small>`, 'Demo olarak al', () => grant(p.id, 'web-' + Date.now()));
+}
+window.addEventListener('flixprices', () => { if (cur === 'shop') render(); });
+
+// ---------------- panels ----------------
+let cur = null, tab = {};
+export const panelOpen = () => !!cur;
+export function openPanel(kind) { cur = kind; $('#sheet').classList.add('show'); document.body.classList.add('panel'); render(); SFX.click(); }
+export function closePanel() { if (!cur) return; const was = cur; cur = null; $('#sheet').classList.remove('show'); document.body.classList.remove('panel'); if (was !== 'shop') setTimeout(maybeInter, 400); }
+function row({ icon, name, desc, lvl, btn, btnCls = '', act, ad, adAct, dis }) {
+  return `<div class="row"><div class="ic">${icon}</div><div class="mid"><b>${name}${lvl ? ` <em>${lvl}</em>` : ''}</b><span>${desc}</span></div>${ad ? `<button class="ad" data-a="${adAct}">▶<small>${ad}</small></button>` : ''}<button class="buy ${btnCls}" data-a="${act}" ${dis ? 'disabled' : ''}>${btn}</button></div>`;
+}
+const money = (n) => '₺' + fmt(n);
+function render() {
+  const T = $('#shT'), B = $('#shBody'), TB = $('#shTabs'); TB.innerHTML = ''; let h = '';
+  const fw = freeUpWait(); const adLbl = fw > 0 ? mins(fw) : 'Ücretsiz';
+  if (cur === 'ofis') {
+    T.textContent = 'Geliştirmeler'; const t = tab.ofis || 'Patron'; TB.innerHTML = ['Patron', 'Fabrika'].map(k => `<button class="tb ${t === k ? 'on' : ''}" data-t="${k}">${k}</button>`).join('');
+    for (const u of UPS.filter(u => u.grp === t)) { const l = lv(u.id), max = l >= u.max, c = upCost(u, l);
+      h += row({ icon: u.icon, name: u.name, lvl: 'Sv ' + (l + 1), desc: max ? u.desc(l) + ' · en üst seviye' : u.desc(l) + ' → ' + u.desc(l + 1), btn: max ? 'TAMAM' : money(c), btnCls: max ? 'max' : SV.money >= c ? '' : 'no', act: 'up:' + u.id, dis: max, ad: max ? null : adLbl, adAct: 'adup:' + u.id }); }
+  } else if (cur === 'ik') {
+    T.textContent = 'İşe alım';
+    for (const s of STAFF) { const n = SV.staff[s.id], max = n >= s.max, c = max ? 0 : s.costs[n];
+      h += row({ icon: s.icon, name: s.name, lvl: n + '/' + s.max, desc: s.desc, btn: max ? 'TAMAM' : 'İşe al ' + money(c), btnCls: max ? 'max' : SV.money >= c ? '' : 'no', act: 'hire:' + s.id, dis: max }); }
+    for (const u of SUPS) { const l = lv(u.id), max = l >= u.max, c = upCost(u, l);
+      h += row({ icon: u.icon, name: u.name, lvl: 'Sv ' + (l + 1), desc: max ? u.desc(l) : u.desc(l) + ' → ' + u.desc(l + 1), btn: max ? 'TAMAM' : money(c), btnCls: max ? 'max' : SV.money >= c ? '' : 'no', act: 'up:' + u.id, dis: max || !SV.staff.tas, ad: max || !SV.staff.tas ? null : adLbl, adAct: 'adup:' + u.id }); }
+    if (!SV.staff.tas) h += '<p class="note">Eleman geliştirmeleri ilk taşıyıcıyı alınca açılır.</p>';
+  } else if (cur === 'dolap') {
+    T.textContent = 'Dolap'; const t = tab.dolap || 'skin'; const names = { skin: 'Kostüm', acc: 'Aksesuar', floor: 'Zemin' };
+    TB.innerHTML = Object.keys(names).map(k => `<button class="tb ${t === k ? 'on' : ''}" data-t="${k}">${names[k]}</button>`).join('');
+    for (const c of COS[t]) { const own = SV.cos.own.includes(c.id), on = SV.cos[t] === c.id; const sw = t === 'floor' ? (c.wood ? 'linear-gradient(90deg,#c98a4e,#e0a86a)' : c.rainbow ? 'linear-gradient(90deg,#f88,#fd8,#8f8,#8df,#d8f)' : `linear-gradient(135deg,${c.a} 50%,${c.b} 50%)`) : null;
+      const icon = t === 'floor' ? `<i class="sw" style="background:${sw}"></i>` : t === 'skin' ? `<i class="sw" style="background:${{ kraliyet: '#e22511', buzul: '#2f8fe0', ejder: '#1a9a4a', neon: '#ff2d9a', altin: '#ffb81a' }[c.id]}"></i>` : { yok: '➖', gozluk: '🕶️', kulak: '🎧', pelerin: '🦸', tac: '👑' }[c.id];
+      const price = c.gem ? c.gem + ' 💎' : c.money ? money(c.money) : 'Ücretsiz'; const can = c.gem ? SV.gems >= c.gem : c.money ? SV.money >= c.money : true;
+      h += row({ icon, name: c.name, desc: own ? (on ? 'Giyili' : 'Senin') : price, btn: on ? 'GİYİLİ' : own ? 'GİY' : price, btnCls: on ? 'max' : own ? 'alt' : can ? '' : 'no', act: 'cos:' + t + ':' + c.id, dis: on }); }
+  } else if (cur === 'shop') {
+    T.textContent = 'Mağaza'; const g = gemAdState();
+    h += `<div class="row free"><div class="ic">▶</div><div class="mid"><b>Reklam izle: +${AD.gemsPerAd} 💎</b><span>${g.left <= 0 ? 'Bugünlük bitti' : g.wait > 0 ? mins(g.wait) + ' sonra' : 'Bugün ' + g.left + ' hak'}</span></div><button class="buy" data-a="adgem" ${g.left <= 0 || g.wait > 0 ? 'disabled' : ''}>İZLE</button></div>`;
+    for (const p of IAP) { const owned = p.once && SV[p.kind]; if (p.kind === 'noads' && SV.vip) continue;
+      h += `<div class="row ${p.tag ? 'hot' : ''}"><div class="ic">${p.kind === 'gems' ? '💎' : p.kind === 'noads' ? '🚫' : p.kind === 'vip' ? '⭐' : '🎁'}</div><div class="mid"><b>${p.name}${p.tag ? ` <em>${p.tag}</em>` : ''}</b><span>${p.desc || 'Kostüm ve aksesuarlar için'}</span></div><button class="buy ${owned ? 'max' : 'iap'}" data-a="iap:${p.id}" ${owned ? 'disabled' : ''}>${owned ? 'ALINDI' : priceOf(p)}</button></div>`; }
+    h += `<div class="set"><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : '<span>Web sürümü: ödemeler demo</span>'}</div>`;
+  }
+  B.innerHTML = h;
+}
+async function onAct(a) {
+  const [k, x, y] = a.split(':');
+  if (k === 'up') { const u = UPS.concat(SUPS).find(q => q.id === x), l = lv(x), c = upCost(u, l); if (l >= u.max) return; if (SV.money < c) { toast('Para yetmiyor'); SFX.nope && SFX.nope(); return; } SV.money -= c; SV.up[x] = l + 1; SFX.buy(); haptic(25); save(); }
+  else if (k === 'adup') { if (freeUpWait() > 0) { toast('Biraz bekle: ' + mins(freeUpWait())); return; } const u = UPS.concat(SUPS).find(q => q.id === x); if (lv(x) >= u.max) return; const r = await adRewarded(); if (r === 'rewarded') { SV.up[x] = lv(x) + 1; SV.freeUpLast = Date.now(); SFX.milestone(); toast(u.name + ' ücretsiz yükseldi!'); save(); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
+  else if (k === 'hire') { const s = STAFF.find(q => q.id === x), n = SV.staff[x]; if (n >= s.max) return; const c = s.costs[n]; if (SV.money < c) { toast('Para yetmiyor'); return; } SV.money -= c; SV.staff[x] = n + 1; spawnStaff(); SFX.milestone(); haptic(40); toast(s.name + ' işe başladı!'); save(); }
+  else if (k === 'cos') { const c = COS[x].find(q => q.id === y); if (!SV.cos.own.includes(y)) { if (c.gem) { if (SV.gems < c.gem) { toast('Elmas yetmiyor, mağazaya bak'); return; } SV.gems -= c.gem; } else if (c.money) { if (SV.money < c.money) { toast('Para yetmiyor'); return; } SV.money -= c.money; } SV.cos.own.push(y); SFX.milestone(); }
+    SV.cos[x] = y; if (x === 'floor') setFloor(y); else setLook(); SFX.buy(); save(); }
+  else if (k === 'adgem') { const r = await adRewarded(); if (r === 'rewarded') { SV.ads.n++; SV.ads.last = Date.now(); SV.gems += AD.gemsPerAd; toast('+' + AD.gemsPerAd + ' 💎'); SFX.coin(); save(); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
+  else if (k === 'iap') { const p = IAP.find(q => q.id === x); await buy(p); }
+  else if (k === 'snd') setSound(!soundOn());
+  else if (k === 'restore') { try { const ids = await window.FlixNative.restore(); toast(ids.length ? 'Satın alımlar geri yüklendi' : 'Geri yüklenecek satın alım yok'); } catch { toast('Mağazaya ulaşılamadı'); } }
+  refreshHUD(); if (cur) render();
+}
+
+// ---------------- HUD ----------------
+export function refreshHUD() {
+  $('#gems b').textContent = fmt(SV.gems);
+  const b = $('#boostB'), left = SV.boostUntil - Date.now();
+  if (left > 0) { b.classList.add('on'); b.querySelector('small').textContent = Math.floor(left / 60000) + ':' + String(Math.floor(left / 1000) % 60).padStart(2, '0'); } else { b.classList.remove('on'); b.querySelector('small').textContent = 'Reklam'; }
+  b.style.display = tutDone() ? '' : 'none'; $('#shopB').style.display = tutDone() ? '' : 'none';
+  $('#vipTag').style.display = SV.vip ? '' : 'none';
+}
+function confirmBox(html, okTxt, ok, alt) {
+  const M = $('#modal'); $('#mBody').innerHTML = html; const b = $('#mOk'), b2 = $('#mAlt'); b.textContent = okTxt; b2.style.display = alt ? '' : 'none'; if (alt) b2.innerHTML = alt.txt;
+  M.classList.add('show'); setPaused(true);
+  const close = () => { M.classList.remove('show'); setPaused(false); };
+  b.onclick = () => { close(); ok && ok(); }; b2.onclick = () => { close(); alt && alt.fn(); }; $('#mX').onclick = close;
+}
+// çevrimdışı kazanç: eleman ya da kasiyer varsa
+export function offlinePopup() {
+  if (!SV.lastSeen || !(SV.staff.tas || SV.staff.kas)) return; const away = Math.min(AD.offlineCapMin, (Date.now() - SV.lastSeen) / 60000); if (away < 2) return;
+  const earn = Math.round(Math.max(20, SV.ipm) * AD.offlineShare * away * (SV.vip ? 2 : 1)); if (earn < 10) return;
+  confirmBox(`<div class="big">💤</div><b>Sen yokken elemanların çalıştı</b><br><small>${Math.round(away)} dakika · fabrika kazancı</small><div class="amt">₺${fmt(earn)}</div>`, 'Al', () => { SV.money += earn; bumpMoney(); save(); },
+    { txt: '▶ 2 katı al', fn: async () => { const r = await adRewarded(); SV.money += r === 'rewarded' ? earn * 2 : earn; bumpMoney(); save(); toast(r === 'rewarded' ? '2 kat kazanç alındı!' : 'Kazanç alındı'); } });
+}
+export function initUI() {
+  $('#sheet').addEventListener('click', (e) => { const t = e.target.closest('[data-t]'); if (t) { tab[cur] = t.dataset.t; render(); return; } const b = e.target.closest('[data-a]'); if (b && !b.disabled) onAct(b.dataset.a); });
+  $('#shX').onclick = () => closePanel();
+  $('#shopB').onclick = () => { SFX.unlock(); if (cur === 'shop') closePanel(); else openPanel('shop'); };
+  $('#boostB').onclick = async () => { SFX.unlock(); if (SV.boostUntil > Date.now()) { toast('2x kazanç aktif · ' + mins(SV.boostUntil - Date.now())); return; } const r = await adRewarded(); if (r === 'rewarded') { SV.boostUntil = Date.now() + AD.boostMin * 60000; SFX.milestone(); toast(AD.boostMin + ' dakika 2x kazanç!'); save(); refreshHUD(); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); };
+  window.__fabGrant = grant; if (window.FlixNative && window.FlixNative.flush) setTimeout(() => window.FlixNative.flush(), 0);
+  if (window.FlixAds) { window.FlixAds.setScreen('game'); if (SV.noads || SV.vip) window.FlixAds.setAdsRemoved(true); }
+  refreshHUD();
+}

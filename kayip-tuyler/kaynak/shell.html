@@ -1,0 +1,104 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#4f47a8">
+<title>Flix: Kayıp Tüyler</title>
+<style>
+/*FONTS*/
+:root{--ink:#241c48;--cream:#fff8ef;--yel:#ffcf4a;--yel2:#f0a92a;--glass:rgba(255,255,255,.55);--b:#2a80dc;--g:#2fa043;--y:#ffd41f;
+--disp:BC,'Arial Narrow',Impact,sans-serif;--body:R,system-ui,-apple-system,sans-serif;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;overflow:hidden;background:#cfe0ee;font-family:var(--body);color:var(--ink);touch-action:manipulation}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.d{font-family:var(--disp);font-style:italic;font-weight:900;line-height:.9}
+.scr{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .45s ease}
+.scr.show{opacity:1;pointer-events:auto}
+.glass{background:var(--glass);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.7);box-shadow:0 8px 24px rgba(40,20,90,.14),inset 0 1px 0 rgba(255,255,255,.6)}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.btn{height:60px;border-radius:30px;padding:0 30px;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--disp);font-style:italic;font-weight:900;font-size:26px;letter-spacing:.5px;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn.main{background:linear-gradient(#ffdc6a,var(--yel2));color:#3b2508;box-shadow:0 10px 26px rgba(160,80,20,.35),inset 0 2px 0 rgba(255,255,255,.6)}
+.btn.sec{background:var(--glass);color:var(--ink)}
+/* home */
+#home{pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:calc(var(--st) + 26px) 22px calc(var(--sb) + 30px)}
+#home.show{pointer-events:auto}
+#home .brand{display:flex;align-items:center;gap:10px}
+#home .brand img{width:62px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.18))}
+#home .brand span{font-size:11px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(40,20,90,.4)}
+#home h1{font-size:clamp(64px,19vw,96px);color:#fff;text-shadow:0 6px 30px rgba(60,30,110,.35);margin-top:18px;letter-spacing:.5px}
+#home h1 em{display:block;font-size:.42em;letter-spacing:4px;font-style:italic;color:#fff6e8;opacity:.92;margin-bottom:6px}
+#home .bottom{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+#home .row{display:flex;gap:12px}
+#home .row .btn{flex:1}
+.snd{width:60px;height:60px;border-radius:30px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.snd svg .x{display:none}.snd.off svg .w{display:none}.snd.off svg .x{display:block}
+/* levels */
+#levels{background:linear-gradient(180deg,#4f47a8,#d995b0 60%,#ffc9a8);overflow-y:auto;padding:calc(var(--st) + 22px) 18px calc(var(--sb) + 30px);color:#fff}
+#levels header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+#levels header b{font-size:44px}
+.chap{margin-bottom:22px}
+.chh small{font-size:11px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;opacity:.8}
+.chh b{display:block;font-family:var(--disp);font-style:italic;font-weight:900;font-size:32px;margin:4px 0 4px}
+.chh p{font-size:14px;opacity:.9;max-width:40ch;margin-bottom:12px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lv{position:relative;aspect-ratio:3/4;border-radius:20px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:12px;text-align:left;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.lv .n{font-family:var(--disp);font-style:italic;font-weight:900;font-size:40px;line-height:1}
+.lv .t{font-size:13px;font-weight:700;line-height:1.2}
+.lv .f{position:absolute;top:14px;right:12px;width:12px;height:28px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;border:2px solid rgba(255,255,255,.75)}
+.lv.done .f.c0{background:var(--b);border-color:#fff}.lv.done .f.c1{background:var(--g);border-color:#fff}.lv.done .f.c2{background:var(--y);border-color:#fff}
+.lv.lock{opacity:.45}.lv.lock .n::after{content:' 🔒';font-size:18px}
+.back{width:48px;height:48px;border-radius:24px;display:flex;align-items:center;justify-content:center}
+/* hud */
+#hud{pointer-events:none}#hud.show{pointer-events:none}#hud.show .hb{pointer-events:auto}
+#title{position:absolute;left:20px;top:calc(var(--st) + 22px);color:#fff;transition:transform .6s cubic-bezier(.2,.8,.2,1);transform-origin:left top}
+#title small{font-size:11px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;opacity:.85;text-shadow:0 1px 6px rgba(40,20,90,.4)}
+#title b{display:block;font-size:42px;margin-top:6px;text-shadow:0 4px 18px rgba(40,20,90,.35)}
+#title.small{transform:scale(.62)}
+#fdots{position:absolute;right:18px;top:calc(var(--st) + 22px);padding:9px 12px;border-radius:16px;display:flex;gap:7px}
+#fdots i{display:block;width:11px;height:26px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;border:1.6px solid rgba(60,50,110,.45)}
+#fdots i.on.c0{background:var(--b);border-color:var(--b)}#fdots i.on.c1{background:var(--g);border-color:var(--g)}#fdots i.on.c2{background:var(--y);border-color:#e0b000}
+#fdots i.cur{border-style:dashed;border-color:#fff;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{transform:scale(1.15)}}
+.hb{position:absolute;bottom:calc(var(--sb) + 30px);width:58px;height:58px;border-radius:29px;display:flex;align-items:center;justify-content:center}
+#pauseBtn{left:20px}
+#hintBtn{right:20px;width:70px;height:70px;border-radius:35px;flex-direction:column;background:linear-gradient(#ffd25e,var(--yel2));color:#3b2508;box-shadow:0 10px 24px rgba(160,80,20,.35),inset 0 2px 0 rgba(255,255,255,.6)}
+#hintBtn span{font-size:9px;font-weight:800;letter-spacing:1px;margin-top:2px}
+#toast{position:fixed;left:50%;bottom:calc(var(--sb) + 120px);transform:translate(-50%,10px);padding:10px 18px;border-radius:22px;font-size:14px;font-weight:500;opacity:0;transition:.35s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+/* modals */
+.modal{display:flex;align-items:flex-end;justify-content:center;padding:0 16px calc(var(--sb) + 26px);background:rgba(36,28,72,.25)}
+.card{width:100%;max-width:420px;border-radius:28px;padding:26px 22px 22px;text-align:center;transform:translateY(30px);transition:transform .5s cubic-bezier(.2,.9,.2,1.1);background:rgba(255,250,244,.82)}
+.modal.show .card{transform:none}
+.card h2{font-size:40px;margin:6px 0 8px}
+.card p{font-size:15px;opacity:.8;margin-bottom:18px}
+.card .stack{display:flex;flex-direction:column;gap:10px}
+.card .btn{width:100%}
+.kicker{font-size:11px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;opacity:.6}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(#4f47a8,#e59fb2,#ffd0b0);color:#fff;transition:opacity .6s;z-index:9}
+body.ready #loading{opacity:0;pointer-events:none}
+</style></head><body>/*INTRO*/
+<canvas id="gl"></canvas>
+<div id="home" class="scr">
+  <div><div class="brand"><img id="logoImg" alt="FLIX"><span>Bir FLIX macerası</span></div>
+  <h1 class="d"><em>FLIX</em>Kayıp<br>Tüyler</h1></div>
+  <div class="bottom">
+    <button class="btn main" id="play">Oyna</button>
+    <div class="row"><button class="btn sec glass" id="lvBtn">Bölümler</button>
+    <button class="snd glass" aria-label="Ses"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#241c48" stroke-width="2" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#241c48"/><path class="w" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg></button></div>
+  </div>
+</div>
+<div id="levels" class="scr"><header><b class="d">Bölümler</b><button class="back glass" id="lvBack" aria-label="Kapat"><svg width="18" height="18" viewBox="0 0 18 18" stroke="#241c48" stroke-width="2.4" stroke-linecap="round"><path d="M3 3l12 12M15 3L3 15"/></svg></button></header><div id="lvlist"></div></div>
+<div id="hud" class="scr">
+  <div id="title"><small id="lvNum"></small><b class="d" id="lvName"></b></div>
+  <div id="fdots" class="glass"><i></i><i></i><i></i></div>
+  <button class="hb glass" id="pauseBtn" aria-label="Duraklat"><svg width="16" height="16"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="#241c48"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="#241c48"/></svg></button>
+  <button class="hb" id="hintBtn" aria-label="İpucu"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3zM9.5 19h5v2h-5z" fill="#3b2508"/></svg><span>İPUCU</span></button>
+</div>
+<div id="toast" class="glass"></div>
+<div id="pause" class="scr modal"><div class="card glass"><div class="kicker">Duraklatıldı</div><h2 class="d">Biraz nefes al</h2><p>FLIX seni bekliyor.</p><div class="stack">
+  <button class="btn main" id="resume">Devam et</button><button class="btn sec glass" id="restart">Baştan başla</button><button class="btn sec glass" id="toLevels">Bölümler</button>
+  <div style="display:flex;gap:10px"><button class="btn sec glass" id="toHome" style="flex:1">Ana menü</button><button class="snd glass" aria-label="Ses"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#241c48" stroke-width="2" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#241c48"/><path class="w" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg></button></div></div></div></div>
+<div id="win" class="scr modal"><div class="card glass"><div class="kicker">Bölüm tamam</div><h2 class="d" id="winT"></h2><p id="winS"></p><div class="stack"><button class="btn main" id="winN"></button></div></div></div>
+<div id="loading"><b class="d" style="font-size:44px">Kayıp Tüyler</b></div>
+<script>window.FLIX_LOGO="/*LOGO*/";document.getElementById('logoImg').src=window.FLIX_LOGO;</script>
+<script>/*GAME*/</script>
+</body></html>

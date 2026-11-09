@@ -8,6 +8,7 @@ Flix Kick Up, Flix Arkana ve Flix Sen Olsaydın artık gerçek iPhone uygulamas�
 | Flix Sen Olsaydın | `flix-kick-up` reposu, `direktor/app/` (yakında kendi reposuna taşınacak) | `com.flixtoys.direktor` | iPhone, dikey |
 | Flix Arkana | `Flix-Arkana` reposu, `app/` | `com.flixtoys.arkana` | iPhone + iPad, yatay |
 | Flix Atış | `flix-kick-up` reposu, `atis/app/` | `com.flixtoys.atis` | iPhone, dikey |
+| Flix Fabrika | `flix-kick-up` reposu, `fabrika/app/` | `com.flixtoys.fabrika` | iPhone, dikey |
 
 **Yayın sırası:** önce Flix Kick Up, sonra Flix Arkana, en son Flix Sen Olsaydın. Üçü de birbirinden bağımsız; birini yüklemek diğerlerini etkilemez.
 
@@ -199,3 +200,42 @@ gh secret set ATIS_ADMOB_INTERSTITIAL_ID -R $R -b "ca-app-pub-.../..."
 ```
 
 Kimlik girilmezse uygulama Google'ın **test reklamlarını** gösterir (TestFlight'ta denemek için yeterli, gerçek para kazandırmaz). App Store Connect > Uygulama Gizliliği kısmında "Cihaz kimliği: reklam / takip" ve "Satın alımlar" işaretlenmeli (Kick Up'taki gibi). Gizlilik sayfası diğer oyunlarla aynı: https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html
+
+## Flix Fabrika (yeni oyun, 2026-11-09)
+
+Flix Fabrika da aynı yolla yüklenir, GitHub sırları (secrets) aynı. Satın alma ve reklam olduğu için "Ücretli Uygulamalar" anlaşması (bölüm 1, madde 2) şart.
+
+1. developer.apple.com > Identifiers > **+** > App IDs > App: Bundle ID **Explicit** `com.flixtoys.fabrika`.
+2. App Store Connect > Uygulamalar > **+** > Yeni Uygulama: ad **Flix Fabrika**, dil Türkçe, paket kimliği `com.flixtoys.fabrika`, SKU `fabrika1`.
+3. Yükle (Mac gerekmez): GitHub > `flix-kick-up` > Actions > **iOS TestFlight** > Run workflow > app: **fabrika**, version: **1.0**. Terminalden:
+
+```bash
+gh workflow run ios-testflight.yml -R kaanimamoglu27/flix-kick-up -f app=fabrika -f version=1.0
+```
+
+Mac'ten: `cd fabrika/app && ./ios.sh yukle 1.0`.
+
+**Satın alma ürünleri** (App Store Connect > Flix Fabrika > Para Kazanma > Uygulama İçi Satın Almalar > **+**). Ürün kimlikleri birebir aynı yazılmalı:
+
+| Ürün kimliği | Tür | İçerik | Önerilen fiyat |
+|---|---|---|---|
+| `fab_gems_100` | Tüketilebilir | 100 elmas | ₺29,99 |
+| `fab_gems_300` | Tüketilebilir | 300 elmas | ₺79,99 |
+| `fab_gems_800` | Tüketilebilir | 800 elmas | ₺179,99 |
+| `fab_gems_2000` | Tüketilebilir | 2.000 elmas | ₺399,99 |
+| `fab_starter` | Tüketilemez | Başlangıç Paketi: 150 elmas + ₺2.000 oyun parası + Altın FLIX kostümü | ₺49,99 |
+| `fab_noads` | Tüketilemez | Reklamsız (ara reklamlar kalkar) | ₺89,99 |
+| `fab_vip` | Tüketilemez | VIP Fabrika: tüm satışlar kalıcı 2 kat + reklamsız | ₺149,99 |
+
+Elmas kostüm, aksesuar ve zemin almak için kullanılır; reklam izleyerek de kazanılır (günde 8 kez +5). Oyunda görünen fiyatlar App Store'dan gelir.
+
+**Reklamlar (AdMob)**: https://apps.admob.com > Uygulamalar > Uygulama ekle > iOS > **Flix Fabrika**. İki reklam birimi aç: **Ödüllü** (3 dakika 2x kazanç, ücretsiz geliştirme, +5 elmas, çevrimdışı kazancı 2 kat al) ve **Geçiş** (eğitimden sonra en sık 4 dakikada bir, sadece panel kapanınca ya da yeni alan açılınca; Reklamsız ya da VIP alınca hiç çıkmaz). Kimlikleri GitHub sırlarına gir:
+
+```bash
+R=kaanimamoglu27/flix-kick-up
+gh secret set FABRIKA_ADMOB_APP_ID          -R $R -b "ca-app-pub-...~..."
+gh secret set FABRIKA_ADMOB_REWARDED_ID     -R $R -b "ca-app-pub-.../..."
+gh secret set FABRIKA_ADMOB_INTERSTITIAL_ID -R $R -b "ca-app-pub-.../..."
+```
+
+Kimlik girilmezse uygulama Google'ın test reklamlarını gösterir. Uygulama Gizliliği: "Cihaz kimliği: reklam / takip" ve "Satın alımlar" işaretlenmeli. İkon (`fabrika/app/store/icon-1024.png`) ve açılış ekranı geçici; App Store görselleri sonra yapılacak.
