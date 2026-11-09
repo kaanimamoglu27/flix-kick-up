@@ -403,3 +403,10 @@ Kaan "Kurye rotası" fikrini seçti (bkz. brainstorm.md). v8'deki ŞART eşya ve
 - 4. evden sonra pencerelerin kepenkleri açılıp kapanıyor. Kapalı kepenge atılan paket "TAK!" diye seker. Kapıya atmak güvenli ama kombo büyütmez.
 - Pako zamanla daha çok hızlanıyor, tuzaklar da mesafeyle sıklaşıyor. Çantada 5 paket var, kargo durağı her 4 evde bir.
 - Görünüm baştan değişti: 70'ler funky tarzı. Gün batımı gökyüzü, dönen güneş ışınları, çizgili retro güneş, dalgalı gökkuşağı tepeler, pofuduk bulutlar, dama desenli zemin, şeker renkli dans eden evler, yuvarlak düğmeler, Shrikhand ve Baloo 2 yazı tipleri.
+
+## Yasal Bilgiler / Legal & Information (2026-11-09)
+
+Ayarlar'da (Sen Olsaydın'da ana ekranın altında) **Yasal Bilgiler** ve **Hakkında** düğmeleri var. Panel TR/EN, dili cihaz diline göre seçer, üstteki TR/EN ile değişir.
+Belgeler flixtoysofficial.com'daki resmi sayfalar; uygulamada Safari'de, web'de yeni sekmede açılır (oyun içinde WebView yok). İnternet yoksa uyarı ve adres gösterilir.
+Hakkında: geliştiriciler, %50/%50 telif sahipliği, yayıncı FLIX TOYS, destek e-postası, açık kaynak bileşenler.
+Kod oyunun içinde tek bir `<script>/* FLIX legal */` bloğu (FlixLegal), düğmeler `data-flixlegal="legal|about"`. Oynanış, reklam, satın alma ve kayıtlar değişmedi.

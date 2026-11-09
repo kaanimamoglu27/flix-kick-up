@@ -93,7 +93,7 @@ function render() {
     h += '<p class="note">Bonuslar üst üste eklenir. Elmasları mağazadan alabilirsin.</p>';
   } else if (cur === 'menu') {
     T.textContent = 'Ayarlar';
-    h += `<div class="set col"><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button><button data-a="home">🏠 Ana menüye dön</button><button data-a="endg">${ENDGAME ? '↩ Normal oyuna dön' : '🧪 Endgame modu (test)'}</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : ''}</div><p class="note">Flix Fabrika · FLIX TOYS</p>`;
+    h += `<div class="set col"><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button><button data-a="home">🏠 Ana menüye dön</button><button data-a="endg">${ENDGAME ? '↩ Normal oyuna dön' : '🧪 Endgame modu (test)'}</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : ''}<button data-flixlegal="legal">📜 Yasal Bilgiler · Legal</button><button data-flixlegal="about">ℹ️ Hakkında · About</button></div><p class="note">Flix Fabrika · FLIX TOYS</p>`;
   } else if (cur === 'shop') {
     T.textContent = 'Mağaza'; const g = gemAdState();
     h += `<div class="row free"><div class="ic">▶</div><div class="mid"><b>Reklam izle: +${AD.gemsPerAd} 💎</b><span>${g.left <= 0 ? 'Bugünlük bitti' : g.wait > 0 ? mins(g.wait) + ' sonra' : 'Bugün ' + g.left + ' hak'}</span></div><button class="buy" data-a="adgem" ${g.left <= 0 || g.wait > 0 ? 'disabled' : ''}>İZLE</button></div>`;
