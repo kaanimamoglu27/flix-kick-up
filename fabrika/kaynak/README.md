@@ -63,3 +63,9 @@ Three.js r170 + esbuild, tek HTML dosyası üretir: `python3 build.py` (yanında
 - Patron her şeyi kendisi yapıyor: standda tüy + tabandan FLIX'i elle kuruyor (çekiçleme), kutuluyor ve 3 kez sektirip test ediyor.
 - Alan açıldıkça büyüyor: 2. hindi → Atölye (salon, duvarlar, dolap) → Montaj masası → Hindi çiftliği (kümes kapanır, hindiler çiftliğe taşınır) → Büyük pres (mini makinenin yerini alır) → Oyun parkı → Ofis → ...
 - Yeni 4 adımlı öğretici. Eski kayıtlar bu açılışları kendiliğinden alır.
+
+## 1.7 (2026-11-09)
+- Büyüme daha yavaş ve adım adım: Avlu → Atölye avlusu (çitli, alet duvarı) → Montaj masası → 3. hindi → Depo kanadı (sol duvar, depo rafları, dolap) → Büyük pres → Fabrika binası (arka duvarlar, FABRİKA tabelası, çiftlik kapısı) → Hindi çiftliği → Oyun parkı → Ofis → İşe alım. Sonraki pedler 1,5 kat pahalı.
+- Tüyler yakında: kümes işe alıma kadar avluda kalıyor; çiftliğin tüy sandığı kapının hemen arkasında.
+- Oynanış görselleri: elle kurarken kıvılcım, kutulayınca duman ve yıldız, test sektirmelerinde toz, testten geçince yıldızlar, tüy alırken tüy uçuşması, para toplarken altın; yürürken hafif toz; yığın halkaları üstündeyken parlıyor.
+- Stantta dalgalanan FLIX bayrakları, saksılar, vitrin FLIX'leri. Kümeste su yalağı, yem kabı, KÜMES tabelası; mini makinede yanıp sönen lamba ve dumanlı baca; avluda taş yol, çiçek kasaları, sokak lambaları, bank, ağaçlar, ışık zinciri.
