@@ -2036,6 +2036,7 @@ function previewAim() {
 }
 function shoot(pow) {
   P.shot++; hudShots();
+  if (!P.revived && P.shot >= SHOT_LIMIT - 2 && window.FlixAds && window.FlixAds.prepareRewarded) window.FlixAds.prepareRewarded('shots');
   P.body = newBody(P.from, launchVel(P.yaw, pow)); P.phase = 'fly'; P.flyT = 0; SAVE.seen = 1; save();
   SFX.launch(pow); buzz(15); squash = 1; tuyUI(); dotsG.children.forEach((m) => { m.visible = false; }); $('aimsvg').innerHTML = '';
   if (LV.tut === 1) tutorDone(1); if (LV.tut === 2 && !BOT) setTimeout(() => { if (P.phase === 'fly') toast('BASILI TUT', 'süzül!', '#2fa84f'); }, 450);
@@ -2132,7 +2133,7 @@ function endAd(kind, fe) {
   b.hidden = false; b.disabled = false; b.className = 'adbtn ' + kind;
   b.innerHTML = kind === 'double' ? `<i>▶</i><span>Reklam izle<b>2x tüy · +${fe}</b></span>` : `<i>▶</i><span>Reklam izle<b>+${AD_CFG.extraShots} atış hakkı</b></span>`;
   b.onclick = async () => {
-    if (b.disabled) return; b.disabled = true; const r = await adRewarded();
+    if (b.disabled) return; b.disabled = true; const r = await adRewarded(kind === 'double' ? 'fe' : 'shots');
     if (r !== 'rewarded') { b.disabled = false; toastShop('Reklam şu an yok', 'biraz sonra dene'); return; }
     if (kind === 'double') { addFe(fe, 'reklam ödülü: 2x'); b.innerHTML = '<i>✓</i><span>Ödül alındı<b>+' + fe + ' tüy</b></span>'; const t = $('endRows').querySelector('.tot b'); if (t) t.textContent = '+' + fe * 2 + ' tüy'; }
     else reviveRun();
@@ -2572,9 +2573,11 @@ function webAd(kind) { // the web build has no ad network: shows our own FLIX ad
     close.onclick = () => { if (close.disabled) return; show('adL', false); res(kind === 'rewarded' ? 'rewarded' : true); };
   });
 }
-async function adRewarded() { if (window.FlixAds) return window.FlixAds.showRewarded(4000); return webAd('rewarded'); }
-async function adInterstitial() { if (SAVE.noads) return false; if (window.FlixAds) return window.FlixAds.showInterstitial(); return webAd('inter'); }
-function maybeInterstitial() { SAVE.wins++; save(); if (SAVE.noads || BOT || cur < AD_CFG.interFromLevel) return Promise.resolve(false); if (SAVE.wins % AD_CFG.interEvery) return Promise.resolve(false); return adInterstitial(); }
+let lastRewardAt = 0;
+async function adRewarded(which) { let r; if (window.FlixAds) r = await window.FlixAds.showRewarded(which === 'shots' ? 8000 : 5000, which || 'fe'); else if (NATIVE) r = 'unavailable'; else r = await webAd('rewarded'); if (r !== 'unavailable') lastRewardAt = Date.now(); return r; }
+async function adInterstitial() { if (SAVE.noads || Date.now() - lastRewardAt < 90000) return false; if (window.FlixAds) return window.FlixAds.showInterstitial(); if (NATIVE) return false; return webAd('inter'); }
+function adTurn() { SAVE.adN = (SAVE.adN || 0) + 1; save(); if (SAVE.noads || BOT || cur < AD_CFG.interFromLevel) return Promise.resolve(false); if (SAVE.adN % AD_CFG.interEvery) return Promise.resolve(false); return adInterstitial(); }
+function maybeInterstitial() { SAVE.wins++; save(); return adTurn(); }
 function freeFeState() { const d = new Date().toDateString(); if (SAVE.ads.day !== d) { SAVE.ads.day = d; SAVE.ads.n = 0; } const wait = SAVE.ads.last + AD_CFG.freeCooldownMin * 60000 - Date.now(); return {left: AD_CFG.freePerDay - SAVE.ads.n, wait: Math.max(0, wait)}; }
 
 // ---- purchases ----
@@ -2628,7 +2631,7 @@ function renderShop() {
   g.innerHTML = html;
   g.querySelectorAll('.item[data-id]').forEach((b) => b.addEventListener('click', () => shopPick(b.dataset.id)));
   g.querySelectorAll('.item[data-buy]').forEach((b) => b.addEventListener('click', () => { const id = b.dataset.buy, p = PACKS.find((q) => q.id === id) || (id === STARTER.id ? {...STARTER, title: 'Başlangıç Paketi'} : id === PACK2.id ? {...PACK2, title: 'Sokak 2 paketi'} : {...NOADS, title: 'Reklamsız'}); buyProduct({...p, title: p.title || fmtN(p.fe) + ' tüy'}); }));
-  const ff = $('freeFe'); if (ff) ff.addEventListener('click', async () => { const r = await adRewarded(); if (r === 'rewarded') { SAVE.ads.n++; SAVE.ads.last = Date.now(); addFe(AD_CFG.freeFe, 'reklam ödülü'); renderShop(); } else toastShop('Reklam şu an yok', 'biraz sonra dene'); });
+  const ff = $('freeFe'); if (ff) ff.addEventListener('click', async () => { if (ff.disabled) return; ff.disabled = true; const r = await adRewarded('fe'); if (r === 'rewarded') { SAVE.ads.n++; SAVE.ads.last = Date.now(); addFe(AD_CFG.freeFe, 'reklam ödülü'); renderShop(); } else { ff.disabled = false; toastShop('Reklam şu an yok', 'biraz sonra dene'); } });
 }
 function shopPick(id) {
   const T = TABS[shopTab], it = T.list.find((x) => x.id === id), key = ownKey(shopTab, id);
@@ -2692,7 +2695,7 @@ function openDaily() {
   const days = DAILY.map((n, k) => `<div class="dd${k < st.day ? ' got' : ''}${k === st.day ? ' now' : ''}"><small>${k + 1}. gün</small><b>${fmtN(n)}</b></div>`).join('');
   if (!st.ready) { dlg('GÜNLÜK HEDİYE', 'YARIN GEL', `<div class="days">${days}</div><p>Bugünkü hediyeni aldın. Her gün gel, 7. gün ${DAILY[6]} tüy!</p>`, [{t: 'Tamam', c: 'ok'}]); return; }
   dlg('GÜNLÜK HEDİYE', '+' + DAILY[st.day] + ' TÜY', `<div class="days">${days}</div><p>Her gün gelirsen hediye büyür. Bir gün kaçırırsan baştan başlar.</p>`,
-    [{t: '▶ Reklam izle · 2x', c: 'ad', f: async () => { const r = await adRewarded(); if (r === 'rewarded') claimDaily(2); else { toastShop('Reklam şu an yok', 'normal hediyeni verdim'); claimDaily(1); } }},
+    [{t: '▶ Reklam izle · 2x', c: 'ad', f: async () => { const r = await adRewarded('fe'); if (r === 'rewarded') claimDaily(2); else { toastShop('Reklam şu an yok', 'normal hediyeni verdim'); claimDaily(1); } }},
      {t: 'Al', c: 'ok', f: () => claimDaily(1)}]);
 }
 function openHow() {
@@ -2704,7 +2707,7 @@ function dlg(tag, title, body, btns) {
   for (const b of btns) { const e = document.createElement('button'); e.className = 'mbtn ' + (b.c || ''); e.textContent = b.t; e.onclick = () => { show('dlgL', false); if (b.f) b.f(); }; w.appendChild(e); }
   show('dlgL', true); tick();
 }
-function maybeLoseAd() { SAVE.loses++; save(); if (SAVE.noads || BOT || SAVE.loses % 2) return Promise.resolve(false); return adInterstitial(); }
+function maybeLoseAd() { SAVE.loses++; save(); return adTurn(); }
 dailyUI();
 
 
