@@ -37,43 +37,53 @@ export const UPS = [
   { id: 'pres', grp: 'Fabrika', name: 'Pres hızı', icon: '⚙️', max: 8, base: 50, mult: 1.8, desc: (l) => (1.6 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/taban' },
   { id: 'mont', grp: 'Fabrika', name: 'Montaj hızı', icon: '🤖', max: 8, base: 60, mult: 1.8, desc: (l) => (1.4 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/FLIX' },
   { id: 'kumes', grp: 'Fabrika', name: 'Kümes verimi', icon: '🦃', max: 8, base: 50, mult: 1.8, desc: (l) => '+' + Math.round((1 / Math.pow(0.85, l) - 1) * 100) + '% tüy' },
-  { id: 'test', grp: 'Fabrika', name: 'Test cihazı', icon: '🧪', max: 6, base: 70, mult: 1.9, desc: (l) => (1.2 * Math.pow(0.85, l)).toFixed(1).replace('.', ',') + ' sn · %' + Math.max(0, 8 - l * 2) + ' hatalı' },
+  { id: 'test', grp: 'Fabrika', name: 'Test çocuğu', icon: '🧒', max: 6, base: 70, mult: 1.9, desc: (l) => (l >= 3 ? 2 : 3) + ' sektirme · ' + ((l >= 3 ? 2 : 3) * 0.55 * Math.pow(0.88, l)).toFixed(1).replace('.', ',') + ' sn · %' + Math.max(0, 8 - l * 2) + ' hatalı' },
   { id: 'truck', grp: 'Fabrika', name: 'Kamyon', icon: '🚚', max: 5, base: 300, mult: 2.0, desc: (l) => (10 + l * 4) + ' kutu · ' + Math.round(30 * Math.pow(0.85, l)) + ' sn yol' },
   { id: 'tez', grp: 'Fabrika', name: 'Tezgâh rafı', icon: '🧺', max: 4, base: 80, mult: 2.2, desc: (l) => (12 + l * 4) + ' FLIX' },
 ];
 // İşe alım (para)
 export const STAFF = [
   { id: 'tas', name: 'Taşıyıcı', icon: '🧑‍🏭', desc: 'Tüy ve taban taşır, FLIX’leri tezgâha dizer', costs: [150, 700, 2600, 8000], max: 4 },
-  { id: 'kas', name: 'Kasiyer', icon: '🧾', desc: 'Kasada durur, sen yokken de satış yapar', costs: [250], max: 1 },
+  { id: 'kas', name: 'Kasiyer', icon: '🧾', desc: 'Kasada durur, satışı 3 kat hızlandırır', costs: [250], max: 1 },
 ];
 export const SUPS = [
   { id: 'wspd', name: 'Eleman hızı', icon: '⚡', max: 5, base: 120, mult: 2.0, desc: (l) => '+' + (l * 15) + '% hız' },
   { id: 'wcap', name: 'Eleman kapasitesi', icon: '🎒', max: 5, base: 150, mult: 2.0, desc: (l) => (2 + l) + ' parça' },
 ];
 // Kozmetik: para (₺) veya elmas (💎)
+// Kozmetik: hepsi elmasla (💎) alınır, giyilince bonus verir. b: spd = yürüme hızı, cap = taşıma, kar = satış kârı
 export const COS = {
   skin: [
-    { id: 'kraliyet', name: 'Kırmızı FLIX', price: 0 },
-    { id: 'buzul', name: 'Buz Mavisi', gem: 30 },
-    { id: 'ejder', name: 'Ejder Yeşili', gem: 60 },
-    { id: 'neon', name: 'Neon Pembe', gem: 90 },
-    { id: 'altin', name: 'Altın FLIX', gem: 150 },
+    { id: 'kraliyet', name: 'Kırmızı FLIX', price: 0, b: {} },
+    { id: 'buzul', name: 'Buz Mavisi', gem: 30, b: { spd: 0.08 } },
+    { id: 'ejder', name: 'Ejder Yeşili', gem: 60, b: { cap: 2 } },
+    { id: 'neon', name: 'Neon Pembe', gem: 90, b: { kar: 0.08 } },
+    { id: 'altin', name: 'Altın FLIX', gem: 150, b: { kar: 0.15, spd: 0.1 } },
   ],
   acc: [
-    { id: 'yok', name: 'Aksesuarsız', price: 0 },
-    { id: 'gozluk', name: 'Güneş gözlüğü', money: 600 },
-    { id: 'kulak', name: 'Kulaklık', gem: 25 },
-    { id: 'pelerin', name: 'Kahraman pelerini', gem: 50 },
-    { id: 'tac', name: 'Altın taç', gem: 120 },
+    { id: 'yok', name: 'Aksesuarsız', price: 0, b: {} },
+    { id: 'gozluk', name: 'Güneş gözlüğü', gem: 15, b: { spd: 0.05 } },
+    { id: 'kulak', name: 'Kulaklık', gem: 25, b: { cap: 1 } },
+    { id: 'pelerin', name: 'Kahraman pelerini', gem: 50, b: { spd: 0.12 } },
+    { id: 'tac', name: 'Altın taç', gem: 120, b: { kar: 0.12, cap: 1 } },
   ],
   floor: [
-    { id: 'nane', name: 'Nane karo', price: 0, a: '#c4e8d4', b: '#ade0c4', l: 'rgba(40,110,80,.18)' },
-    { id: 'krem', name: 'Krem karo', money: 900, a: '#f6e6c8', b: '#ecd5ae', l: 'rgba(120,80,40,.15)' },
-    { id: 'flix', name: 'FLIX sarı-mavi', gem: 25, a: '#ffe48a', b: '#a9c1ee', l: 'rgba(11,42,94,.18)' },
-    { id: 'ahsap', name: 'Ahşap parke', gem: 40, wood: true },
-    { id: 'gokkusagi', name: 'Gökkuşağı', gem: 80, rainbow: true },
+    { id: 'nane', name: 'Nane karo', price: 0, b: {}, a: '#c4e8d4', b2: '#ade0c4', l: 'rgba(40,110,80,.18)' },
+    { id: 'krem', name: 'Krem karo', gem: 15, b: { kar: 0.03 }, a: '#f6e6c8', b2: '#ecd5ae', l: 'rgba(120,80,40,.15)' },
+    { id: 'flix', name: 'FLIX sarı-mavi', gem: 25, b: { kar: 0.05 }, a: '#ffe48a', b2: '#a9c1ee', l: 'rgba(11,42,94,.18)' },
+    { id: 'ahsap', name: 'Ahşap parke', gem: 40, b: { kar: 0.07 }, wood: true },
+    { id: 'gokkusagi', name: 'Gökkuşağı', gem: 80, b: { kar: 0.1 }, rainbow: true },
   ],
 };
+export const bonusTxt = (b) => [b.spd && '+' + Math.round(b.spd * 100) + '% hız', b.cap && '+' + b.cap + ' taşıma', b.kar && '+' + Math.round(b.kar * 100) + '% kâr'].filter(Boolean).join(' · ');
+// Süreli bonuslar: reklam izleyerek ya da elmasla açılır. x2 = eski "2x kazanç" (SV.boostUntil)
+export const BONUS = [
+  { id: 'x2', name: '2x Kazanç', icon: '💰', desc: 'Tüm satışlar 2 kat', min: 3, gem: 15, col: '#25a855' },
+  { id: 'hiz', name: 'Turbo Hız', icon: '⚡', desc: 'Sen ve elemanlar 1,5 kat hızlı', min: 3, gem: 10, col: '#ff9a1a' },
+  { id: 'uret', name: 'Çift Üretim', icon: '⚙️', desc: 'Kümes, pres ve montaj 2 kat hızlı', min: 3, gem: 12, col: '#2a80dc' },
+  { id: 'musteri', name: 'Müşteri Akını', icon: '🛍️', desc: 'Müşteriler 2 kat sık gelir, daha çok alır', min: 3, gem: 12, col: '#e84aa0' },
+  { id: 'miknatis', name: 'Para Mıknatısı', icon: '🧲', desc: 'Paralar kendiliğinden cebine gelir', min: 5, gem: 15, col: '#7a4fd8' },
+];
 // Gerçek para ürünleri (App Store kimlikleri app/www/native-bridge.js ile aynı olmalı). price: web/demoda gösterilen yedek fiyat.
 export const IAP = [
   { id: 'fab_gems_100', kind: 'gems', n: 100, name: '100 Elmas', price: '₺29,99' },
