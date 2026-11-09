@@ -43,3 +43,17 @@ Three.js r170 + esbuild, tek HTML dosyası üretir: `python3 build.py` (yanında
 - Müşteriler kaldırımdan gelip en kısa kuyruğu seçiyor; kasiyersiz kasada oyuncu yanındayken satış.
 - Test kuyruğu uzayınca test çocuğu hızlanır; test seviyesi 5+ tek sektirme.
 - Hata: 1.3'te yazılan ucuz ped fiyatları uygulanmıyordu; düzeltildi. Tüm pedler yeniden fiyatlandı.
+
+## 1.5 (2026-11-09)
+- Test artık bir oyun parkı: 3 çocuk aynı anda sektiriyor (kaydırak, salıncak, renkli kauçuk zemin). Test seviyesi 10'a çıktı.
+- Ofis gerçek bir oda: cam duvarlar, açılan kapı, masa, ekran, kupa rafı (her 6 geliştirme seviyesinde bir kupa). Kâr, Reklam & tanıtım ve Sipariş primi sınırsız yükselir; diğer geliştirmelerin tavanı yükseldi.
+- Sonsuz siparişler: üstte sipariş kartı (N adet belli renk FLIX sat → ₺ + 💎), her sipariş biraz büyür.
+- Müşteriler mavi, kırmızı, sarı ya da karışık sipariş veriyor; tam istediğini alan %30 fazla ödüyor, 9 sn bulamazsa karışığa razı oluyor.
+- B Blok (sola genişleme): kapılı duvar, depo rafları, forklift, 4. montaj, 2. pres, 5. kasa; çiftlik de sola büyüyor.
+- Tüy toplayıcı robotlar (2 + garajla 3 daha), Toplayıcı robot geliştirmesi.
+- Patron seviyesi ve unvanlar (Çırak, Usta, Şef, Patron, Efsane): karakterin altında renkli halka, karakter büyüyor, ofiste Patron kartı.
+- Kozmetik: 6 yeni kostüm, 4 yeni aksesuar, 3 yeni zemin; elemanlar için 8 kıyafet ve 8 şapka (eleman hız/taşıma bonusu).
+- Flix Rush ve Flix Kick Up tanıtımı: yolun karşısında iki pano, ana menüde kartlar, mağazada "Diğer FLIX oyunları", web reklam kartı.
+- Görsel: makinelerde çizgi roman hatları, kalın kenarlı tabelalar, gökyüzü geçişi, çim dokusu, siloslar, dumanlı bacalar, su kulesi.
+- Performans: kare hızına göre otomatik çözünürlük, müşteri ve tüy geometrileri paylaşımlı (bellek sızıntısı yok), küçük eşyalar gölge atmıyor.
+- Endgame: eski Endgame kaydına yeni alanlar ve geliştirmeler otomatik eklenir.

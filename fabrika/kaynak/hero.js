@@ -180,11 +180,17 @@ const SKINS = {
   lav: {body: 0xff5a1a, cloak: 0x2a0a00, cloakIn: 0xffc20e, metal: 0x3a2a22, gold: 0xffd040, flame: 0xffa020, glove: 0x2a1a10},
   galaksi: {body: 0x5a2dd0, cloak: 0x0b0a2a, cloakIn: 0xff6af0, metal: 0xc8b8ff, gold: 0xffe0ff, flame: 0xb08aff, glove: 0xe8e0ff},
   gece: {body: 0x22262e, cloak: 0x0b0b0b, cloakIn: 0xffc20e, metal: 0xffc20e, gold: 0xffc20e, flame: 0xffc20e, glove: 0xffc20e},
+  kiraz: {body: 0xff4a6a, cloak: 0xffffff, cloakIn: 0x2fa043, metal: 0xffe0e8, gold: 0xffffff, flame: 0xff8aa0, glove: 0xffffff},
+  okyanus: {body: 0x0a5ad8, cloak: 0x2fe8ff, cloakIn: 0x0a2a6a, metal: 0x9ff0ff, gold: 0xffffff, flame: 0x2fe8ff, glove: 0xe0faff},
+  robot: {body: 0x9aa6b8, cloak: 0x2b2e36, cloakIn: 0xff6a1a, metal: 0xe8eef6, gold: 0x2fe8ff, flame: 0x2fe8ff, glove: 0x3a3f4c},
+  zumrut: {body: 0x0a8a5a, cloak: 0x062a1a, cloakIn: 0x7affc8, metal: 0x7affc8, gold: 0xffe9a0, flame: 0x7affc8, glove: 0xeafff4},
+  gunbatimi: {body: 0xff6a2a, cloak: 0x5a2dd0, cloakIn: 0xff2d9a, metal: 0xffd0a0, gold: 0xffe066, flame: 0xff2d9a, glove: 0xfff0e0},
+  kar: {body: 0xf4f8ff, cloak: 0x9fd6ff, cloakIn: 0x2a80dc, metal: 0xbfe6ff, gold: 0x2a80dc, flame: 0x9fe8ff, glove: 0x2a80dc},
   neon: {body: 0xff2d9a, cloak: 0x14062a, cloakIn: 0x2fe8ff, metal: 0x2fe8ff, gold: 0x2fe8ff, flame: 0xff6af0, glove: 0x2fe8ff},
 };
 function hero(skin, opt) {
   opt = opt || {};
-  const H = buildFlix(SKINS[skin]);
+  const H = buildFlix(SKINS[skin] || SKINS.kraliyet);
   H.arms.forEach((a) => { a.torch.visible = false; });
   if (opt.noCloak) { H.cloak.visible = false; H.body.children.forEach((c) => { if (c.geometry === H.cloakGeo) c.visible = false; }); }
   if (opt.face) H.faceMat.map = R.flixFaces[opt.face];
@@ -206,4 +212,4 @@ function pose(H, P) {
   if (P.squash) H.head.scale.set(1 + P.squash, 1 - P.squash, 1 + P.squash);
 }
 
-export { hero, pose, leafGeo };
+export { hero, pose, leafGeo, ink };

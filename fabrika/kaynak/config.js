@@ -25,38 +25,49 @@ export const PADS = [
   { id: 'kasa3', name: '3. Kasa', cost: 2000, fx: 'Müşteri +%50', x: 13.6, z: 14.0, req: 'genis', big: true },
   { id: 'suru', name: 'Hindi sürüsü', cost: 2200, fx: '+6 hindi · 2 kat tüy', x: 17.0, z: -12.5, req: 'genis' },
   { id: 'pelus', name: 'Peluş atölyesi', cost: 2800, fx: 'Yeni ürün: Peluş FLIX', x: 17.5, z: 7.2, req: 'genis' },
+  { id: 'robot', name: 'Tüy toplayıcı', cost: 900, fx: '2 robot tüy toplar', x: -8.4, z: -15.0, req: 'mavi' },
   { id: 'asm3', name: '3. Montaj', cost: 3500, fx: 'Üretim +%50', x: -6.4, z: 6.4, req: 'sari' },
   { id: 'konv', name: 'Konveyör', cost: 4500, fx: 'Montaj kendi teste gider', x: 3.4, z: -4.8, req: 'top' },
   { id: 'kirmizi', name: 'Kırmızı hindi', cost: 5000, fx: 'FLIX değeri 26', x: -3.2, z: -14.2, req: 'sari', col: 'kirmizi' },
   { id: 'ciftlik', name: 'Büyük çiftlik', cost: 6000, fx: '+8 hindi · 2. tüy sandığı', x: 1.0, z: -18.0, req: 'sari', big: true },
   { id: 'hediye', name: 'Hediye paketi', cost: 7000, fx: '3 FLIX = 1,6 kat set', x: 18.5, z: 2.5, req: 'top' },
   { id: 'kasa4', name: '4. Kasa', cost: 9000, fx: 'Müşteri +%33', x: 19.2, z: 14.0, req: 'kasa3', big: true },
+  { id: 'bblok', name: 'B Blok', cost: 10000, fx: 'Fabrika sola büyür', x: -9.2, z: 12.4, req: 'ciftlik', big: true },
+  { id: 'asm4', name: '4. Montaj', cost: 14000, fx: 'Üretim +%33', x: -17.5, z: 3.0, req: 'bblok' },
+  { id: 'pres2', name: '2. Pres', cost: 16000, fx: 'Taban üretimi 2 katı', x: -19.0, z: -3.8, req: 'bblok' },
   { id: 'mor', name: 'Mor hindi', cost: 12000, fx: 'FLIX değeri 38', x: 0.0, z: -14.2, req: 'kirmizi', col: 'mor' },
+  { id: 'kasa5', name: '5. Kasa', cost: 20000, fx: 'Müşteri +%25', x: -17.5, z: 14.0, req: 'bblok', big: true },
+  { id: 'robot2', name: 'Robot garajı', cost: 30000, fx: '+3 robot · hızlı toplama', x: -18.5, z: -12.0, req: 'pres2' },
   { id: 'altin', name: 'Altın hindi', cost: 25000, fx: 'FLIX değeri 60', x: 3.2, z: -14.2, req: 'mor', col: 'altin' },
 ];
 // Ürünler (satış fiyatı ₺). FLIX'in fiyatı tüy rengine göre (COLS.v), hediye paketi = içindeki 3 FLIX x 1,6
 export const PROD = { top: 30, giftMult: 1.6, truckMult: 1.5, plushMult: 0.6, keyMult: 0.5 };
 // Ofis geliştirmeleri (para). cost = base * mult^lv
 export const UPS = [
-  { id: 'spd', grp: 'Patron', name: 'Yürüme hızı', icon: '👟', max: 6, base: 40, mult: 1.9, desc: (l) => '+' + (l * 12) + '% hız' },
-  { id: 'cap', grp: 'Patron', name: 'Taşıma kapasitesi', icon: '📦', max: 10, base: 30, mult: 1.75, desc: (l) => (4 + l) + ' parça' },
-  { id: 'kar', grp: 'Patron', name: 'Kâr', icon: '💰', max: 10, base: 90, mult: 1.85, desc: (l) => '+' + (l * 10) + '% satış' },
-  { id: 'pres', grp: 'Fabrika', name: 'Pres hızı', icon: '⚙️', max: 8, base: 50, mult: 1.8, desc: (l) => (1.6 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/taban' },
-  { id: 'mont', grp: 'Fabrika', name: 'Montaj hızı', icon: '🤖', max: 8, base: 60, mult: 1.8, desc: (l) => (1.4 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/FLIX' },
-  { id: 'kumes', grp: 'Fabrika', name: 'Kümes verimi', icon: '🦃', max: 8, base: 50, mult: 1.8, desc: (l) => '+' + Math.round((1 / Math.pow(0.85, l) - 1) * 100) + '% tüy' },
-  { id: 'bant', grp: 'Fabrika', name: 'Tüy bandı hızı', icon: '🛤️', max: 6, base: 300, mult: 1.9, desc: (l) => (1.1 * Math.pow(0.8, l)).toFixed(2).replace('.', ',') + ' sn/parça' },
-  { id: 'test', grp: 'Fabrika', name: 'Test çocuğu', icon: '🧒', max: 6, base: 70, mult: 1.9, desc: (l) => (l >= 3 ? 2 : 3) + ' sektirme · ' + ((l >= 3 ? 2 : 3) * 0.55 * Math.pow(0.88, l)).toFixed(1).replace('.', ',') + ' sn · %' + Math.max(1, Math.round(10 - l * 1.5)) + ' hatalı' },
-  { id: 'truck', grp: 'Fabrika', name: 'Kamyon', icon: '🚚', max: 5, base: 300, mult: 2.0, desc: (l) => (10 + l * 4) + ' kutu · ' + Math.round(30 * Math.pow(0.85, l)) + ' sn yol' },
-  { id: 'tez', grp: 'Fabrika', name: 'Tezgâh rafı', icon: '🧺', max: 4, base: 80, mult: 2.2, desc: (l) => (12 + l * 4) + ' FLIX' },
+  { id: 'spd', grp: 'Patron', name: 'Yürüme hızı', icon: '👟', max: 12, base: 40, mult: 1.8, desc: (l) => '+' + spdPct(l) + '% hız' },
+  { id: 'cap', grp: 'Patron', name: 'Taşıma kapasitesi', icon: '📦', max: 26, base: 30, mult: 1.55, desc: (l) => (4 + l) + ' parça' },
+  { id: 'kar', grp: 'Patron', name: 'Kâr', icon: '💰', max: Infinity, base: 90, mult: 1.6, desc: (l) => '+' + (l * 10) + '% satış' },
+  { id: 'pres', grp: 'Fabrika', name: 'Pres hızı', icon: '⚙️', max: 14, base: 50, mult: 1.8, desc: (l) => (1.6 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/taban' },
+  { id: 'mont', grp: 'Fabrika', name: 'Montaj hızı', icon: '🤖', max: 14, base: 60, mult: 1.8, desc: (l) => (1.4 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/FLIX' },
+  { id: 'kumes', grp: 'Fabrika', name: 'Kümes verimi', icon: '🦃', max: 14, base: 50, mult: 1.8, desc: (l) => '+' + Math.round((1 / Math.pow(0.85, l) - 1) * 100) + '% tüy' },
+  { id: 'bant', grp: 'Fabrika', name: 'Tüy bandı hızı', icon: '🛤️', max: 10, base: 300, mult: 1.9, desc: (l) => (1.1 * Math.pow(0.8, l)).toFixed(2).replace('.', ',') + ' sn/parça' },
+  { id: 'test', grp: 'Fabrika', name: 'Oyun parkı (3 çocuk)', icon: '🧒', max: 10, base: 70, mult: 1.8, desc: (l) => KICKN(l) + ' sektirme · ' + (KICKN(l) * 0.55 * Math.pow(0.9, l)).toFixed(1).replace('.', ',') + ' sn · %' + Math.max(1, Math.round(10 - l)) + ' hatalı' },
+  { id: 'truck', grp: 'Fabrika', name: 'Kamyon', icon: '🚚', max: 10, base: 300, mult: 2.0, desc: (l) => (10 + l * 4) + ' kutu · ' + Math.round(30 * Math.pow(0.85, l)) + ' sn yol' },
+  { id: 'tez', grp: 'Fabrika', name: 'Tezgâh rafı', icon: '🧺', max: 8, base: 80, mult: 2.2, desc: (l) => (12 + l * 4) + ' FLIX' },
+  { id: 'robot', grp: 'Fabrika', name: 'Toplayıcı robot', icon: '🤖', max: 8, base: 400, mult: 1.8, need: 'robot', desc: (l) => 'Tank ' + (3 + l) + ' tüy · +' + (l * 10) + '% hız' },
+  { id: 'cek', grp: 'Patron', name: 'Reklam & tanıtım', icon: '📣', max: Infinity, base: 150, mult: 1.7, desc: (l) => '+' + Math.round((1 - Math.pow(0.94, l)) * 100) + '% müşteri' },
+  { id: 'pazar', grp: 'Patron', name: 'Sipariş primi', icon: '📦', max: Infinity, base: 200, mult: 1.65, desc: (l) => '+' + (l * 15) + '% sipariş ödülü' },
 ];
+export const KICKN = (l) => l >= 7 ? 1 : l >= 3 ? 2 : 3;
+export const spdPct = (l) => Math.round(l <= 6 ? l * 12 : 72 + (l - 6) * 6);
 // İşe alım (para)
 export const STAFF = [
   { id: 'tas', name: 'Taşıyıcı', icon: '🧑‍🏭', desc: 'Tüy ve taban taşır, FLIX’leri tezgâha dizer', costs: [150, 700, 2600, 8000, 15000, 26000, 42000, 65000], max: 8 },
-  { id: 'kas', name: 'Kasiyer', icon: '🧾', desc: 'Her kasaya bir kasiyer: satış 3 kat hızlı', costs: [250, 900, 2500, 6000], max: 4 },
+  { id: 'kas', name: 'Kasiyer', icon: '🧾', desc: 'Her kasaya bir kasiyer: satış 3 kat hızlı', costs: [250, 900, 2500, 6000, 12000], max: 5 },
 ];
 export const SUPS = [
-  { id: 'wspd', name: 'Eleman hızı', icon: '⚡', max: 5, base: 120, mult: 2.0, desc: (l) => '+' + (l * 15) + '% hız' },
-  { id: 'wcap', name: 'Eleman kapasitesi', icon: '🎒', max: 5, base: 150, mult: 2.0, desc: (l) => (2 + l) + ' parça' },
+  { id: 'wspd', name: 'Eleman hızı', icon: '⚡', max: 8, base: 120, mult: 1.9, desc: (l) => '+' + (l * 12) + '% hız' },
+  { id: 'wcap', name: 'Eleman kapasitesi', icon: '🎒', max: 8, base: 150, mult: 1.9, desc: (l) => (2 + l) + ' parça' },
 ];
 // Kozmetik: para (₺) veya elmas (💎)
 // Kozmetik: hepsi elmasla (💎) alınır, giyilince bonus verir. b: spd = yürüme hızı, cap = taşıma, kar = satış kârı
@@ -72,6 +83,12 @@ export const COS = {
     { id: 'altin', name: 'Altın FLIX', gem: 150, b: { kar: 0.15, spd: 0.1 }, sw: '#ffb81a' },
     { id: 'galaksi', name: 'Galaksi', gem: 200, b: { kar: 0.2 }, sw: 'linear-gradient(135deg,#5a2dd0,#ff6af0)' },
     { id: 'gece', name: 'Gece Altını', gem: 250, b: { spd: 0.15, kar: 0.12 }, sw: 'linear-gradient(135deg,#22262e 55%,#ffc20e 55%)' },
+    { id: 'kiraz', name: 'Kiraz', gem: 70, b: { cap: 1, kar: 0.05 }, sw: '#ff4a6a' },
+    { id: 'okyanus', name: 'Okyanus', gem: 110, b: { spd: 0.1, cap: 1 }, sw: 'linear-gradient(135deg,#0a5ad8,#2fe8ff)' },
+    { id: 'robot', name: 'Robot FLIX', gem: 180, b: { cap: 3 }, sw: 'linear-gradient(135deg,#9aa6b8,#e8eef6)' },
+    { id: 'zumrut', name: 'Zümrüt', gem: 220, b: { kar: 0.18, cap: 1 }, sw: 'linear-gradient(135deg,#0a8a5a,#7affc8)' },
+    { id: 'gunbatimi', name: 'Gün Batımı', gem: 280, b: { spd: 0.14, kar: 0.14 }, sw: 'linear-gradient(135deg,#ff6a2a,#ff2d9a 60%,#5a2dd0)' },
+    { id: 'kar', name: 'Kar Tanesi', gem: 320, b: { spd: 0.18, cap: 2 }, sw: 'linear-gradient(135deg,#ffffff,#bfe6ff)' },
   ],
   acc: [
     { id: 'yok', name: 'Aksesuarsız', price: 0, b: {}, ic: '➖' },
@@ -84,6 +101,10 @@ export const COS = {
     { id: 'tac', name: 'Altın taç', gem: 120, b: { kar: 0.12, cap: 1 }, ic: '👑' },
     { id: 'kanat', name: 'Tüy kanatlar', gem: 150, b: { spd: 0.18 }, ic: '🪽' },
     { id: 'hale', name: 'Işık halesi', gem: 200, b: { kar: 0.12, spd: 0.08 }, ic: '😇' },
+    { id: 'bere', name: 'Kışlık bere', gem: 35, b: { cap: 1 }, ic: '🧶' },
+    { id: 'kovboy', name: 'Kovboy şapkası', gem: 60, b: { spd: 0.08, kar: 0.03 }, ic: '🤠' },
+    { id: 'maske', name: 'Süper maske', gem: 90, b: { spd: 0.1, cap: 1 }, ic: '🦹' },
+    { id: 'anten', name: 'Yıldız anten', gem: 140, b: { kar: 0.1, cap: 1 }, ic: '⭐' },
   ],
   floor: [
     { id: 'nane', name: 'Nane karo', price: 0, b: {}, a: '#c4e8d4', b2: '#ade0c4', l: 'rgba(40,110,80,.18)' },
@@ -95,9 +116,33 @@ export const COS = {
     { id: 'satranc', name: 'Satranç', gem: 60, b: { kar: 0.08 }, a: '#f2f2f2', b2: '#2a2e36', l: 'rgba(0,0,0,.25)' },
     { id: 'gokkusagi', name: 'Gökkuşağı', gem: 80, b: { kar: 0.1 }, rainbow: true },
     { id: 'gece', name: 'Gece mavisi', gem: 120, b: { kar: 0.12, spd: 0.04 }, a: '#1a2a52', b2: '#14224a', l: 'rgba(255,200,40,.55)' },
+    { id: 'beton', name: 'Fabrika betonu', gem: 30, b: { cap: 1 }, a: '#cfd3d9', b2: '#c3c8cf', l: 'rgba(40,50,70,.22)', hazard: true },
+    { id: 'kiremit', name: 'Kırmızı karo', gem: 45, b: { kar: 0.05 }, a: '#ffb8aa', b2: '#ff9f8e', l: 'rgba(140,30,20,.2)' },
+    { id: 'uzay', name: 'Uzay', gem: 160, b: { kar: 0.14, spd: 0.05 }, a: '#151b3e', b2: '#10163a', l: 'rgba(140,180,255,.4)', stars: true },
+  ],
+  // eleman kıyafetleri ve şapkaları: tüm taşıyıcılar giyer. ws = eleman hızı, wc = eleman taşıma
+  wskin: [
+    { id: 'karisik', name: 'Karışık renkler', price: 0, b: {}, sw: 'linear-gradient(90deg,#2f8fe0 25%,#1a9a4a 25% 50%,#ff2d9a 50% 75%,#ffb81a 75%)' },
+    { id: 'buzul', name: 'Mavi tulum', gem: 25, b: { ws: 0.06 }, sw: '#2f8fe0' },
+    { id: 'ejder', name: 'Yeşil yelek', gem: 40, b: { wc: 1 }, sw: '#1a9a4a' },
+    { id: 'kraliyet', name: 'FLIX kırmızısı', gem: 60, b: { ws: 0.08, wc: 1 }, sw: '#e22511' },
+    { id: 'turkuaz', name: 'Turkuaz ekip', gem: 80, b: { ws: 0.12 }, sw: '#18c0b0' },
+    { id: 'robot', name: 'Robot ekip', gem: 140, b: { wc: 2 }, sw: 'linear-gradient(135deg,#9aa6b8,#e8eef6)' },
+    { id: 'altin', name: 'Altın ekip', gem: 200, b: { ws: 0.15, wc: 1 }, sw: '#ffb81a' },
+    { id: 'galaksi', name: 'Galaksi ekip', gem: 260, b: { ws: 0.18, wc: 2 }, sw: 'linear-gradient(135deg,#5a2dd0,#ff6af0)' },
+  ],
+  wacc: [
+    { id: 'kask', name: 'Usta bareti', price: 0, b: {}, ic: '⛑️' },
+    { id: 'yok', name: 'Şapkasız', price: 0, b: {}, ic: '➖' },
+    { id: 'sapka', name: 'FLIX şapkası', gem: 20, b: { ws: 0.05 }, ic: '🧢' },
+    { id: 'kulak', name: 'Kulaklık', gem: 30, b: { wc: 1 }, ic: '🎧' },
+    { id: 'bere', name: 'Kışlık bere', gem: 35, b: { ws: 0.06 }, ic: '🧶' },
+    { id: 'gozluk', name: 'Güneş gözlüğü', gem: 45, b: { ws: 0.08 }, ic: '🕶️' },
+    { id: 'kovboy', name: 'Kovboy şapkası', gem: 70, b: { ws: 0.08, wc: 1 }, ic: '🤠' },
+    { id: 'tac', name: 'Altın taç', gem: 150, b: { ws: 0.12, wc: 1 }, ic: '👑' },
   ],
 };
-export const bonusTxt = (b) => [b.spd && '+' + Math.round(b.spd * 100) + '% hız', b.cap && '+' + b.cap + ' taşıma', b.kar && '+' + Math.round(b.kar * 100) + '% kâr'].filter(Boolean).join(' · ');
+export const bonusTxt = (b) => [b.spd && '+' + Math.round(b.spd * 100) + '% hız', b.cap && '+' + b.cap + ' taşıma', b.kar && '+' + Math.round(b.kar * 100) + '% kâr', b.ws && '+' + Math.round(b.ws * 100) + '% eleman hızı', b.wc && '+' + b.wc + ' eleman taşıma'].filter(Boolean).join(' · ');
 // Süreli bonuslar: reklam izleyerek ya da elmasla açılır. x2 = eski "2x kazanç" (SV.boostUntil)
 export const BONUS = [
   { id: 'x2', name: '2x Kazanç', icon: '💰', desc: 'Tüm satışlar 2 kat', min: 3, gem: 15, col: '#25a855' },
@@ -124,3 +169,10 @@ export const AD = {
   freeUpCooldownMin: 3,   // ▶ ücretsiz geliştirme bekleme süresi
   offlineCapMin: 120, offlineShare: 0.35, // çevrimdışı kazanç (eleman ya da kasiyer varsa)
 };
+// Diğer FLIX oyunları (çapraz tanıtım: menü, mağaza, reklam kartı, dünyadaki panolar)
+export const PROMO = [
+  { id: 'rush', name: 'FLIX RUSH', txt: 'Neon yörüngede kaç, rekor kır!', url: 'https://apps.apple.com/app/id6795291439', bg: 'linear-gradient(160deg,#2a0a6a,#ff2d9a)' },
+  { id: 'kickup', name: 'FLIX KICK UP', txt: 'FLIX’i düşürmeden sektir!', url: 'https://kaanimamoglu27.github.io/flix-kick-up/', bg: 'linear-gradient(160deg,#e22511,#7a0d05)' },
+];
+// Müşteri siparişleri: mavi / kırmızı / sarı FLIX ya da karışık. Tam istediğini alan %30 fazla öder.
+export const ORDERS = { mavi: { n: 'Mavi', c: '#2a80dc' }, kirmizi: { n: 'Kırmızı', c: '#e8301c' }, sari: { n: 'Sarı', c: '#ffc20e' }, mix: { n: 'Karışık', c: 'conic-gradient(#2a80dc 0 33%,#e8301c 0 66%,#ffc20e 0)' } };

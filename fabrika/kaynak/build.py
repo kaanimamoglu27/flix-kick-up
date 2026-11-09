@@ -14,5 +14,7 @@ fonts = ''.join([ff('BC', 'barlow-condensed-latin-900-italic.woff2', 900, 'itali
 logo = 'data:image/webp;base64,' + base64.b64encode(open(os.path.join(here, 'logo.webp'), 'rb').read()).decode()
 html = open(os.path.join(here, 'shell.html')).read().replace('/*FONTS*/', fonts).replace('/*LOGO*/', logo)
 js = open(os.path.join(here, 'bundle.js')).read().replace('</script', '<\\/script')
+ads = ''.join('window.AD_%s="data:image/webp;base64,%s";' % (k, base64.b64encode(open(os.path.join(here, f), 'rb').read()).decode()) for k, f in [('RUSH', 'ad_rush.webp'), ('KICKUP', 'ad_kickup.webp')])
+html = html.replace('/*ADS*/', ads)
 html = html.replace('/*INTRO*/', open(os.path.join(here, 'intro.html')).read()).replace('/*GAME*/', js)
 open(out, 'w').write(html); print(out, len(html) // 1024, 'KB')

@@ -117,6 +117,34 @@ body.menu #toast{top:50%}
 #mmTiles button{aspect-ratio:1;border-radius:18px;background:#fff;border:3px solid #fff;box-shadow:0 5px 0 #c9b88f;color:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 #mmTiles button i{font-style:normal;font-size:26px}#mmTiles button small{font-family:var(--disp);font-style:italic;font-weight:900;font-size:14px}
 #mmTiles button:active{transform:translateY(3px);box-shadow:0 2px 0 #c9b88f}
+
+/* ===== 1.5: patron rozeti, sipariş kartı, müşteri sipariş rengi, uçan yazı, tanıtımlar ===== */
+#pat{position:fixed;left:14px;top:calc(var(--st) + 124px);padding:3px 10px 3px 4px;border-radius:12px;background:rgba(11,31,63,.62);border:2px solid rgba(255,255,255,.85);box-shadow:0 3px 0 rgba(0,0,0,.18);font-weight:800;font-size:12px;display:flex;gap:6px;align-items:center;pointer-events:none}
+#pat i{width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(255,255,255,.6)}
+#bon{top:calc(var(--st) + 156px)}
+#ct{position:fixed;right:14px;top:calc(var(--st) + 12px);width:min(186px,46vw);padding:6px 10px 8px;border-radius:16px;background:var(--cream);color:var(--navy);border:3px solid #fff;box-shadow:0 4px 0 rgba(0,0,0,.18);pointer-events:none;display:flex;flex-direction:column;gap:2px}
+#ct small{font-family:var(--disp);font-style:italic;font-weight:900;font-size:12px;color:var(--red);letter-spacing:1px}
+#ct b{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:800}#ct b i{width:12px;height:12px;border-radius:50%;border:2px solid var(--navy)}
+#ct u{display:block;height:7px;border-radius:4px;background:#e6dcc8;overflow:hidden}#ct u s{display:block;height:100%;background:linear-gradient(90deg,#5fe08a,#25a855)}
+#ct em{font-style:normal;font-size:11px;font-weight:800;color:#127a36}
+#vipTag{top:calc(var(--st) + 98px)}
+.bub .od{display:block;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px rgba(11,31,63,.5);margin-left:-8px;margin-top:10px}
+.bub.wait{animation:pulse .5s infinite alternate}
+.ft{position:fixed;left:0;top:0;font-family:var(--disp);font-style:italic;font-weight:900;font-size:24px;text-shadow:0 2px 0 #1b1330,0 0 6px rgba(0,0,0,.4);pointer-events:none;z-index:5}
+.pcard{display:flex;gap:10px;padding:10px;border-radius:18px;background:linear-gradient(135deg,#0b2a5e,#24407a);color:#fff;border:3px solid #fff;box-shadow:0 3px 0 var(--line)}
+.pcard .pt{width:78px;flex:0 0 auto;border-radius:14px;background:rgba(255,255,255,.1);border:3px solid var(--pc);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0}
+.pcard .pt b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:38px;line-height:1;color:var(--pc)}.pcard .pt small{font-size:9px;font-weight:800;letter-spacing:.5px;opacity:.9}
+.pcard .ps{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;font-size:11.5px;align-content:center}.pcard .ps b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:16px;color:#ffd84a}
+.promo{margin-top:4px;padding:8px;border-radius:18px;background:#fff;border:2px solid var(--line)}.promo>b{display:block;font-family:var(--disp);font-style:italic;font-weight:900;font-size:15px;color:var(--red);margin:0 0 6px 4px}
+.promo>div{display:grid;grid-template-columns:1fr 1fr;gap:7px}.promo button{display:flex;align-items:center;gap:7px;padding:7px;border-radius:14px;color:#fff;text-align:left;border:2px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.promo img{width:40px;height:40px;border-radius:10px;flex:0 0 auto}.promo span{display:flex;flex-direction:column;min-width:0}.promo span b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:15px}.promo span small{font-size:9.5px;opacity:.9;line-height:1.15}
+#mmPromo{display:flex;gap:8px;margin-top:14px}#mmPromo button{display:flex;align-items:center;gap:7px;padding:6px 12px 6px 6px;border-radius:16px;border:3px solid #fff;box-shadow:0 4px 0 rgba(0,0,0,.25);color:#fff}
+#mmPromo img{width:36px;height:36px;border-radius:9px}#mmPromo span{display:flex;flex-direction:column;align-items:flex-start;line-height:1}#mmPromo b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:16px}#mmPromo small{font-size:10px;font-weight:700;opacity:.9;margin-top:2px}
+#adL img{border-radius:34px;box-shadow:0 10px 30px rgba(0,0,0,.35);border:4px solid #fff}#adL h2{font-size:52px;text-shadow:0 4px 0 #1b1330}
+#adGo{margin-top:6px;padding:14px 28px;border-radius:20px;background:linear-gradient(#ffe066,#ffb40e);color:#3b2508;font-family:var(--disp);font-style:italic;font-weight:900;font-size:26px;border:4px solid #fff;box-shadow:0 6px 0 #b9770c}
+#adL>small{opacity:.75;font-size:12px;font-weight:700}
+body.menu #pat,body.menu #ct{opacity:0!important}
+body.panel #ct{opacity:0}
 </style></head><body>/*INTRO*/
 <canvas id="gl"></canvas>
 <div id="money"><i>₺</i><b>0</b></div>
@@ -126,6 +154,8 @@ body.menu #toast{top:50%}
 <div id="gems"><i>💎</i><b>0</b></div>
 <div id="lvl">Fabrika Sv 1 <i><u></u></i></div>
 <div id="vipTag">VIP · 2x</div>
+<div id="pat"></div>
+<div id="ct"></div>
 <div id="bon"></div>
 <button id="menuB" class="fab">⚙️</button>
 <button id="boostB" class="fab"><b>⚡</b><small>Bonus</small></button>
@@ -133,11 +163,12 @@ body.menu #toast{top:50%}
 <div id="mm"><img id="mmLogo" src="/*LOGO*/" alt=""><h1>FABRİKA</h1><h2>Hindi çiftliğinden oyuncakçıya FLIX üret</h2><button id="mmEnd">🧪 ENDGAME TEST MODU</button><div id="mmGap"></div>
 <div id="mmStats"><span id="mmLv"></span><span id="mmMoney"></span><span id="mmGems"></span></div>
 <button id="mmPlay"><i>▶</i><b>OYNA</b></button>
+<div id="mmPromo"></div>
 <div id="mmTiles"><button data-p="dolap"><i>👕</i><small>Dolap</small></button><button data-p="bonus"><i>⚡</i><small>Bonus</small></button><button data-p="shop"><i>🛒</i><small>Mağaza</small></button><button data-p="menu"><i>⚙️</i><small>Ayarlar</small></button></div></div>
 <div id="sheet"><div id="shHd"><span id="shT"></span><button id="shX">✕</button></div><div id="shTabs"></div><div id="shBody"></div></div>
 <div id="modal"><div id="mCard"><button id="mX">✕</button><div id="mBody"></div><div id="mBtns"><button id="mAlt"></button><button id="mOk">Tamam</button></div></div></div>
-<div id="adL"><span id="adKind"></span><button id="adX">5</button><img src="/*LOGO*/" alt=""><h2>FLIX<br>KICK IT · FLICK IT</h2><p>flixtoysofficial.com</p></div>
+<div id="adL"><span id="adKind"></span><button id="adX">5</button><img id="adImg" src="" alt=""><h2 id="adName">FLIX</h2><p id="adTxt"></p><button id="adGo">HEMEN İNDİR</button><small>Bir FLIX TOYS oyunu</small></div>
 <div id="hint">Parmağını sürükleyerek yürü</div>
-<script>window.FLIX_LOGO="/*LOGO*/";</script>
+<script>window.FLIX_LOGO="/*LOGO*/";/*ADS*/</script>
 <script>/*GAME*/</script>
 </body></html>
