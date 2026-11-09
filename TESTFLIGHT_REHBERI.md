@@ -190,14 +190,12 @@ Flix Atış 1.5'te **uygulama içi satın alma ve reklam var** (7 ürün), bu y�
 
 Oyunda görünen fiyatlar App Store'dan gelir; tabloda yazanlar sadece mağaza yüklenene kadar görünür.
 
-**Reklamlar (AdMob)**: https://apps.admob.com > Uygulamalar > Uygulama ekle > iOS > **Flix Atış**. Sonra iki reklam birimi aç: **Ödüllü** (2x tüy, +2 atış, bedava tüy, günlük hediye x2) ve **Geçiş** (3. bölümden sonra her 3 bölümde bir, ayrıca her 2. başarısız denemede). Kimlikleri GitHub sırlarına gir:
-
-```bash
-R=kaanimamoglu27/flix-kick-up
-gh secret set ATIS_ADMOB_APP_ID          -R $R -b "ca-app-pub-...~..."
-gh secret set ATIS_ADMOB_REWARDED_ID     -R $R -b "ca-app-pub-.../..."
-gh secret set ATIS_ADMOB_INTERSTITIAL_ID -R $R -b "ca-app-pub-.../..."
-```
+**Reklamlar (AdMob)**: Flix Atış'ın gerçek AdMob kimlikleri `atis/app/www/ads-config.js` dosyasına yazıldı (uygulama `ca-app-pub-9939733946730095~4563076784`, geçiş, ödüllü +60 tüy, ödüllü +2 atış). GitHub sırrı girmen gerekmez.
+- Geçiş reklamı her 3 biten bölümde bir çıkar, ödüllü reklamdan hemen sonra çıkmaz. Banner yok. Reklamsız satın alınınca geçiş reklamları kalkar.
+- TestFlight iş akışı ve `./ios.sh yukle` gerçek reklamları kullanır. Simülatör, `./ios.sh hazirla` ve Xcode'dan çalıştırma Google'ın test reklamlarını gösterir.
+- TestFlight'ta kendi reklamına tıklama (AdMob hesabı askıya alınabilir). Kendi iPhone'unda test reklamı görmek istersen Xcode konsolunda yazan cihaz kimliğini `testDevices` listesine ekle.
+- App Store Connect > Uygulama Gizliliği: "Veri toplanıyor" seç. Cihaz Kimliği (reklam, izleme için), Ürün Etkileşimi ve Reklam Verileri (üçüncü taraf reklam), Kilitlenme ve Performans Verileri (uygulama işlevi). İzleme sorusu (ATT) açık, metni Info.plist'te.
+- AdMob > Gizlilik ve mesajlaşma: AB/İngiltere için GDPR onay mesajı oluştur (uygulama gösterir), app-ads.txt'i flixtoysofficial.com köküne koy.
 
 Kimlik girilmezse uygulama Google'ın **test reklamlarını** gösterir (TestFlight'ta denemek için yeterli, gerçek para kazandırmaz). App Store Connect > Uygulama Gizliliği kısmında "Cihaz kimliği: reklam / takip" ve "Satın alımlar" işaretlenmeli (Kick Up'taki gibi). Gizlilik sayfası diğer oyunlarla aynı: https://kaanimamoglu27.github.io/flix-kick-up/gizlilik.html
 

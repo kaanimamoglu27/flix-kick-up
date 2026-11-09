@@ -7,6 +7,7 @@
 - AdMob: app id, tracking prompt text, SKAdNetwork ids. Ids come from www/ads-config.js; the env variables
   ADMOB_APP_ID / ADMOB_REWARDED_ID / ADMOB_INTERSTITIAL_ID / ADMOB_BANNER_ID (GitHub secrets ATIS_ADMOB_*) override them and are
   written into the app's copy of ads-config.js. Missing or malformed ids fall back to Google's TEST ids.
+- ADS_MODE=real (release: ./ios.sh yukle, TestFlight workflow) uses the real ad units; any other build shows Google test ads
 - optional env BUILD_NUMBER / APP_VERSION set the build number and version shown in the App Store"""
 import json, os, plistlib, subprocess, pathlib, re, shutil
 app = pathlib.Path(__file__).resolve().parent.parent
@@ -26,7 +27,8 @@ ads_cfg = (app / 'www' / 'ads-config.js').read_text(encoding='utf-8')
 def cfg_id(key):
     m = re.search(r"\b%s:\s*'([^']*)'" % key, ads_cfg)
     return m.group(1).strip() if m else ''
-env_units = {k: (os.environ.get('ADMOB_%s_ID' % k) or '').strip() for k in ('REWARDED', 'INTERSTITIAL', 'BANNER')}
+env_units = {k: (os.environ.get('ADMOB_%s_ID' % k) or '').strip() for k in ('REWARDED', 'REWARDED_SHOTS', 'INTERSTITIAL', 'BANNER')}
+ADS_REAL = (os.environ.get('ADS_MODE') or '').strip().lower() == 'real'  # release builds only; everything else gets Google test ads
 units = {k: env_units[k] or cfg_id('IOS_' + k) for k in env_units}
 TEST_APP_ID = 'ca-app-pub-3940256099942544~1458002511'
 app_id = (os.environ.get('ADMOB_APP_ID') or '').strip() or cfg_id('IOS_APP_ID')
@@ -62,6 +64,7 @@ if ac.exists():
     t = ac.read_text(encoding='utf-8')
     for k, v in env_units.items():
         if v: t = re.sub(r"(\bIOS_%s:\s*)'[^']*'" % k, lambda m: m.group(1) + "'%s'" % v.replace("'", ''), t)
+    t = re.sub(r"forceTestAds:\s*\w+", 'forceTestAds: %s' % ('false' if ADS_REAL else 'true'), t)
     ac.write_text(t, encoding='utf-8')
 elif any(env_units.values()):
     print('WARNING: ios/App/App/public/ads-config.js not found, run npx cap sync ios first')
@@ -71,4 +74,4 @@ s = s.replace('TARGETED_DEVICE_FAMILY = "1,2";', 'TARGETED_DEVICE_FAMILY = 1;')
 if os.environ.get('BUILD_NUMBER'): s = re.sub(r'CURRENT_PROJECT_VERSION = [^;]+;', 'CURRENT_PROJECT_VERSION = %s;' % os.environ['BUILD_NUMBER'], s)
 if os.environ.get('APP_VERSION'): s = re.sub(r'MARKETING_VERSION = [^;]+;', 'MARKETING_VERSION = %s;' % os.environ['APP_VERSION'], s)
 pbx.write_text(s)
-print('iOS project ready: portrait, iPhone only, icon, launch screen, AdMob app id', pl['GADApplicationIdentifier'], '| real ad units:', ', '.join(real_units) or 'none (test ads)')
+print('iOS project ready: portrait, iPhone only, icon, launch screen, AdMob app id', pl['GADApplicationIdentifier'], '| ads:', ('REAL (' + ', '.join(real_units) + ')') if ADS_REAL and real_units else 'Google TEST ads (set ADS_MODE=real for a release build)')

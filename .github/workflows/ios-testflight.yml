@@ -57,6 +57,9 @@ jobs:
           ADMOB_APP_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_APP_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_APP_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_APP_ID || '' }}
           ADMOB_REWARDED_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_REWARDED_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_REWARDED_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_REWARDED_ID || '' }}
           ADMOB_INTERSTITIAL_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_INTERSTITIAL_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_INTERSTITIAL_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_INTERSTITIAL_ID || '' }}
+          ADMOB_REWARDED_SHOTS_ID: ${{ inputs.app == 'atis' && secrets.ATIS_ADMOB_REWARDED_SHOTS_ID || '' }}
+          # Flix Atış: TestFlight / App Store builds use the real ad units from atis/app/www/ads-config.js; local and check builds get test ads.
+          ADS_MODE: ${{ inputs.app == 'atis' && 'real' || '' }}
           ADMOB_BANNER_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_BANNER_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_BANNER_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_BANNER_ID || '' }}
           # Kick Up online server (repository variable, not a secret). Overrides ONLINE_SERVER_URL in online-config.js.
           ONLINE_SERVER_URL: ${{ inputs.app == 'kickup' && vars.KICKUP_ONLINE_SERVER_URL || '' }}

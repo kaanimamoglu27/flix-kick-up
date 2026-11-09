@@ -6,20 +6,23 @@
    ATIS_ADMOB_INTERSTITIAL_ID and ATIS_ADMOB_BANNER_ID: tools/ios_setup.py writes them into the app's copy of this file.
    Ad pacing and reward amounts are game rules, they live in the game (AD_CFG in the game source, atis/kaynak/game4.js). */
 window.FLIX_ADS_CONFIG = {
-  // true: always Google's test ads (even when real ids are filled in). false/'auto': real ids where filled in, test ads otherwise.
-  forceTestAds: false,
+  // true: always Google's test ads. tools/ios_setup.py sets this in the app's copy: true for development builds
+  // (./ios.sh hazirla / simulator / xcode, build check), false for release builds (./ios.sh yukle, TestFlight workflow; env ADS_MODE=real).
+  forceTestAds: true,
   ids: {
     // App id, form ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX (with ~). tools/ios_setup.py puts it into Info.plist (GADApplicationIdentifier).
-    IOS_APP_ID: '',
+    IOS_APP_ID: 'ca-app-pub-9939733946730095~4563076784',
     // Ad unit ids, form ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX (with /)
-    IOS_REWARDED: '',
-    IOS_INTERSTITIAL: '',
+    IOS_REWARDED: 'ca-app-pub-9939733946730095/6662626518',        // rewarded: +60 feathers in the shop (also 2x feathers, daily gift x2)
+    IOS_REWARDED_SHOTS: 'ca-app-pub-9939733946730095/8690024054',  // rewarded: +2 shots when the 8 shots run out
+    IOS_INTERSTITIAL: 'ca-app-pub-9939733946730095/4226220778',    // interstitial: after every 3rd finished level
     IOS_BANNER: '',
     ANDROID_REWARDED: '',
+    ANDROID_REWARDED_SHOTS: '',
     ANDROID_INTERSTITIAL: '',
     ANDROID_BANNER: ''
   },
-  // Banner at the bottom of the home screen only (never during a run, never with "No Ads"). Off: the home screen's
+  // No banner in Flix Atış (Kaan, 2026-11-09). Banner at the bottom of the home screen only (never during a run, never with "No Ads"). Off: the home screen's
   // bottom buttons sit where the banner would go, so turn it on only after checking the layout on a phone.
   bannerEnabled: false,
   // Asks the iPhone's "Allow tracking?" question once (personalised ads earn more). Not required by AdMob:

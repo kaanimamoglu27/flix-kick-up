@@ -2,7 +2,9 @@
    Defines window.FlixAds only inside the iOS / Android app; in a browser or on GitHub Pages it does nothing
    (the game then uses its own FLIX toy ad), so no AdMob call can ever fail there.
    The game calls:
-     FlixAds.showRewarded()     -> 'rewarded' | 'closed' | 'unavailable'  ('rewarded' only after AdMob's reward callback)
+     FlixAds.showRewarded(waitMs, which) -> 'rewarded' | 'closed' | 'unavailable'  ('rewarded' only after AdMob's reward callback)
+                                which: 'fe' (+60 feathers unit, default) or 'shots' (+2 shots unit)
+     FlixAds.prepareRewarded(which) -> loads that rewarded unit ahead of time (only one rewarded ad is loaded at a time)
      FlixAds.showInterstitial() -> true when an ad was shown and closed; false right away when none is ready
      FlixAds.rewardedReady()    -> true when a rewarded ad is loaded
      FlixAds.setAdsRemoved(on)  -> "No Ads" bought / restored: interstitial and banner stop for good
@@ -18,15 +20,16 @@
 
   // Google's public test ad units (https://developers.google.com/admob/ios/test-ads)
   const TEST = ios
-    ? {REWARDED: 'ca-app-pub-3940256099942544/1712485313', INTERSTITIAL: 'ca-app-pub-3940256099942544/4411468910', BANNER: 'ca-app-pub-3940256099942544/2435281174'}
-    : {REWARDED: 'ca-app-pub-3940256099942544/5224354917', INTERSTITIAL: 'ca-app-pub-3940256099942544/1033173712', BANNER: 'ca-app-pub-3940256099942544/9214589741'};
+    ? {REWARDED: 'ca-app-pub-3940256099942544/1712485313', REWARDED_SHOTS: 'ca-app-pub-3940256099942544/1712485313', INTERSTITIAL: 'ca-app-pub-3940256099942544/4411468910', BANNER: 'ca-app-pub-3940256099942544/2435281174'}
+    : {REWARDED: 'ca-app-pub-3940256099942544/5224354917', REWARDED_SHOTS: 'ca-app-pub-3940256099942544/5224354917', INTERSTITIAL: 'ca-app-pub-3940256099942544/1033173712', BANNER: 'ca-app-pub-3940256099942544/9214589741'};
   const UNIT = /^ca-app-pub-\d{16}\/\d{10}$/;
   function unit(kind) {
     const real = ((CFG.ids || {})[(ios ? 'IOS_' : 'ANDROID_') + kind] || '').trim();
     const test = CFG.forceTestAds === true || !UNIT.test(real);
     return {adId: test ? TEST[kind] : real, isTesting: test};
   }
-  const units = {rewarded: unit('REWARDED'), inter: unit('INTERSTITIAL'), banner: unit('BANNER')};
+  const units = {rewarded: unit('REWARDED'), shots: unit('REWARDED_SHOTS'), inter: unit('INTERSTITIAL'), banner: unit('BANNER')};
+  let rwWant = 'fe';  // which rewarded unit the single rewarded slot should hold
 
   const EXPIRE_MS = 50 * 60 * 1000;      // AdMob full-screen ads expire after an hour; reload a bit before
   const RETRY_MS = [5000, 15000, 30000, 60000, 120000, 300000];  // backoff after a failed load
@@ -35,9 +38,9 @@
     rewarded: {prepare: 'prepareRewardVideoAd', show: 'showRewardVideoAd', ev: {dismissed: 'onRewardedVideoAdDismissed', failed: 'onRewardedVideoAdFailedToShow', reward: 'onRewardedVideoAdReward'}},
     inter: {prepare: 'prepareInterstitial', show: 'showInterstitial', ev: {dismissed: 'interstitialAdDismissed', failed: 'interstitialAdFailedToShow'}}
   };
-  for (const k in fmt) Object.assign(fmt[k], {state: 'idle', loadedAt: 0, p: null, fails: 0, timer: 0});
+  for (const k in fmt) Object.assign(fmt[k], {state: 'idle', loadedAt: 0, p: null, fails: 0, timer: 0, unit: ''});
 
-  let started = false, canRequest = true, removed = false, showing = false, screen = 'menu', bannerOn = false, bannerMade = false;
+  let lastReward = 0, started = false, canRequest = true, removed = false, showing = false, screen = 'menu', bannerOn = false, bannerMade = false;
   const startedP = init();
 
   async function init() {
@@ -62,10 +65,12 @@
     const f = fmt[kind];
     if (!started || !canRequest || showing) return Promise.resolve(false);
     if (kind === 'inter' && removed) return Promise.resolve(false);
-    if (f.state === 'ready' && Date.now() - f.loadedAt > EXPIRE_MS) f.state = 'idle';
+    const uk = kind === 'inter' ? 'inter' : rwWant === 'shots' ? 'shots' : 'rewarded';
+    if (f.state === 'ready' && (Date.now() - f.loadedAt > EXPIRE_MS || f.unit !== uk)) f.state = 'idle';
+    if (f.state === 'loading' && f.unit !== uk) return f.p.then(() => load(kind));
     if (f.state !== 'idle') return f.p;
-    clearTimeout(f.timer); f.state = 'loading';
-    const u = units[kind === 'inter' ? 'inter' : 'rewarded'];
+    clearTimeout(f.timer); f.state = 'loading'; f.unit = uk;
+    const u = units[uk];
     f.p = A[f.prepare]({adId: u.adId, isTesting: u.isTesting}).then(() => {
       f.state = 'ready'; f.loadedAt = Date.now(); f.fails = 0; return true;
     }, (e) => {
@@ -87,6 +92,7 @@
         if (done) return; done = true; clearTimeout(guard);
         for (const h of hs) { try { h.remove(); } catch (e) {} }
         showing = false; f.state = 'idle'; syncBanner();
+        if (kind === 'rewarded') { lastReward = Date.now(); rwWant = 'fe'; }
         resolve({shown, rewarded});
         load(kind);
       };
@@ -104,8 +110,9 @@
     });
   }
 
-  async function showRewarded(waitMs) {
+  async function showRewarded(waitMs, which) {
     try {
+      rwWant = which === 'shots' ? 'shots' : 'fe';
       await Promise.race([startedP, sleep(waitMs || 0)]);
       if (!started || !canRequest || showing) return 'unavailable';
       const ok = await Promise.race([load('rewarded'), sleep(waitMs || 0).then(() => false)]);
@@ -118,6 +125,7 @@
   async function showInterstitial() {
     try {
       if (removed || !started || !canRequest || showing) return false;
+      if (Date.now() - lastReward < 90 * 1000) return false;  // never right after a rewarded ad
       const f = fmt.inter;
       if (f.state !== 'ready' || Date.now() - f.loadedAt > EXPIRE_MS) { load('inter'); return false; }  // never make the player wait
       return (await present('inter')).shown;
@@ -146,6 +154,7 @@
     showRewarded,
     showInterstitial,
     rewardedReady: () => started && canRequest && fmt.rewarded.state === 'ready',
+    prepareRewarded(which) { if (showing) return; rwWant = which === 'shots' ? 'shots' : 'fe'; load('rewarded'); },
     setAdsRemoved(on) {
       removed = !!on;
       if (removed) { clearTimeout(fmt.inter.timer); hideBanner(); }
