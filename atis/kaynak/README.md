@@ -1,6 +1,12 @@
 Flix Atış kaynak dosyaları.
 
-v8 (güncel, 1.5): adil bölümler (fairLevel: kova binaya değiyorsa rotada geri kayar; kovanın/başlangıcın üstündeki ip, araba, büfe vb. kaldırılır),
+v9 (1.5.1): gerçek AdMob (sadece iOS uygulamasında; web'de FLIX tanıtım kartı aynen kalır). Kimlikler app/www/ads-config.js'te.
+Geçiş reklamı her 3 biten bölümde bir (kazanma ya da 8 atışın bitmesi, 3. bölümden sonra), ödüllü reklamdan sonraki 90 sn içinde hiç çıkmaz.
+Ödüllü +60 tüy (dükkân, günde 6) ve 2x tüy / günlük hediye x2 aynı birimi, "+2 atış hakkı" ayrı birimi kullanır; ödül sadece AdMob'un ödül bildiriminden sonra verilir.
+Reklam yüklenmezse oyun beklemez (ödüllüde en fazla 5-8 sn). Banner yok. Geliştirme derlemeleri Google test reklamı gösterir; gerçek reklam sadece
+ADS_MODE=real ile (./ios.sh yukle, TestFlight iş akışı). game9.js = game8.js + `python3 patch9.py`; derleme `GAME_F=game9.js python3 build8.py`.
+
+v8 (1.5): adil bölümler (fairLevel: kova binaya değiyorsa rotada geri kayar; kovanın/başlangıcın üstündeki ip, araba, büfe vb. kaldırılır),
 kamera ile FLIX arasındaki binalar saydamlaşır (OCC/fadeOcc), kamera sadece bir şeyin içine düşecekse yaklaşır/yükselir. Tam çekiş daha güçlü (VMAX 19.5),
 sekme 0.32 -> 0.45. Her bölümde 8 atış hakkı, par 2-3 (pars8.js = botun atışı, 2-3 arası). Yıldız: par = 3, par+2'ye kadar 2, sonrası 1.
 Bölümler daha çeşitli (worlds8.js: meydan + anıt, kanal + iki köprü, merdiven); açık dünyalarda (Afrika, Antarktika, Avustralya, Uzay) dükkan duvarı yerine

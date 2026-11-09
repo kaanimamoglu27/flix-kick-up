@@ -26,7 +26,7 @@ prepare() {
 upload() {
   local version="${1:-1.0}"
   : "${APPLE_TEAM_ID:?APPLE_TEAM_ID eksik. Örnek: export APPLE_TEAM_ID=ABCDE12345 (developer.apple.com > Membership)}"
-  export APP_VERSION="$version" BUILD_NUMBER="${BUILD_NUMBER:-$(date +%y%m%d%H%M)}"
+  export ADS_MODE=real APP_VERSION="$version" BUILD_NUMBER="${BUILD_NUMBER:-$(date +%y%m%d%H%M)}"
   prepare
   local auth=() out="build/testflight"
   if [ -n "${ASC_KEY_ID:-}" ]; then
