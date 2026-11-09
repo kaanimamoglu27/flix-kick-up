@@ -23,7 +23,7 @@ export function nearest(tr, x, z, hint) {
 
 export function makeKart(pos, yaw, idx) {
   return { x: pos.x, z: pos.z, h: yaw, s: 0, vl: 0, steer: 0, eng: 0, y: 0, vy: 0, roll: 0, pitch: 0, idx, lap: 0, prog: 0, half: false, done: false,
-    boost: 0, boosting: false, drift: false, driftT: 0, driftDir: 0, padT: 0, hitT: 0, wallHit: 0, speedMul: 1, finishT: 0, skill: 1, laneOff: 0 };
+    boost: 0, boosting: false, drift: false, driftT: 0, driftLvl: 0, lvlUp: 0, hop: 0, driftDir: 0, padT: 0, hitT: 0, wallHit: 0, speedMul: 1, finishT: 0, skill: 1, laneOff: 0 };
 }
 // heading h: forward = (-sin h, 0, -cos h)  (yaw 0 faces -z, like the 3D model)
 export const fwdX = (k) => -Math.sin(k.h), fwdZ = (k) => -Math.cos(k.h);
@@ -32,11 +32,12 @@ export const fwdX = (k) => -Math.sin(k.h), fwdZ = (k) => -Math.cos(k.h);
 export function drive(k, ctl, dt) {
   const C = KCFG;
   const boosting = ctl.boost && k.boost > 0; k.boosting = boosting; if (boosting) k.boost = Math.max(0, k.boost - 40 * dt);
-  if (k.padT > 0) k.padT -= dt;
+  if (k.padT > 0) k.padT -= dt; else k.padLvl = 0;
   const turbo = boosting || k.padT > 0; k.turbo = turbo;
   const maxS = C.maxSpeed * (turbo ? C.boostMul : 1) * k.speedMul;
   // engine smoothing like racing-game: lerp(engine, target, delta * 20)
-  const target = ctl.gas * C.accel * (turbo ? 1.7 : 1);
+  // punchy launch, tapering near top speed
+  const target = ctl.gas * C.accel * (turbo ? 1.7 : 1) * (1.35 - 0.6 * Math.min(1, Math.max(0, k.s) / C.maxSpeed));
   k.eng += (target - k.eng) * Math.min(1, dt * 20);
   // like racing-game: applyEngineForce(speed < maxSpeed ? engine : 0)
   k.s += ((k.s < maxS ? k.eng : 0) - C.drag * k.s * 0.08) * dt;
@@ -45,9 +46,9 @@ export function drive(k, ctl, dt) {
   if (k.s < 0) k.s *= Math.exp(-3 * dt);
   // drift = brake + steer at speed: tighter turn, slide, mini turbo on release
   const wantDrift = ctl.brake && Math.abs(ctl.steer) > 0.3 && k.s > 14;
-  if (wantDrift && !k.drift) { k.drift = true; k.driftDir = Math.sign(ctl.steer); k.driftT = 0; }
-  if (k.drift && (!ctl.brake || k.s < 10)) { if (k.driftT > 0.7) { k.padT = Math.min(1.3, 0.4 + k.driftT * 0.45); k.miniTurbo = 1; } k.drift = false; }
-  if (k.drift) { k.driftT += dt; k.s -= 3 * dt; }
+  if (wantDrift && !k.drift) { k.drift = true; k.driftDir = Math.sign(ctl.steer); k.driftT = 0; k.driftLvl = 0; if (k.y <= 0) k.vy = 6.5; k.hop = 1; }
+  if (k.drift && (!ctl.brake || k.s < 10)) { if (k.driftLvl > 0) { k.padT = [0, 0.7, 1.1, 1.6][k.driftLvl]; k.miniTurbo = k.driftLvl; k.padLvl = k.driftLvl; } k.drift = false; k.driftLvl = 0; }
+  if (k.drift) { k.driftT += dt; k.s -= 2.2 * dt; const lv = k.driftT > 2.2 ? 3 : k.driftT > 1.3 ? 2 : k.driftT > 0.6 ? 1 : 0; if (lv > k.driftLvl) { k.driftLvl = lv; k.lvlUp = lv; } }
   // steering (lerp like racing-game)
   const st = k.drift ? Math.max(-1, Math.min(1, ctl.steer * 0.55 + k.driftDir * 0.7)) : ctl.steer;
   k.steer += (st - k.steer) * Math.min(1, dt * 14);
@@ -88,12 +89,12 @@ export function track(tr, k) {
   if (Math.abs(d) > lim) {
     const push = Math.abs(d) - lim, sg = Math.sign(d);
     k.x -= n.x * sg * push; k.z -= n.z * sg * push;
-    const into = (fwdX(k) * n.x + fwdZ(k) * n.z) * sg;
-    if (into > 0.05) { k.s *= 1 - Math.min(0.5, into * 0.8); k.wallHit = into; }
+    var into = (fwdX(k) * n.x + fwdZ(k) * n.z) * sg;
+    if (into > 0.05) { k.s *= 1 - Math.min(0.35, into * 0.55); k.wallHit = into; }
     // turn the nose back along the track
     const t = tr.Tn[k.idx], th = Math.atan2(-t.x, -t.z); let dh = th - k.h; dh = Math.atan2(Math.sin(dh), Math.cos(dh));
     if (Math.abs(dh) < 1.5) k.h += dh * 0.15;
-    k.vl *= 0.3;
+    k.vl = k.vl * 0.3 + sg * Math.max(0, into) * 5;
   }
   let lapped = false;
   if (prev >= 0) {
@@ -113,8 +114,8 @@ export function collide(ks) {
       a.x -= nx * o; a.z -= nz * o; b.x += nx * o; b.z += nz * o;
       // rear-ender: the one behind loses a little, the one in front gets a nudge (only when closing in)
       const afw = fwdX(a) * nx + fwdZ(a) * nz; // >0: b is ahead of a
-      if (afw > 0.5 && a.s > b.s) { const dv = (a.s - b.s) * 0.5; a.s -= dv; b.s += dv * 0.6; }
-      else if (afw < -0.5 && b.s > a.s) { const dv = (b.s - a.s) * 0.5; b.s -= dv; a.s += dv * 0.6; }
+      if (afw > 0.5 && a.s > b.s) { const dv = (a.s - b.s) * 0.3; a.s -= dv; b.s += dv * 0.6; }
+      else if (afw < -0.5 && b.s > a.s) { const dv = (b.s - a.s) * 0.3; b.s -= dv; a.s += dv * 0.6; }
       // side bump: push along each kart's right vector
       const ar = -fwdZ(a) * nx + fwdX(a) * nz, br = -fwdZ(b) * nx + fwdX(b) * nz;
       if (!a.hitT || a.hitT <= 0) { a.vl -= ar * 3; b.vl += br * 3; }

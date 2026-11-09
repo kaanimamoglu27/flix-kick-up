@@ -49,6 +49,7 @@ button{font-family:inherit;border:0;cursor:pointer;color:inherit}
 .trk.lock{filter:grayscale(.8);opacity:.7}
 #garageP{background:linear-gradient(180deg,rgba(255,247,230,0) 0%,rgba(255,247,230,0) 34%,var(--cream) 46%)}
 #garageP .gh{display:flex;justify-content:space-between;align-items:center}
+.gi.drv i{display:flex;align-items:center;justify-content:center;font-size:20px}
 #garageP h3{font-weight:800;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;margin:6px 0}
 .gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
 .gi{background:#fff;border:2px solid var(--navy);border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:5px;align-items:stretch;color:var(--navy);text-align:center}
@@ -123,6 +124,7 @@ button{font-family:inherit;border:0;cursor:pointer;color:inherit}
   <div class="gh"><h2 data-tr="GARAJ" data-en="GARAGE">GARAJ</h2><div class="tuy" style="background:var(--navy);color:#fff">🪶 <span class="tuyN">0</span></div></div>
   <div style="flex:0 0 30vh"></div>
   <div class="scroll">
+    <h3 data-tr="Sürücü" data-en="Driver">Sürücü</h3><div class="gg" id="gD"></div>
     <h3 data-tr="Kart rengi" data-en="Kart colour">Kart rengi</h3><div class="gg" id="gC"></div>
     <h3 data-tr="FLIX tüyleri" data-en="FLIX feathers">FLIX tüyleri</h3><div class="gg" id="gF"></div>
   </div>
@@ -290,7 +292,7 @@ function nearest(tr, x, z, hint) {
 
 function makeKart(pos, yaw, idx) {
   return { x: pos.x, z: pos.z, h: yaw, s: 0, vl: 0, steer: 0, eng: 0, y: 0, vy: 0, roll: 0, pitch: 0, idx, lap: 0, prog: 0, half: false, done: false,
-    boost: 0, boosting: false, drift: false, driftT: 0, driftDir: 0, padT: 0, hitT: 0, wallHit: 0, speedMul: 1, finishT: 0, skill: 1, laneOff: 0 };
+    boost: 0, boosting: false, drift: false, driftT: 0, driftLvl: 0, lvlUp: 0, hop: 0, driftDir: 0, padT: 0, hitT: 0, wallHit: 0, speedMul: 1, finishT: 0, skill: 1, laneOff: 0 };
 }
 // heading h: forward = (-sin h, 0, -cos h)  (yaw 0 faces -z, like the 3D model)
 const fwdX = (k) => -Math.sin(k.h), fwdZ = (k) => -Math.cos(k.h);
@@ -299,11 +301,12 @@ const fwdX = (k) => -Math.sin(k.h), fwdZ = (k) => -Math.cos(k.h);
 function drive(k, ctl, dt) {
   const C = KCFG;
   const boosting = ctl.boost && k.boost > 0; k.boosting = boosting; if (boosting) k.boost = Math.max(0, k.boost - 40 * dt);
-  if (k.padT > 0) k.padT -= dt;
+  if (k.padT > 0) k.padT -= dt; else k.padLvl = 0;
   const turbo = boosting || k.padT > 0; k.turbo = turbo;
   const maxS = C.maxSpeed * (turbo ? C.boostMul : 1) * k.speedMul;
   // engine smoothing like racing-game: lerp(engine, target, delta * 20)
-  const target = ctl.gas * C.accel * (turbo ? 1.7 : 1);
+  // punchy launch, tapering near top speed
+  const target = ctl.gas * C.accel * (turbo ? 1.7 : 1) * (1.35 - 0.6 * Math.min(1, Math.max(0, k.s) / C.maxSpeed));
   k.eng += (target - k.eng) * Math.min(1, dt * 20);
   // like racing-game: applyEngineForce(speed < maxSpeed ? engine : 0)
   k.s += ((k.s < maxS ? k.eng : 0) - C.drag * k.s * 0.08) * dt;
@@ -312,9 +315,9 @@ function drive(k, ctl, dt) {
   if (k.s < 0) k.s *= Math.exp(-3 * dt);
   // drift = brake + steer at speed: tighter turn, slide, mini turbo on release
   const wantDrift = ctl.brake && Math.abs(ctl.steer) > 0.3 && k.s > 14;
-  if (wantDrift && !k.drift) { k.drift = true; k.driftDir = Math.sign(ctl.steer); k.driftT = 0; }
-  if (k.drift && (!ctl.brake || k.s < 10)) { if (k.driftT > 0.7) { k.padT = Math.min(1.3, 0.4 + k.driftT * 0.45); k.miniTurbo = 1; } k.drift = false; }
-  if (k.drift) { k.driftT += dt; k.s -= 3 * dt; }
+  if (wantDrift && !k.drift) { k.drift = true; k.driftDir = Math.sign(ctl.steer); k.driftT = 0; k.driftLvl = 0; if (k.y <= 0) k.vy = 6.5; k.hop = 1; }
+  if (k.drift && (!ctl.brake || k.s < 10)) { if (k.driftLvl > 0) { k.padT = [0, 0.7, 1.1, 1.6][k.driftLvl]; k.miniTurbo = k.driftLvl; k.padLvl = k.driftLvl; } k.drift = false; k.driftLvl = 0; }
+  if (k.drift) { k.driftT += dt; k.s -= 2.2 * dt; const lv = k.driftT > 2.2 ? 3 : k.driftT > 1.3 ? 2 : k.driftT > 0.6 ? 1 : 0; if (lv > k.driftLvl) { k.driftLvl = lv; k.lvlUp = lv; } }
   // steering (lerp like racing-game)
   const st = k.drift ? Math.max(-1, Math.min(1, ctl.steer * 0.55 + k.driftDir * 0.7)) : ctl.steer;
   k.steer += (st - k.steer) * Math.min(1, dt * 14);
@@ -355,12 +358,12 @@ function track(tr, k) {
   if (Math.abs(d) > lim) {
     const push = Math.abs(d) - lim, sg = Math.sign(d);
     k.x -= n.x * sg * push; k.z -= n.z * sg * push;
-    const into = (fwdX(k) * n.x + fwdZ(k) * n.z) * sg;
-    if (into > 0.05) { k.s *= 1 - Math.min(0.5, into * 0.8); k.wallHit = into; }
+    var into = (fwdX(k) * n.x + fwdZ(k) * n.z) * sg;
+    if (into > 0.05) { k.s *= 1 - Math.min(0.35, into * 0.55); k.wallHit = into; }
     // turn the nose back along the track
     const t = tr.Tn[k.idx], th = Math.atan2(-t.x, -t.z); let dh = th - k.h; dh = Math.atan2(Math.sin(dh), Math.cos(dh));
     if (Math.abs(dh) < 1.5) k.h += dh * 0.15;
-    k.vl *= 0.3;
+    k.vl = k.vl * 0.3 + sg * Math.max(0, into) * 5;
   }
   let lapped = false;
   if (prev >= 0) {
@@ -380,8 +383,8 @@ function collide(ks) {
       a.x -= nx * o; a.z -= nz * o; b.x += nx * o; b.z += nz * o;
       // rear-ender: the one behind loses a little, the one in front gets a nudge (only when closing in)
       const afw = fwdX(a) * nx + fwdZ(a) * nz; // >0: b is ahead of a
-      if (afw > 0.5 && a.s > b.s) { const dv = (a.s - b.s) * 0.5; a.s -= dv; b.s += dv * 0.6; }
-      else if (afw < -0.5 && b.s > a.s) { const dv = (b.s - a.s) * 0.5; b.s -= dv; a.s += dv * 0.6; }
+      if (afw > 0.5 && a.s > b.s) { const dv = (a.s - b.s) * 0.3; a.s -= dv; b.s += dv * 0.6; }
+      else if (afw < -0.5 && b.s > a.s) { const dv = (b.s - a.s) * 0.3; b.s -= dv; a.s += dv * 0.6; }
       // side bump: push along each kart's right vector
       const ar = -fwdZ(a) * nx + fwdX(a) * nz, br = -fwdZ(b) * nx + fwdX(b) * nz;
       if (!a.hitT || a.hitT <= 0) { a.vl -= ar * 3; b.vl += br * 3; }
@@ -396,11 +399,1889 @@ function gridPos(tr, slot) {
   return { pos: P.clone().addScaledVector(n, side), yaw: Math.atan2(-t.x, -t.z), idx: i };
 }
 
+// ===== Flix Kart drivers: FLIX hero (ARKANA model), Usta Wu, Kick, Flick =====
+// Models come from Flix's own sources: arena_paket/flix-kahraman-modeli.js (FLIX hero) and the
+// Usta Wu Instagram series (person/wuChar/kickChar/flickChar). Adapted here for a seated driving pose.
+const DTAU = Math.PI * 2;
+let dseed = 7; const drnd = () => { dseed = (dseed * 16807) % 2147483647; return (dseed - 1) / 2147483646; }; const drr = (a, b) => a + (b - a) * drnd();
+const LM = (c, o = {}) => new THREE.MeshLambertMaterial(Object.assign({ color: c, flatShading: true }, o));
+const dmesh = (g, m, x = 0, y = 0, z = 0) => { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.castShadow = true; return o; };
+function weldJit(g, a) { const p = g.attributes.position, map = {}; for (let i = 0; i < p.count; i++) { const k = p.getX(i).toFixed(3) + ',' + p.getY(i).toFixed(3) + ',' + p.getZ(i).toFixed(3); if (!map[k]) map[k] = [drr(-a, a), drr(-a, a), drr(-a, a)]; const d = map[k]; p.setXYZ(i, p.getX(i) + d[0], p.getY(i) + d[1], p.getZ(i) + d[2]); } g.computeVertexNormals(); return g; }
+
+// ---------- ink outline (from flix-oyuncak-modeli.js) ----------
+const INKC = 0x1b1330, OUTM = {};
+function outlineMat(th, col) {
+  const k = th + '_' + col; if (OUTM[k]) return OUTM[k];
+  const m = new THREE.MeshBasicMaterial({ color: col === undefined ? INKC : col, side: THREE.BackSide });
+  m.onBeforeCompile = (s) => { s.vertexShader = s.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * ' + th.toFixed(4) + ';'); };
+  return (OUTM[k] = m);
+}
+function ink(obj, th, col, skip) {
+  const list = []; obj.traverse((o) => { if (o.isMesh && !o.userData.noInk && !(o.material && (o.material.transparent || o.material.isMeshBasicMaterial))) list.push(o); });
+  for (const m of list) { if (skip && skip(m)) continue; const s = new THREE.Mesh(m.geometry, outlineMat(th, col)); s.userData.noInk = true; m.add(s); }
+  return obj;
+}
+
+// ---------- FLIX hero (ARKANA) ----------
+const HR = {};
+function hcanvas(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
+function flixFace(kind) {
+  return hcanvas(512, 256, (x) => {
+    x.clearRect(0, 0, 512, 256); const ink = '#1a1012';
+    const eye = (cx, cy, look) => {
+      if (kind === 'blink') { x.strokeStyle = ink; x.lineWidth = 9; x.lineCap = 'round'; x.beginPath(); x.arc(cx, cy + 6, 26, 0.15 * Math.PI, 0.85 * Math.PI); x.stroke(); return; }
+      if (kind === 'hurt') { x.strokeStyle = ink; x.lineWidth = 10; x.lineCap = 'round'; x.beginPath(); x.moveTo(cx - 20, cy - 18); x.lineTo(cx + 20, cy + 2); x.lineTo(cx - 20, cy + 22); x.stroke(); return; }
+      x.fillStyle = '#fbf6ea'; x.strokeStyle = ink; x.lineWidth = 8; x.beginPath(); x.ellipse(cx, cy, 30, 40, 0, 0, DTAU); x.fill(); x.stroke();
+      x.fillStyle = ink; x.beginPath(); x.ellipse(cx + look, cy + 6, 13, 18, 0, 0, DTAU); x.fill();
+      x.fillStyle = '#fff'; x.beginPath(); x.arc(cx + look + 5, cy - 2, 5, 0, DTAU); x.fill();
+    };
+    const L = kind === 'shout' ? 0 : 5; eye(205, 92, L); eye(300, 92, L);
+    x.strokeStyle = ink; x.lineWidth = 9; x.lineCap = 'round';
+    const br = kind === 'shout' ? 10 : kind === 'hurt' ? -6 : 0;
+    x.beginPath(); x.moveTo(178, 42 + br); x.quadraticCurveTo(205, 30 - br, 230, 40); x.stroke();
+    x.beginPath(); x.moveTo(275, 40); x.quadraticCurveTo(300, 30 - br, 326, 42 + br); x.stroke();
+    x.lineWidth = 8; x.fillStyle = '#4a0d12';
+    if (kind === 'hurt') { x.beginPath(); x.ellipse(258, 196, 26, 20, 0, 0, DTAU); x.fill(); x.stroke(); }
+    else {
+      const w = kind === 'shout' ? 92 : 104, h = kind === 'shout' ? 74 : 62;
+      x.beginPath(); x.moveTo(258 - w, 160); x.quadraticCurveTo(258, 160 + h * 2.1, 258 + w, 160); x.quadraticCurveTo(258, 176, 258 - w, 160); x.fill(); x.stroke();
+      x.save(); x.clip(); x.fillStyle = '#fbf6ea'; x.fillRect(150, 150, 220, 26); x.fillStyle = '#e8566a'; x.beginPath(); x.ellipse(266, 160 + h * 1.15, 40, 24, 0, 0, DTAU); x.fill(); x.restore();
+      x.beginPath(); x.moveTo(258 - w, 160); x.quadraticCurveTo(258, 160 + h * 2.1, 258 + w, 160); x.stroke();
+      x.lineWidth = 7; x.beginPath(); x.arc(258 - w - 6, 156, 10, -0.4, 1.2); x.stroke(); x.beginPath(); x.arc(258 + w + 6, 156, 10, 1.9, 3.5); x.stroke();
+    }
+  });
+}
+const HSKINS = {
+  kraliyet: { body: 0xe22511, cloak: 0x0a2a5e, cloakIn: 0x9a0f14, metal: 0xaab2c0, gold: 0xffc20e, glove: 0xfbf6ea },
+  buzul: { body: 0x2f8fe0, cloak: 0xf4f8ff, cloakIn: 0x2d6cff, metal: 0xd8e8f8, gold: 0xffffff, glove: 0xffffff },
+  altin: { body: 0xffb81a, cloak: 0xfbf6ea, cloakIn: 0xe22511, metal: 0xfff2c0, gold: 0xffffff, glove: 0xffffff },
+  neon: { body: 0xff2d9a, cloak: 0x14062a, cloakIn: 0x2fe8ff, metal: 0x2fe8ff, gold: 0x2fe8ff, glove: 0x2fe8ff },
+};
+function buildHero(S) {
+  if (!HR.faces) HR.faces = { happy: flixFace('happy'), blink: flixFace('blink'), shout: flixFace('shout'), hurt: flixFace('hurt') };
+  const phong = (c, sh) => new THREE.MeshPhongMaterial({ color: c, shininess: sh || 30, specular: 0x3a3a50 });
+  const cyl = (rt, rb, h, seg) => new THREE.CylinderGeometry(rt, rb, h, seg || 10);
+  const g = new THREE.Group(), body = new THREE.Group(); g.add(body);
+  const red = new THREE.MeshPhongMaterial({ color: S.body, shininess: 70, specular: 0x553333 }), inkM = phong(0x1a1214, 40), glove = new THREE.MeshPhongMaterial({ color: S.glove, shininess: 50, specular: 0x333333 });
+  const metal = new THREE.MeshPhongMaterial({ color: S.metal, shininess: 130, specular: 0xbbbbcc }), gold = new THREE.MeshPhongMaterial({ color: S.gold, shininess: 130, specular: 0xffeeaa });
+  const add = (geo, mat, x, y, z, par) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; (par || body).add(m); return m; };
+  const head = new THREE.Group(); head.position.y = 1.18; body.add(head);
+  const bulb = add(new THREE.SphereGeometry(0.42, 24, 18), red, 0, 0, 0, head); bulb.scale.set(1.15, 0.92, 1.0);
+  const prof = []; for (let i = 0; i <= 16; i++) { const k = i / 16; prof.push(new THREE.Vector2(0.24 + Math.pow(k, 1.6) * 0.36 + Math.sin(k * Math.PI) * 0.04, 0.2 + k * 1.15)); }
+  const tg = new THREE.LatheGeometry(prof, 40), tp = tg.attributes.position;
+  for (let i = 0; i < tp.count; i++) { const y = tp.getY(i), k = (y - 0.2) / 1.15; if (k < 0.55) continue; const a = Math.atan2(tp.getX(i), tp.getZ(i)), f = ((a / DTAU * 5 + 0.25) % 1 + 1) % 1, tri = 1 - Math.abs(f * 2 - 1); tp.setY(i, y + (tri * 0.42 - 0.14) * Math.pow((k - 0.55) / 0.45, 1.5)); }
+  tg.computeVertexNormals();
+  add(tg, new THREE.MeshPhongMaterial({ color: S.body, shininess: 70, specular: 0x553333, side: THREE.DoubleSide }), 0, 0, 0, head);
+  const faceMat = new THREE.MeshBasicMaterial({ map: HR.faces.happy, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+  const face = add(new THREE.SphereGeometry(0.425, 24, 18, Math.PI * 0.18, Math.PI * 0.64, Math.PI * 0.18, Math.PI * 0.6), faceMat, 0, 0, 0, head); face.scale.copy(bulb.scale); face.castShadow = false;
+  const nose = add(new THREE.SphereGeometry(0.075, 12, 8), red, 0, 0, 0.41, head); nose.scale.set(1.2, 0.9, 0.9);
+  add(new THREE.CylinderGeometry(0.52, 0.44, 0.42, 20, 1, true, Math.PI * 0.62, Math.PI * 0.76), new THREE.MeshPhongMaterial({ color: S.cloak, side: THREE.DoubleSide, shininess: 30 }), 0, 0.12, -0.04, head);
+  const legs = [], arms = [];
+  for (const s of [-1, 1]) {
+    const pd = add(new THREE.SphereGeometry(0.17, 14, 8, 0, DTAU, 0, Math.PI / 2), metal, s * 0.42, 1.24, -0.02); pd.rotation.z = -s * 0.55; pd.scale.set(1.15, 0.8, 1.05);
+    const rim = add(new THREE.TorusGeometry(0.17, 0.02, 6, 18), gold, s * 0.42, 1.24, -0.02); rim.rotation.set(Math.PI / 2, -s * 0.55, 0); rim.scale.set(1.15, 1.05, 1);
+    const hip = new THREE.Group(); hip.position.set(s * 0.17, 0.92, 0); body.add(hip);
+    add(cyl(0.045, 0.045, 0.47), inkM, 0, -0.235, 0, hip);
+    const knee = new THREE.Group(); knee.position.y = -0.47; hip.add(knee);
+    add(cyl(0.045, 0.045, 0.37), inkM, 0, -0.185, 0, knee);
+    const shoe = add(new THREE.SphereGeometry(0.16, 14, 10), red, 0, -0.39, 0.08, knee); shoe.scale.set(0.9, 0.62, 1.45);
+    legs.push({ hip, knee });
+    const sh = new THREE.Group(); sh.position.set(s * 0.43, 1.12, 0); body.add(sh);
+    add(cyl(0.04, 0.04, 0.32), inkM, 0, -0.16, 0, sh);
+    const el = new THREE.Group(); el.position.y = -0.32; sh.add(el);
+    add(cyl(0.04, 0.04, 0.24), inkM, 0, -0.12, 0, el);
+    add(cyl(0.075, 0.065, 0.12), metal, 0, -0.18, 0, el);
+    const hand = new THREE.Group(); hand.position.y = -0.33; el.add(hand);
+    const palm = add(new THREE.SphereGeometry(0.1, 12, 8), glove, 0, -0.05, 0, hand); palm.scale.set(1, 1.05, 0.8);
+    for (let f = 0; f < 3; f++) { const fi = add(new THREE.SphereGeometry(0.036, 8, 6), glove, -0.045 + f * 0.045, -0.14, 0.02, hand); fi.scale.y = 1.9; }
+    arms.push({ sh, el, hand });
+  }
+  // short racing cape that flaps in the wind
+  const cg = new THREE.PlaneGeometry(0.9, 0.95, 4, 6); cg.translate(0, -0.475, 0);
+  const cpos = cg.attributes.position; for (let i = 0; i < cpos.count; i++) { const v = -cpos.getY(i) / 0.95; cpos.setX(i, cpos.getX(i) * (0.85 + v * 0.5)); }
+  cg.userData.base = Float32Array.from(cpos.array);
+  const cloak = new THREE.Mesh(cg, new THREE.MeshPhongMaterial({ color: S.cloak, side: THREE.DoubleSide, shininess: 25 })); cloak.position.set(0, 1.36, -0.32); cloak.castShadow = true; body.add(cloak);
+  ink(g, 0.018, INKC, (m) => m === face || m === cloak);
+  return { g, body, legs, arms, head, faceMat, cloak, cg, kind: 'hero' };
+}
+
+// ---------- Usta Wu series characters ----------
+function person(o) {
+  const g = new THREE.Group(); const skin = LM(o.skin || '#c98d5e');
+  const hip = new THREE.Group(); hip.position.y = 0.92; g.add(hip);
+  const legs = []; for (const s of [-1, 1]) { const pv = new THREE.Group(); pv.position.set(s * 0.13, 0, 0); hip.add(pv);
+    pv.add(dmesh(new THREE.CylinderGeometry(0.11, 0.095, 0.48, 6), LM(o.pants), 0, -0.24, 0));
+    const knee = new THREE.Group(); knee.position.y = -0.46; pv.add(knee);
+    knee.add(dmesh(new THREE.CylinderGeometry(0.09, 0.075, 0.42, 6), LM(o.sock || o.pants), 0, -0.21, 0));
+    knee.add(dmesh(new THREE.BoxGeometry(0.15, 0.1, 0.3), LM(o.shoe || '#222'), 0, -0.44, 0.07)); legs.push({ pv, knee }); }
+  if (o.robe) g.add(dmesh(weldJit(new THREE.CylinderGeometry(0.27, 0.42, 0.75, 7, 1, true), 0.02), LM(o.robe, { side: THREE.DoubleSide }), 0, 1.0, 0));
+  const torso = dmesh(weldJit(new THREE.CylinderGeometry(0.3, 0.24, 0.72, 7), 0.015), LM(o.shirt), 0, 1.32, 0); g.add(torso);
+  if (o.belt) g.add(dmesh(new THREE.CylinderGeometry(0.25, 0.25, 0.08, 7), LM(o.belt), 0, 1.0, 0));
+  const neck = new THREE.Group(); neck.position.y = 1.7; g.add(neck);
+  neck.add(dmesh(new THREE.CylinderGeometry(0.07, 0.08, 0.12, 6), skin, 0, 0.02, 0));
+  const head = dmesh(weldJit(new THREE.IcosahedronGeometry(0.2, 1), 0.015), skin, 0, 0.24, 0); head.scale.set(1, 1.12, 1); neck.add(head);
+  if (o.hair) neck.add(dmesh(weldJit(new THREE.SphereGeometry(0.215, 7, 5, 0, DTAU, 0, Math.PI * 0.55), 0.01), LM(o.hair), 0, 0.27, -0.01));
+  if (o.hat) neck.add(dmesh(new THREE.ConeGeometry(0.36, 0.2, 8), LM(o.hat), 0, 0.5, 0));
+  for (const s of [-1, 1]) neck.add(dmesh(new THREE.SphereGeometry(0.025, 5, 4), LM('#111'), s * 0.07, 0.27, 0.18));
+  const arms = []; for (const s of [-1, 1]) { const sh = new THREE.Group(); sh.position.set(s * 0.36, 1.6, 0); g.add(sh);
+    sh.add(dmesh(new THREE.CylinderGeometry(0.075, 0.065, 0.42, 6), LM(o.sleeve || o.shirt), 0, -0.2, 0));
+    const el = new THREE.Group(); el.position.y = -0.4; sh.add(el); el.add(dmesh(new THREE.CylinderGeometry(0.06, 0.05, 0.38, 6), skin, 0, -0.19, 0));
+    el.add(dmesh(new THREE.IcosahedronGeometry(0.065, 0), skin, 0, -0.4, 0)); arms.push({ sh, el }); }
+  g.userData = { legs, arms, neck, torso }; return g;
+}
+function starTex(bg, fg) { return hcanvas(128, 128, (x) => { x.fillStyle = bg; x.fillRect(0, 0, 128, 128); x.fillStyle = fg; x.beginPath(); for (let i = 0; i < 10; i++) { const r = i % 2 ? 22 : 52, a = -Math.PI / 2 + i * Math.PI / 5; x.lineTo(64 + Math.cos(a) * r, 66 + Math.sin(a) * r); } x.closePath(); x.fill(); x.lineWidth = 5; x.strokeStyle = '#5a1208'; x.stroke(); }); }
+function bigEyes(nk, y, z, sp, r, brow) { for (const s of [-1, 1]) { const w = dmesh(new THREE.SphereGeometry(r, 10, 8), new THREE.MeshLambertMaterial({ color: '#ffffff' }), s * sp, y, z); w.scale.z = 0.6; nk.add(w);
+  const p = dmesh(new THREE.SphereGeometry(r * 0.55, 8, 6), new THREE.MeshBasicMaterial({ color: '#111' }), s * sp, y, z + r * 0.45); p.scale.z = 0.5; nk.add(p);
+  nk.add(dmesh(new THREE.SphereGeometry(r * 0.18, 6, 4), new THREE.MeshBasicMaterial({ color: '#fff' }), s * sp - r * 0.15, y + r * 0.2, z + r * 0.62));
+  if (brow) { const b = dmesh(new THREE.BoxGeometry(r * 1.6, r * 0.35, r * 0.3), new THREE.MeshBasicMaterial({ color: '#111' }), s * sp, y + r * 1.15, z + r * 0.3); b.rotation.z = s * brow; nk.add(b); } } }
+function wuChar() {
+  const g = person({ skin: '#e3b98f', robe: '#8a2b2b', shirt: '#8a2b2b', sleeve: '#8a2b2b', pants: '#3a2a20', sock: '#e8e2d0', shoe: '#1d1d1d', belt: '#e0b44a', hair: '#eeeeee', hat: '#2b2420' });
+  const nk = g.userData.neck; const beard = new THREE.Group(); beard.position.set(0, 0.16, 0.13); nk.add(beard);
+  const bm = dmesh(weldJit(new THREE.ConeGeometry(0.15, 0.6, 6), 0.01), LM('#f2f2f2'), 0, -0.3, 0); bm.rotation.x = Math.PI; beard.add(bm); beard.scale.set(1, 2.1, 1);
+  for (const s of [-1, 1]) { const ms = dmesh(new THREE.ConeGeometry(0.035, 0.22, 4), LM('#f2f2f2'), s * 0.09, 0.17, 0.17); ms.rotation.z = s * 2.0; nk.add(ms);
+    const eb = dmesh(new THREE.BoxGeometry(0.09, 0.03, 0.03), LM('#f2f2f2'), s * 0.075, 0.34, 0.18); eb.rotation.z = -s * 0.25; nk.add(eb); }
+  g.userData.beard = beard; return g;
+}
+function kickChar() {
+  const g = person({ skin: '#ffd21a', shirt: '#ffd21a', sleeve: '#ffd21a', pants: '#ffd21a', sock: '#ffd21a', shoe: '#e3200f', belt: '#7a4a1a' });
+  const nk = g.userData.neck; nk.children.filter((c) => c.geometry && c.geometry.type === 'SphereGeometry').forEach((c) => (c.visible = false));
+  const head = nk.children.find((c) => c.geometry && c.geometry.type === 'IcosahedronGeometry' && c.position.y > 0.2); head.scale.set(1.45, 1.35, 1.4); head.position.y = 0.3;
+  const tip = dmesh(weldJit(new THREE.ConeGeometry(0.24, 0.5, 8), 0.01), LM('#ffd21a'), 0, 0.72, -0.02); tip.rotation.x = -0.12; nk.add(tip);
+  bigEyes(nk, 0.33, 0.2, 0.12, 0.085, 0.4);
+  nk.add(dmesh(new THREE.BoxGeometry(0.16, 0.035, 0.03), new THREE.MeshBasicMaterial({ color: '#5a1208' }), 0, 0.17, 0.27));
+  g.add(dmesh(new THREE.PlaneGeometry(0.3, 0.3), new THREE.MeshLambertMaterial({ map: starTex('#ffd21a', '#e3200f') }), 0, 1.36, 0.29));
+  for (const a of g.userData.arms) a.el.add(dmesh(new THREE.IcosahedronGeometry(0.11, 1), LM('#e3200f'), 0, -0.42, 0));
+  const cape = dmesh(new THREE.PlaneGeometry(0.75, 1.0, 1, 4), LM('#d0281a', { side: THREE.DoubleSide }), 0, -0.5, 0); const cp = new THREE.Group(); cp.position.set(0, 1.62, -0.25); cp.add(cape); g.add(cp); g.userData.cape = cp;
+  return g;
+}
+function flickChar() {
+  const g = person({ skin: '#ffffff', shirt: '#f4f4f8', sleeve: '#f4f4f8', pants: '#f4f4f8', sock: '#f4f4f8', shoe: '#1f3a7a' });
+  const nk = g.userData.neck; nk.children.filter((c) => c.geometry && c.geometry.type === 'SphereGeometry').forEach((c) => (c.visible = false));
+  const head = nk.children.find((c) => c.geometry && c.geometry.type === 'IcosahedronGeometry' && c.position.y > 0.2); head.scale.set(1.7, 1.55, 1.6); head.position.y = 0.33;
+  bigEyes(nk, 0.36, 0.27, 0.12, 0.075, 0);
+  for (const s of [-1, 1]) { const ck = dmesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({ color: '#ff9db0' }), s * 0.2, 0.25, 0.27); ck.scale.z = 0.3; nk.add(ck); }
+  const sm = dmesh(new THREE.TorusGeometry(0.06, 0.016, 6, 12, Math.PI), new THREE.MeshBasicMaterial({ color: '#5a1208' }), 0, 0.22, 0.31); sm.rotation.z = Math.PI; nk.add(sm);
+  for (let i = 0; i < 3; i++) { const tr = dmesh(new THREE.TorusGeometry(0.22, 0.06, 6, 14), LM(i % 2 ? '#ffffff' : '#1f5fbf'), 0, 1.68 - i * 0.07, 0); tr.rotation.x = Math.PI / 2; g.add(tr); }
+  for (const a of g.userData.arms) a.el.add(dmesh(new THREE.CylinderGeometry(0.07, 0.07, 0.08, 8), LM('#1f5fbf'), 0, -0.32, 0));
+  return g;
+}
+
+// ---------- roster ----------
+const DRIVERS = [
+  { id: 'flix', tr: 'Flix', en: 'Flix', kart: 0xe22511, cost: 0, sub: ['Arkana kahramanı', 'Arkana hero'] },
+  { id: 'wu', tr: 'Usta Wu', en: 'Master Wu', kart: 0x2c4a52, cost: 0, sub: ['Sektiremeyen usta', 'The master who can\'t juggle'] },
+  { id: 'kick', tr: 'Kick', en: 'Kick', kart: 0xffc20e, cost: 600, sub: ['Süper tekme', 'Super kick'] },
+  { id: 'flick', tr: 'Flick', en: 'Flick', kart: 0x1f5fbf, cost: 600, sub: ['Hızlı fiske', 'Quick flick'] },
+  { id: 'buzul', tr: 'Buzul Flix', en: 'Ice Flix', kart: 0x8fd3ff, cost: 1500, sub: ['Soğukkanlı', 'Ice cold'] },
+  { id: 'neon', tr: 'Neon Flix', en: 'Neon Flix', kart: 0xff2d9a, cost: 2500, sub: ['Gece yarışçısı', 'Night racer'] },
+];
+
+// returns {g, anim(dt, st)}; g faces -z (kart forward), hip at y=0, seated
+function makeDriver(id) {
+  const root = new THREE.Group(); let anim;
+  if (id === 'flix' || id === 'buzul' || id === 'neon' || id === 'altin') {
+    const H = buildHero(HSKINS[id === 'flix' ? 'kraliyet' : id]);
+    H.g.rotation.y = Math.PI; H.g.scale.setScalar(0.62); H.g.position.y = -0.92 * 0.62; root.add(H.g);
+    let blinkT = 2, faceK = 'happy';
+    anim = (dt, st) => {
+      const A = H.arms, L = H.legs;
+      for (const l of L) { l.hip.rotation.x = -1.45; l.knee.rotation.x = 1.25; }
+      const cel = st.celebrate || 0;
+      if (cel > 0) { const w = Math.sin(st.t * 12); A[0].sh.rotation.set(-0.3, 0, -(2.4 + w * 0.3)); A[1].sh.rotation.set(-0.3, 0, 2.4 - w * 0.3); A[0].el.rotation.x = A[1].el.rotation.x = -0.3; }
+      else { const s = st.steer * 0.35; A[0].sh.rotation.set(-1.15 + s, 0, -0.15); A[1].sh.rotation.set(-1.15 - s, 0, 0.15); A[0].el.rotation.x = A[1].el.rotation.x = -0.35; }
+      H.body.rotation.z = -st.steer * 0.12 * Math.min(1, st.s / 20); H.body.rotation.x = st.boost ? -0.12 : 0;
+      H.head.rotation.y = st.steer * 0.35; H.head.rotation.z = Math.sin(st.t * 9) * 0.02 * Math.min(1, st.s / 10);
+      blinkT -= dt; let k = st.hit ? 'hurt' : st.boost || cel ? 'shout' : 'happy'; if (k === 'happy' && blinkT < 0.12) k = 'blink'; if (blinkT < 0) blinkT = 2 + Math.random() * 3;
+      if (k !== faceK) { faceK = k; H.faceMat.map = HR.faces[k]; }
+      // cape flaps with speed
+      const p = H.cg.attributes.position, b = H.cg.userData.base, sp = Math.min(1, st.s / 30);
+      for (let i = 0; i < p.count; i++) { const y = b[i * 3 + 1], x = b[i * 3], v = -y / 0.95; p.setZ(i, -v * (0.25 + sp * 0.75) + Math.sin(st.t * 14 + v * 5 + x * 3) * 0.06 * v * (0.3 + sp)); p.setY(i, y * (1 - sp * 0.45)); }
+      p.needsUpdate = true; H.cg.computeVertexNormals();
+    };
+  } else {
+    const P = id === 'wu' ? wuChar() : id === 'kick' ? kickChar() : flickChar();
+    P.rotation.y = Math.PI; const sc = id === 'wu' ? 0.82 : 0.78; P.scale.setScalar(sc); P.position.y = -0.92 * sc; root.add(P);
+    const u = P.userData;
+    anim = (dt, st) => {
+      for (const l of u.legs) { l.pv.rotation.x = -1.45; l.knee.rotation.x = 1.3; }
+      const cel = st.celebrate || 0;
+      if (cel > 0) { const w = Math.sin(st.t * 12); u.arms[0].sh.rotation.set(-0.2, 0, -(2.5 + w * 0.3)); u.arms[1].sh.rotation.set(-0.2, 0, 2.5 - w * 0.3); u.arms[0].el.rotation.x = u.arms[1].el.rotation.x = -0.2; }
+      else { const s = st.steer * 0.3; u.arms[0].sh.rotation.set(-1.2 + s, 0, -0.12); u.arms[1].sh.rotation.set(-1.2 - s, 0, 0.12); u.arms[0].el.rotation.x = u.arms[1].el.rotation.x = -0.45; }
+      u.neck.rotation.y = st.steer * 0.4; u.neck.rotation.x = st.hit ? 0.3 : st.boost ? -0.15 : 0;
+      P.rotation.z = st.steer * 0.12 * Math.min(1, st.s / 20);
+      if (u.beard) u.beard.rotation.x = Math.min(0.5, st.s / 60) + Math.sin(st.t * 16) * 0.05 * Math.min(1, st.s / 20);
+      if (u.cape) u.cape.rotation.x = 0.25 + Math.min(1.1, st.s / 30) + Math.sin(st.t * 15) * 0.08;
+    };
+  }
+  return { g: root, anim };
+}
+
+const { renderSfx, engineGear } = (() => {
+// ============================================================
+// Super Kart 3D.js — sfx.js
+// Pure procedural SFX recipes (fat modern arcade racing theme), 100%
+// synthesized with the WebAudio API — no samples, no assets.
+//
+// Palette (FECO r2 pass): every beep-type SFX was rebuilt from raw
+// chiptune tones into layered, filtered, punchy hits — sub-kick thumps,
+// noise bursts with filter sweeps, lowpassed square bodies, sparkle
+// layers. The AudioManager master chain (EQ → saturation → glue
+// compressor → makeup → limiter, with a shared convolver reverb send)
+// seats them all in one fat arcade space.
+//
+// Contract (ARCHITECTURE.md):
+//   renderSfx(ctx, out, name, opts)
+//     ctx  — ANY BaseAudioContext (AudioContext in the game,
+//            OfflineAudioContext for QA rendering).
+//     out  — destination AudioNode (master chain or ctx.destination).
+//     name — one of the SFX names below.
+//     opts — { volume=1, rate=1, pan=0, at=0, ... } plus per-recipe
+//            extras (speed01, dur).
+//
+// The recipes are pure: no DOM, no global state. The WAV dumped by
+// scripts/render-sfx.mjs therefore IS the sound the game plays.
+//
+// Pitfalls baked in (validated in the match-3djs project):
+//   - Long tails use setTargetAtTime(0.0001, t, timeConstant)
+//     instead of exponentialRampToValueAtTime (decays too fast).
+//   - Noise buffers are DC-blocked (mean subtracted) to avoid pops.
+//   - Oscillator frequencies are clamped to >= 30 Hz.
+// ============================================================
+
+// Note frequencies (Hz). C4 = 261.63.
+const N = {
+  C4: 261.63, E4: 329.63, G4: 392.0, B4: 493.88,
+  C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880.0,
+  C6: 1046.5, D6: 1174.66, E6: 1318.51, G6: 1567.98, A6: 1760.0,
+  C7: 2093.0, D7: 2349.32,
+};
+
+// Pentatonic pool for sparkle/shine runs.
+const SFX_PENTA = [N.C5, N.D5, N.E5, N.G5, N.A5, N.C6, N.D6, N.E6];
+
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+// Deterministic noise keeps OfflineAudioContext renders reproducible while
+// preserving the same broadband texture in live playback. Audio variation is
+// supplied by pitch/pan/event timing, never by an unseeded global RNG.
+function mulberry32(seed) {
+  return () => {
+    seed |= 0;
+    seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ------------------------------------------------------------
+// Engine gear map (audit r2): a continuous 55→205Hz RPM sweep reads as
+// a synth drone, not a kart. Piecewise gears with OVERLAPPING ranges
+// (hysteresis): at the shift boundary the new gear always starts BELOW
+// the old gear's redline, so the pitch audibly DROPS on upshift, then
+// climbs again. `load` is the throttle proxy (speed01); `local` is the
+// position inside the current gear (0 right after shift → 1 redline).
+// Shared by the live engine loop (AudioManager) and the QA 'engine'
+// recipe so both always agree.
+// ------------------------------------------------------------
+const ENGINE_GEARS = [
+  { lo: 0.0,  hi: 0.28, base: 58,  redline: 150 },
+  { lo: 0.22, hi: 0.52, base: 92,  redline: 175 },
+  { lo: 0.48, hi: 0.78, base: 128, redline: 195 },
+  { lo: 0.74, hi: 1.0,  base: 164, redline: 205 },
+];
+
+/**
+ * Piecewise gear map: speed01 (0 idle … 1 full) → engine state.
+ * @param {number} speed01
+ * @returns {{gear:number, rpm:number, local:number, load:number, ratio:number}}
+ */
+function engineGear(speed01) {
+  const s = clamp(speed01, 0, 1);
+  let gear = 0;
+  for (let g = 1; g < ENGINE_GEARS.length; g++) {
+    if (s >= ENGINE_GEARS[g].lo) gear = g;
+  }
+  const gd = ENGINE_GEARS[gear];
+  const span = Math.max(1e-6, gd.hi - gd.lo);
+  const local = clamp((s - gd.lo) / span, 0, 1);
+  const rpm = gd.base + local * (gd.redline - gd.base);
+  const lo = ENGINE_GEARS[0].base;
+  const hi = ENGINE_GEARS[ENGINE_GEARS.length - 1].redline;
+  return {
+    gear,
+    rpm,
+    local,
+    load: s, // throttle proxy — 0 coasting, 1 full throttle
+    ratio: clamp((rpm - lo) / (hi - lo), 0, 1),
+  };
+}
+
+/* ---------------- Shared helpers ---------------- */
+
+// One cached 2s white-noise buffer per context (DC-blocked).
+// BufferSources are stopped early, so a single buffer serves
+// every requested duration.
+const _noiseCache = new WeakMap();
+function noiseBuffer(ctx) {
+  let buf = _noiseCache.get(ctx);
+  if (!buf) {
+    const len = Math.max(1, Math.ceil(ctx.sampleRate * 2));
+    buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    let sum = 0;
+    const rng = mulberry32((ctx.sampleRate ^ len ^ 0x534658) | 0);
+    for (let i = 0; i < len; i++) {
+      data[i] = rng() * 2 - 1;
+      sum += data[i];
+    }
+    const mean = sum / len;
+    if (Math.abs(mean) > 1e-7) {
+      for (let i = 0; i < len; i++) data[i] -= mean;
+    }
+    _noiseCache.set(ctx, buf);
+  }
+  return buf;
+}
+
+/**
+ * Generic gain envelope: attack, then either a long setTargetAtTime
+ * tail (timeConstant), a held sustain + release, or a plain decay.
+ */
+function env(gain, { at, peak, attack = 0.004, timeConstant = null, dur = null, sustain = false, release = 0.05 }) {
+  const p = clamp(Math.max(0.0001, peak), 0.0001, 1);
+  const a = Math.max(0.002, attack);
+  gain.gain.setValueAtTime(0.0001, at);
+  gain.gain.exponentialRampToValueAtTime(p, at + a);
+  if (timeConstant != null) {
+    gain.gain.setTargetAtTime(0.0001, at + a, timeConstant);
+  } else if (sustain && dur != null) {
+    gain.gain.setValueAtTime(p, Math.max(at + a, at + dur - release));
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+  } else if (dur != null) {
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+  }
+}
+
+/**
+ * Oscillator + envelope + optional filter / frequency glide / LFO.
+ * `timeConstant` gives a long natural tail (bells), `sustain` holds
+ * the peak until `dur - release` (loops, horns), otherwise the gain
+ * decays exponentially across `dur`.
+ */
+function osc(ctx, out, {
+  type = 'sine', freq = 440, glideTo = null, dur = 0.1, vol = 0.2,
+  at = 0, attack = 0.004, timeConstant = null, sustain = false, release = 0.05,
+  filterType = null, filterFreq = null, filterQ = 1, filterGlideTo = null,
+  lfoFreq = null, lfoDepth = 0,
+}) {
+  const oscNode = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  oscNode.type = type;
+  oscNode.frequency.setValueAtTime(Math.max(1, freq), at);
+  if (glideTo !== null && glideTo > 0) {
+    oscNode.frequency.exponentialRampToValueAtTime(Math.max(1, glideTo), at + Math.max(0.02, dur));
+  }
+  if (lfoFreq != null && lfoFreq > 0) {
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.value = lfoFreq;
+    lfoGain.gain.value = lfoDepth;
+    lfo.connect(lfoGain);
+    lfoGain.connect(oscNode.frequency);
+    lfo.start(at);
+    lfo.stop(at + dur + 0.1);
+  }
+
+  let node = oscNode;
+  if (filterType) {
+    const flt = ctx.createBiquadFilter();
+    flt.type = filterType;
+    flt.frequency.setValueAtTime(Math.max(20, filterFreq ?? freq * 2), at);
+    if (filterGlideTo !== null && filterGlideTo > 0) {
+      flt.frequency.exponentialRampToValueAtTime(Math.max(20, filterGlideTo), at + Math.max(0.02, dur));
+    }
+    flt.Q.value = filterQ;
+    oscNode.connect(flt);
+    node = flt;
+  }
+
+  if (timeConstant != null) {
+    env(gain, { at, peak: vol, attack, timeConstant });
+  } else if (sustain) {
+    env(gain, { at, peak: vol, attack, dur, sustain: true, release });
+  } else {
+    env(gain, { at, peak: vol, attack, dur });
+  }
+
+  node.connect(gain);
+  gain.connect(out);
+  const tail = timeConstant != null ? Math.min(0.6, timeConstant * 4) : 0.06;
+  oscNode.start(at);
+  oscNode.stop(at + dur + tail);
+}
+
+/**
+ * Filtered noise burst. Same envelope modes as `osc`; `glideTo` sweeps
+ * the filter cutoff (whooshes).
+ */
+function noise(ctx, out, {
+  dur = 0.1, vol = 0.2, at = 0, filterType = 'lowpass', freq = 800, q = 1,
+  glideTo = null, attack = 0.003, timeConstant = null, sustain = false, release = 0.05,
+}) {
+  const src = ctx.createBufferSource();
+  src.buffer = noiseBuffer(ctx);
+  const flt = ctx.createBiquadFilter();
+  flt.type = filterType;
+  flt.frequency.setValueAtTime(Math.max(20, freq), at);
+  if (glideTo !== null && glideTo > 0) {
+    flt.frequency.exponentialRampToValueAtTime(Math.max(20, glideTo), at + Math.max(0.02, dur));
+  }
+  flt.Q.value = q;
+  const gain = ctx.createGain();
+  if (timeConstant != null) {
+    env(gain, { at, peak: vol, attack, timeConstant });
+  } else if (sustain) {
+    env(gain, { at, peak: vol, attack, dur, sustain: true, release });
+  } else {
+    env(gain, { at, peak: vol, attack, dur });
+  }
+  src.connect(flt);
+  flt.connect(gain);
+  gain.connect(out);
+  const tail = timeConstant != null ? Math.min(0.6, timeConstant * 4) : 0.06;
+  src.start(at);
+  src.stop(at + dur + tail);
+}
+
+/**
+ * Punchy sub kick — the modern arcade impact body (no samples):
+ * a sine thump with a fast exponential pitch drop + a 2ms highpassed
+ * noise "beater" click for attack. Used to fatten hits, pickups and
+ * boost launches instead of raw beeps.
+ */
+function kick(ctx, out, { at = 0, vol = 0.6, freq = 140, glideTo = 40, dur = 0.22, click = 0.35 }) {
+  osc(ctx, out, {
+    type: 'sine', freq: Math.max(30, freq), glideTo: Math.max(30, glideTo),
+    dur, vol, at, attack: 0.001,
+  });
+  noise(ctx, out, { dur: 0.012, vol: vol * click, at, filterType: 'highpass', freq: 6000 });
+}
+
+/**
+ * Bell chime: fundamental + harmonic partials + a detuned pair for
+ * shimmer. Uses setTargetAtTime tails (long natural decay).
+ */
+function chime(ctx, out, { freq = 523, dur = 0.3, vol = 0.3, at = 0, partials = [1, 2, 3, 4], timeConstant = null }) {
+  const tc = timeConstant ?? dur * 0.22;
+  const amps = { 1: 1.0, 2: 0.42, 3: 0.2, 4: 0.1, 5: 0.06, 6: 0.04 };
+  // AUDIT R60 (auditoria som #1/10): 'star' C7×6 = 12.5kHz, 'itemPickup'
+  // ×5 = 10.4kHz — partials acima de 8kHz reforçavam o brilho estridente.
+  // Filtra os que passam de 8kHz; nunca deixa vazio.
+  const usable = partials.filter((p) => freq * p <= 8000);
+  if (!usable.length) usable.push(1);
+  const ampScale = usable.length > 3 ? 1.25 : 1;
+  for (const p of usable) {
+    osc(ctx, out, {
+      type: 'sine', freq: Math.max(30, freq * p), dur, vol: vol * (amps[p] ?? 0.2) / ampScale,
+      at, attack: 0.003, timeConstant: tc,
+    });
+  }
+  osc(ctx, out, { type: 'sine', freq: Math.max(30, freq * 1.003), dur: dur * 0.85, vol: vol * 0.16, at, attack: 0.003, timeConstant: tc * 0.8 });
+  osc(ctx, out, { type: 'sine', freq: Math.max(30, freq * 0.997), dur: dur * 0.85, vol: vol * 0.16, at, attack: 0.003, timeConstant: tc * 0.8 });
+}
+
+/** Bright cartoon "horn" voice: sawtooth + square through lowpasses. */
+function horn(ctx, out, at, freq, dur, vol = 0.5) {
+  osc(ctx, out, { type: 'sawtooth', freq, dur, vol: vol * 0.8, at, attack: 0.008, sustain: true, release: 0.07, filterType: 'lowpass', filterFreq: 2300, filterQ: 0.7 });
+  osc(ctx, out, { type: 'square', freq, dur, vol: vol * 0.35, at, attack: 0.008, sustain: true, release: 0.07, filterType: 'lowpass', filterFreq: 3400, filterQ: 0.7 });
+}
+
+/* ---------------- Recipes ---------------- */
+
+/**
+ * Render one SFX into `out`.
+ * @param {BaseAudioContext} ctx
+ * @param {AudioNode} out
+ * @param {string} name engine|boost|drift|itemPickup|useItem|shell|redShell|
+ *   banana|star|lightning|crash|countdown|go|lap|finalLap|cheer|finish|
+ *   victory|uiClick|uiHover|musicIntro (alias: menuMusic)
+ * @param {Object} [opts] { volume=1, rate=1, pan=0, at=0, speed01, dur }
+ */
+function renderSfx(ctx, out, name, opts = {}) {
+  if (!ctx || !out) return;
+  const { volume = 1, rate = 1, pan = 0, at = 0 } = opts;
+  const v = (x) => x * volume;
+
+  // Optional stereo pan: route every voice through a panner.
+  let target = out;
+  if (typeof pan === 'number' && pan !== 0 && typeof ctx.createStereoPanner === 'function') {
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = clamp(pan, -1, 1);
+    panner.connect(out);
+    target = panner;
+  }
+
+  switch (name) {
+    case 'engine': {
+      // Looping tone pair (sawtooth base + square octave + sine sub) used
+      // by AudioManager.setEngineLoop; here rendered for QA. `speed01`
+      // drives the piecewise GEAR MAP (audit r2): RPM climbs within a
+      // gear and DROPS on upshift — the old continuous 55→205Hz sweep
+      // read as a synth drone, not a kart gearbox. `dur` is the QA render
+      // window. Matches AudioManager._updateEngineLoop exactly.
+      const speed = clamp(opts.speed01 ?? 0.6, 0, 1);
+      const d = Math.max(0.3, opts.dur ?? 2.0);
+      const { rpm, local, load, ratio } = engineGear(speed);
+      const lug = (1 - local) * load; // post-upshift strain (muffles top end)
+      const cut = 300 + ratio * 1500 - lug * 250;
+      const lvl = 0.28 + 0.64 * (0.7 * load + 0.3 * local);
+      osc(ctx, target, {
+        type: 'sawtooth', freq: rpm, dur: d, vol: v(lvl * 0.55), at, attack: 0.1, sustain: true, release: 0.08,
+        filterType: 'lowpass', filterFreq: cut, filterQ: 0.8, lfoFreq: 24, lfoDepth: rpm * 0.012,
+      });
+      osc(ctx, target, {
+        type: 'square', freq: rpm * 2, dur: d, vol: v(lvl * 0.22), at, attack: 0.1, sustain: true, release: 0.08,
+        filterType: 'lowpass', filterFreq: cut * 1.4, filterQ: 1.2,
+      });
+      // Sub oscillator — matches the live engine loop (low-end body).
+      osc(ctx, target, {
+        type: 'sine', freq: rpm * 0.5, dur: d, vol: v(lvl * 0.5), at, attack: 0.1, sustain: true, release: 0.08,
+      });
+      noise(ctx, target, { dur: d, vol: v(lvl * 0.1), at, filterType: 'bandpass', freq: cut * 0.6, q: 0.5, attack: 0.1, sustain: true, release: 0.08 });
+      break;
+    }
+
+    case 'boost': {
+      // Turbo launch (modern arcade): kick thump + RISING noise whoosh
+      // (bandpass sweep 300→3600) + a growling saw that rises in pitch
+      // AND opens its lowpass (the flame body) + fire crackle + sub drop.
+      const d = 1.0;
+      kick(ctx, target, { at, vol: v(0.58), freq: 150, glideTo: 45, dur: 0.22 });
+      noise(ctx, target, { dur: d, vol: v(0.38), at, filterType: 'bandpass', freq: 300, q: 1.1, glideTo: 3600, attack: 0.05, sustain: true, release: 0.12 });
+      osc(ctx, target, {
+        type: 'sawtooth', freq: 95 * rate, glideTo: 210 * rate, dur: d * 0.9, vol: v(0.36), at, attack: 0.02,
+        filterType: 'lowpass', filterFreq: 400, filterQ: 1, filterGlideTo: 3200,
+      });
+      noise(ctx, target, { dur: d, vol: v(0.12), at: at + 0.06, filterType: 'highpass', freq: 5200, attack: 0.06, sustain: true, release: 0.08 });
+      osc(ctx, target, { type: 'sine', freq: 120 * rate, glideTo: 40 * rate, dur: 0.3, vol: v(0.6), at, attack: 0.003 });
+      break;
+    }
+
+    case 'drift': {
+      // Tire screech: high-Q bandpass noise squeal with wobble LFO,
+      // plus a low rumble and a bright chirp layer.
+      const d = 0.85;
+      const src = ctx.createBufferSource();
+      src.buffer = noiseBuffer(ctx);
+      const flt = ctx.createBiquadFilter();
+      flt.type = 'bandpass';
+      flt.Q.value = 9;
+      flt.frequency.setValueAtTime(950, at);
+      flt.frequency.linearRampToValueAtTime(1550, at + d * 0.45);
+      flt.frequency.exponentialRampToValueAtTime(1100, at + d * 0.95);
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = 21;
+      const lfoG = ctx.createGain();
+      lfoG.gain.value = 160;
+      lfo.connect(lfoG);
+      lfoG.connect(flt.frequency);
+      lfo.start(at);
+      lfo.stop(at + d + 0.1);
+      const g = ctx.createGain();
+      env(g, { at, peak: v(0.3), attack: 0.04, dur: d, sustain: true, release: 0.1 });
+      src.connect(flt);
+      flt.connect(g);
+      g.connect(target);
+      src.start(at);
+      src.stop(at + d + 0.1);
+      noise(ctx, target, { dur: d, vol: v(0.26), at, filterType: 'lowpass', freq: 300, q: 0.8, attack: 0.03, sustain: true, release: 0.08 });
+      noise(ctx, target, { dur: d * 0.7, vol: v(0.12), at: at + 0.1, filterType: 'bandpass', freq: 2400, q: 4, attack: 0.05, sustain: true, release: 0.07 });
+      break;
+    }
+
+    case 'uiClick': {
+      // Soft tactile click (no raw squares): a lowpassed triangle blip
+      // through a gentle bandpass + a micro noise tick — feels like a
+      // console menu, not a game-boy beep.
+      osc(ctx, target, {
+        type: 'triangle', freq: 520 * rate, glideTo: 760 * rate, dur: 0.06, vol: v(0.16), at, attack: 0.001,
+        filterType: 'lowpass', filterFreq: 2400, filterQ: 0.8,
+      });
+      noise(ctx, target, { dur: 0.02, vol: v(0.05), at, filterType: 'bandpass', freq: 3200, q: 1.5 });
+      break;
+    }
+
+    case 'uiSelect': {
+      // Confirming two-tone for "Start Race" — soft lowpassed body tones
+      // (no raw square) + a chime sparkle on top.
+      osc(ctx, target, { type: 'triangle', freq: 523.25 * rate, dur: 0.09, vol: v(0.2), at, attack: 0.002, filterType: 'lowpass', filterFreq: 2600 });
+      osc(ctx, target, { type: 'square', freq: 783.99 * rate, dur: 0.14, vol: v(0.12), at: at + 0.07, attack: 0.002, filterType: 'lowpass', filterFreq: 3200, filterQ: 1 });
+      chime(ctx, target, { freq: 1046.5 * rate, dur: 0.3, vol: v(0.14), at: at + 0.12, partials: [1, 2, 3] });
+      break;
+    }
+
+    case 'driftReleaseMiniBoost': {
+      // Drift-release pop: kick tick + quick rising blip + tight whoosh
+      // (bandpass noise sweep) + a sparkle on top — the arcade
+      // "release the boost" feel, not a beep.
+      kick(ctx, target, { at, vol: v(0.5), freq: 190, glideTo: 55, dur: 0.12 });
+      osc(ctx, target, { type: 'triangle', freq: 320 * rate, glideTo: 1100 * rate, dur: 0.16, vol: v(0.28), at, attack: 0.002 });
+      noise(ctx, target, { dur: 0.24, vol: v(0.22), at: at + 0.01, filterType: 'bandpass', freq: 1300, q: 1.2, glideTo: 3800, attack: 0.02, timeConstant: 0.08 });
+      chime(ctx, target, { freq: 1568 * rate, dur: 0.25, vol: v(0.18), at: at + 0.06, partials: [1, 2, 3] });
+      break;
+    }
+
+    case 'offroad': {
+      // Gravel/grass rumble while the kart is on the shoulder.
+      noise(ctx, target, { dur: 0.7, vol: v(0.16), at, filterType: 'bandpass', freq: 420, q: 1.1, attack: 0.05, sustain: true, release: 0.15 });
+      noise(ctx, target, { dur: 0.55, vol: v(0.08), at: at + 0.02, filterType: 'highpass', freq: 3000, attack: 0.06, sustain: true, release: 0.1 });
+      break;
+    }
+
+    case 'itemPickup': {
+      // Item-box pickup: sub pop + bright chime arpeggio C6-E6-G6-C7 +
+      // air shimmer. The pop gives it physical weight (layered pickup).
+      kick(ctx, target, { at, vol: v(0.26), freq: 200, glideTo: 60, dur: 0.14 });
+      osc(ctx, target, { type: 'sine', freq: 200 * rate, glideTo: 800 * rate, dur: 0.09, vol: v(0.26), at, attack: 0.002 });
+      const notes = [N.C6, N.E6, N.G6, N.C7];
+      let t = at;
+      for (const n of notes) {
+        chime(ctx, target, { freq: n * rate, dur: 0.24, vol: v(0.36), at: t, partials: [1, 2, 3, 4, 5] });
+        t += 0.055;
+      }
+      noise(ctx, target, { dur: 0.45, vol: v(0.16), at: t, filterType: 'highpass', freq: 7500, timeConstant: 0.12 });
+      break;
+    }
+
+    case 'useItem': {
+      // Power-up equip: sub pop + bright upward blip + sparkle — reads
+      // as a punchy item grab, not a game-boy beep.
+      kick(ctx, target, { at, vol: v(0.35), freq: 220, glideTo: 70, dur: 0.1 });
+      osc(ctx, target, { type: 'triangle', freq: 800 * rate, glideTo: 1500 * rate, dur: 0.12, vol: v(0.32), at, attack: 0.002 });
+      osc(ctx, target, { type: 'sine', freq: 1800 * rate, dur: 0.06, vol: v(0.12), at: at + 0.02, attack: 0.002 });
+      chime(ctx, target, { freq: 2093 * rate, dur: 0.18, vol: v(0.1), at: at + 0.05, partials: [1, 2, 3] });
+      break;
+    }
+
+    case 'shell': {
+      // Fast whoosh + whistling projectile.
+      const d = 0.55;
+      noise(ctx, target, { dur: d, vol: v(0.4), at, filterType: 'bandpass', freq: 380, q: 0.9, glideTo: 2600, attack: 0.04, sustain: true, release: 0.08 });
+      osc(ctx, target, {
+        type: 'sine', freq: 520 * rate, glideTo: 1250 * rate, dur: d, vol: v(0.22), at: at + 0.02,
+        attack: 0.05, sustain: true, release: 0.07, lfoFreq: 20, lfoDepth: 12,
+      });
+      break;
+    }
+
+    case 'redShell': {
+      // Angrier whoosh: growling saw + fast noise sweep + warble.
+      const d = 0.5;
+      osc(ctx, target, {
+        type: 'sawtooth', freq: 240 * rate, glideTo: 100 * rate, dur: d, vol: v(0.4), at, attack: 0.005,
+        filterType: 'lowpass', filterFreq: 1100, filterQ: 0.8, filterGlideTo: 450,
+      });
+      noise(ctx, target, { dur: d, vol: v(0.35), at, filterType: 'bandpass', freq: 260, q: 1, glideTo: 2100, attack: 0.02, sustain: true, release: 0.06 });
+      osc(ctx, target, { type: 'square', freq: 800 * rate, glideTo: 1400 * rate, dur: 0.22, vol: v(0.15), at: at + 0.03, attack: 0.003, filterType: 'highpass', filterFreq: 2000 });
+      break;
+    }
+
+    case 'banana': {
+      // Slip-slap: filtered noise impact sweep + springy boing on a fat
+      // sine body + a high "slip!" blip. Keeps the cartoon spring but
+      // the slap gives it physical weight.
+      noise(ctx, target, { dur: 0.09, vol: v(0.4), at, filterType: 'bandpass', freq: 1500, q: 1.4, glideTo: 320, attack: 0.001, timeConstant: 0.05 });
+      const f0 = 235 * rate;
+      const o = ctx.createOscillator();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(Math.max(30, f0), at);
+      o.frequency.exponentialRampToValueAtTime(Math.max(30, f0 * 0.4), at + 0.06);
+      o.frequency.exponentialRampToValueAtTime(Math.max(30, f0 * 0.85), at + 0.13);
+      o.frequency.exponentialRampToValueAtTime(Math.max(30, f0 * 0.52), at + 0.22);
+      o.frequency.exponentialRampToValueAtTime(Math.max(30, f0 * 0.72), at + 0.32);
+      const g = ctx.createGain();
+      env(g, { at, peak: v(0.45), attack: 0.004, timeConstant: 0.18 });
+      o.connect(g);
+      g.connect(target);
+      o.start(at);
+      o.stop(at + 0.6);
+      osc(ctx, target, { type: 'sine', freq: Math.max(30, f0 * 0.5), glideTo: Math.max(30, f0 * 0.25), dur: 0.3, vol: v(0.35), at, attack: 0.002, timeConstant: 0.15 });
+      osc(ctx, target, { type: 'sine', freq: 1700 * rate, dur: 0.05, vol: v(0.16), at: at + 0.01, attack: 0.002 });
+      break;
+    }
+
+    case 'star': {
+      // Magical shimmer arpeggio up + sparkle chord + air.
+      const notes = [N.C6, N.D6, N.E6, N.G6, N.A6, N.C7];
+      let t = at;
+      for (const n of notes) {
+        chime(ctx, target, { freq: n * rate, dur: 0.5, vol: v(0.35), at: t, partials: [1, 2, 3, 4, 5] });
+        t += 0.06;
+      }
+      noise(ctx, target, { dur: 0.7, vol: v(0.12), at: at + 0.1, filterType: 'highpass', freq: 9000, timeConstant: 0.15 });
+      chime(ctx, target, { freq: N.C7 * rate, dur: 0.7, vol: v(0.25), at: t, partials: [1, 2, 3, 4, 5, 6] });
+      break;
+    }
+
+    case 'lightning': {
+      // Electric zap (pitch drop) + crackle bursts + fading rumble.
+      osc(ctx, target, {
+        type: 'sawtooth', freq: 2600 * rate, glideTo: 160 * rate, dur: 0.2, vol: v(0.5), at, attack: 0.001,
+        filterType: 'highpass', filterFreq: 400,
+      });
+      osc(ctx, target, {
+        type: 'square', freq: 1500 * rate, glideTo: 120 * rate, dur: 0.24, vol: v(0.28), at: at + 0.01, attack: 0.001,
+        filterType: 'highpass', filterFreq: 600,
+      });
+      const crack = [0.22, 0.3, 0.37, 0.46, 0.55, 0.64];
+      for (const off of crack) {
+        noise(ctx, target, { dur: 0.03, vol: v(0.25), at: at + off, filterType: 'bandpass', freq: 3200, q: 2.5 });
+      }
+      osc(ctx, target, { type: 'sine', freq: 90 * rate, glideTo: 40 * rate, dur: 0.35, vol: v(0.3), at: at + 0.15, attack: 0.005 });
+      break;
+    }
+
+    case 'crash': {
+      // FAT impact (arcade, not 8-bit): sub kick body (sine 120→38Hz) +
+      // lowpassed noise burst with a pitch-drop sweep + a metallic clank
+      // (bandpassed square gliding down) + a fast shard-hiss layer.
+      kick(ctx, target, { at, vol: v(0.65), freq: 120, glideTo: 38, dur: 0.3 });
+      noise(ctx, target, {
+        dur: 0.42, vol: v(0.43), at, filterType: 'lowpass', freq: 6000, q: 0.6, // QA: dry peak headroom
+        glideTo: 160, attack: 0.001, timeConstant: 0.14,
+      });
+      osc(ctx, target, {
+        type: 'square', freq: 920 * rate, glideTo: 300 * rate, dur: 0.16, vol: v(0.22), at: at + 0.004, attack: 0.001,
+        filterType: 'bandpass', filterFreq: 1500, filterQ: 2.2, filterGlideTo: 450,
+      });
+      noise(ctx, target, { dur: 0.2, vol: v(0.16), at: at + 0.01, filterType: 'bandpass', freq: 3200, q: 2, glideTo: 900, attack: 0.002, timeConstant: 0.05 });
+      break;
+    }
+
+    case 'driftReady': {
+      // Distinct rising chime when the drift charge hits the release point
+      // (audit v5 F5: was reusing the overtake blip — same sound, two events).
+      // Now with a soft noise tick for presence.
+      osc(ctx, target, { type: 'sine', freq: 660 * rate, glideTo: 990 * rate, dur: 0.09, vol: v(0.3), at, attack: 0.002 });
+      osc(ctx, target, { type: 'sine', freq: 1320 * rate, dur: 0.06, vol: v(0.12), at: at + 0.05, attack: 0.002 });
+      noise(ctx, target, { dur: 0.03, vol: v(0.05), at, filterType: 'highpass', freq: 5500 });
+      break;
+    }
+
+    case 'posDown': {
+      // Descending two-tone (lost a place): triangle lead + lowpassed
+      // square body for weight (not a raw square — filtered and fat).
+      osc(ctx, target, { type: 'triangle', freq: 520 * rate, glideTo: 300 * rate, dur: 0.14, vol: v(0.26), at, attack: 0.003 });
+      osc(ctx, target, { type: 'square', freq: 520 * rate, glideTo: 300 * rate, dur: 0.14, vol: v(0.14), at, attack: 0.003, filterType: 'lowpass', filterFreq: 1800 });
+      osc(ctx, target, { type: 'sine', freq: 300 * rate, glideTo: 180 * rate, dur: 0.14, vol: v(0.26), at: at + 0.1, attack: 0.003 });
+      break;
+    }
+
+    case 'posUp': {
+      // Ascending two-tone (overtook someone): triangle lead + lowpassed
+      // square body for weight + sine tail.
+      osc(ctx, target, { type: 'triangle', freq: 380 * rate, glideTo: 560 * rate, dur: 0.12, vol: v(0.26), at, attack: 0.003 });
+      osc(ctx, target, { type: 'square', freq: 380 * rate, glideTo: 560 * rate, dur: 0.12, vol: v(0.14), at, attack: 0.003, filterType: 'lowpass', filterFreq: 1800 });
+      osc(ctx, target, { type: 'sine', freq: 620 * rate, glideTo: 820 * rate, dur: 0.14, vol: v(0.26), at: at + 0.08, attack: 0.003 });
+      break;
+    }
+
+    case 'landing': {
+      // Touchdown (audit UX-F3): sub thump + filtered noise puff — a
+      // grounded impact, not a beep.
+      kick(ctx, target, { at, vol: v(0.5), freq: 120, glideTo: 50, dur: 0.16, click: 0.2 });
+      noise(ctx, target, { dur: 0.18, vol: v(0.2), at, filterType: 'lowpass', freq: 900, attack: 0.003, timeConstant: 0.06 });
+      break;
+    }
+
+    case 'countdown': {
+      // Stadium countdown tone: fat lowpassed square + sine sub body +
+      // soft octave — a full enveloped tone, not a thin beep.
+      const f = 660 * rate;
+      osc(ctx, target, {
+        type: 'square', freq: f, dur: 0.26, vol: v(0.3), at, attack: 0.006, sustain: true, release: 0.06,
+        filterType: 'lowpass', filterFreq: 1800, filterQ: 0.9,
+      });
+      osc(ctx, target, { type: 'sine', freq: Math.max(30, f * 0.5), dur: 0.26, vol: v(0.35), at, attack: 0.006, sustain: true, release: 0.06 });
+      osc(ctx, target, { type: 'sine', freq: Math.max(30, f * 2), dur: 0.2, vol: v(0.1), at: at + 0.005, attack: 0.006, sustain: true, release: 0.04 });
+      break;
+    }
+
+    case 'go': {
+      // Race start: kick punch + fat horn blast E5 -> A5 with sub body
+      // and crowd-air on top — the arcade launch, not a beep.
+      kick(ctx, target, { at, vol: v(0.54), freq: 170, glideTo: 50, dur: 0.25 }); // QA: keep dry peak below 1.0
+      osc(ctx, target, { type: 'sine', freq: 160 * rate, glideTo: 60 * rate, dur: 0.22, vol: v(0.5), at, attack: 0.002 });
+      horn(ctx, target, at, 659.25 * rate, 0.5, v(0.36));
+      horn(ctx, target, at + 0.16, 880 * rate, 0.62, v(0.36));
+      chime(ctx, target, { freq: 1318.51 * rate, dur: 0.5, vol: v(0.12), at: at + 0.2, partials: [1, 2, 3] });
+      noise(ctx, target, { dur: 0.25, vol: v(0.07), at: at + 0.2, filterType: 'highpass', freq: 7000, timeConstant: 0.1 });
+      break;
+    }
+
+    case 'pickup': {
+      // Modern coin pickup: two bright lowpassed-square blips with fast
+      // decay + a high sine sparkle — reads as a reward, not a beep.
+      const coin = [880 * rate, 1318.51 * rate];
+      coin.forEach((f, i) => {
+        osc(ctx, target, {
+          type: 'square', freq: Math.max(30, f), dur: 0.14, vol: v(0.32), at: at + i * 0.07, attack: 0.002,
+          filterType: 'lowpass', filterFreq: 5200, filterQ: 0.8,
+        });
+      });
+      osc(ctx, target, { type: 'sine', freq: 2093 * rate, dur: 0.22, vol: v(0.14), at: at + 0.09, attack: 0.002, timeConstant: 0.06 });
+      noise(ctx, target, { dur: 0.12, vol: v(0.05), at: at + 0.12, filterType: 'highpass', freq: 8000 });
+      break;
+    }
+
+    case 'lap': {
+      // Rising chime run announcing a completed lap.
+      const notes = [N.C5, N.E5, N.G5, N.C6, N.E6];
+      let t = at;
+      for (const n of notes) {
+        chime(ctx, target, { freq: n * rate, dur: 0.35, vol: v(0.45), at: t, partials: [1, 2, 3, 4] });
+        t += 0.09;
+      }
+      noise(ctx, target, { dur: 0.4, vol: v(0.1), at: t, filterType: 'highpass', freq: 7500, timeConstant: 0.12 });
+      break;
+    }
+
+    case 'finalLap': {
+      // Dedicated FINAL LAP jingle (audit r2): was reusing posUp — the
+      // overtake blip — so the last lap sounded like any other position
+      // change. This is a short urgent fanfare: staccato horn triple
+      // E5-G5-C6, held C6, sparkle on top. Distinct from 'lap' (chime
+      // run) and 'finish' (longer horn fanfare).
+      horn(ctx, target, at, 659.25 * rate, 0.16, v(0.3));
+      horn(ctx, target, at + 0.13, 783.99 * rate, 0.16, v(0.3));
+      horn(ctx, target, at + 0.26, 1046.5 * rate, 0.42, v(0.34));
+      chime(ctx, target, { freq: 1318.51 * rate, dur: 0.6, vol: v(0.2), at: at + 0.34, partials: [1, 2, 3, 4] });
+      noise(ctx, target, { dur: 0.35, vol: v(0.06), at: at + 0.3, filterType: 'highpass', freq: 7500, timeConstant: 0.12 });
+      break;
+    }
+
+    case 'cheer': {
+      // Crowd cheer burst (audit r2): swelling bandpass-noise roar plus a
+      // few rising triangle "woo" voices. `intensity` (0..1) scales
+      // loudness/length — small on overtakes, big on the finish line.
+      const inten = clamp(opts.intensity ?? 0.5, 0.05, 1);
+      const d = 0.5 + inten * 0.9;
+      noise(ctx, target, {
+        dur: d, vol: v(0.1 + inten * 0.3), at, filterType: 'bandpass',
+        freq: 450 + inten * 250, q: 0.7, glideTo: 900 + inten * 500,
+        attack: 0.08, sustain: true, release: 0.15,
+      });
+      noise(ctx, target, {
+        dur: d * 0.8, vol: v(0.04 + inten * 0.12), at: at + 0.03,
+        filterType: 'bandpass', freq: 1800, q: 2, attack: 0.1, sustain: true, release: 0.1,
+      });
+      const wooCount = 2 + Math.round(inten * 3);
+      let wt = at + 0.05;
+      for (let i = 0; i < wooCount; i++) {
+        const f = (420 + i * 55) * rate; // deterministic voice ladder
+        osc(ctx, target, {
+          type: 'triangle', freq: f, glideTo: f * 1.12, dur: 0.3 + inten * 0.2,
+          vol: v(0.05 + inten * 0.1), at: wt, attack: 0.08, sustain: true, release: 0.1,
+          filterType: 'lowpass', filterFreq: 1400, lfoFreq: 6, lfoDepth: f * 0.02,
+        });
+        wt += 0.09;
+      }
+      break;
+    }
+
+    case 'finish': {
+      // Fanfare arpeggio + held top note.
+      const notes = [N.C5, N.E5, N.G5, N.C6, N.E6];
+      let t = at;
+      for (const n of notes) {
+        horn(ctx, target, t, n * rate, 0.22, v(0.3));
+        t += 0.11;
+      }
+      horn(ctx, target, t, N.G6 * rate, 0.7, v(0.34));
+      chime(ctx, target, { freq: N.C7 * rate, dur: 0.8, vol: v(0.22), at: t, partials: [1, 2, 3, 4, 5] });
+      noise(ctx, target, { dur: 0.6, vol: v(0.08), at: t, filterType: 'highpass', freq: 8000, timeConstant: 0.15 });
+      break;
+    }
+
+    case 'victory': {
+      // Longer celebration: full fanfare, held chord, sparkle run.
+      const notes = [N.C5, N.E5, N.G5, N.C6, N.E6, N.G6];
+      let t = at;
+      for (const n of notes) {
+        horn(ctx, target, t, n * rate, 0.24, v(0.28));
+        t += 0.13;
+      }
+      for (const n of [N.C5, N.E5, N.G5, N.C6]) {
+        chime(ctx, target, { freq: n * rate, dur: 1.4, vol: v(0.16), at: t, partials: [1, 2, 3, 4] });
+      }
+      let s = t + 0.3;
+      const sparkle = [N.C7, N.D7, N.C7, N.G6, N.E6, N.G6, N.C7];
+      for (const n of sparkle) {
+        chime(ctx, target, { freq: n * rate, dur: 0.35, vol: v(0.16), at: s, partials: [1, 2, 3, 4, 5] });
+        s += 0.07;
+      }
+      noise(ctx, target, { dur: 1.2, vol: v(0.08), at: t + 0.4, filterType: 'highpass', freq: 8500, timeConstant: 0.2 });
+      break;
+    }
+
+    case 'uiHover': {
+      // Soft hover tick (USER FIX: sine + gentle triangle — the old square
+      // was the sharpest '8-bit' artifact in the menu).
+      osc(ctx, target, { type: 'sine', freq: 900 * rate, dur: 0.05, vol: v(0.06), at, attack: 0.002 });
+      osc(ctx, target, { type: 'triangle', freq: 1500 * rate, dur: 0.04, vol: v(0.07), at, attack: 0.002 });
+      break;
+    }
+
+    case 'musicIntro':
+    case 'menuMusic': {
+      // Soft intro sting for the MusicEngine: Cmaj7 pad swell +
+      // gentle chime melody + air.
+      const d = 1.7;
+      for (const n of [N.C4, N.E4, N.G4, N.B4]) {
+        osc(ctx, target, {
+          type: 'triangle', freq: n, dur: d, vol: v(0.16), at, attack: 0.35, sustain: true, release: 0.25,
+          filterType: 'lowpass', filterFreq: 900,
+        });
+      }
+      const mel = [N.C5, N.E5, N.G5, N.E5];
+      let t = at + 0.4;
+      for (const n of mel) {
+        chime(ctx, target, { freq: n, dur: 0.5, vol: v(0.2), at: t, partials: [1, 2, 3] });
+        t += 0.24;
+      }
+      noise(ctx, target, { dur: 1.0, vol: v(0.06), at: at + 0.3, filterType: 'highpass', freq: 7500, timeConstant: 0.2 });
+      break;
+    }
+
+    default: {
+      // Unknown name: warn (recipes stay pure) and play a quiet tick
+      // so callers always hear feedback. USER FIX (audit r2): triangle
+      // instead of the old raw square — the fallback was the last '8-bit'
+      // square left in the SFX set.
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn(`[sfx] Unknown SFX name: "${name}"`);
+      }
+      osc(ctx, target, { type: 'triangle', freq: 1000 * rate, dur: 0.04, vol: v(0.1), at, attack: 0.002 });
+      break;
+    }
+  }
+}
+
+return { renderSfx, engineGear };
+})();
+const { MusicEngine } = (() => {
+// ============================================================
+// Super Kart 3D.js — music.js
+// Procedural racing playlist (lo-fi hype, zero audio assets):
+// pads with a slow wobble, pentatonic chimes, sine bass, punchy
+// kick/snare/hat groove and a vinyl texture with crackles — all
+// synthesized live with the WebAudio API.
+//
+// Contract (ARCHITECTURE.md):
+//   new MusicEngine(ctx, { volume, onEnded, menu, intensity })
+//   start(), stop(), next(), setVolume(v), setIntensity(0..1)
+//   static renderOffline(ctx, out, trackName, seed, cycles)
+//   static trackNames(), static trackDuration(name, cycles)
+//
+// Emotional arc (audit r3): setIntensity(0..1) reshapes the arrangement
+// live — 0 is the calm/menu color (pad+bass pulled back), ≥0.7 adds a
+// ghost-hat 16th layer, opens the pad filter (+60% cutoff) and nudges BPM
+// (+4% at max). Values ramp ~0.4s in the scheduler, so the final-lap lift
+// swells instead of snapping. `menu: true` plays a single calm loop
+// (MENU_TRACK, cycles=Infinity) instead of the shuffled race playlist.
+//
+// Scheduler: setInterval(tick, 100) with a 0.35s lookahead;
+// 16th-note steps, swing on odd steps. Tracks loop their chord
+// progression `cycles` times, then the playlist advances.
+//
+// Pitfalls baked in (validated in the match-3djs project):
+//   - stop() sets a `_stopping` guard so the _finishTrack timeout
+//     cannot restart the music.
+//   - The bus gain starts at 0 and fades in on play; renderOffline
+//     sets bus.gain.value = 1 explicitly (no fade-in runs there).
+//   - All randomized synthesis uses a seeded RNG so offline renders
+//     are byte-for-byte reproducible for a given seed.
+// ============================================================
+
+const midiHz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+// ------------------------------------------------------------
+// Chord voicings (MIDI notes) — closed voicings in a comfortable
+// lo-fi register (C3-B4).
+// ------------------------------------------------------------
+const CHORDS = {
+  Cmaj7:  [48, 52, 55, 59],
+  Am7:    [45, 48, 52, 55],
+  Fmaj7:  [53, 57, 60, 64],
+  G7:     [43, 47, 50, 53],
+  Dm7:    [50, 53, 57, 60],
+  Bbmaj7: [46, 50, 53, 57],
+  A7:     [45, 49, 52, 55],
+  Em7:    [52, 55, 59, 62],
+  Gmaj7:  [43, 47, 50, 54],
+  D7:     [50, 53, 57, 60],
+  C7:     [48, 52, 55, 58],
+  E7:     [52, 56, 59, 62],
+  Dmaj7:  [50, 54, 57, 61],
+  Gadd9:  [43, 47, 50, 54, 57],
+};
+
+// Pentatonic pools per key (for the chime melody).
+const PENTA = {
+  C:  [60, 62, 64, 67, 69, 72, 74, 76],
+  Dm: [50, 53, 55, 57, 60, 62, 65, 67],
+  Am: [57, 60, 62, 64, 67, 69, 72, 74],
+  F:  [53, 57, 60, 62, 65, 69, 72, 74],
+  G:  [55, 59, 62, 64, 67, 71, 74, 76],
+  Em: [52, 55, 59, 62, 64, 67, 71, 74],
+};
+
+// ------------------------------------------------------------
+// Playlist — 3 tracks: different BPM, progression and groove.
+// Each: chords (MIDI voicings), 16-step drum/bass patterns,
+// timbre knobs and lo-fi vinyl texture.
+// ------------------------------------------------------------
+const TRACKS = [
+  {
+    name: 'Turbo Circuit',
+    key: 'C',
+    bpm: 124,
+    chords: ['Cmaj7', 'Am7', 'Fmaj7', 'G7'],
+    barsPerChord: 1,
+    cycles: 8,
+    padType: 'triangle',
+    padFilter: 1300,
+    padWobble: 0.35,
+    padGain: 0.9,
+    chimeVol: 0.13,
+    chimeDensity: 0.5,
+    bassVol: 0.26,
+    drumVol: 0.2,
+    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    hatPattern: [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1],
+    bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+  },
+  {
+    name: 'Rainbow Drift',
+    key: 'Dm',
+    bpm: 138,
+    chords: ['Dm7', 'Bbmaj7', 'Fmaj7', 'A7'],
+    barsPerChord: 2,
+    cycles: 4,
+    padType: 'sawtooth',
+    padFilter: 850,
+    padWobble: 0.55,
+    padGain: 1.0,
+    chimeVol: 0.11,
+    chimeDensity: 0.4,
+    bassVol: 0.28,
+    drumVol: 0.22,
+    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],
+    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    hatPattern: [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+    bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+  },
+  {
+    name: 'Star Sprint',
+    key: 'Am',
+    bpm: 150,
+    chords: ['Am7', 'Fmaj7', 'Cmaj7', 'G7'],
+    barsPerChord: 2,
+    cycles: 4,
+    padType: 'sawtooth',
+    padFilter: 1500,
+    padWobble: 0.3,
+    padGain: 1.1,
+    chimeVol: 0.14,
+    chimeDensity: 0.55,
+    bassVol: 0.26,
+    drumVol: 0.24,
+    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    hatPattern: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+    bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+  },
+  {
+    name: 'Neon Nights',
+    key: 'Dm',
+    bpm: 142,
+    chords: ['Dm7', 'Bbmaj7', 'Fmaj7', 'E7'],
+    barsPerChord: 1,
+    cycles: 8,
+    padType: 'sawtooth',
+    padFilter: 700,
+    padWobble: 0.6,
+    padGain: 1.0,
+    chimeVol: 0.12,
+    chimeDensity: 0.45,
+    bassVol: 0.3,
+    drumVol: 0.24,
+    kickPattern: [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    hatPattern: [1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1],
+    bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+  },
+];
+
+// Calm menu loop (audit r3) — a laid-back variant of 'Turbo Circuit'
+// (track 1): slow BPM, sparse groove, soft pads. `cycles: Infinity` makes
+// the scheduler loop the progression forever without ever advancing the
+// playlist, so the menu music only ends via stopMenuMusic().
+const MENU_TRACK = {
+  name: 'Menu Cruise',
+  key: 'C',
+  bpm: 86,
+  chords: ['Cmaj7', 'Am7', 'Fmaj7', 'G7'],
+  barsPerChord: 2,
+  cycles: Infinity,
+  padType: 'triangle',
+  padFilter: 900,
+  padWobble: 0.22,
+  padGain: 0.7,
+  chimeVol: 0.09,
+  chimeDensity: 0.3,
+  bassVol: 0.15,
+  drumVol: 0.11,
+  kickPattern: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+  snarePattern: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+  hatPattern: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+};
+
+const STEPS_PER_BEAT = 4; // 16th notes
+const SWING = 0.62;       // delayed offbeats (lo-fi groove)
+const LOOKAHEAD = 0.35;   // scheduler lookahead window (s)
+
+class MusicEngine {
+  /**
+   * Accepts both call styles:
+   *   new MusicEngine(ctx, { output, volume, onEnded, seed })
+   *   new MusicEngine({ ctx, output, volume, onEnded, seed })
+   * @param {BaseAudioContext} ctx
+   * @param {AudioNode} [opts.output] Destination (defaults to ctx.destination).
+   * @param {number} [opts.volume] Music bus volume (default 0.34).
+   * @param {Function} [opts.onEnded] Called with the finished track.
+   * @param {number} [opts.seed] RNG seed for deterministic synthesis.
+   */
+  constructor(ctxOrOpts, opts = {}) {
+    const cfg = (ctxOrOpts && typeof ctxOrOpts === 'object' && 'ctx' in ctxOrOpts)
+      ? ctxOrOpts
+      : { ...opts, ctx: ctxOrOpts };
+    const { ctx, output = null, volume = 0.34, onEnded = null, seed = Date.now(), track = null, menu = false, intensity = 0.5 } = cfg;
+
+    this._ctx = ctx;
+    this._out = output || ctx.destination;
+    this._volume = clamp01(volume);
+    // Emotional arc state (audit r3): smoothed toward _intensityTarget in
+    // _tick. 0 = calm (menu), 0.5 = normal race, ≥0.7 = final-lap lift.
+    this._intensityTarget = clamp01(intensity);
+    this._intensity = this._intensityTarget;
+    this._menu = menu;
+    this._onEnded = onEnded;
+    this._seed = seed >>> 0;
+    this._rng = this._mulberry32(this._seed);
+    this._offline = typeof OfflineAudioContext !== 'undefined' && ctx instanceof OfflineAudioContext;
+
+    // Bus starts muted; fades in on play (pitfall: no clicks).
+    this._bus = ctx.createGain();
+    this._bus.gain.value = 0;
+
+    // Sidechain-style duck gain (AAA groove): the kick dips the whole music
+    // bus ~10% for ~0.12s, so the mix breathes with the beat instead of
+    // sitting flat. Programmed from the scheduler (WebAudio has no cheap
+    // native sidechain path).
+    this._duckGain = ctx.createGain();
+    this._duckGain.gain.value = 1;
+
+    // Lo-fi space: short feedback delay.
+    this._delay = ctx.createDelay(1.0);
+    this._delay.delayTime.value = 0.27;
+    this._fb = ctx.createGain();
+    this._fb.gain.value = 0.3;
+    this._wet = ctx.createGain();
+    this._wet.gain.value = 0.2;
+    this._bus.connect(this._duckGain);
+    this._duckGain.connect(this._delay);
+    this._delay.connect(this._fb);
+    this._fb.connect(this._delay);
+    this._delay.connect(this._wet);
+    this._wet.connect(this._out);
+    this._duckGain.connect(this._out);
+
+    this._vinyl = null;
+    this._vinylGain = null;
+    this._crackleTimer = null;
+
+    // `menu: true` swaps the shuffled 3-track playlist for the single calm
+    // loop; everything downstream (scheduler, instruments) is identical.
+    this._playlist = menu ? [MENU_TRACK] : TRACKS.slice();
+    // `track` option pins the FIRST song (per-track identity — NEON CITY
+    // opens with 'Neon Nights'; then the playlist continues shuffled).
+    if (track) {
+      const ti = this._playlist.findIndex((t) => t.name === track);
+      if (ti > 0) this._playlist.unshift(this._playlist.splice(ti, 1)[0]);
+    }
+    this._trackIdx = -1;
+    this._timer = null;
+    this._finishTimer = null;
+    this._step = 0;
+    this._nextStepTime = 0;
+    this._playing = false;
+    this._stopping = false;
+    this._lastTrack = null;
+    this._currentTrack = null;
+  }
+
+  _mulberry32(a) {
+    return function () {
+      a |= 0;
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ---------------- Lifecycle ---------------- */
+
+  /**
+   * Shuffles the playlist and starts playing. A repeated call while
+   * playing restarts with a fresh shuffle.
+   * @param {Function} [onTrackEnd] Optional per-call callback.
+   */
+  start(onTrackEnd = null) {
+    if (onTrackEnd) this._onTrackEnd = onTrackEnd;
+    if (this._playing) this.stop();
+    this._stopping = false;
+    this._shufflePlaylist();
+    this._playNext(0.15);
+  }
+
+  /**
+   * Stops everything (fast fade). The `_stopping` guard prevents the
+   * pending _finishTrack timeout from starting the next track.
+   */
+  stop() {
+    this._stopping = true;
+    this._playing = false;
+    this._stopScheduler();
+    if (this._finishTimer) {
+      clearTimeout(this._finishTimer);
+      this._finishTimer = null;
+    }
+    this._stopVinyl();
+    const now = this._ctx.currentTime;
+    this._bus.gain.cancelScheduledValues(now);
+    this._bus.gain.setValueAtTime(this._bus.gain.value, now);
+    this._bus.gain.linearRampToValueAtTime(0, now + 0.4);
+  }
+
+  /** Skips to the next track in the playlist. */
+  next() {
+    if (!this._playing) {
+      this._stopping = false;
+      this._playNext(0.1);
+      return;
+    }
+    this._stopScheduler();
+    this._playing = false;
+    if (this._finishTimer) {
+      clearTimeout(this._finishTimer);
+      this._finishTimer = null;
+    }
+    const now = this._ctx.currentTime;
+    this._bus.gain.cancelScheduledValues(now);
+    this._bus.gain.setValueAtTime(this._bus.gain.value, now);
+    this._bus.gain.linearRampToValueAtTime(0, now + 0.2);
+    const self = this;
+    this._finishTimer = setTimeout(() => {
+      this._finishTimer = null;
+      if (!self._stopping) self._playNext(0.35);
+    }, 260);
+  }
+
+  setVolume(v) {
+    this._volume = clamp01(v);
+    if (this._playing) {
+      this._bus.gain.setTargetAtTime(this._volume, this._ctx.currentTime, 0.05);
+    }
+  }
+
+  /**
+   * Emotional intensity 0..1 (audit r3):
+   *   0.0 — calm: pad + bass pulled back (menu / cruise)
+   *   0.5 — normal race arrangement
+   *   ≥0.7 — lift: ghost-hat 16th layer, pad filter opens (+60%), BPM +4%
+   * Values are smoothed toward the target in _tick (~0.4s ramp) so the
+   * final-lap call swells in instead of snapping.
+   * @param {number} v 0..1
+   */
+  setIntensity(v) {
+    this._intensityTarget = clamp01(v);
+    // Before the first notes, snap so the opening color is right (menu).
+    if (!this._playing) this._intensity = this._intensityTarget;
+  }
+
+  isPlaying() {
+    return this._playing;
+  }
+
+  get currentTrack() {
+    return this._currentTrack ? this._currentTrack.name : null;
+  }
+
+  /* ---------------- Playlist ---------------- */
+
+  _shufflePlaylist() {
+    // Menu mode owns a single infinite loop; races shuffle the playlist.
+    const list = (this._menu ? [MENU_TRACK] : TRACKS).slice();
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(this._rng() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    // The last played track never opens the next cycle (no immediate
+    // repeat of the opening track).
+    if (this._lastTrack) {
+      const idx = list.findIndex((t) => t.name === this._lastTrack);
+      if (idx > -1) {
+        // AUDIT R25-FIX: push the spliced TRACK OBJECT, not the name
+        // string — `_playNext` reads `.chords/.bpm` off the entry, so a
+        // bare string threw on the 4th play of the 2nd cycle and killed
+        // the music in long sessions.
+        const [t] = list.splice(idx, 1);
+        list.push(t);
+      }
+    }
+    this._playlist = list;
+    this._trackIdx = -1;
+  }
+
+  _playNext(startDelay = 0.1) {
+    this._stopping = false;
+    this._trackIdx += 1;
+    if (this._trackIdx >= this._playlist.length) {
+      this._shufflePlaylist();
+      this._trackIdx = 0;
+    }
+    const track = this._playlist[this._trackIdx];
+    this._currentTrack = track;
+    this._lastTrack = track.name;
+    this._step = 0;
+    this._nextStepTime = this._ctx.currentTime + startDelay;
+    this._playing = true;
+    this._ensureVinyl();
+    // Fade the bus in (pitfall: bus starts at 0).
+    const now = this._ctx.currentTime;
+    this._bus.gain.cancelScheduledValues(now);
+    this._bus.gain.setValueAtTime(this._bus.gain.value, now);
+    this._bus.gain.linearRampToValueAtTime(this._volume, now + 1.2);
+    this._startScheduler();
+  }
+
+  /* ---------------- Scheduler (lookahead) ---------------- */
+
+  _startScheduler() {
+    if (this._timer) return;
+    this._timer = setInterval(() => this._tick(), 100);
+  }
+
+  _stopScheduler() {
+    if (this._timer) {
+      clearInterval(this._timer);
+      this._timer = null;
+    }
+  }
+
+  _tick() {
+    // Smooth intensity toward its target at ~10Hz (0.25/tick ≈ 0.4s ramp)
+    // so the final-lap lift swells in; BPM follows the smoothed value.
+    this._intensity += (this._intensityTarget - this._intensity) * 0.25;
+    const stepDur = this._stepDuration();
+    while (this._nextStepTime < this._ctx.currentTime + LOOKAHEAD) {
+      this._scheduleStep(this._step, this._nextStepTime);
+      this._step += 1;
+      this._nextStepTime += stepDur;
+      if (!this._playing) return;
+    }
+    if (this._step >= this._totalSteps()) {
+      // `_nextStepTime` is the audio time immediately after the last step.
+      // Do not start the fade at `currentTime`: lookahead may have queued the
+      // final beat up to LOOKAHEAD seconds ahead.
+      this._finishTrack(this._nextStepTime);
+    }
+  }
+
+  /** Effective 16th-step duration — track BPM nudged by intensity (+4% at max). */
+  _stepDuration() {
+    return 60 / (this._currentTrack.bpm * (1 + 0.04 * this._intensity)) / STEPS_PER_BEAT;
+  }
+
+  _totalSteps() {
+    const t = this._currentTrack;
+    return t.chords.length * t.barsPerChord * 16 * t.cycles;
+  }
+
+  _finishTrack(trackEndTime = this._ctx.currentTime) {
+    this._stopScheduler();
+    this._playing = false;
+    const now = this._ctx.currentTime;
+    const end = Math.max(now, trackEndTime);
+    this._bus.gain.cancelScheduledValues(now);
+    this._bus.gain.setValueAtTime(this._bus.gain.value, now);
+    this._bus.gain.linearRampToValueAtTime(0, end + 0.6);
+    const cb = this._onEnded;
+    const track = this._currentTrack;
+    this._finishTimer = setTimeout(() => {
+      this._finishTimer = null;
+      if (cb) cb(track);
+      // Guard: stop() (or a next() already pending) must not restart.
+      if (!this._stopping) this._playNext(0.4);
+    }, Math.max(650, (end - now) * 1000 + 650));
+  }
+
+  /* ---------------- Vinyl texture ---------------- */
+
+  _ensureVinyl() {
+    if (this._vinyl) return;
+    const ctx = this._ctx;
+    const len = ctx.sampleRate * 2;
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (this._rng() * 2 - 1) * 0.5;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 3200;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.012;
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(this._bus);
+    src.start();
+    this._vinyl = src;
+    this._vinylGain = gain;
+    if (!this._offline) {
+      // Random crackles every ~900ms while playing.
+      this._crackleTimer = setInterval(() => {
+        if (!this._playing) return;
+        if (this._rng() < 0.4) this._playCrackle(ctx.currentTime + 0.01);
+      }, 900);
+    }
+  }
+
+  _playCrackle(at) {
+    const ctx = this._ctx;
+    const len = Math.floor(ctx.sampleRate * 0.004);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (this._rng() * 2 - 1) * 0.4;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 2500;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.05, at);
+    g.gain.exponentialRampToValueAtTime(0.001, at + 0.004);
+    src.connect(hp);
+    hp.connect(g);
+    g.connect(this._bus);
+    src.start(at);
+    src.stop(at + len / ctx.sampleRate + 0.02); // AUDIT R66: stop explícito
+  }
+
+  _stopVinyl() {
+    if (this._vinyl) {
+      try { this._vinyl.stop(); } catch { /* already stopped */ }
+      this._vinyl = null;
+      this._vinylGain = null;
+    }
+    if (this._crackleTimer) {
+      clearInterval(this._crackleTimer);
+      this._crackleTimer = null;
+    }
+  }
+
+  /* ---------------- Step scheduling ---------------- */
+
+  _swingTime(step, time) {
+    // Offbeats (odd steps) land late — lo-fi swing.
+    if (step % 2 === 1) {
+      return time + this._stepDuration() * (SWING - 0.5);
+    }
+    return time;
+  }
+
+  _scheduleStep(step, time) {
+    const t = this._currentTrack;
+    const stepsPerBar = 16;
+    const stepsPerChord = stepsPerBar * t.barsPerChord;
+    const chordIdx = Math.floor(step / stepsPerChord) % t.chords.length;
+    const stepInChord = step % stepsPerChord;
+    const stepInBar = step % stepsPerBar;
+
+    // Chord change -> pad + bass root + occasional chime.
+    if (stepInChord === 0) {
+      const chord = CHORDS[t.chords[chordIdx]];
+      this._playPad(chord, time, t, stepsPerChord);
+      this._playBass(chord[0] - 12, time, t);
+      if (t.chimeDensity > 0 && this._rng() < 0.35) this._playChime(chord, time, t);
+    }
+    // Sparse chime melody mid-chord.
+    if (t.chimeDensity > 0 && stepInChord === 8 && this._rng() < t.chimeDensity) {
+      this._playChime(CHORDS[t.chords[chordIdx]], time, t);
+    }
+
+    // Drums.
+    if (t.kickPattern[stepInBar]) {
+      this._playKick(time, t);
+      this._scheduleDuck(time); // sidechain-style pump on the kick
+    }
+    if (t.snarePattern[stepInBar]) this._playSnare(time, t);
+    if (t.hatPattern[stepInBar]) this._playHat(this._swingTime(step, time), t);
+    // Intensity lift (audit r3): at ≥0.7 quiet ghost hats fill the 16th
+    // gaps — the groove tightens into a driving double-time feel on the
+    // final lap.
+    else if (this._intensity >= 0.7) this._playHat(this._swingTime(step, time), t, 0.55);
+
+    // Bass groove.
+    if (t.bassPattern[stepInBar]) {
+      this._playBass(CHORDS[t.chords[chordIdx]][0] - 12, time, t, 0.9);
+    }
+  }
+
+  /* ---------------- Instruments ---------------- */
+
+  _playPad(chord, time, track, stepsPerChord) {
+    const ctx = this._ctx;
+    const dur = stepsPerChord * this._stepDuration() + 0.4;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    // Intensity opens the pad filter up to +60% cutoff (brighter at the lift).
+    const filterFreq = track.padFilter * (1 + 0.6 * this._intensity);
+    filter.frequency.value = filterFreq;
+    filter.Q.value = 0.6;
+    // Slow ~0.1Hz wobble on the filter cutoff.
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.07 + track.padWobble * 0.09;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = filterFreq * 0.16;
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+    lfo.start(time);
+    lfo.stop(time + dur);
+    const g = ctx.createGain();
+    // Calm (0) pulls pads back to 0.8x; full hype pushes them to 1.1x.
+    const padVol = 0.085 * track.padGain * (0.8 + 0.3 * this._intensity);
+    g.gain.setValueAtTime(0.0001, time);
+    g.gain.linearRampToValueAtTime(padVol, time + 0.5);
+    g.gain.setValueAtTime(padVol, time + dur - 0.5);
+    g.gain.linearRampToValueAtTime(0.0001, time + dur);
+    filter.connect(g);
+    g.connect(this._bus);
+    for (const note of chord) {
+      const osc = ctx.createOscillator();
+      osc.type = track.padType;
+      osc.frequency.value = midiHz(note);
+      osc.detune.value = (this._rng() * 2 - 1) * 7;
+      osc.connect(filter);
+      osc.start(time);
+      osc.stop(time + dur);
+      // Soft sine one octave up (brightness layer).
+      if (track.chimeVol > 0.12) {
+        const osc2 = ctx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.value = midiHz(note + 12);
+        osc2.detune.value = (this._rng() * 2 - 1) * 4;
+        const g2 = ctx.createGain();
+        const bright = 0.035 * track.padGain * (0.7 + 0.5 * this._intensity);
+        g2.gain.setValueAtTime(0.0001, time);
+        g2.gain.linearRampToValueAtTime(bright, time + 0.6);
+        g2.gain.setValueAtTime(bright, time + dur - 0.6);
+        g2.gain.linearRampToValueAtTime(0.0001, time + dur);
+        osc2.connect(g2);
+        g2.connect(this._bus);
+        osc2.start(time);
+        osc2.stop(time + dur);
+      }
+    }
+  }
+
+  _playBass(noteMidi, time, track, vel = 1) {
+    const ctx = this._ctx;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = midiHz(noteMidi);
+    const g = ctx.createGain();
+    // Calm (0) pulls the bass back to 0.7x; the lift beefs it up to 1.1x.
+    const vol = 0.2 * track.bassVol * vel * (0.7 + 0.4 * this._intensity);
+    g.gain.setValueAtTime(0.0001, time);
+    g.gain.linearRampToValueAtTime(vol, time + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.42);
+    osc.connect(g);
+    g.connect(this._bus);
+    osc.start(time);
+    osc.stop(time + 0.5);
+  }
+
+  _playChime(chord, time, track) {
+    const ctx = this._ctx;
+    const pool = PENTA[track.key] || PENTA.C;
+    const note = pool[Math.floor(this._rng() * pool.length)] + (this._rng() < 0.3 ? 12 : 0);
+    const f = midiHz(note);
+    const dur = 0.9;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, time);
+    g.gain.linearRampToValueAtTime(track.chimeVol * (0.6 + 0.5 * this._intensity), time + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, time + dur);
+    g.connect(this._bus);
+    for (const partial of [1, 2, 3]) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = f * partial;
+      osc.detune.value = (this._rng() * 2 - 1) * 3;
+      const pg = ctx.createGain();
+      pg.gain.value = 1 / partial;
+      osc.connect(pg);
+      pg.connect(g);
+      osc.start(time);
+      osc.stop(time + dur);
+    }
+  }
+
+  _playKick(time, track) {
+    const ctx = this._ctx;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, time);
+    osc.frequency.exponentialRampToValueAtTime(46, time + 0.09);
+    const g = ctx.createGain();
+    const vol = 0.72 * track.drumVol * (0.75 + 0.35 * this._intensity);
+    g.gain.setValueAtTime(vol, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.13);
+    osc.connect(g);
+    g.connect(this._bus);
+    osc.start(time);
+    osc.stop(time + 0.15);
+    // Click transient (short highpassed noise) — gives the kick a physical
+    // beater attack instead of a pure sine thump.
+    const len = Math.floor(ctx.sampleRate * 0.012);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (this._rng() * 2 - 1) * (1 - i / len);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 2200;
+    const cg = ctx.createGain();
+    cg.gain.value = 0.1 * track.drumVol * (0.75 + 0.35 * this._intensity);
+    src.connect(hp);
+    hp.connect(cg);
+    cg.connect(this._bus);
+    src.start(time);
+    src.stop(time + len / ctx.sampleRate + 0.02); // AUDIT R66: stop explícito (nodes finitos não são GC'd no WebAudio)
+  }
+
+  /** Dips the music bus right on the kick (sidechain pump, ~12%). */
+  _scheduleDuck(time) {
+    // AUDIT R66 (auditoria som #1/5): o duck era agendado com currentTime e
+    // cancelava/re-agendava a cada tick — pumping irregular + atropelava o
+    // fade-in do bus. Agora agenda NO tempo da batida (futuro).
+    const t = time;
+    this._duckGain.gain.cancelScheduledValues(t);
+    this._duckGain.gain.setValueAtTime(1, t);
+    this._duckGain.gain.linearRampToValueAtTime(0.88, t + 0.015);
+    this._duckGain.gain.linearRampToValueAtTime(1, t + 0.14);
+  }
+
+  _playSnare(time, track) {
+    const ctx = this._ctx;
+    const len = Math.floor(ctx.sampleRate * 0.09);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (this._rng() * 2 - 1) * Math.pow(1 - i / len, 1.6);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 1700;
+    bp.Q.value = 0.7;
+    const g = ctx.createGain();
+    g.gain.value = 0.45 * track.drumVol * (0.75 + 0.35 * this._intensity);
+    src.connect(bp);
+    bp.connect(g);
+    g.connect(this._bus);
+    src.start(time);
+    src.stop(time + len / ctx.sampleRate + 0.02); // AUDIT R66: stop explícito
+    // Body tone (short sine at ~190Hz) — the snare needs a pitch core or it
+    // reads as pure white-noise hiss.
+    const body = ctx.createOscillator();
+    body.type = 'sine';
+    body.frequency.setValueAtTime(230, time);
+    body.frequency.exponentialRampToValueAtTime(170, time + 0.06);
+    const bg = ctx.createGain();
+    bg.gain.setValueAtTime(0.16 * track.drumVol * (0.75 + 0.35 * this._intensity), time);
+    bg.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+    body.connect(bg);
+    bg.connect(this._bus);
+    body.start(time);
+    body.stop(time + 0.1);
+  }
+
+  _playHat(time, track, volMult = 1) {
+    const ctx = this._ctx;
+    const len = Math.floor(ctx.sampleRate * 0.03);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (this._rng() * 2 - 1) * Math.pow(1 - i / len, 2);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 6000;
+    const g = ctx.createGain();
+    g.gain.value = 0.09 * track.drumVol * (0.75 + 0.35 * this._intensity) * volMult;
+    src.connect(hp);
+    hp.connect(g);
+    g.connect(this._bus);
+    src.start(time);
+    src.stop(time + len / ctx.sampleRate + 0.02); // AUDIT R66: stop explícito
+  }
+
+  /* ---------------- Offline render (QA) ---------------- */
+
+  /**
+   * Schedules a whole track into an OfflineAudioContext using the
+   * exact same synthesis code as the real-time scheduler — with the
+   * same seed, renders are deterministic. Vinyl texture and crackles
+   * are included so the QA WAV matches the in-game sound.
+   * @param {OfflineAudioContext} ctx
+   * @param {AudioNode} output
+   * @param {string} trackName
+   * @param {number} [seed]
+   * @param {number} [cycles] Override the track's cycle count.
+   */
+  static renderOffline(ctx, output, trackName, seed = 12345, cycles = null) {
+    const track = TRACKS.find((t) => t.name === trackName) || TRACKS[0];
+    const engine = new MusicEngine(ctx, { output, volume: 1, seed });
+    engine._currentTrack = track;
+    engine._playing = true;
+    engine._bus.gain.value = 1; // offline: no fade-in (pitfall)
+    const stepDur = engine._stepDuration();
+    const cyc = cycles ?? track.cycles;
+    const totalSteps = track.chords.length * track.barsPerChord * 16 * cyc;
+    const totalDur = totalSteps * stepDur;
+    for (let step = 0; step < totalSteps; step++) {
+      engine._scheduleStep(step, step * stepDur);
+    }
+    // Vinyl texture + deterministic crackles (same code as real time).
+    engine._ensureVinyl();
+    for (let t = 0.5; t < totalDur - 0.15; t += 0.9) {
+      if (engine._rng() < 0.4) engine._playCrackle(t);
+    }
+    return engine;
+  }
+
+  /** Duration of a track (seconds) for sizing offline contexts. */
+  static trackDuration(name, cycles = 1) {
+    const track = TRACKS.find((t) => t.name === name) || TRACKS[0];
+    const stepDur = 60 / track.bpm / STEPS_PER_BEAT;
+    return track.chords.length * track.barsPerChord * 16 * cycles * stepDur;
+  }
+
+  static trackNames() {
+    return TRACKS.map((t) => t.name);
+  }
+}
+
+{ TRACKS };
+
+return { MusicEngine };
+})();
+// ===== Flix Kart audio glue =====
+// Master chain, engine loop and tyre squeal adapted from fecolinhares/super-kart-3djs AudioManager.js
+// (MIT, Copyright (c) 2026 Feco Linhares); one-shots via its sfx.js, music via its music.js (MusicEngine).
+const AUD = {
+  ctx: null, master: null, music: null, menu: null, eng: null, skid: null, on: true, musicVol: 0.3,
+  init() {
+    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {}); return this.ctx; }
+    const Ctx = window.AudioContext || window.webkitAudioContext; if (!Ctx) return null;
+    const c = (this.ctx = new Ctx());
+    this.master = c.createGain(); this.master.gain.value = this.on ? 0.85 : 0;
+    const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 28;
+    const ls = c.createBiquadFilter(); ls.type = 'lowshelf'; ls.frequency.value = 150; ls.gain.value = 3;
+    const hs = c.createBiquadFilter(); hs.type = 'highshelf'; hs.frequency.value = 11000; hs.gain.value = -2;
+    const comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 22; comp.ratio.value = 3.5; comp.attack.value = 0.004; comp.release.value = 0.22;
+    const lim = c.createDynamicsCompressor(); lim.threshold.value = -6; lim.knee.value = 2; lim.ratio.value = 20; lim.attack.value = 0.001; lim.release.value = 0.06;
+    this.master.connect(hp); hp.connect(ls); ls.connect(hs); hs.connect(comp); comp.connect(lim); lim.connect(c.destination);
+    // procedural small-hall reverb send
+    const sr = c.sampleRate, len = Math.floor(sr * 1.8), pre = Math.floor(sr * 0.02), buf = c.createBuffer(2, len, sr);
+    for (let ch = 0; ch < 2; ch++) { const d = buf.getChannelData(ch); let last = 0; for (let i = pre; i < len; i++) { const t = (i - pre) / (len - pre); last = last * 0.55 + (Math.random() * 2 - 1) * 0.45; d[i] = last * Math.pow(1 - t, 2.6) * (ch ? 0.86 : 1); } }
+    const conv = c.createConvolver(); conv.buffer = buf; const send = c.createGain(); send.gain.value = 0.16; const wet = c.createBiquadFilter(); wet.type = 'lowpass'; wet.frequency.value = 6000;
+    this.master.connect(send); send.connect(conv); conv.connect(wet); wet.connect(comp);
+    // noise buffer for engine / skid
+    const nb = c.createBuffer(1, sr, sr), nd = nb.getChannelData(0); for (let i = 0; i < sr; i++) nd[i] = Math.random() * 2 - 1; this.noise = nb;
+    if (this.wantMenu) this.menuMusic(true); if (this.wantRace) this.raceMusic(true);
+    return c;
+  },
+  setOn(v) { this.on = v; if (this.master) this.master.gain.setTargetAtTime(v ? 0.85 : 0, this.ctx.currentTime, 0.05); },
+  play(name, opts = {}) { if (!this.ctx || !this.on) return; try { renderSfx(this.ctx, this.master, name, Object.assign({}, opts, { volume: Math.min(0.85, opts.volume ?? 0.7), at: this.ctx.currentTime + (opts.delay || 0) })); } catch (e) {} },
+  menuMusic(on) {
+    this.wantMenu = on; if (!this.ctx) return;
+    if (on) { this.raceMusic(false); if (!this.menu) { this.menu = new MusicEngine(this.ctx, { output: this.master, volume: this.musicVol * 0.6, menu: true }); this.menu.setIntensity(0); this.menu.start(); } }
+    else if (this.menu) { this.menu.stop(); this.menu = null; }
+  },
+  raceMusic(on, track) {
+    this.wantRace = on; if (!this.ctx) return;
+    if (on) { this.menuMusic(false); this.wantRace = true; if (!this.music) { this.music = new MusicEngine(this.ctx, { output: this.master, volume: this.musicVol, track, intensity: 0.5 }); this.music.start(); } }
+    else if (this.music) { this.music.stop(); this.music = null; }
+  },
+  intensity(v) { if (this.music) this.music.setIntensity(v); },
+  pauseMusic(p) { if (!this.ctx) return; if (p) this.ctx.suspend && this.ctx.suspend(); else this.ctx.resume && this.ctx.resume(); },
+  // ---- continuous player engine (saw + square + sub through lowpass + soft clip, combustion noise) ----
+  engineOn() {
+    if (!this.ctx || this.eng) return; const c = this.ctx;
+    const base = c.createOscillator(), oct = c.createOscillator(), sub = c.createOscillator(); base.type = 'sawtooth'; oct.type = 'square'; sub.type = 'sine';
+    const flt = c.createBiquadFilter(); flt.type = 'lowpass'; flt.Q.value = 1.2;
+    const sh = c.createWaveShaper(); const cv = new Float32Array(160); for (let i = 0; i < 160; i++) { const x = (i / 159) * 2 - 1; cv[i] = Math.tanh(0.5 * x); } sh.curve = cv;
+    const gain = c.createGain(); gain.gain.value = 0;
+    const vb = c.createGain(), vo = c.createGain(), vs = c.createGain(); vb.gain.value = 0.55; vo.gain.value = 0.22; vs.gain.value = 0.5;
+    base.connect(vb); vb.connect(flt); oct.connect(vo); vo.connect(flt); sub.connect(vs); vs.connect(flt); flt.connect(sh); sh.connect(gain); gain.connect(this.master);
+    const nz = c.createBufferSource(); nz.buffer = this.noise; nz.loop = true; const nb = c.createBiquadFilter(); nb.type = 'bandpass'; nb.Q.value = 0.7; const ng = c.createGain(); ng.gain.value = 0.06; nz.connect(nb); nb.connect(ng); ng.connect(gain);
+    const lfo = c.createOscillator(); lfo.frequency.value = 22; const lg = c.createGain(); lg.gain.value = 3; lfo.connect(lg); lg.connect(base.detune);
+    base.frequency.value = 58; oct.frequency.value = 117; sub.frequency.value = 29; flt.frequency.value = 300; nb.frequency.value = 220;
+    [base, oct, sub, nz, lfo].forEach((o) => o.start());
+    // tyre squeal loop (high-Q bandpass noise with wobble)
+    const sq = c.createBufferSource(); sq.buffer = this.noise; sq.loop = true; const sf = c.createBiquadFilter(); sf.type = 'bandpass'; sf.Q.value = 9; sf.frequency.value = 1250;
+    const sl = c.createOscillator(); sl.frequency.value = 19; const slg = c.createGain(); slg.gain.value = 150; sl.connect(slg); slg.connect(sf.frequency);
+    const sg = c.createGain(); sg.gain.value = 0; sq.connect(sf); sf.connect(sg); sg.connect(this.master); sq.start(); sl.start();
+    this.eng = { base, oct, sub, flt, gain, nb, lg, nz, lfo, sq, sl, sg, sf, last: 0 };
+  },
+  engineOff() { const e = this.eng; if (!e) return; this.eng = null; const t = this.ctx.currentTime; e.gain.gain.setTargetAtTime(0, t, 0.05); e.sg.gain.setTargetAtTime(0, t, 0.05); setTimeout(() => { [e.base, e.oct, e.sub, e.nz, e.lfo, e.sq, e.sl].forEach((o) => { try { o.stop(); } catch (x) {} }); }, 300); },
+  engineUpd(speed01, turbo, drift, gas) {
+    const e = this.eng; if (!e) return; const t = this.ctx.currentTime; if (t - e.last < 1 / 30) return; e.last = t; const tc = 0.06;
+    const g = engineGear(Math.min(1, speed01 + (turbo ? 0.06 : 0))), lug = (1 - g.local) * g.load, rpm = g.rpm * (turbo ? 1.08 : 1);
+    e.base.frequency.setTargetAtTime(rpm, t, tc); e.oct.frequency.setTargetAtTime(rpm * 2.02, t, tc); e.sub.frequency.setTargetAtTime(rpm * 0.5, t, tc);
+    e.flt.frequency.setTargetAtTime(300 + g.ratio * 1500 - lug * 250 + (turbo ? 500 : 0), t, tc); e.nb.frequency.setTargetAtTime(220 + g.ratio * 900, t, tc);
+    const load = Math.max(0.12, g.load * (gas ? 1 : 0.6));
+    e.gain.gain.setTargetAtTime(0.42 * (0.18 + 0.82 * load) * (0.3 + 0.62 * (0.7 * load + 0.3 * g.local)), t, tc);
+    e.lg.gain.setTargetAtTime(3 + load * 4, t, tc);
+    e.sg.gain.setTargetAtTime(drift ? 0.07 + speed01 * 0.06 : 0, t, drift ? 0.04 : 0.08);
+  },
+};
+
 // ================= FLIX KART — game layer =================
-const VERSION = '1.0';
+const VERSION = '2.0';
 const $ = (s) => document.querySelector(s);
 const SAVE_KEY = 'flix_kart1';
-const DEF = { lang: 'tr', snd: 1, tuy: 0, color: 'kirmizi', feather: 'klasik', ownC: ['kirmizi'], ownF: ['klasik'], best: {}, wins: {}, unlocked: ['mutfak'], races: 0, tut: 0 };
+const DEF = { lang: 'tr', snd: 1, tuy: 0, color: 'kirmizi', feather: 'klasik', ownC: ['kirmizi'], ownF: ['klasik'], driver: 'flix', ownD: ['flix', 'wu'], best: {}, wins: {}, unlocked: ['mutfak'], races: 0, tut: 0 };
 let SV; try { SV = Object.assign({}, DEF, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { SV = Object.assign({}, DEF); }
 const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(SV)); } catch (e) {} };
 const T = (tr, en) => (SV.lang === 'en' ? en : tr);
@@ -416,31 +2297,19 @@ const FEATHERS = [
   { id: 'ates', tr: 'Ateş', en: 'Fire', f: [C.red, 0xffb000, C.red], cost: 600 }, { id: 'gece', tr: 'Gece', en: 'Midnight', f: [0x1b2a6b, 0xc8d2ff, 0x1b2a6b], cost: 900 },
   { id: 'seker', tr: 'Şeker', en: 'Candy', f: [0xff4fa3, 0xffe066, 0x46d8ff], cost: 1200 }, { id: 'gokkusagi', tr: 'Gökkuşağı', en: 'Rainbow', f: [0xff3b30, 0x34c759, 0x007aff], cost: 2500 },
 ];
-const BOTS = [
+const BOTS_OLD = [
   { n: 'Onat', c: 0x2a80dc, f: [0xffffff, 0x2a80dc, 0xffffff] }, { n: 'Ece', c: 0x2fa043, f: [C.yel, C.green, C.yel] }, { n: 'Kerem', c: 0xffc20e, f: [C.red, C.yel, C.red] },
   { n: 'Zeynep', c: 0x8a3dd8, f: [0xd6a4ff, 0x8a3dd8, 0xd6a4ff] }, { n: 'Mert', c: 0xff7a1a, f: [0xffffff, C.orange, C.navy] },
 ];
 const REWARD = [150, 100, 70, 50, 40, 30];
 
-// ---------- audio ----------
-let AC = null, eng = null;
-function ac() { if (!AC) try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} return AC; }
-function beep(freq, dur = 0.12, type = 'sine', vol = 0.15, slide = 0) {
-  if (!SV.snd || !ac()) return; const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
-  o.type = type; o.frequency.setValueAtTime(freq, t); if (slide) o.frequency.exponentialRampToValueAtTime(freq * slide, t + dur);
-  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + dur + 0.02);
-}
-function engineOn() {
-  if (!SV.snd || !ac() || eng) return;
-  const o = AC.createOscillator(), o2 = AC.createOscillator(), f = AC.createBiquadFilter(), g = AC.createGain();
-  o.type = 'sawtooth'; o2.type = 'square'; f.type = 'lowpass'; f.frequency.value = 600; g.gain.value = 0.0;
-  o.connect(f); o2.connect(f); f.connect(g).connect(AC.destination); o.start(); o2.start(); eng = { o, o2, f, g };
-}
-function engineOff() { if (eng) { try { eng.o.stop(); eng.o2.stop(); } catch (e) {} eng = null; } }
-function engineUpd(s, turbo) { if (!eng) return; const t = AC.currentTime, fr = 55 + s * 3.2 + (turbo ? 40 : 0); eng.o.frequency.setTargetAtTime(fr, t, 0.05); eng.o2.frequency.setTargetAtTime(fr * 0.5, t, 0.05); eng.f.frequency.setTargetAtTime(400 + s * 25, t, 0.1); eng.g.gain.setTargetAtTime(0.035 + Math.min(0.03, s / 1200), t, 0.1); }
-const sfx = { pick: () => beep(880, 0.08, 'triangle', 0.1, 1.5), wall: () => beep(90, 0.15, 'square', 0.08, 0.6), go: () => beep(880, 0.35, 'square', 0.1), tick: () => beep(440, 0.15, 'square', 0.08),
-  turbo: () => beep(300, 0.5, 'sawtooth', 0.06, 3), lap: () => [660, 880].forEach((f, i) => setTimeout(() => beep(f, 0.12, 'triangle', 0.1), i * 90)),
-  win: () => [523, 659, 784, 1047, 1319].forEach((f, i) => setTimeout(() => beep(f, 0.2, 'triangle', 0.12), i * 100)), buy: () => [392, 523, 659, 784].forEach((f, i) => setTimeout(() => beep(f, 0.12, 'square', 0.06), i * 60)) };
+// ---------- audio (see audio.js) ----------
+AUD.on = !!SV.snd;
+function ac() { AUD.init(); }
+const sfx = { pick: () => AUD.play('pickup', { volume: 0.55 }), wall: (v) => AUD.play('crash', { volume: 0.25 + v * 0.4 }), go: () => AUD.play('go', { volume: 0.8 }), tick: () => AUD.play('countdown', { volume: 0.75 }),
+  turbo: () => AUD.play('boost', { volume: 0.6 }), mini: () => AUD.play('driftReleaseMiniBoost', { volume: 0.7 }), lvl: () => AUD.play('driftReady', { volume: 0.5 }), lap: () => AUD.play('lap', { volume: 0.7 }), final: () => AUD.play('finalLap', { volume: 0.75 }),
+  win: () => AUD.play('victory', { volume: 0.8 }), fin: () => AUD.play('finish', { volume: 0.75 }), buy: () => AUD.play('uiSelect', { volume: 0.6 }), click: () => AUD.play('uiClick', { volume: 0.6 }), no: () => AUD.play('posDown', { volume: 0.5 }),
+  up: () => AUD.play('posUp', { volume: 0.45 }), down: () => AUD.play('posDown', { volume: 0.35 }), bump: () => AUD.play('crash', { volume: 0.25 }), land: () => AUD.play('landing', { volume: 0.35 }) };
 
 // ---------- renderer / scene ----------
 const cv = $('#gl');
@@ -551,6 +2420,25 @@ function buildWorld(def) {
     for (let i = 0; i < 5; i++) tryPlace((x, z) => ball(x, z, rnd(4, 7)), 7);
     for (let i = 0; i < 6; i++) tryPlace((x, z) => crayon(x, z, [C.red, C.yel, C.blue, C.green, 0x8a3dd8, C.orange][i]), 9);
   }
+  // chevron boards on the outside of sharp corners
+  const chevT = canvasTex(256, 128, (c, w, h) => { c.fillStyle = '#ffd41f'; c.fillRect(0, 0, w, h); c.fillStyle = '#022753'; for (let k = 0; k < 3; k++) { const x = 40 + k * 70; c.beginPath(); c.moveTo(x, 14); c.lineTo(x + 46, 64); c.lineTo(x, 114); c.lineTo(x + 22, 114); c.lineTo(x + 68, 64); c.lineTo(x + 22, 14); c.closePath(); c.fill(); } c.strokeStyle = '#022753'; c.lineWidth = 10; c.strokeRect(5, 5, w - 10, h - 10); });
+  const chevL = phys(0xffffff, { map: chevT, roughness: 0.5 }), chevR = chevL.clone(); chevR.map = chevT.clone(); chevR.map.needsUpdate = true; chevR.map.wrapS = THREE.RepeatWrapping; chevR.map.repeat.x = -1;
+  const postM = phys(0x022753, { roughness: 0.5 });
+  let lastC = -99;
+  for (let i = 0; i < tr.N; i += 3) { if (tr.K[i] < 0.42 || i - lastC < 14) continue; lastC = i;
+    const a = tr.Tn[i], b = tr.Tn[(i + 10) % tr.N], turn = a.x * b.z - a.z * b.x; // >0: turning right (screen) in x/z
+    const out = turn > 0 ? 1 : -1; // outside side along normal
+    for (const dj of [4, 9, 14]) { const j = (i + dj) % tr.N, P = tr.P[j].clone().addScaledVector(tr.Nm[j], out * (tr.W / 2 + 2.2));
+      const bd = new THREE.Group(); bd.position.set(P.x, 0, P.z); bd.rotation.y = Math.atan2(-tr.Tn[j].x, -tr.Tn[j].z); g.add(bd);
+      mesh(new THREE.BoxGeometry(3.6, 1.8, 0.2), [postM, postM, postM, postM, out > 0 ? chevL : chevR, postM], bd, 0, 2.4, 0); mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.6, 8), postM, bd, 0, 0.8, 0); } }
+  // sponsor billboards facing the track
+  const ads = [['FLIX KICK UP', '#e22511', '#ffd41f'], ['FLIX ARKANA', '#14062a', '#ffc20e'], ['FLIX 3 2 1', '#022753', '#ffffff'], ['FLIX TOYS', '#ffd41f', '#e22511']];
+  ads.forEach((ad, n) => { const i = Math.round(((n + 0.5) / ads.length + 0.07) * tr.N) % tr.N, side = n % 2 ? 1 : -1;
+    const P = tr.P[i].clone().addScaledVector(tr.Nm[i], side * (tr.W / 2 + 6)); if (!farFromTrack(tr, P.x, P.z, 3)) return;
+    const tx = canvasTex(1024, 384, (c, w, h) => { c.fillStyle = ad[1]; c.fillRect(0, 0, w, h); c.fillStyle = ad[2]; c.fillRect(0, h - 26, w, 26); if (LOGO_IMG) c.drawImage(LOGO_IMG, 30, 50, 280, 250); c.fillStyle = ad[2]; c.font = 'italic 900 120px "Barlow Condensed", Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(ad[0].replace('FLIX ', ''), w * 0.64, h * 0.42); c.font = '800 44px Rubik, sans-serif'; c.fillText(T('ŞİMDİ OYNA', 'PLAY NOW'), w * 0.64, h * 0.75); });
+    const bb = new THREE.Group(); bb.position.set(P.x, 0, P.z); const tn = tr.Tn[i]; bb.rotation.y = Math.atan2(-tn.x, -tn.z) + side * Math.PI / 2; g.add(bb);
+    const face = phys(0xffffff, { map: tx, roughness: 0.4, emissive: 0x222222 });
+    mesh(new THREE.BoxGeometry(14, 5.2, 0.4), [postM, postM, postM, postM, face, postM], bb, 0, 6.2, 0); for (const x of [-5, 5]) mesh(new THREE.CylinderGeometry(0.25, 0.25, 4, 8), postM, bb, x, 2, 0); });
   // pickups (feathers) + turbo pads
   const pickups = [], pads = [];
   const fMat = FEATHERS.map((f) => new THREE.MeshStandardMaterial({ map: featherTex(f.f[1]), alphaTest: 0.35, side: THREE.DoubleSide, emissive: 0x332200, roughness: 0.5 }));
@@ -573,59 +2461,120 @@ function buildWorld(def) {
 }
 
 // ---------- karts ----------
-function kartMesh(col, feathers, metal) {
-  const g = new THREE.Group(), body = phys(col, { roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.08, metalness: metal ? 0.8 : 0.1 });
+function kartMesh(col, feathers, metal, driverId) {
+  const g = new THREE.Group(), body = phys(col, { roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.06, metalness: metal ? 0.8 : 0.15 });
+  const dark = phys(0x1b1b22, { roughness: 0.45 }), chrome = phys(0xe8e8ee, { metalness: 1, roughness: 0.18 }), white = phys(0xf4f1ea, { roughness: 0.4 });
   const inner = new THREE.Group(); g.add(inner); inner.scale.setScalar(2.4);
-  mesh(new RoundedBoxGeometry(0.95, 0.28, 1.6, 3, 0.12), body, inner, 0, 0.28, 0);
-  mesh(new RoundedBoxGeometry(0.75, 0.2, 0.5, 3, 0.08), body, inner, 0, 0.36, -0.68);
-  mesh(new RoundedBoxGeometry(1.15, 0.08, 0.28, 2, 0.03), phys(0x1b1b22, { roughness: 0.4 }), inner, 0, 0.62, 0.78);
-  mesh(new THREE.BoxGeometry(0.06, 0.24, 0.06), phys(0x1b1b22), inner, -0.4, 0.48, 0.74); mesh(new THREE.BoxGeometry(0.06, 0.24, 0.06), phys(0x1b1b22), inner, 0.4, 0.48, 0.74);
-  const tire = phys(0x18181c, { roughness: 0.75 }), rim = phys(0xdedede, { metalness: 1, roughness: 0.2 }); const wheels = [];
-  for (const [wx, wz, r] of [[-0.55, -0.55, 0.2], [0.55, -0.55, 0.2], [-0.58, 0.55, 0.25], [0.58, 0.55, 0.25]]) {
-    const w = new THREE.Group(); w.position.set(wx, r, wz); inner.add(w); const t = mesh(new THREE.TorusGeometry(r * 0.7, r * 0.32, 10, 20), tire, w); t.rotation.y = Math.PI / 2;
-    const rr = mesh(new THREE.CylinderGeometry(r * 0.5, r * 0.5, 0.14, 12), rim, w); rr.rotation.z = Math.PI / 2; wheels.push(w); }
-  mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.25, 10), rim, inner, 0.25, 0.3, 0.85).rotation.x = Math.PI / 2; mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.25, 10), rim, inner, -0.25, 0.3, 0.85).rotation.x = Math.PI / 2;
-  const toy = makeToy({ colors: feathers, lite: true }); toy.scale.setScalar(0.42); toy.position.set(0, 0.5, 0.15); toy.rotation.x = 0.35; inner.add(toy);
-  // turbo flames
-  const flames = new THREE.Group(); inner.add(flames);
-  for (const sx of [0.25, -0.25]) { const f = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.9, 10, 1, true), new THREE.MeshBasicMaterial({ color: 0x6fd8ff, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false })); f.rotation.x = -Math.PI / 2; f.position.set(sx, 0.3, 1.35); flames.add(f);
-    const f2 = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.5, 8, 1, true), new THREE.MeshBasicMaterial({ color: 0xffffff, blending: THREE.AdditiveBlending, depthWrite: false })); f2.rotation.x = -Math.PI / 2; f2.position.set(sx, 0.3, 1.15); flames.add(f2); }
+  const chassis = new THREE.Group(); inner.add(chassis);
+  // floor pan + body tub with a pointed nose
+  mesh(new RoundedBoxGeometry(1.0, 0.12, 1.75, 2, 0.05), dark, chassis, 0, 0.17, 0);
+  mesh(new RoundedBoxGeometry(0.9, 0.26, 1.15, 3, 0.11), body, chassis, 0, 0.32, 0.12);
+  mesh(new RoundedBoxGeometry(0.62, 0.2, 0.7, 3, 0.09), body, chassis, 0, 0.3, -0.62);
+  const nose = mesh(new RoundedBoxGeometry(1.08, 0.12, 0.26, 2, 0.05), body, chassis, 0, 0.2, -0.98);
+  mesh(new RoundedBoxGeometry(0.5, 0.05, 0.3, 2, 0.02), white, chassis, 0, 0.41, -0.66);
+  // side pods with white racing stripe
+  for (const sx of [-1, 1]) { mesh(new RoundedBoxGeometry(0.22, 0.2, 0.8, 2, 0.08), body, chassis, sx * 0.52, 0.27, 0.1); mesh(new THREE.BoxGeometry(0.02, 0.06, 0.72), white, chassis, sx * 0.635, 0.3, 0.1); }
+  // seat + backrest, steering column + wheel
+  mesh(new RoundedBoxGeometry(0.46, 0.08, 0.42, 2, 0.03), dark, chassis, 0, 0.44, 0.24);
+  const back = mesh(new RoundedBoxGeometry(0.46, 0.24, 0.08, 2, 0.03), dark, chassis, 0, 0.55, 0.47); back.rotation.x = -0.25;
+  const col2 = mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.42, 6), dark, chassis, 0, 0.5, -0.18); col2.rotation.x = 1.0;
+  const wheel = new THREE.Group(); wheel.position.set(0, 0.62, -0.08); wheel.rotation.x = -1.0; chassis.add(wheel);
+  mesh(new THREE.TorusGeometry(0.13, 0.025, 6, 18), dark, wheel).rotation.x = Math.PI / 2; mesh(new THREE.BoxGeometry(0.24, 0.02, 0.03), chrome, wheel);
+  // rear wing on struts with the logo
+  const wingT = canvasTex(256, 64, (c, w, h) => { c.fillStyle = '#' + new THREE.Color(col).getHexString(); c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.fillRect(0, h - 8, w, 8); if (LOGO_IMG) c.drawImage(LOGO_IMG, w / 2 - 34, 4, 68, 56); });
+  mesh(new RoundedBoxGeometry(1.1, 0.2, 0.12, 2, 0.05), [body, body, body, body, phys(0xffffff, { map: wingT, roughness: 0.3, clearcoat: 1 }), body], chassis, 0, 0.38, 0.86);
+  mesh(new RoundedBoxGeometry(0.9, 0.05, 0.22, 2, 0.02), body, chassis, 0, 0.5, 0.8).rotation.x = -0.15;
+  // exhausts
+  for (const sx of [0.18, -0.18]) { const e = mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.3, 10), chrome, chassis, sx * 2.2, 0.2, 0.95); e.rotation.x = Math.PI / 2; }
+  // wheels: chunky tyres, coloured rims, front ones steer
+  const tire = phys(0x18181c, { roughness: 0.8 }), rim = phys(col, { metalness: 0.6, roughness: 0.25 }); const wheels = [];
+  for (const [wx, wz, r, wd] of [[-0.6, -0.62, 0.21, 0.2], [0.6, -0.62, 0.21, 0.2], [-0.64, 0.6, 0.27, 0.28], [0.64, 0.6, 0.27, 0.28]]) {
+    const piv = new THREE.Group(); piv.position.set(wx, r, wz); inner.add(piv); const w = new THREE.Group(); piv.add(w);
+    const t = mesh(new THREE.CylinderGeometry(r, r, wd, 18), tire, w); t.rotation.z = Math.PI / 2;
+    const rr = mesh(new THREE.CylinderGeometry(r * 0.6, r * 0.6, wd + 0.02, 10), rim, w); rr.rotation.z = Math.PI / 2;
+    const hub = mesh(new THREE.CylinderGeometry(r * 0.2, r * 0.2, wd + 0.04, 8), chrome, w); hub.rotation.z = Math.PI / 2;
+    wheels.push({ piv, w }); }
+  // driver
+  const drv = makeDriver(driverId || 'flix'); drv.g.position.set(0, 0.5, 0.2); drv.g.scale.setScalar(1.75 / 2.4); chassis.add(drv.g);
+  // small FLIX toy mascot on the nose (feather colours from the garage)
+  const toy = makeToy({ colors: feathers, lite: true }); toy.scale.setScalar(0.2); toy.position.set(0, 0.36, -0.92); toy.rotation.x = -0.2; chassis.add(toy);
+  // turbo flames (colour set per frame)
+  const flames = new THREE.Group(); chassis.add(flames); const fm = [];
+  for (const sx of [0.18, -0.18]) { const m1 = new THREE.MeshBasicMaterial({ color: 0x6fd8ff, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
+    const f = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.9, 10, 1, true), m1); f.rotation.x = Math.PI / 2; f.position.set(sx * 2.2, 0.2, 1.48); flames.add(f); fm.push(m1);
+    const f2 = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.5, 8, 1, true), new THREE.MeshBasicMaterial({ color: 0xffffff, blending: THREE.AdditiveBlending, depthWrite: false })); f2.rotation.x = Math.PI / 2; f2.position.set(sx * 2.2, 0.2, 1.31); flames.add(f2); }
   flames.visible = false;
-  return { g, inner, wheels, flames, toy };
+  // blob shadow keeps karts grounded on phones
+  const bs = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 2.2), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: 0.55 })); bs.rotation.x = -Math.PI / 2; bs.position.y = 0.02; inner.add(bs);
+  return { g, inner, chassis, wheels, flames, fm, toy, drv, wheel, bs };
 }
+const blobTex = canvasTex(64, 64, (c) => { const gr = c.createRadialGradient(32, 32, 4, 32, 32, 31); gr.addColorStop(0, 'rgba(0,0,0,.8)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = gr; c.fillRect(0, 0, 64, 64); });
 
 let karts = [], me = null, race = null, kartGroup = new THREE.Group(); scene.add(kartGroup);
 function playerLook() { const c = COLORS.find((x) => x.id === SV.color) || COLORS[0], f = FEATHERS.find((x) => x.id === SV.feather) || FEATHERS[0]; return { c: c.c, f: f.f, metal: c.metal }; }
 function setupKarts(withBots) {
   kartGroup.clear(); karts = [];
-  const tr = world.tr, look = playerLook();
+  const tr = world.tr, look = playerLook(), myD = DRIVERS.find((d) => d.id === SV.driver) || DRIVERS[0];
+  const rivals = DRIVERS.filter((d) => d.id !== myD.id);
   const order = withBots ? [0, 1, 2, 3, 4, 5] : [0];
   const pslot = withBots ? 5 : 0; // player starts at the back
-  order.forEach((slot, n) => {
+  const BF = [[C.blue, C.green, C.yel], [0xffffff, 0x2a80dc, 0xffffff], [C.red, C.yel, C.red], [0xd6a4ff, 0x8a3dd8, 0xd6a4ff], [0xffffff, C.orange, C.navy]];
+  let bi = 0;
+  order.forEach((slot) => {
     const isMe = slot === pslot, g = gridPos(tr, slot), k = makeKart(g.pos, g.yaw, g.idx);
-    const bot = isMe ? null : BOTS[n % BOTS.length];
-    const vis = isMe ? kartMesh(look.c, look.f, look.metal) : kartMesh(bot.c, bot.f);
-    kartGroup.add(vis.g); k.vis = vis; k.me = isMe; k.name = isMe ? T('SEN', 'YOU') : bot.n; k.color = isMe ? look.c : bot.c;
+    const d = isMe ? myD : rivals[bi % rivals.length], n = isMe ? 0 : bi++;
+    const kc = isMe ? look.c : d.kart;
+    const vis = isMe ? kartMesh(look.c, look.f, look.metal, d.id) : kartMesh(kc, BF[n % 5], 0, d.id);
+    kartGroup.add(vis.g); k.vis = vis; k.me = isMe; k.name = isMe ? T(d.tr, d.en) + ' (' + T('SEN', 'YOU') + ')' : T(d.tr, d.en); k.color = kc; k.did = d.id;
     k.skill = isMe ? 1 : [0.97, 1.0, 1.03, 1.06, 1.09][n % 5]; k.laneOff = isMe ? 0 : (n % 2 ? 1 : -1) * 1.2;
     karts.push(k); if (isMe) me = k;
   });
   syncKarts(0);
 }
+const FLAMEC = [0x6fd8ff, 0x6fd8ff, 0xffa020, 0xd96bff];
+let animT = 0;
 function syncKarts(dt) {
+  animT += dt;
   for (const k of karts) {
-    const v = k.vis; v.g.position.set(k.x, k.y, k.z); v.g.rotation.set(0, k.h, 0);
-    v.inner.rotation.set(k.pitch, k.drift ? -k.driftDir * 0.25 : 0, k.roll + (k.hitT > 0 ? Math.sin(k.hitT * 60) * 0.05 : 0));
-    v.wheels.forEach((w, i) => { w.rotation.x -= k.s * dt * (i < 2 ? 2.1 : 1.7); if (i < 2) w.rotation.y = k.steer * 0.4; });
-    v.flames.visible = !!k.turbo; if (k.turbo) v.flames.children.forEach((f) => (f.scale.y = 0.8 + Math.random() * 0.6));
-    v.toy.rotation.z = -k.roll * 1.5; v.toy.rotation.x = 0.35 + Math.min(0.3, k.s / 120);
+    const v = k.vis; v.g.position.set(k.x, 0, k.z); v.g.rotation.set(0, k.h, 0);
+    // visual drift angle, hop squash, suspension bob
+    k.vDrift = (k.vDrift || 0) + ((k.drift ? -k.driftDir * 0.42 : 0) - (k.vDrift || 0)) * Math.min(1, dt * 8);
+    const bob = Math.sin(animT * 18 + k.x) * 0.012 * Math.min(1, Math.abs(k.s) / 20);
+    v.inner.position.y = k.y; v.inner.rotation.set(k.pitch, k.vDrift, k.roll + (k.hitT > 0 ? Math.sin(k.hitT * 60) * 0.05 : 0));
+    const sq = k.y > 0 ? 1 + Math.min(0.12, k.vy * 0.015) : 1; v.chassis.scale.set(1 / Math.sqrt(sq), sq, 1 / Math.sqrt(sq)); v.chassis.position.y = bob;
+    v.bs.position.y = 0.02 - k.y / 2.4; v.bs.material.opacity = 0.55 / (1 + k.y * 0.4);
+    v.wheels.forEach((w, i) => { w.w.rotation.x -= k.s * dt * (i < 2 ? 2.0 : 1.55); if (i < 2) w.piv.rotation.y = k.steer * 0.45; });
+    v.wheel.rotation.y = k.steer * 1.2;
+    v.flames.visible = !!k.turbo; if (k.turbo) { v.flames.children.forEach((f) => (f.scale.y = 0.8 + Math.random() * 0.7)); const fc = FLAMEC[k.padLvl || 0]; v.fm.forEach((m) => m.color.setHex(fc)); }
+    v.toy.rotation.z = -k.roll * 1.5;
+    const cel = race && k.done ? 1 : 0;
+    v.drv.anim(dt, { steer: k.steer, s: Math.max(0, k.s), boost: k.turbo, hit: k.hitT > 0.1 || k.wallHit > 0.3, celebrate: cel, t: animT + k.skill * 10 });
   }
 }
-
 // ---------- particles (dust / sparks / pickups) ----------
 const parts = []; const PGEO = new THREE.SphereGeometry(0.18, 6, 5);
-const pmats = { dust: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 }), spark: new THREE.MeshBasicMaterial({ color: 0xffd41f }), blue: new THREE.MeshBasicMaterial({ color: 0x6fd8ff }), feather: new THREE.MeshBasicMaterial({ color: 0xfff2a0 }) };
-function puff(x, y, z, kind, n = 1, sp = 3) { for (let i = 0; i < n; i++) { if (parts.length > 160) return; const m = new THREE.Mesh(PGEO, pmats[kind]); m.position.set(x, y, z); scene.add(m); parts.push({ m, vx: (Math.random() - 0.5) * sp, vy: Math.random() * sp, vz: (Math.random() - 0.5) * sp, life: 0.5 + Math.random() * 0.3, t: 0 }); } }
-function stepParts(dt) { for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.t += dt; if (p.t > p.life) { scene.remove(p.m); parts.splice(i, 1); continue; } p.vy -= 6 * dt; p.m.position.x += p.vx * dt; p.m.position.y += p.vy * dt; p.m.position.z += p.vz * dt; p.m.scale.setScalar(1 - p.t / p.life); } }
+const pmats = { dust: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 }), spark: new THREE.MeshBasicMaterial({ color: 0xffd41f }), blue: new THREE.MeshBasicMaterial({ color: 0x6fd8ff }), feather: new THREE.MeshBasicMaterial({ color: 0xfff2a0 }), fire: new THREE.MeshBasicMaterial({ color: 0xffa42a, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }), smoke: new THREE.MeshBasicMaterial({ color: 0xbfbfbf, transparent: true, opacity: 0.35, depthWrite: false }),
+  s1: new THREE.MeshBasicMaterial({ color: 0x6fd8ff, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }), s2: new THREE.MeshBasicMaterial({ color: 0xffa020, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }), s3: new THREE.MeshBasicMaterial({ color: 0xd96bff, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }),
+  c0: new THREE.MeshBasicMaterial({ color: 0xe22511 }), c1: new THREE.MeshBasicMaterial({ color: 0xffc20e }), c2: new THREE.MeshBasicMaterial({ color: 0x2a80dc }), c3: new THREE.MeshBasicMaterial({ color: 0x2fa043 }) };
+function puff(x, y, z, kind, n = 1, sp = 3) { for (let i = 0; i < n; i++) { if (parts.length > 220) return; const m = new THREE.Mesh(PGEO, pmats[kind]); m.position.set(x, y, z); scene.add(m); parts.push({ m, vx: (Math.random() - 0.5) * sp, vy: Math.random() * sp, vz: (Math.random() - 0.5) * sp, life: 0.5 + Math.random() * 0.3, t: 0, g: kind === 'smoke' || kind === 'fire' ? -3 : 6 }); } }
+const SPGEO = new THREE.BoxGeometry(0.12, 0.12, 0.5);
+function driftFx(k) {
+  const lv = k.driftLvl, fx = fwdX(k), fz = fwdZ(k), rx = -fz, rz = fx;
+  for (const sd of [-1, 1]) { const wx = k.x - fx * 1.5 + rx * sd * 1.5, wz = k.z - fz * 1.5 + rz * sd * 1.5;
+    if (lv > 0 && Math.random() < 0.8) { const m = new THREE.Mesh(SPGEO, pmats['s' + lv]); m.position.set(wx, 0.3, wz); m.rotation.y = Math.random() * 6; scene.add(m); parts.push({ m, vx: (Math.random() - 0.5) * 6 - fx * 4, vy: 2 + Math.random() * 4, vz: (Math.random() - 0.5) * 6 - fz * 4, life: 0.25 + Math.random() * 0.2, t: 0, g: 18 }); }
+    else if (Math.random() < 0.35) puff(wx, 0.3, wz, 'dust', 1, 1.5);
+    if (k.me) skid(wx, wz, sd); }
+}
+// skid marks: ring buffer of quads
+const SKN = 400, skPos = new Float32Array(SKN * 4 * 3), skGeo = new THREE.BufferGeometry(); skGeo.setAttribute('position', new THREE.BufferAttribute(skPos, 3));
+{ const idx = []; for (let i = 0; i < SKN; i++) { const b = i * 4; idx.push(b, b + 1, b + 2, b + 1, b + 3, b + 2); } skGeo.setIndex(idx); }
+const skMesh = new THREE.Mesh(skGeo, new THREE.MeshBasicMaterial({ color: 0x1a1a1a, transparent: true, opacity: 0.35, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 })); skMesh.frustumCulled = false; scene.add(skMesh);
+let skI = 0; const skLast = {};
+function skid(x, z, sd) { const L = skLast[sd]; skLast[sd] = { x, z, t: animT }; if (!L || animT - L.t > 0.1) return; const dx = x - L.x, dz = z - L.z, d = Math.hypot(dx, dz) || 1, nx = -dz / d * 0.22, nz = dx / d * 0.22, b = (skI % SKN) * 12; skI++;
+  skPos.set([L.x + nx, 0.06, L.z + nz, L.x - nx, 0.06, L.z - nz, x + nx, 0.06, z + nz, x - nx, 0.06, z - nz], b); skGeo.attributes.position.needsUpdate = true; }
+function skidClear() { skPos.fill(0); skGeo.attributes.position.needsUpdate = true; skLast[-1] = skLast[1] = null; }
+function confetti(n) { if (!me) return; for (let i = 0; i < n; i++) { const m = new THREE.Mesh(SPGEO, pmats['c' + (i % 4)]); m.position.set(me.x + (Math.random() - 0.5) * 6, 4 + Math.random() * 3, me.z + (Math.random() - 0.5) * 6); m.rotation.set(Math.random() * 6, Math.random() * 6, 0); scene.add(m); parts.push({ m, vx: (Math.random() - 0.5) * 10, vy: 6 + Math.random() * 8, vz: (Math.random() - 0.5) * 10, life: 1.6 + Math.random(), t: 0, g: 9, spin: 1 }); } }
+function stepParts(dt) { for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.t += dt; if (p.t > p.life) { scene.remove(p.m); parts.splice(i, 1); continue; } p.vy -= (p.g ?? 6) * dt; p.m.position.x += p.vx * dt; p.m.position.y += p.vy * dt; p.m.position.z += p.vz * dt; if (p.spin) { p.m.rotation.x += dt * 8; p.m.rotation.z += dt * 6; } else p.m.scale.setScalar(1 - p.t / p.life); } }
 
 // ---------- minimap ----------
 const mm = $('#mm'), mmc = mm.getContext('2d'); let mmBase = null, mmT = null;
@@ -648,7 +2597,7 @@ const keys = {}; const ctl = { left: false, right: false, drift: false, turbo: f
 addEventListener('keydown', (e) => { keys[e.key] = true; if (['ArrowLeft', 'ArrowRight', ' ', 'ArrowDown', 'ArrowUp'].includes(e.key)) e.preventDefault(); });
 addEventListener('keyup', (e) => { keys[e.key] = false; });
 function hold(el, key) {
-  const on = (e) => { e.preventDefault(); ctl[key] = true; el.classList.add('on'); ac(); }, off = (e) => { e.preventDefault(); ctl[key] = false; el.classList.remove('on'); };
+  const on = (e) => { e.preventDefault(); ctl[key] = true; el.classList.add('on'); ac(); if (key === 'turbo' && race) race.turboTap = race.t; }, off = (e) => { e.preventDefault(); ctl[key] = false; el.classList.remove('on'); };
   el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off); el.addEventListener('pointercancel', off); el.addEventListener('pointerleave', off);
 }
 hold($('#bL'), 'left'); hold($('#bR'), 'right'); hold($('#bD'), 'drift'); hold($('#bT'), 'turbo');
@@ -664,9 +2613,9 @@ let toastT = 0; function toast(s, ms = 1600) { const t = $('#toast'); t.textCont
 function big(s, cls = '') { const b = $('#big'); b.textContent = s; b.className = cls; b.hidden = false; b.style.animation = 'none'; void b.offsetWidth; b.style.animation = ''; }
 
 function startRace(defId) {
-  const def = TRACKS.find((t) => t.id === defId); buildWorld(def); setupKarts(true);
+  $('#res').hidden = true; const def = TRACKS.find((t) => t.id === defId); buildWorld(def); setupKarts(true); skidClear();
   race = { t: -3.6, phase: 'count', lastCount: 4, order: [], finished: [], def };
-  show('raceP'); $('#lapTot').textContent = def.laps; updHud(); engineOn(); big('', 'hide');
+  show('raceP'); $('#lapTot').textContent = def.laps; updHud(); ac(); AUD.raceMusic(true); AUD.engineOn(); big('', 'hide');
   if (!SV.tut) toast(T('◀ ▶ ile dön. Tüy topla, TURBO bas. DRİFT basılı tutup dön, bırakınca mini turbo!', '◀ ▶ to steer. Grab feathers, hit TURBO. Hold DRIFT in turns, release for a mini turbo!'), 4200);
 }
 function fmt(t) { const m = Math.floor(t / 60), s = t - m * 60; return `${m}:${s.toFixed(2).padStart(5, '0')}`; }
@@ -683,7 +2632,9 @@ function stepRace(dt) {
   const tr = world.tr; race.t += dt;
   if (race.phase === 'count') {
     const c = Math.ceil(-race.t); if (c !== race.lastCount && c <= 3 && c >= 1) { race.lastCount = c; big(String(c), 'cnt'); sfx.tick(); }
-    if (race.t >= 0) { race.phase = 'go'; big(T('BAŞLA!', 'GO!'), 'go'); sfx.go(); if (!SV.tut) { SV.tut = 1; save(); } }
+    // rocket start: tap TURBO just before GO
+    if (race.t > -0.45 && race.turboTap != null && race.turboTap > -0.45 && !race.rocket) { race.rocket = 1; }
+    if (race.t >= 0) { race.phase = 'go'; big(T('BAŞLA!', 'GO!'), 'go'); sfx.go(); if (race.rocket) { me.padT = 1.3; me.s = 14; setTimeout(() => { big(T('SÜPER START!', 'ROCKET START!'), 'lap'); sfx.turbo(); }, 350); } if (!SV.tut) { SV.tut = 1; save(); } }
     for (const k of karts) drive(k, { steer: 0, gas: 0, brake: true }, dt);
   } else {
     // rubber band: bots ease off if far ahead, push if far behind
@@ -700,23 +2651,28 @@ function stepRace(dt) {
   for (const k of karts) {
     if (track(tr, k) && !k.done) {
       if (k.lap >= race.def.laps) { k.done = true; k.finishT = race.t; race.finished.push(k); if (k.me) finishMe(); }
-      else if (k.me) { big(k.lap === race.def.laps - 1 ? T('SON TUR!', 'FINAL LAP!') : `${T('TUR', 'LAP')} ${k.lap + 1}`, 'lap'); sfx.lap(); }
+      else if (k.me) { big(k.lap === race.def.laps - 1 ? T('SON TUR!', 'FINAL LAP!') : `${T('TUR', 'LAP')} ${k.lap + 1}`, 'lap'); if (k.lap === race.def.laps - 1) { sfx.final(); AUD.intensity(0.85); } else sfx.lap(); }
     }
-    if (k.me && k.wallHit > 0.25) { sfx.wall(); puff(k.x, 0.8, k.z, 'spark', 6, 6); }
-    if (k.drift && Math.random() < 0.6) puff(k.x + fwdZ(k) * 1.5 * (Math.random() - 0.5) * 2 - fwdX(k) * 2, 0.3, k.z - fwdZ(k) * 2, k.driftT > 0.7 ? 'blue' : 'dust', 1, 1.5);
-    if (k.me && k.miniTurbo) { k.miniTurbo = 0; sfx.turbo(); big(T('MİNİ TURBO!', 'MINI TURBO!'), 'lap'); }
+    if (k.me && k.wallHit > 0.2 && !(race.wallCd > 0)) { race.wallCd = 0.35; sfx.wall(k.wallHit); shake = Math.max(shake, 0.25 + k.wallHit * 0.5); puff(k.x + fwdX(k) * 2, 1, k.z + fwdZ(k) * 2, 'spark', 8, 7); }
+    if (k.me && k.hitT > 0.2 && !(race.bumpCd > 0)) { race.bumpCd = 0.4; sfx.bump(); shake = Math.max(shake, 0.25); }
+    if (k.me && k.lvlUp) { k.lvlUp = 0; sfx.lvl(); }
+    if (k.me && k.y <= 0 && k.hop) { k.hop = 0; }
+    if (k.drift && k.y <= 0.05) driftFx(k); if (k.turbo && Math.random() < 0.5) puff(k.x - fwdX(k) * 2.8, 0.8, k.z - fwdZ(k) * 2.8, 'fire', 1, 1.2); else if (k.me && k.s > 4 && Math.random() < 0.08) puff(k.x - fwdX(k) * 2.8, 0.7, k.z - fwdZ(k) * 2.8, 'smoke', 1, 0.8);
+    if (k.miniTurbo) { const lv = k.miniTurbo; k.miniTurbo = 0; if (k.me) { sfx.mini(); shake = Math.max(shake, 0.15); big(lv >= 3 ? T('ULTRA TURBO!', 'ULTRA TURBO!') : lv === 2 ? T('SÜPER TURBO!', 'SUPER TURBO!') : T('MİNİ TURBO!', 'MINI TURBO!'), 'lap'); } }
     // pickups
     for (const p of world.pickups) { if (p.off > 0) continue; if ((p.x - k.x) ** 2 + (p.z - k.z) ** 2 < 6.5) { p.off = 4; p.m.visible = false; k.boost = Math.min(100, k.boost + 7); if (k.me) { sfx.pick(); puff(p.x, 2, p.z, 'feather', 6, 4); race.feathers = (race.feathers || 0) + 1; } } }
-    for (const p of world.pads) { if ((p.x - k.x) ** 2 + (p.z - k.z) ** 2 < 6 && !(k.padT > 0.5)) { k.padT = 1.1; if (k.me) { sfx.turbo(); big('TURBO!', 'lap'); } } }
+    for (const p of world.pads) { if ((p.x - k.x) ** 2 + (p.z - k.z) ** 2 < 6 && !(k.padT > 0.5)) { k.padT = 1.1; k.padLvl = 0; if (k.me) { sfx.turbo(); shake = Math.max(shake, 0.12); big('TURBO!', 'lap'); } } }
   }
   if (me.boosting && !race.boostSnd) { race.boostSnd = 1; sfx.turbo(); } if (!me.boosting) race.boostSnd = 0;
   for (const p of world.pickups) { if (p.off > 0) { p.off -= dt; if (p.off <= 0) p.m.visible = true; } p.m.rotation.y += dt * 2.5; p.m.position.y = 2.2 + Math.sin(race.t * 3 + p.i) * 0.3; }
-  engineUpd(me.s, me.turbo);
+  AUD.engineUpd(Math.max(0, me.s) / (KCFG.maxSpeed * 1.2), me.turbo, me.drift, race.phase !== 'count' || !!race.turboTap);
+  if (race.wallCd > 0) race.wallCd -= dt; if (race.bumpCd > 0) race.bumpCd -= dt;
+  if (race.phase !== 'count' && !race.finishedMe) { const pos = race.pos || 6; if (race.lastPos && pos < race.lastPos) sfx.up(); else if (race.lastPos && pos > race.lastPos) sfx.down(); race.lastPos = pos; }
   if (race.finishedMe) { race.after = (race.after || 0) + dt; if (race.after > 2.2 && !race.shown) { race.shown = true; results(); } }
 }
 function finishMe() {
   race.finishedMe = true; const place = race.finished.indexOf(me) + 1; race.place = place;
-  big(place === 1 ? T('KAZANDIN!', 'YOU WIN!') : `${place}. ${T('OLDUN', 'PLACE')}`, place === 1 ? 'win' : 'go'); place <= 3 ? sfx.win() : sfx.lap();
+  big(place === 1 ? T('KAZANDIN!', 'YOU WIN!') : `${place}. ${T('OLDUN', 'PLACE')}`, place === 1 ? 'win' : 'go'); place <= 3 ? sfx.win() : sfx.fin(); confetti(place <= 3 ? 90 : 30);
 }
 function results() {
   const def = race.def, place = race.place, rew = REWARD[place - 1] + (race.feathers || 0) * 2; const firstWin = place === 1 && !SV.wins[def.id];
@@ -730,9 +2686,9 @@ function results() {
   $('#resList').innerHTML = rows.map((r, i) => `<div class="rr ${r.k.me ? 'me' : ''}"><b>${i + 1}</b><i style="background:#${new THREE.Color(r.k.color).getHexString()}"></i><span>${r.k.name}</span><em>${fmt(r.t)}</em></div>`).join('');
   $('#resTitle').textContent = place === 1 ? T('ŞAMPİYON!', 'CHAMPION!') : `${place}. ${T('SIRA', 'PLACE')}`;
   $('#resRew').innerHTML = `🪶 +${rew}${bonus ? ` · ${T('ilk galibiyet', 'first win')} +${bonus}` : ''}${newBest ? ` · ⏱ ${T('rekor', 'best')} ${fmt(myT)}` : ''}${unlockMsg ? `<br>${unlockMsg}` : ''}`;
-  $('#res').hidden = false; engineOff();
+  $('#res').hidden = false; AUD.engineOff(); AUD.menuMusic(true);
 }
-function quitRace() { race = null; engineOff(); $('#res').hidden = true; $('#pause').hidden = true; big('', 'hide'); home(); }
+function quitRace() { race = null; AUD.engineOff(); $('#res').hidden = true; $('#pause').hidden = true; big('', 'hide'); home(); }
 
 // ---------- menus ----------
 let showroom = { a: 0 };
@@ -745,38 +2701,54 @@ function upd() { document.querySelectorAll('.tuyN').forEach((e) => (e.textConten
 function tracksPane() {
   $('#trackList').innerHTML = TRACKS.map((t) => { const open = SV.unlocked.includes(t.id); return `<button class="trk ${open ? '' : 'lock'}" data-t="${t.id}" style="background:${t.id === 'mutfak' ? 'linear-gradient(135deg,#f6d7a8,#d9a46c)' : 'linear-gradient(135deg,#7fb0ff,#3c6fd1)'}">
     <b class="d">${T(t.tr, t.en)}</b><span>${t.laps} ${T('tur', 'laps')} · ${open ? (SV.best[t.id] ? '⏱ ' + fmt(SV.best[t.id]) : T('rekor yok', 'no record')) : '🔒 ' + T('önceki pistte ilk 3', 'top 3 on previous track')}</span>${SV.wins[t.id] ? `<em>🏆 ${SV.wins[t.id]}</em>` : ''}</button>`; }).join('');
-  $('#trackList').querySelectorAll('.trk').forEach((b) => (b.onclick = () => { if (b.classList.contains('lock')) { toast(T('Önce önceki pistte ilk 3\'e gir', 'Finish top 3 on the previous track first')); return; } beep(523, 0.08, 'triangle', 0.1); startRace(b.dataset.t); }));
+  $('#trackList').querySelectorAll('.trk').forEach((b) => (b.onclick = () => { if (b.classList.contains('lock')) { toast(T('Önce önceki pistte ilk 3\'e gir', 'Finish top 3 on the previous track first')); return; } sfx.click(); startRace(b.dataset.t); }));
   show('trackP');
 }
 function garage() {
   const card = (it, own, on, kind) => `<button class="gi ${on ? 'on' : ''}" data-k="${kind}" data-id="${it.id}"><i style="background:${kind === 'c' ? '#' + new THREE.Color(it.c).getHexString() : `linear-gradient(90deg,${it.f.map((x) => '#' + new THREE.Color(x).getHexString()).join(',')})`}"></i><span>${T(it.tr, it.en)}</span><em>${on ? '✓' : own ? T('Seç', 'Use') : '🪶 ' + it.cost.toLocaleString('tr-TR')}</em></button>`;
+  $('#gD').innerHTML = DRIVERS.map((d) => { const own = SV.ownD.includes(d.id), on = SV.driver === d.id; return `<button class="gi drv ${on ? 'on' : ''}" data-k="d" data-id="${d.id}"><i style="background:#${new THREE.Color(d.kart).getHexString()}">${d.id === 'wu' ? '🥋' : d.id === 'kick' ? '⭐' : d.id === 'flick' ? '💨' : '🔥'}</i><span>${T(d.tr, d.en)}</span><em>${on ? '✓' : own ? T('Seç', 'Use') : '🪶 ' + d.cost.toLocaleString('tr-TR')}</em></button>`; }).join('');
   $('#gC').innerHTML = COLORS.map((c) => card(c, SV.ownC.includes(c.id), SV.color === c.id, 'c')).join('');
   $('#gF').innerHTML = FEATHERS.map((f) => card(f, SV.ownF.includes(f.id), SV.feather === f.id, 'f')).join('');
   document.querySelectorAll('.gi').forEach((b) => (b.onclick = () => {
-    const kind = b.dataset.k, list = kind === 'c' ? COLORS : FEATHERS, own = kind === 'c' ? SV.ownC : SV.ownF, it = list.find((x) => x.id === b.dataset.id);
-    if (!own.includes(it.id)) { if (SV.tuy < it.cost) { toast(T('Yeterli tüy yok. Yarışarak kazan!', 'Not enough feathers. Race to earn!')); beep(160, 0.18, 'sawtooth', 0.06, 0.7); return; } SV.tuy -= it.cost; own.push(it.id); sfx.buy(); }
-    if (kind === 'c') SV.color = it.id; else SV.feather = it.id; save(); upd(); enterShowroom(); garage();
+    const kind = b.dataset.k, list = kind === 'c' ? COLORS : kind === 'd' ? DRIVERS : FEATHERS, own = kind === 'c' ? SV.ownC : kind === 'd' ? SV.ownD : SV.ownF, it = list.find((x) => x.id === b.dataset.id);
+    if (!own.includes(it.id)) { if (SV.tuy < it.cost) { toast(T('Yeterli tüy yok. Yarışarak kazan!', 'Not enough feathers. Race to earn!')); sfx.no(); return; } SV.tuy -= it.cost; own.push(it.id); sfx.buy(); }
+    if (kind === 'c') SV.color = it.id; else if (kind === 'd') SV.driver = it.id; else SV.feather = it.id; sfx.click(); save(); upd(); enterShowroom(); garage();
   }));
   show('garageP'); upd();
 }
 function applyLang() { document.querySelectorAll('[data-tr]').forEach((e) => (e.textContent = SV.lang === 'en' ? e.dataset.en : e.dataset.tr)); $('#langBtn').textContent = SV.lang === 'en' ? 'EN' : 'TR'; $('#sndBtn').textContent = SV.snd ? '🔊' : '🔇'; }
-$('#playBtn').onclick = () => { ac(); beep(523, 0.08, 'triangle', 0.1); tracksPane(); };
-$('#garBtn').onclick = () => { ac(); garage(); };
+$('#playBtn').onclick = () => { ac(); AUD.menuMusic(true); sfx.click(); tracksPane(); };
+$('#garBtn').onclick = () => { ac(); AUD.menuMusic(true); sfx.click(); garage(); };
 document.querySelectorAll('.back').forEach((b) => (b.onclick = home));
 $('#langBtn').onclick = () => { SV.lang = SV.lang === 'en' ? 'tr' : 'en'; save(); applyLang(); };
-$('#sndBtn').onclick = () => { SV.snd = SV.snd ? 0 : 1; save(); applyLang(); if (!SV.snd) engineOff(); };
-$('#pauseBtn').onclick = () => { if (!race || race.shown) return; race.paused = true; $('#pause').hidden = false; engineOff(); };
-$('#resume').onclick = () => { race.paused = false; $('#pause').hidden = true; engineOn(); };
+$('#sndBtn').onclick = () => { SV.snd = SV.snd ? 0 : 1; save(); applyLang(); ac(); AUD.setOn(!!SV.snd); if (SV.snd && !race) AUD.menuMusic(true); };
+$('#pauseBtn').onclick = () => { if (!race || race.shown) return; race.paused = true; $('#pause').hidden = false; AUD.pauseMusic(true); };
+$('#resume').onclick = () => { race.paused = false; $('#pause').hidden = true; AUD.pauseMusic(false); };
 $('#quit').onclick = quitRace; $('#resHome').onclick = quitRace;
 $('#again').onclick = () => { $('#res').hidden = true; const id = race.def.id; startRace(id); };
-document.addEventListener('visibilitychange', () => { if (document.hidden) { if (race && !race.shown && !race.paused) { race.paused = true; $('#pause').hidden = false; } engineOff(); if (AC && AC.suspend) AC.suspend(); } else if (AC && AC.resume) AC.resume(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { if (race && !race.shown && !race.paused) { race.paused = true; $('#pause').hidden = false; } AUD.pauseMusic(true); } else if (!(race && race.paused)) AUD.pauseMusic(false); });
+
+// ---------- speed lines overlay ----------
+const sl = document.createElement('canvas'); sl.id = 'slines'; sl.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2'; document.body.appendChild(sl);
+const slc = sl.getContext('2d'); let slK = 0; const slines = [];
+function speedLines(dt, want) {
+  slK += (want - slK) * Math.min(1, dt * 5); if (!race) slK = 0;
+  if (slK < 0.03) { if (sl.width) { sl.width = 0; } return; }
+  const w = Math.round(W * 0.5), h = Math.round(H * 0.5); if (sl.width !== w || sl.height !== h) { sl.width = w; sl.height = h; }
+  slc.clearRect(0, 0, w, h); const cx = w / 2, cy = h * 0.45;
+  while (slines.length < 28) slines.push({ a: Math.random() * Math.PI * 2, r: 0.3 + Math.random() * 0.5, l: 0.08 + Math.random() * 0.12, v: 1.4 + Math.random() });
+  slc.strokeStyle = 'rgba(255,255,255,' + (0.5 * slK).toFixed(3) + ')'; slc.lineWidth = 1.6; slc.beginPath();
+  for (const p of slines) { p.r += p.v * dt; if (p.r > 1.1) { p.r = 0.35 + Math.random() * 0.2; p.a = Math.random() * Math.PI * 2; }
+    const R0 = p.r * Math.max(w, h) * 0.6, R1 = R0 + p.l * Math.max(w, h) * slK; slc.moveTo(cx + Math.cos(p.a) * R0, cy + Math.sin(p.a) * R0); slc.lineTo(cx + Math.cos(p.a) * R1, cy + Math.sin(p.a) * R1); }
+  slc.stroke();
+}
 
 // ---------- camera ----------
-const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(); let camInit = false, sway = 0;
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(); let camInit = false, sway = 0, shake = 0;
 function updCamera(dt, t) {
   if (!me) return;
   if (!race) { // showroom orbit
-    showroom.a += dt * 0.35; const r = 11; camera.position.set(me.x + Math.sin(showroom.a) * r, 4.2, me.z + Math.cos(showroom.a) * r); camera.lookAt(me.x, 2.2, me.z);
+    speedLines(dt, 0); showroom.a += dt * 0.35; const gar = !$('#garageP').hidden, r = gar ? 13 : 11; camera.position.set(me.x + Math.sin(showroom.a) * r, 4.2, me.z + Math.cos(showroom.a) * r); camera.lookAt(me.x, gar ? -1.2 : 2.0, me.z);
     camera.fov = W / H < 0.75 ? 52 : 45; camera.updateProjectionMatrix(); camInit = false; return;
   }
   const fx = fwdX(me), fz = fwdZ(me), sp = Math.max(0, me.s);
@@ -784,11 +2756,12 @@ function updCamera(dt, t) {
   const tx = me.x - fx * back, tz = me.z - fz * back;
   if (!camInit) { camPos.set(tx, up, tz); camLook.set(me.x + fx * 12, 1.2, me.z + fz * 12); camInit = true; }
   camPos.lerp(new THREE.Vector3(tx, up, tz), Math.min(1, dt * 6)); camLook.lerp(new THREE.Vector3(me.x + fx * 12, 1.2, me.z + fz * 12), Math.min(1, dt * 8));
-  camera.position.copy(camPos); camera.lookAt(camLook);
+  camera.position.copy(camPos); if (shake > 0) { shake = Math.max(0, shake - dt * 1.6); const a = shake * shake * 1.2; camera.position.x += (Math.random() - 0.5) * a; camera.position.y += (Math.random() - 0.5) * a; } camera.lookAt(camLook);
   // racing-game style sway when boosting + roll into turns
   const turbo = me.turbo; sway += ((turbo ? (sp / KCFG.maxSpeed + 0.25) * 30 : (sp / KCFG.maxSpeed) * 2) - sway) * Math.min(1, dt * 10);
   camera.rotation.z += (-me.steer * sp) / 900 + (Math.sin(t * (turbo ? 60 : 30) * 0.9) / 1000) * sway;
-  const fov = (W / H < 0.75 ? 66 : 55) + (turbo ? 8 : 0) + sp / 12; camera.fov += (fov - camera.fov) * Math.min(1, dt * 4); camera.updateProjectionMatrix();
+  const fov = (W / H < 0.75 ? 66 : 55) + (turbo ? 10 : 0) + sp / 10;
+  speedLines(dt, turbo ? 1 : Math.max(0, (sp - 30) / 12)); camera.fov += (fov - camera.fov) * Math.min(1, dt * 4); camera.updateProjectionMatrix();
 }
 
 // ---------- loop ----------
@@ -808,7 +2781,7 @@ function frame() {
 const LOGO_IMG = new Image(); LOGO_IMG.src = LOGO_URL;
 LOGO_IMG.decode().catch(() => {}).then(() => {
   setLogo(LOGO_IMG); resize(); applyLang(); home(); frame(); $('#boot').remove();
-  window.__fk = { snap: () => { camInit = false; }, auto: (sec, thr = 0.25) => { for (let i = 0; i < sec * 60 && race && !race.shown; i++) { const c = botControl(world.tr, me, race.t); ctl.left = c.steer > thr; ctl.right = c.steer < -thr; ctl.turbo = window.__noT ? false : me.boost > 40; if (!race.paused) stepRace(1 / 60); } ctl.left = ctl.right = ctl.turbo = false; syncKarts(1 / 60); }, sim: (sec) => { for (let i = 0; i < sec * 60; i++) if (race && !race.paused && !race.shown) stepRace(1 / 60); syncKarts(1 / 60); }, get race() { return race; }, get me() { return me; }, karts: () => karts, SV, startRace, ctl, home };
+  window.__fk = { snap: () => { camInit = false; }, auto: (sec, thr = 0.25) => { for (let i = 0; i < sec * 60 && race && !race.shown; i++) { const c = botControl(world.tr, me, race.t); ctl.left = c.steer > thr; ctl.right = c.steer < -thr; ctl.turbo = window.__noT ? false : me.boost > 40; if (!race.paused) stepRace(1 / 60); } ctl.left = ctl.right = ctl.turbo = false; syncKarts(1 / 60); }, sim: (sec) => { for (let i = 0; i < sec * 60; i++) if (race && !race.paused && !race.shown) stepRace(1 / 60); syncKarts(1 / 60); }, get race() { return race; }, get me() { return me; }, karts: () => karts, SV, startRace, ctl, home, gl: renderer, AUD };
 });
 
 </script>
