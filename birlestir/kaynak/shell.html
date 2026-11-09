@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#e22511">
+<title>Flix Birleştir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,800;1,900&family=Rubik:wght@400;500;700;800&display=swap">
+<style>
+:root{--red:#e22511;--navy:#022753;--yel:#ffd41f;--cream:#fff7e6;--d:"Barlow Condensed",Impact,"Arial Narrow",sans-serif;--b:Rubik,system-ui,-apple-system,sans-serif;
+ --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);--sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#15306b;font-family:var(--b);color:#fff;-webkit-user-select:none;user-select:none;touch-action:none}
+#gl{position:fixed;inset:0;display:block}
+.d{font-family:var(--d);font-style:italic;font-weight:900;line-height:.9}
+.pane{position:fixed;inset:0;padding:calc(var(--st) + 12px) max(16px,var(--sr)) calc(var(--sb) + 16px) max(16px,var(--sl))}
+.pane[hidden],[hidden]{display:none!important}
+button{font-family:inherit;border:0;cursor:pointer;color:inherit}
+.btn{border-radius:16px;padding:14px 18px;font-family:var(--d);font-style:italic;font-weight:900;font-size:24px;letter-spacing:.3px;border:3px solid var(--navy);box-shadow:0 5px 0 var(--navy);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--navy)}
+.btn.y{background:var(--yel);color:var(--navy)} .btn.w{background:#fff;color:var(--navy)} .btn.t{background:transparent;color:#fff;border-color:rgba(255,255,255,.5);box-shadow:none;font-size:18px}
+.btn.sm{font-size:16px;padding:8px 10px;border-radius:12px;box-shadow:0 3px 0 var(--navy)}
+.btn[disabled]{opacity:.45}
+.chip{background:rgba(2,39,83,.72);border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:6px 10px;display:flex;flex-direction:column;min-width:70px}
+.chip small{font-size:10px;font-weight:700;letter-spacing:1.4px;opacity:.75;text-transform:uppercase}
+.chip b{font-family:var(--d);font-style:italic;font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+/* home */
+#homeP{background:linear-gradient(180deg,rgba(226,37,17,.97),rgba(190,24,8,.97));display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+#homeP .top{width:100%;display:flex;justify-content:space-between;align-items:center}
+#homeP .top img{height:34px}
+.tuy{background:rgba(2,39,83,.35);border-radius:999px;padding:6px 12px;font-weight:800;font-size:14px}
+.hero-t{font-size:clamp(54px,16vw,84px);color:#fff;text-shadow:0 5px 0 var(--navy);margin-top:4px}
+.hero-t span{color:var(--yel)}
+.hero-s{font-weight:500;font-size:14px;max-width:30ch;opacity:.95}
+.stage{position:relative;flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.stage:before{content:"";position:absolute;width:min(70vw,300px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,212,31,.55),rgba(255,212,31,0) 70%)}
+#homeToy{position:relative;width:min(62vw,280px);max-height:100%;object-fit:contain;animation:bob 2.6s ease-in-out infinite;filter:drop-shadow(0 14px 14px rgba(0,0,0,.3))}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(4deg)}}
+.hb{display:grid;gap:12px;width:min(100%,360px)}
+.hb .btn{width:100%}
+.hrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:min(100%,360px)}
+.hrow .btn{font-size:18px;padding:10px 6px}
+.best{font-size:13px;font-weight:700;opacity:.9}
+.mini{display:flex;gap:8px;align-items:center}
+.mini button{background:rgba(2,39,83,.35);border-radius:12px;width:44px;height:36px;font-weight:800}
+/* game */
+#gameP{pointer-events:none}
+#gameP .hud{pointer-events:auto}
+.gtop{display:flex;align-items:center;gap:8px}
+.gtop img{height:30px;margin-right:auto}
+.goal{margin-top:10px;background:rgba(2,39,83,.72);border:2px solid rgba(255,255,255,.2);border-radius:16px;padding:8px 12px;display:flex;align-items:center;gap:10px}
+.goal .lv{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--d);font-style:italic;font-weight:900;font-size:20px;color:var(--navy);border:2px solid #fff;flex:0 0 auto}
+.goal .gt{flex:1;min-width:0}
+.goal .gt small{font-size:10px;font-weight:700;letter-spacing:1.4px;opacity:.75;text-transform:uppercase;display:block}
+.goal .gt b{font-family:var(--d);font-style:italic;font-size:22px}
+#tiers{display:flex;gap:3px;margin-top:4px}
+#tiers i{flex:1;height:6px;border-radius:3px}
+#tiers i.nx{outline:2px solid var(--yel)}
+#swipe{position:fixed;inset:0;pointer-events:auto}
+.gbot{position:fixed;left:max(16px,var(--sl));right:max(16px,var(--sr));bottom:calc(var(--sb) + 16px);display:flex;align-items:flex-end;gap:10px}
+.rb{width:58px;height:58px;border-radius:16px;background:rgba(2,39,83,.78);border:2px solid rgba(255,255,255,.25);font-size:22px;font-weight:800;position:relative;display:flex;align-items:center;justify-content:center}
+.rb em{position:absolute;top:-8px;right:-8px;background:var(--yel);color:var(--navy);font-style:normal;font-size:12px;font-weight:800;border-radius:999px;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--navy)}
+.big{margin-left:auto;width:92px;height:92px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe873,#ffd41f 55%,#e3a900);border:4px solid var(--navy);box-shadow:0 6px 0 var(--navy);color:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--d);font-style:italic;font-weight:900;font-size:20px;line-height:.95;position:relative}
+.big .ic{font-size:30px;font-style:normal}
+.big em{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-style:normal;font-family:var(--b);font-size:13px;font-weight:800;border-radius:999px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.big.dim{filter:saturate(.3);opacity:.75}
+/* sheets */
+.sheet{background:var(--cream);color:var(--navy);display:flex;flex-direction:column;gap:12px}
+.sheet h2{font-family:var(--d);font-style:italic;font-weight:900;font-size:40px;color:var(--red)}
+.sheet .sub{font-size:13px;color:#56627a;margin-top:-8px}
+.sheet .scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding-bottom:8px}
+.sheet .back{align-self:stretch}
+#albumGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.al{background:#fff;border:2px solid var(--navy);border-radius:14px;padding:6px;text-align:center;min-width:0}
+.al .ai{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.al .ai img{width:100%;height:100%;object-fit:contain}
+.al .ai b{font-family:var(--d);font-style:italic;font-size:44px;color:rgba(255,255,255,.35)}
+.al .an{font-weight:800;font-size:13px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al .ar{font-size:10px;font-weight:700}
+.al.lock{opacity:.8}
+#shopGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.sh{background:#fff;border:2px solid var(--navy);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px;align-items:stretch;text-align:center}
+.sw{height:70px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:var(--d);font-style:italic;font-weight:900;font-size:30px}
+.sw.u{background:#ffe9a8;color:var(--navy)}
+.sn{font-weight:800;font-size:14px}
+.tuyrow{display:flex;justify-content:space-between;align-items:center}
+.tuyrow .tuy{background:var(--navy);color:#fff}
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(2,20,50,.62);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+#modal .card{background:var(--cream);color:var(--navy);border:4px solid var(--navy);border-radius:24px;padding:20px 18px;width:min(100%,340px);display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:0 10px 0 var(--navy)}
+#modal.pop .card{animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.rv-k{font-family:var(--d);font-style:italic;font-weight:900;font-size:30px;color:var(--red)}
+.rv-img{width:190px;height:190px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.rv-img img{width:100%;height:100%;object-fit:contain;animation:bob 2.4s ease-in-out infinite}
+.rv-r{color:#fff;font-weight:800;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;border-radius:999px;padding:4px 10px}
+.rv-n{font-family:var(--d);font-style:italic;font-weight:900;font-size:30px}
+.rv-s{font-size:13px;color:#56627a}
+.rv-b{background:#ffe9a8;border-radius:12px;padding:8px 12px;font-weight:800;font-size:14px}
+.ov-s{font-family:var(--d);font-style:italic;font-weight:900;font-size:64px;line-height:1}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.row2 .btn{font-size:18px;padding:12px 8px}
+#modal .card>.btn{width:100%}
+#modal .btn.t{color:var(--navy);border-color:rgba(2,39,83,.3)}
+.boxa{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center}
+.boxa .bx{font-size:96px;animation:shake .5s ease-in-out 2}
+.boxa .bi{position:absolute;font-size:54px;font-weight:900;color:var(--navy);animation:rise .6s .9s both cubic-bezier(.2,1.6,.4,1)}
+@keyframes shake{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+@keyframes rise{from{transform:translateY(40px) scale(.2);opacity:0}to{transform:translateY(-58px) scale(1);opacity:1}}
+#toast{position:fixed;left:50%;top:calc(var(--st) + 150px);transform:translateX(-50%);background:var(--navy);color:#fff;font-weight:700;font-size:14px;padding:10px 14px;border-radius:12px;z-index:30;max-width:86vw;text-align:center;border:2px solid var(--yel)}
+#boot{position:fixed;inset:0;background:var(--red);display:flex;align-items:center;justify-content:center;z-index:50;font-family:var(--d);font-style:italic;font-weight:900;font-size:40px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body>
+<canvas id="gl"></canvas>
+<div id="boot">FLIX…</div>
+
+<section class="pane" id="homeP" hidden>
+  <div class="top"><img src="@@LOGO@@" alt="FLIX"><div class="mini"><button id="langBtn">TR</button><button id="sndBtn">🔊</button><div class="tuy">🪶 <span id="tuyH">0</span></div></div></div>
+  <div class="hero-t d">FLIX<br><span data-tr="BİRLEŞTİR" data-en="MERGE">BİRLEŞTİR</span></div>
+  <div class="hero-s" data-tr="Aynı iki FLIX'i kaydırıp birleştir. Sıradan'dan Efsane'ye 13 FLIX'i topla." data-en="Swipe two equal FLIX together. Collect all 13, from Common to Mythic.">Aynı iki FLIX'i kaydırıp birleştir.</div>
+  <div class="stage"><img id="homeToy" alt=""></div>
+  <div class="best"><span data-tr="En iyi skor" data-en="Best score">En iyi skor</span>: <span id="homeBest">0</span></div>
+  <div class="hb">
+    <button class="btn y" id="contBtn" data-tr="DEVAM ET" data-en="CONTINUE">DEVAM ET</button>
+    <button class="btn y" id="playBtn" data-tr="YENİ OYUN" data-en="NEW GAME">YENİ OYUN</button>
+  </div>
+  <div class="hrow">
+    <button class="btn w" id="albumBtn" data-tr="ALBÜM" data-en="ALBUM">ALBÜM</button>
+    <button class="btn w" id="shopBtn" data-tr="DÜKKÂN" data-en="SHOP">DÜKKÂN</button>
+    <button class="btn w" id="boxHome">🎁</button>
+  </div>
+</section>
+
+<section class="pane" id="gameP" hidden>
+  <div id="swipe"></div>
+  <div class="hud">
+    <div class="gtop"><img src="@@LOGO@@" alt="FLIX">
+      <div class="chip"><small data-tr="Skor" data-en="Score">Skor</small><b id="score">0</b></div>
+      <div class="chip"><small data-tr="En iyi" data-en="Best">En iyi</small><b id="best">0</b></div>
+    </div>
+    <div class="goal"><div class="lv" id="goalLv">3</div><div class="gt"><small data-tr="Sıradaki FLIX" data-en="Next FLIX">Sıradaki FLIX</small><b id="goalName">Klasik</b><div id="tiers"></div></div><div class="tuy">🪶 <span id="tuyG">0</span></div></div>
+  </div>
+  <div class="gbot hud">
+    <button class="rb" id="homeBtn" aria-label="Menü">⌂</button>
+    <button class="rb" id="newBtn" aria-label="Yeni oyun">⟳</button>
+    <button class="rb" id="undoBtn" aria-label="Geri al">↶<em id="undoN">3</em></button>
+    <button class="big" id="boxBtn"><span class="ic">🎁</span><span data-tr="KUTU" data-en="BOX">KUTU</span><em id="boxN">0</em></button>
+  </div>
+</section>
+
+<section class="pane sheet" id="albumP" hidden>
+  <h2 data-tr="ALBÜM" data-en="ALBUM">ALBÜM</h2>
+  <div class="sub"><span id="albumCnt">0/13</span> · <span data-tr="Yeni bir FLIX'e ilk kez ulaşınca albüme girer ve sürpriz kutu kazanırsın." data-en="Reach a new FLIX for the first time to add it and win a surprise box.">Yeni bir FLIX'e ilk kez ulaşınca albüme girer.</span></div>
+  <div class="scroll"><div id="albumGrid"></div></div>
+  <button class="btn y back" data-tr="GERİ" data-en="BACK">GERİ</button>
+</section>
+
+<section class="pane sheet" id="shopP" hidden>
+  <div class="tuyrow"><h2 data-tr="DÜKKÂN" data-en="SHOP">DÜKKÂN</h2><div class="tuy">🪶 <span id="tuyS">0</span></div></div>
+  <div class="sub" data-tr="Tüyleri oyun bitince ve sürpriz kutulardan kazanırsın." data-en="Earn feathers when a game ends and from surprise boxes.">Tüyleri oyun bitince kazanırsın.</div>
+  <div class="scroll"><div id="shopGrid"></div></div>
+  <button class="btn y back" data-tr="GERİ" data-en="BACK">GERİ</button>
+</section>
+
+<div id="modal" hidden><div class="card"></div></div>
+<div id="toast" hidden></div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const LOGO_URL = '@@LOGO@@';
+@@TOY@@
+@@CORE@@
+@@GAME@@
+</script>
+</body></html>
