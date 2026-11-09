@@ -10,10 +10,16 @@ export const COLS = {
 };
 // Yerdeki satın alma alanları. req: önce açılması gereken alan ('tut' = eğitim bitti).
 export const PADS = [
-  { id: 'ofis', name: 'Ofis', cost: 40, fx: 'Geliştirmeler açılır', x: 7.6, z: -3.2, req: 'tut' },
-  { id: 'mavi', name: 'Mavi hindi', cost: 60, fx: 'FLIX değeri 5 → 8', x: -3.2, z: -10.9, req: 'tut', col: 'mavi' },
-  { id: 'ik', name: 'İşe alım', cost: 120, fx: 'Eleman al, iş yürüsün', x: -8.2, z: 1.5, req: 'ofis' },
-  { id: 'asm2', name: '2. Montaj', cost: 180, fx: 'Üretim 2 katı', x: -1.0, z: 3.4, req: 'mavi' },
+  { id: 'kumes2', name: '2. hindi', cost: 15, fx: 'Tüy 2 katı', x: -3.6, z: 12.2, req: 'tut' },
+  { id: 'atolye', name: 'Atölye', cost: 40, fx: 'Alan büyür · montaj yeri açılır', x: 7.4, z: 8.0, req: 'tut', big: true },
+  { id: 'masa', name: 'Montaj masası', cost: 60, fx: 'Robot kol FLIX kurar', x: -1.0, z: -2.0, req: 'atolye' },
+  { id: 'ciftlik0', name: 'Hindi çiftliği', cost: 90, fx: '4 hindi · büyük tüy sandığı', x: 0.0, z: -5.6, req: 'atolye', big: true },
+  { id: 'pres', name: 'Büyük pres', cost: 120, fx: 'Taban üretimi hızlanır', x: -8.4, z: -3.5, req: 'masa' },
+  { id: 'park', name: 'Oyun parkı', cost: 160, fx: '3 çocuk FLIX test eder', x: 8.6, z: 0.8, req: 'masa', big: true },
+  { id: 'ofis', name: 'Ofis', cost: 200, fx: 'Geliştirmeler açılır', x: 7.6, z: -3.2, req: 'park' },
+  { id: 'mavi', name: 'Mavi hindi', cost: 120, fx: 'FLIX değeri 5 → 8', x: -3.2, z: -10.9, req: 'ciftlik0', col: 'mavi' },
+  { id: 'ik', name: 'İşe alım', cost: 250, fx: 'Eleman al, iş yürüsün', x: -8.2, z: 1.5, req: 'ofis' },
+  { id: 'asm2', name: '2. Montaj', cost: 300, fx: 'Üretim 2 katı', x: -1.0, z: 3.4, req: 'mavi' },
   { id: 'geri', name: 'Geri dönüşüm', cost: 250, fx: 'Hatalılar anahtarlık olur', x: -5.2, z: 10.2, req: 'ik' },
   { id: 'yesil', name: 'Yeşil hindi', cost: 350, fx: 'FLIX değeri 12', x: 0.0, z: -10.9, req: 'asm2', col: 'yesil' },
   { id: 'kasa2', name: '2. Kasa', cost: 400, fx: 'Müşteri 2 katı', x: -3.0, z: 14.0, req: 'asm2', big: true },

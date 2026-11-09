@@ -57,3 +57,9 @@ Three.js r170 + esbuild, tek HTML dosyası üretir: `python3 build.py` (yanında
 - Görsel: makinelerde çizgi roman hatları, kalın kenarlı tabelalar, gökyüzü geçişi, çim dokusu, siloslar, dumanlı bacalar, su kulesi.
 - Performans: kare hızına göre otomatik çözünürlük, müşteri ve tüy geometrileri paylaşımlı (bellek sızıntısı yok), küçük eşyalar gölge atmıyor.
 - Endgame: eski Endgame kaydına yeni alanlar ve geliştirmeler otomatik eklenir.
+
+## 1.6 (2026-11-09)
+- Oyun artık küçük başlıyor: çitle çevrili küçük bir avlu, 1 hindi, 1 mini makine ve satış standı. Başta sadece stant ve müşteriler var.
+- Patron her şeyi kendisi yapıyor: standda tüy + tabandan FLIX'i elle kuruyor (çekiçleme), kutuluyor ve 3 kez sektirip test ediyor.
+- Alan açıldıkça büyüyor: 2. hindi → Atölye (salon, duvarlar, dolap) → Montaj masası → Hindi çiftliği (kümes kapanır, hindiler çiftliğe taşınır) → Büyük pres (mini makinenin yerini alır) → Oyun parkı → Ofis → ...
+- Yeni 4 adımlı öğretici. Eski kayıtlar bu açılışları kendiliğinden alır.

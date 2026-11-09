@@ -13,7 +13,7 @@ const rnd = (a = 0, b = 1) => a + Math.random() * (b - a);
 export const fmt = (n) => n < 10000 ? Math.floor(n).toLocaleString('tr-TR') : n < 1e6 ? (n / 1e3).toFixed(1).replace('.', ',') + ' B' : (n / 1e6).toFixed(2).replace('.', ',') + ' M';
 
 // ---------------- save ----------------
-const DEF = () => ({ v: 3, t2: 1, money: 0, gems: 0, unl: [], tut: 0, made: 0, up: {}, staff: { tas: 0, kas: 0 }, cos: { skin: 'kraliyet', acc: 'yok', floor: 'nane', wskin: 'karisik', wacc: 'kask', own: ['kraliyet', 'yok', 'nane', 'karisik', 'kask'] }, ct: null, ctDone: 0,
+const DEF = () => ({ v: 3, t2: 1, t3: 1, money: 0, gems: 0, unl: [], tut: 0, made: 0, up: {}, staff: { tas: 0, kas: 0 }, cos: { skin: 'kraliyet', acc: 'yok', floor: 'nane', wskin: 'karisik', wacc: 'kask', own: ['kraliyet', 'yok', 'nane', 'karisik', 'kask'] }, ct: null, ctDone: 0,
   noads: 0, vip: 0, starter: 0, boostUntil: 0, ads: { day: '', n: 0, last: 0 }, freeUpLast: 0, lastInter: 0, lastSeen: 0, ipm: 0, del: 0, paid: {}, txn: [], bonus: {} });
 // Endgame test modu (Kaan için): ayrı kayıt, her şey açık, tüm geliştirmeler en üstte, tüm bonuslar kalıcı
 export const ENDGAME = (() => { try { return localStorage.getItem('flix_fab_mode') === 'end'; } catch { return false; } })();
@@ -25,7 +25,7 @@ function endSave() { const d = DEF(), far = Date.now() + 3650 * 864e5; d.tut = 9
 export let SV = (() => { const d = DEF(); try {
   const o = JSON.parse(localStorage.getItem(KEY) || 'null');
   if (ENDGAME && !(o && o.v === 3)) return endSave();
-  if (o && o.v === 3) { const s = { ...d, ...o, cos: { ...d.cos, ...o.cos }, staff: { ...d.staff, ...o.staff }, ads: { ...d.ads, ...o.ads } }; if (!o.t2) { if (s.tut >= 6) s.tut = 99; s.t2 = 1; } for (const f of ['karisik', 'kask', 'yok']) if (!s.cos.own.includes(f)) s.cos.own.push(f); if (ENDGAME) { const e = endSave(); for (const id of e.unl) if (!s.unl.includes(id)) s.unl.push(id); for (const k in e.up) s.up[k] = Math.max(s.up[k] || 0, e.up[k]); s.staff = e.staff; for (const id of e.cos.own) if (!s.cos.own.includes(id)) s.cos.own.push(id); } return s; }
+  if (o && o.v === 3) { const s = { ...d, ...o, cos: { ...d.cos, ...o.cos }, staff: { ...d.staff, ...o.staff }, ads: { ...d.ads, ...o.ads } }; if (!o.t2) { if (s.tut >= 6) s.tut = 99; s.t2 = 1; } if (!o.t3) { s.t3 = 1; if (s.tut < 99) s.tut = 0; if (s.unl.length) for (const id of ['park', 'pres', 'ciftlik0', 'masa', 'atolye']) if (!s.unl.includes(id)) s.unl.unshift(id); } for (const f of ['karisik', 'kask', 'yok']) if (!s.cos.own.includes(f)) s.cos.own.push(f); if (ENDGAME) { const e = endSave(); for (const id of e.unl) if (!s.unl.includes(id)) s.unl.push(id); for (const k in e.up) s.up[k] = Math.max(s.up[k] || 0, e.up[k]); s.staff = e.staff; for (const id of e.cos.own) if (!s.cos.own.includes(id)) s.cos.own.push(id); } return s; }
   if (ENDGAME) return endSave();
   const o2 = JSON.parse(localStorage.getItem('flix_fabrika2') || 'null');
   if (o2 && o2.v === 2) { d.money = (o2.money || 0) + 300; d.tut = (o2.tut || 0) >= 6 ? 99 : 0; d.made = o2.made || 0; d.del = o2.del || 0; if ((o2.unl || []).includes('asm2')) d.unl.push('ofis', 'mavi', 'asm2'); if ((o2.unl || []).includes('isci')) { d.unl.push('ik'); d.staff.tas = 1; } return d; }
@@ -188,6 +188,52 @@ const stationsAnim = {};
 function buildWorld() {
   const gt = tex(256, 256, (c, w, h) => { c.fillStyle = '#86c95e'; c.fillRect(0, 0, w, h); for (let i = 0; i < 9000; i++) { c.fillStyle = `rgba(${Math.random() < 0.5 ? '40,110,30' : '210,255,170'},${Math.random() * 0.22})`; c.fillRect(Math.random() * w, Math.random() * h, 1.5, 4); } for (let i = 0; i < 40; i++) { c.fillStyle = ['#fff6a0', '#ffffff', '#ff9ac0'][i % 3]; c.beginPath(); c.arc(Math.random() * w, Math.random() * h, 1.6, 0, 7); c.fill(); } }, true); gt.repeat.set(50, 50);
   const gp = add(new THREE.PlaneGeometry(200, 200), M(0xffffff, { roughness: 1, map: gt }), null, 0, -0.02, 0); gp.rotation.x = -Math.PI / 2; gp.castShadow = false;
+  buildStarter();
+  // ---- shop counters (kasa): first one now, 3 more as pads ----
+  buildCounter(0, 4.0); counter = K[0].pile; cashPile = K[0].cash;
+  rb(1.6, 0.8, 1.6, MT.navy, null, 9.2, 0.4, 10.4, 0.12); bigFlix = makeFlix('mavi', 2.0); bigFlix.position.set(9.2, 0.8, 10.4); scene.add(bigFlix); box(8.4, 10.0, 9.6, 11.2);
+  add(new THREE.PlaneGeometry(200, 6), MT.road, null, 0, 0.01, 23).rotation.x = -Math.PI / 2;
+  for (let x = -40; x < 60; x += 4) add(new THREE.PlaneGeometry(2, 0.25), M(0xffffff), null, x, 0.02, 23).rotation.x = -Math.PI / 2;
+  add(new THREE.PlaneGeometry(200, 2.4), M(0xd8d2c8), null, 0, 0.015, 19.9).rotation.x = -Math.PI / 2;
+  for (const [x, z] of [[-27.5, -4], [-28, 4], [28, -2], [28.5, 6], [-27.5, 14], [28, -12], [-27.6, -14]]) { add(new THREE.CylinderGeometry(0.2, 0.28, 1.6, 8), MT.woodD, null, x, 0.8, z); add(new THREE.IcosahedronGeometry(1.4, 1), M(0x4fae5a, { flatShading: true, roughness: 0.9 }), null, x, 2.4, z); }
+  buildOutside();
+  arrow = new THREE.Group(); scene.add(arrow); const ag = new THREE.Shape(); ag.moveTo(0, 0.6); ag.lineTo(0.45, 0); ag.lineTo(0.17, 0); ag.lineTo(0.17, -0.5); ag.lineTo(-0.17, -0.5); ag.lineTo(-0.17, 0); ag.lineTo(-0.45, 0); ag.closePath();
+  const am = new THREE.Mesh(new THREE.ShapeGeometry(ag), new THREE.MeshBasicMaterial({ color: 0xffd84a, transparent: true, opacity: 0.95, depthWrite: false })); am.rotation.x = -Math.PI / 2; am.position.y = 0.06; arrow.add(am);
+  beacon = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.15, 40), new THREE.MeshBasicMaterial({ color: 0xffd84a, transparent: true, opacity: 0.9, depthWrite: false })); beacon.rotation.x = -Math.PI / 2; beacon.position.y = 0.05; scene.add(beacon);
+}
+// ---- starter yard: a small fenced plot with one turkey pen, one little machine and the stand ----
+let ST = null, penPile = null, miniPile = null, farmGate = null; const plotObjs = [];
+function buildStarter() {
+  plotObjs.push(rb(16.8, 0.3, 12.6, MT.white, null, 2.0, -0.14, 12.45, 0.1), floorPlane(16.5, 12.3, 2.0, 12.45));
+  const pf = new THREE.Group(); scene.add(pf); plotObjs.push(pf);
+  for (let x = -6.3; x <= 10.31; x += 1.2) rb(0.14, 0.9, 0.14, MT.fence, pf, x, 0.45, 6.3, 0.04); rb(16.6, 0.1, 0.1, MT.fence, pf, 2.0, 0.75, 6.3, 0.03);
+  for (const x of [-6.3, 10.3]) { for (let z = 6.3; z <= 18.6; z += 1.2) rb(0.14, 0.9, 0.14, MT.fence, pf, x, 0.45, z, 0.04); rb(0.1, 0.1, 12.3, MT.fence, pf, x, 0.75, 12.45, 0.03); }
+  const st = tex(512, 128, (c, w, h) => { c.fillStyle = '#1b1330'; c.beginPath(); c.roundRect(0, 0, w, h, 26); c.fill(); c.fillStyle = '#e22511'; c.beginPath(); c.roundRect(5, 5, w - 10, h - 10, 22); c.fill(); if (LOGO) c.drawImage(LOGO, 14, 8, 120, 110); c.fillStyle = '#fff'; c.font = 'italic 900 70px BC'; c.lineWidth = 8; c.strokeStyle = '#1b1330'; c.strokeText('ATÖLYE', 150, 90); c.fillText('ATÖLYE', 150, 90); });
+  for (const sx of [-1.3, 1.3]) rb(0.12, 2.2, 0.12, MT.woodD, pf, 2.0 + sx, 1.1, 6.2, 0.03); add(new THREE.PlaneGeometry(3.0, 0.75), M(0xffffff, { map: st, transparent: true }), pf, 2.0, 2.0, 6.25).castShadow = false;
+  // turkey pen
+  const pen = new THREE.Group(); pen.position.set(-3.6, 0, 9.0); scene.add(pen); const hay = tex(64, 64, (c) => { c.fillStyle = '#d9b860'; c.fillRect(0, 0, 64, 64); for (let i = 0; i < 300; i++) { c.fillStyle = `rgba(${Math.random() < 0.5 ? '160,120,40' : '255,240,170'},.6)`; c.fillRect(Math.random() * 64, Math.random() * 64, 1, 5); } });
+  const pg = add(new THREE.PlaneGeometry(3.4, 3.0), M(0xffffff, { map: hay, roughness: 1 }), pen, 0, 0.03, 0); pg.rotation.x = -Math.PI / 2; pg.castShadow = false;
+  for (const [x0, z0, x1, z1] of [[-1.7, -1.5, 1.7, -1.5], [-1.7, -1.5, -1.7, 1.5], [1.7, -1.5, 1.7, 1.5], [-1.7, 1.5, 0.6, 1.5]]) { const L = Math.hypot(x1 - x0, z1 - z0), n = Math.round(L / 0.55); for (let k = 0; k <= n; k++) rb(0.1, 0.7, 0.1, MT.woodD, pen, x0 + (x1 - x0) * k / n, 0.35, z0 + (z1 - z0) * k / n, 0.03); const r = rb(x0 === x1 ? 0.08 : L, 0.08, z0 === z1 ? 0.08 : L, MT.wood, pen, (x0 + x1) / 2, 0.55, (z0 + z1) / 2, 0.02); }
+  const coop = new THREE.Group(); coop.position.set(-1.0, 0, -0.9); pen.add(coop); rb(1.0, 0.8, 0.8, M(0xc8402e, { roughness: 0.7 }), coop, 0, 0.4, 0, 0.06); const rf = add(new THREE.ConeGeometry(0.8, 0.5, 4), M(0x5a3a2a), coop, 0, 1.05, 0); rf.rotation.y = Math.PI / 4; rf.scale.z = 0.8;
+  rb(1.0, 0.45, 0.8, MT.wood, null, -1.0, 0.22, 8.2, 0.05); outl(pen);
+  penPile = new Pile(-1.0, 8.2, 'feather', 8, 2, 2, 0.4); penPile.base = 0.46; markZone(penPile, new THREE.Vector3(-0.7, 0, 10.0));
+  const penCol = box(-5.4, -1.8, 7.4, 10.6), crCol = box(-1.6, -0.4, 7.7, 8.7);
+  // the little machine: makes FLIX bases one by one
+  const mini = new THREE.Group(); mini.position.set(2.2, 0, 8.0); scene.add(mini);
+  const mb = rb(1.6, 1.3, 1.3, M(0x2a80dc, { roughness: 0.35, map: PANEL }), mini, 0, 0.65, 0, 0.16); rb(1.7, 0.12, 1.4, MT.yel, mini, 0, 1.36, 0, 0.04);
+  const hop = add(new THREE.CylinderGeometry(0.45, 0.22, 0.5, 18, 1, true), M(0xd9dee6, { metalness: 0.5, roughness: 0.35, side: THREE.DoubleSide }), mini, -0.3, 1.66, 0);
+  const gear = add(new THREE.TorusGeometry(0.22, 0.07, 8, 6), MT.red, mini, 0.45, 0.85, 0.67); const pis = add(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 12), MT.steel, mini, 0.35, 1.7, 0);
+  rb(0.6, 0.35, 0.05, M(0x0f1c33, { emissive: 0x2fe06a, emissiveIntensity: 0.6 }), mini, -0.3, 0.75, 0.66, 0.02); rb(0.6, 0.06, 0.5, MT.steel, mini, 1.05, 0.55, 0, 0.02);
+  sign('MİNİ MAKİNE', '#0b2a5e', mini, 0, 1.15, 0.67, 1.3); outl(mini);
+  const miCol = box(1.3, 3.1, 7.3, 8.7); miniPile = new Pile(3.95, 8.0, 'base', 8, 2, 2, 0.6); markZone(miniPile, new THREE.Vector3(3.95, 0, 9.8));
+  ST = { pen, mini, gear, pis, penCol, crCol, miCol, t: 0, hit: 0 };
+  const n = 1 + (has('kumes2') ? 1 : 0); if (!has('ciftlik0')) for (let k = 0; k < n; k++) addTurkey('dogal', true);
+}
+const penPos = () => new THREE.Vector3(rnd(-4.9, -2.6), 0, rnd(8.1, 9.8));
+function retirePen() { if (!penPile) return; scene.remove(ST.pen); scene.remove(penPile.ring); penPile.items.forEach(o => scene.remove(o)); unbox(ST.penCol); unbox(ST.crCol); penPile = null;
+  for (const t of turkeys) if (t.pen) { t.pen = false; t.o.position.copy(tkPos()); t.tgt = tkPos(); } }
+function retireMini() { if (!miniPile) return; scene.remove(ST.mini); scene.remove(miniPile.ring); miniPile.items.forEach(o => scene.remove(o)); unbox(ST.miCol); miniPile = null; }
+function buildAtolye() { plotObjs.forEach(o => scene.remove(o)); plotObjs.length = 0;
   rb(22, 0.3, 25.5, MT.white, null, 0, -0.14, 5.25, 0.1); floorPlane(21.6, 25.1, 0, 5.25);
   LW = [rb(0.5, 1.4, 25.5, MT.wall, null, -11, 0.7, 5.25), rb(0.56, 0.18, 25.56, MT.wallTop, null, -11, 1.45, 5.25)];
   rb(8.5, 1.4, 0.5, MT.wall, null, -6.75, 0.7, -7.5); rb(8.5, 1.4, 0.5, MT.wall, null, 6.75, 0.7, -7.5); rb(8.56, 0.18, 0.56, MT.wallTop, null, -6.75, 1.45, -7.5); rb(8.56, 0.18, 0.56, MT.wallTop, null, 6.75, 1.45, -7.5);
@@ -195,7 +241,18 @@ function buildWorld() {
   const sg = tex(1024, 360, (c, w, h) => { c.fillStyle = '#e22511'; c.beginPath(); c.roundRect(0, 0, w, h, 40); c.fill(); if (LOGO) c.drawImage(LOGO, 30, 20, 360, 320); c.fillStyle = '#fff'; c.font = 'italic 900 150px BC'; c.fillText('FABRİKA', 400, 230); });
   add(new THREE.PlaneGeometry(5.6, 2), M(0xffffff, { map: sg, transparent: true, roughness: 0.5 }), null, -6.75, 2.6, -7.24).castShadow = false;
   rb(0.15, 1.6, 0.15, MT.steel, null, -8.6, 1.4, -7.3); rb(0.15, 1.6, 0.15, MT.steel, null, -4.9, 1.4, -7.3);
-  // ---- turkey farm ----
+  // wardrobe
+  const wd = new THREE.Group(); wd.position.set(-10.1, 0, 16.4); scene.add(wd); rb(1.0, 2.4, 2.0, MT.purple, wd, 0, 1.2, 0, 0.1); rb(0.06, 2.0, 0.85, M(0x9a72f0), wd, 0.52, 1.2, -0.46, 0.03); rb(0.06, 2.0, 0.85, M(0x9a72f0), wd, 0.52, 1.2, 0.46, 0.03);
+  sign('DOLAP', '#7a4fd8', wd, 0.56, 2.6, 0, 1.8, Math.PI / 2); box(-10.7, -9.5, 15.3, 17.5);
+  ZONES.dolap = zoneRing(-8.3, 16.4, 0x9a72f0, 'DOLAP');
+  // teaser of the new hall (before it is bought)
+  teaser = new THREE.Group(); scene.add(teaser);
+  for (let i = 0; i < 6; i++) { const c = add(new THREE.ConeGeometry(0.25, 0.7, 12), M(0xff7a1a, { roughness: 0.5 }), teaser, 13.2, 0.35, -5 + i * 3.2); add(new THREE.CylinderGeometry(0.255, 0.27, 0.12, 12), MT.white, c, 0, 0.0, 0); }
+  sign('YAKINDA: YENİ SALON', '#0b2a5e', teaser, 17.5, 1.6, 0.5, 4.4); rb(0.2, 1.6, 0.2, MT.steel, teaser, 16.2, 0.8, 0.4); rb(0.2, 1.6, 0.2, MT.steel, teaser, 18.8, 0.8, 0.4);
+  // closed gate to the farm until the farm is bought
+  farmGate = new THREE.Group(); scene.add(farmGate); for (let x = -2.3; x <= 2.31; x += 0.46) rb(0.1, 1.2, 0.1, MT.woodD, farmGate, x, 0.6, -7.5, 0.03); rb(4.8, 0.12, 0.12, MT.wood, farmGate, 0, 0.95, -7.5, 0.03); sign('ÇİFTLİK YAKINDA', '#2fa043', farmGate, 0, 1.55, -7.42, 2.6);
+}
+function buildFarm() { if (farmGate) { scene.remove(farmGate); farmGate = null; }
   add(new THREE.PlaneGeometry(22, 12), MT.grass, null, 0, 0.0, -14).rotation.x = -Math.PI / 2;
   backFence = new THREE.Group(); scene.add(backFence);
   for (let x = -10.5; x <= 10.5; x += 1.5) rb(0.14, 1.0, 0.14, MT.fence, backFence, x, 0.5, -20);
@@ -212,7 +269,9 @@ function buildWorld() {
   rb(3, 0.5, 0.8, MT.woodD, null, -2, 0.25, -18.8);
   rb(2.4, 0.5, 2.0, MT.wood, null, -6.8, 0.25, -10.9); box(-8.2, -5.4, -12.1, -9.7);
   farmPile = new Pile(-6.8, -10.9, 'feather', 16, 2, 2, 0.75); farmPile.base = 0.55; markZone(farmPile, new THREE.Vector3(-6.8, 0, -8.8));
-  // ---- press ----
+  retirePen(); for (let i = 0; i < 4; i++) addTurkey('dogal');
+}
+function buildPress() { retireMini();
   const press = new THREE.Group(); press.position.set(-8.4, 0, -3.5); scene.add(press);
   press.userData.body = rb(2.4, 2.6, 2.2, M(0x2a80dc, { roughness: 0.35 }), press, 0, 1.3, 0, 0.18); rb(1.8, 0.35, 1.6, MT.steel, press, 0, 2.8, 0, 0.08);
   press.userData.pis = add(new THREE.CylinderGeometry(0.22, 0.22, 1.2, 16), MT.steel, press, 0, 3.5, 0);
@@ -220,28 +279,6 @@ function buildWorld() {
   press.userData.stars = starRow(press, 0, 2.15, 1.13);
   box(-9.8, -7.0, -4.8, -2.2); pressPile = new Pile(-6.2, -3.5, 'base', 12, 2, 2, 0.8); markZone(pressPile);
   outl(press); stationsAnim.press = press;
-  buildAssembly(0, -1.0, -2.0);
-  buildTest();
-  // ---- shop counters (kasa): first one now, 3 more as pads ----
-  buildCounter(0, 4.0); counter = K[0].pile; cashPile = K[0].cash;
-  rb(1.6, 0.8, 1.6, MT.navy, null, 9.2, 0.4, 10.4, 0.12); bigFlix = makeFlix('mavi', 2.0); bigFlix.position.set(9.2, 0.8, 10.4); scene.add(bigFlix); box(8.4, 10.0, 9.6, 11.2);
-  add(new THREE.PlaneGeometry(200, 6), MT.road, null, 0, 0.01, 23).rotation.x = -Math.PI / 2;
-  for (let x = -40; x < 60; x += 4) add(new THREE.PlaneGeometry(2, 0.25), M(0xffffff), null, x, 0.02, 23).rotation.x = -Math.PI / 2;
-  add(new THREE.PlaneGeometry(200, 2.4), M(0xd8d2c8), null, 0, 0.015, 19.9).rotation.x = -Math.PI / 2;
-  for (const [x, z] of [[-27.5, -4], [-28, 4], [28, -2], [28.5, 6], [-27.5, 14], [28, -12], [-27.6, -14]]) { add(new THREE.CylinderGeometry(0.2, 0.28, 1.6, 8), MT.woodD, null, x, 0.8, z); add(new THREE.IcosahedronGeometry(1.4, 1), M(0x4fae5a, { flatShading: true, roughness: 0.9 }), null, x, 2.4, z); }
-  buildOutside();
-  // wardrobe
-  const wd = new THREE.Group(); wd.position.set(-10.1, 0, 16.4); scene.add(wd); rb(1.0, 2.4, 2.0, MT.purple, wd, 0, 1.2, 0, 0.1); rb(0.06, 2.0, 0.85, M(0x9a72f0), wd, 0.52, 1.2, -0.46, 0.03); rb(0.06, 2.0, 0.85, M(0x9a72f0), wd, 0.52, 1.2, 0.46, 0.03);
-  sign('DOLAP', '#7a4fd8', wd, 0.56, 2.6, 0, 1.8, Math.PI / 2); box(-10.7, -9.5, 15.3, 17.5);
-  ZONES.dolap = zoneRing(-8.3, 16.4, 0x9a72f0, 'DOLAP');
-  // teaser of the new hall (before it is bought)
-  teaser = new THREE.Group(); scene.add(teaser);
-  for (let i = 0; i < 6; i++) { const c = add(new THREE.ConeGeometry(0.25, 0.7, 12), M(0xff7a1a, { roughness: 0.5 }), teaser, 13.2, 0.35, -5 + i * 3.2); add(new THREE.CylinderGeometry(0.255, 0.27, 0.12, 12), MT.white, c, 0, 0.0, 0); }
-  sign('YAKINDA: YENİ SALON', '#0b2a5e', teaser, 17.5, 1.6, 0.5, 4.4); rb(0.2, 1.6, 0.2, MT.steel, teaser, 16.2, 0.8, 0.4); rb(0.2, 1.6, 0.2, MT.steel, teaser, 18.8, 0.8, 0.4);
-  for (let i = 0; i < 4; i++) addTurkey('dogal');
-  arrow = new THREE.Group(); scene.add(arrow); const ag = new THREE.Shape(); ag.moveTo(0, 0.6); ag.lineTo(0.45, 0); ag.lineTo(0.17, 0); ag.lineTo(0.17, -0.5); ag.lineTo(-0.17, -0.5); ag.lineTo(-0.17, 0); ag.lineTo(-0.45, 0); ag.closePath();
-  const am = new THREE.Mesh(new THREE.ShapeGeometry(ag), new THREE.MeshBasicMaterial({ color: 0xffd84a, transparent: true, opacity: 0.95, depthWrite: false })); am.rotation.x = -Math.PI / 2; am.position.y = 0.06; arrow.add(am);
-  beacon = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.15, 40), new THREE.MeshBasicMaterial({ color: 0xffd84a, transparent: true, opacity: 0.9, depthWrite: false })); beacon.rotation.x = -Math.PI / 2; beacon.position.y = 0.05; scene.add(beacon);
 }
 // silos, chimneys with smoke, water tower and the two big billboards for the other FLIX games
 const smoke = []; const smokeGeo = new THREE.IcosahedronGeometry(0.6, 1), smokeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: 0.7, depthWrite: false });
@@ -268,15 +305,16 @@ function setStars(g, n, max = 5) { g.clear(); for (let i = 0; i < max; i++) { co
 const TIER = (l) => l >= 6 ? { c: 0xffc83a, metal: 0.75, r: 0.25 } : l >= 3 ? { c: 0xc8d2e0, metal: 0.7, r: 0.25 } : null;
 // görsel kademeler: geliştirme seviyesi makinelerde görünür (yıldız, gümüş 3+, altın 6+, ikinci robot kol)
 export function applyTiers() {
-  const pr = stationsAnim.press.userData, tp = TIER(lv('pres')); pr.body.material.color.set(tp ? tp.c : 0x2a80dc); pr.body.material.metalness = tp ? tp.metal : 0; setStars(pr.stars, Math.min(5, Math.ceil(lv('pres') * 5 / 8)));
+  if (stationsAnim.press) { const pr = stationsAnim.press.userData, tp = TIER(lv('pres')); pr.body.material.color.set(tp ? tp.c : 0x2a80dc); pr.body.material.metalness = tp ? tp.metal : 0; setStars(pr.stars, Math.min(5, Math.ceil(lv('pres') * 5 / 8))); }
   const tm = TIER(lv('mont')); for (const A of asm) { A.top.material = tm ? M(tm.c, { metalness: tm.metal, roughness: tm.r }) : MT.yel; A.arm2.visible = lv('mont') >= 4; setStars(A.stars, Math.min(5, Math.ceil(lv('mont') * 5 / 8))); }
-  const tt = TIER(lv('test')); TS.body.material.color.set(tt ? tt.c : 0x2fa043); TS.body.material.metalness = tt ? tt.metal : 0; setStars(TS.stars, Math.min(5, lv('test')));
+  if (TS) { const tt = TIER(lv('test')); TS.body.material.color.set(tt ? tt.c : 0x2fa043); TS.body.material.metalness = tt ? tt.metal : 0; setStars(TS.stars, Math.min(5, lv('test'))); }
   if (TR) setStars(TR.stars, lv('truck'));
-  BOUNDS.x1 = has('genis') ? 25.5 : 12.6;
+  setBounds();
 }
+function setBounds() { BOUNDS.x0 = has('bblok') ? -24.5 : has('atolye') ? -11 : -6.3; BOUNDS.x1 = has('genis') ? 25.5 : has('atolye') ? 12.6 : 10.3; BOUNDS.z0 = has('ciftlik0') ? farmZ() - 1 : has('atolye') ? -7.3 : 6.6; NAV.dirty = true; }
 function zoneRing(x, z, col, txt) { const r = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.25, 48), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.85, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(x, 0.045, z); scene.add(r); floorText(txt, x, z);
   return { pos: new THREE.Vector3(x, 0, z), r: 1.2, ring: r }; }
-function markZone(pile, at, col = 0xffffff) { const p = at || pile.pos; const r = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.45, 48), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.34, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(p.x, 0.04, p.z); scene.add(r); pile.zone = at ? at.clone() : pile.pos.clone(); }
+function markZone(pile, at, col = 0xffffff) { const p = at || pile.pos; const r = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.45, 48), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.34, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(p.x, 0.04, p.z); scene.add(r); pile.zone = at ? at.clone() : pile.pos.clone(); pile.ring = r; return r; }
 function inRing(x, z, txt1, txt2) { const ring = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.2, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.34, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.04, z); scene.add(ring);
   const lbl = tex(256, 96, (c, w) => { c.fillStyle = '#fff'; c.font = 'bold 30px R, sans-serif'; c.textAlign = 'center'; c.fillText(txt1, w / 2, 40); c.fillText(txt2, w / 2, 76); });
   const lm = add(new THREE.PlaneGeometry(1.4, 0.52), new THREE.MeshBasicMaterial({ map: lbl, transparent: true, depthWrite: false }), null, x, 0.05, z + 1.6); lm.rotation.x = -Math.PI / 2; lm.castShadow = false; }
@@ -467,7 +505,7 @@ function stepConveyor(dt) {
   if (!konv) return; konv.belts.forEach(b => b.m.map.offset.x -= dt * 1.2);
   konv.t -= dt; if (konv.t > 0) return; konv.t = 0.7;
   for (const [i, path] of [[0, [new THREE.Vector3(2.4, 0.6, -2.6), new THREE.Vector3(5.0, 0.6, 0.2)]], [1, [new THREE.Vector3(2.4, 0.6, 4.0), new THREE.Vector3(5.0, 0.6, 1.4)]]]) {
-    const A = asm[i]; if (!A || !A.out.n || TS.q.length >= 12) continue; const o = A.out.pop();
+    const A = asm[i]; if (!A || !A.out.n || !TS || TS.q.length >= 12) continue; const o = A.out.pop();
     fly(o, o.position, path[0], 0.25, () => fly(o, path[0], path[1], 1.0, () => { scene.remove(o); TS.q.push(o); syncTestQ(); }, 0.05), 0.4); }
 }
 
@@ -535,11 +573,11 @@ function flyPath(o, pts, speed, onEnd) { let i = 0; const step = () => { if (i >
 function stepBelt(dt) {
   if (!FB) return; FB.belts.forEach(m => m.map.offset.x -= dt * 1.4);
   const iv = 1.1 * Math.pow(0.8, lv('bant')) * UB(), V = (x, y, z) => new THREE.Vector3(x, y, z);
-  FB.t -= dt; if (FB.t <= 0) { FB.t = iv; const src = [farmPile, farmPile2].filter(p => p && p.n).sort((a, b) => b.n - a.n)[0]; const A = asm.reduce((a, b) => b.inF.length < a.inF.length ? b : a, asm[0]);
+  FB.t -= dt; if (FB.t <= 0 && asm.length) { FB.t = iv; const src = [farmPile, farmPile2].filter(p => p && p.n).sort((a, b) => b.n - a.n)[0]; const A = asm.reduce((a, b) => b.inF.length < a.inF.length ? b : a, asm[0]);
     if (src && A.inF.length < 10) { const o = src.pop(), col = o.userData.col, sx = src.pos.x; const pts = [o.position.clone(), V(sx, 2.62, -10.9), V(-1.6, 2.62, -10.9), V(-1.6, 2.62, -3.9)];
       flyPath(o, pts, 6, () => fly(o, o.position, V(A.x - 0.6, 1.2, A.z), 0.35, () => { scene.remove(o); A.inF.push(col); syncBuf(A); }, 0.8)); } }
-  FB.tb -= dt; if (FB.tb <= 0) { FB.tb = iv; const A = asm.reduce((a, b) => b.inB < a.inB ? b : a, asm[0]);
-    if (pressPile.n && A.inB < 10) { const o = pressPile.pop(); const pts = [o.position.clone(), V(-6.2, 2.62, -3.5), V(-2.6, 2.62, -3.6)];
+  FB.tb -= dt; if (FB.tb <= 0 && asm.length) { FB.tb = iv; const A = asm.reduce((a, b) => b.inB < a.inB ? b : a, asm[0]);
+    if (pressPile && pressPile.n && A.inB < 10) { const o = pressPile.pop(); const pts = [o.position.clone(), V(-6.2, 2.62, -3.5), V(-2.6, 2.62, -3.6)];
       flyPath(o, pts, 6, () => fly(o, o.position, V(A.x - 0.6, 1.2, A.z), 0.35, () => { scene.remove(o); A.inB++; syncBuf(A); }, 0.8)); } }
 }
 // ---- big farm: fence moves back, more turkeys, second feather crate ----
@@ -651,7 +689,7 @@ const DECOR = [
   [14, () => { const g = new THREE.Group(); g.position.set(1.6, 0, 9.8); scene.add(g); add(new THREE.CylinderGeometry(1.1, 1.2, 0.5, 28), MT.steel, g, 0, 0.25, 0); add(new THREE.CylinderGeometry(1.0, 1.0, 0.05, 28), M(0x5ab8f0, { roughness: 0.05, metalness: 0.2 }), g, 0, 0.5, 0); const f = makeFlix('mor', 0.9); f.position.y = 0.55; g.add(f); decoSpin.push(f); box(0.4, 2.8, 8.6, 11.0); }],
 ];
 const decoBob = [], decoSpin = []; let decoDone = 0;
-function stepDecor(anim) { const L = factoryLevel(); let added = false; for (let i = decoDone; i < DECOR.length && DECOR[i][0] <= L; i++) { DECOR[i][1](); decoDone = i + 1; added = true; } if (added && anim) toast('Fabrika seviye ' + L + '! Yeni süsleme geldi'); }
+function stepDecor(anim) { if (!has('atolye')) return; const L = factoryLevel(); let added = false; for (let i = decoDone; i < DECOR.length && DECOR[i][0] <= L; i++) { DECOR[i][1](); decoDone = i + 1; added = true; } if (added && anim) toast('Fabrika seviye ' + L + '! Yeni süsleme geldi'); }
 
 // turkeys
 function turkeyMesh(col) {
@@ -669,7 +707,7 @@ function turkeyMesh(col) {
   g.userData.body = body; g.scale.setScalar(1.15); return g;
 }
 const tkPos = () => { const xm = has('genis') ? 24 : 9.5; let x, z; do { x = rnd(has('bblok') ? -23 : -9, xm); z = rnd(has('ciftlik') ? -25.6 : -18.6, -11.6); } while ((x > 3.4 && x < 9.6 && z < -15 && z > -20) || (has('robot2') && x > -21.5 && x < -15.5 && z < -11 && z > -15.5)); return new THREE.Vector3(x, 0, z); };
-function addTurkey(col) { const t = turkeyMesh(col); t.position.copy(tkPos()); scene.add(t); turkeys.push({ o: t, col, tgt: tkPos(), wait: rnd(0, 2), peck: 0 }); }
+function addTurkey(col, pen = false) { const t = turkeyMesh(col); t.position.copy(pen ? penPos() : tkPos()); scene.add(t); turkeys.push({ pen, o: t, col, tgt: pen ? penPos() : tkPos(), wait: rnd(0, 2), peck: 0 }); }
 
 // ---------------- player ----------------
 export let P; let H;
@@ -723,6 +761,12 @@ function refreshPads() {
     padObjs.push({ p, mesh: m, paid, t: 0 }); }
 }
 function actPad(p) {
+  if (p.id === 'atolye') buildAtolye();
+  if (p.id === 'masa') buildAssembly(0, -1.0, -2.0);
+  if (p.id === 'ciftlik0') buildFarm();
+  if (p.id === 'pres') buildPress();
+  if (p.id === 'park') buildTest();
+  if (p.id === 'kumes2' && penPile) addTurkey('dogal', true);
   if (p.col) { addTurkey(p.col); addTurkey(p.col); }
   if (p.id === 'suru') ['dogal', 'dogal', 'mavi', 'yesil', 'dogal', 'mavi'].forEach(addTurkey);
   if (p.id === 'asm2') buildAssembly(1, -1.0, 3.4);
@@ -850,20 +894,16 @@ export const soundOn = () => sound;
 
 // ---------------- tutorial ----------------
 const TUT = [
-  { t: 'Kümesten hindi tüylerini al', tgt: () => farmPile.zone, done: () => P.stack.some(o => o.userData.type === 'feather') },
-  { t: 'Presten oyuncak tabanı al', tgt: () => pressPile.zone, done: () => P.stack.some(o => o.userData.type === 'base') },
-  { t: 'Montaj masasına bırak', tgt: () => asm[0].inZone, done: () => asm[0].out.n > 0 || asm[0].inF.length + asm[0].inB > 0 && !P.stack.length },
-  { t: 'Hazır FLIX’leri al', tgt: () => asm[0].out.zone, done: () => P.stack.some(o => o.userData.type === 'toy') },
-  { t: 'Test alanına bırak', tgt: () => TS.inZone, done: () => TS.q.length > 0 || testBusy() || TS.out.n > 0 },
-  { t: 'Testi geçen FLIX’leri al', tgt: () => TS.out.zone, done: () => P.stack.some(o => o.userData.ok) },
-  { t: 'Tezgâha bırak, müşteriler alsın', tgt: () => counter.zone, done: () => SV.del && cashPile.n > 0 || SV.money > 0 },
-  { t: 'Kazandığın parayı topla', tgt: () => cashPile.pos, done: () => SV.money > 0 },
+  { t: 'Hindiden tüy al', tgt: () => penPile ? penPile.zone : K[0].zone, done: () => !penPile || P.stack.some(o => o.userData.type === 'feather') },
+  { t: 'Makineden FLIX tabanı al', tgt: () => miniPile ? miniPile.zone : K[0].zone, done: () => !miniPile || P.stack.some(o => o.userData.type === 'base') },
+  { t: 'Standa git: kur, kutula ve test et', tgt: () => K[0].zone, done: () => K[0].pile.n > 0 || K[0].cash.n > 0 || SV.money > 0 },
+  { t: 'Müşteri alsın, parayı topla', tgt: () => K[0].cash.pos, done: () => SV.money > 0 },
 ];
 export const tutDone = () => SV.tut >= TUT.length;
 function stepTutorial() {
   if (tutDone() && !SV.ct) newContract();
   let tgt = null; const st = TUT[SV.tut];
-  if (st) { if (st.done()) { SV.tut++; SFX.click(); if (SV.tut >= TUT.length) { $('#goal').classList.remove('show'); SV.gems += 10; toast('Harika! Parayla yeni alanlar aç · +10 💎'); refreshPads(); refreshHUD(); } save(); } else { $('#goal').textContent = st.t; $('#goal').classList.add('show'); tgt = st.tgt(); } }
+  if (st) { if (st.done()) { SV.tut++; SFX.click(); if (SV.tut >= TUT.length) { $('#goal').classList.remove('show'); SV.gems += 10; toast('Harika! Parayla atölyeni büyüt · +10 💎'); refreshPads(); refreshHUD(); } save(); } else { $('#goal').textContent = st.t; $('#goal').classList.add('show'); tgt = st.tgt(); } }
   if (!tgt && padObjs.length && SV.money >= Math.min(...padObjs.map(o => o.p.cost - o.paid)) * 0.6) { const o = padObjs.reduce((a, b) => (a.p.cost - a.paid) < (b.p.cost - b.paid) ? a : b); tgt = o.mesh.position; }
   guideTarget = tgt;
 }
@@ -885,14 +925,15 @@ function stepPlush(dt, T) { if (!PL) return; const w = PL.inF.length >= 3 && !PL
   if (w && PL.t <= 0) { PL.t = 2.0 * Math.pow(0.85, lv('mont')) * UB(); const cols = PL.inF.splice(0, 3); const col = cols.reduce((a, b) => COLS[b].v > COLS[a].v ? b : a, cols[0]); const it = makeItem('plush', col, Math.round(cols.reduce((a, c) => a + COLS[c].v, 0) * PROD.plushMult)); scene.add(it); it.position.set(17.3, 1.3, 7.2); const to = PL.out.slot(PL.out.n); PL.out.items.push(it); fly(it, it.position, to, 0.45); SFX.chime && SFX.chime(3); syncPlush(); } }
 function stepWorld(dt, T) {
   if (bonusOn('miknatis') && !inMenu) { magT -= dt; if (magT <= 0) { magT = 0.12; for (const pile of allCash()) if (pile && pile.n) { const o = pile.pop(), v = o.userData.v || 5; fly(o, o.position, P.o.position.clone().add(new THREE.Vector3(0, 1.5, 0)), 0.45, () => { scene.remove(o); SV.money += v; bumpMoney(); }, 2.2); SFX.coin(); break; } } }
-  feT -= dt; if (feT <= 0) { feT = 5.5 * Math.pow(0.85, lv('kumes')) / turkeys.length * UB(); const tk = turkeys[Math.floor(rnd(0, turkeys.length))]; const fp = farmPile2 && !farmPile2.full() && (tk.o.position.x > 0.4 || farmPile.full()) ? farmPile2 : farmPile; if (!fp.full()) { const o = makeItem('feather', tk.col); scene.add(o); o.position.copy(tk.o.position).add(new THREE.Vector3(0, 1, 0)); const to = fp.slot(fp.n); fp.items.push(o); fly(o, o.position, to, 0.7 + tk.o.position.distanceTo(to) * 0.03, null, 2.5); tk.peck = 1; } }
-  prT -= dt; if (prT <= 0) { prT = 1.6 * Math.pow(0.85, lv('pres')) / (1 + (asm.length - 1) * 0.6) * UB(); if (!pressPile.full()) { const o = makeItem('base'); scene.add(o); o.position.copy(pressPile.slot(pressPile.n)); o.scale.setScalar(0.01); pressPile.items.push(o); popIn(o); stationsAnim.press.userData.hit = 1; } }
-  const ph = stationsAnim.press.userData; ph.hit = Math.max(0, (ph.hit || 0) - dt * 4); ph.pis.position.y = 3.5 - Math.sin(ph.hit * Math.PI) * 0.6;
+  feT -= dt; if (feT <= 0) { feT = (penPile && turkeys.every(t => t.pen) ? 2.2 : 5.5) * Math.pow(0.85, lv('kumes')) / Math.max(1, turkeys.length) * UB(); const tk = turkeys[Math.floor(rnd(0, turkeys.length))]; const fp = tk.pen ? penPile : farmPile2 && !farmPile2.full() && (tk.o.position.x > 0.4 || farmPile.full()) ? farmPile2 : farmPile; if (fp && !fp.full()) { const o = makeItem('feather', tk.col); scene.add(o); o.position.copy(tk.o.position).add(new THREE.Vector3(0, 1, 0)); const to = fp.slot(fp.n); fp.items.push(o); fly(o, o.position, to, 0.7 + tk.o.position.distanceTo(to) * 0.03, null, 2.5); tk.peck = 1; } }
+  if (miniPile) { ST.t -= dt; if (ST.t <= 0) { ST.t = 2.4 * Math.pow(0.9, lv('pres')) * UB(); if (!miniPile.full()) { const o = makeItem('base'); scene.add(o); o.position.copy(miniPile.slot(miniPile.n)); o.scale.setScalar(0.01); miniPile.items.push(o); popIn(o); ST.hit = 1; SFX.tick && SFX.tick(); } } ST.hit = Math.max(0, ST.hit - dt * 3); ST.pis.position.y = 1.7 - Math.sin(ST.hit * Math.PI) * 0.3; ST.gear.rotation.z += dt * (miniPile.full() ? 0.5 : 4); }
+  if (pressPile) { prT -= dt; if (prT <= 0) { prT = 1.6 * Math.pow(0.85, lv('pres')) / (1 + (Math.max(1, asm.length) - 1) * 0.6) * UB(); if (!pressPile.full()) { const o = makeItem('base'); scene.add(o); o.position.copy(pressPile.slot(pressPile.n)); o.scale.setScalar(0.01); pressPile.items.push(o); popIn(o); stationsAnim.press.userData.hit = 1; } }
+  const ph = stationsAnim.press.userData; ph.hit = Math.max(0, (ph.hit || 0) - dt * 4); ph.pis.position.y = 3.5 - Math.sin(ph.hit * Math.PI) * 0.6; }
   for (const C of K) C.pile.max = 12 + lv('tez') * 4;
   for (const A of asm) { A.t -= dt; const work = A.inF.length > 0 && A.inB > 0 && !A.out.full();
     if (work && A.t <= 0) { A.t = 1.4 * Math.pow(0.85, lv('mont')) * UB(); const col = A.inF.shift(); A.inB--; const it = makeItem('toy', col); scene.add(it); it.position.set(A.x, 1.2, A.z); const to = A.out.slot(A.out.n); A.out.items.push(it); fly(it, it.position, to, 0.4); SFX.pop(); syncBuf(A); }
     A.arm.rotation.z = work ? Math.sin(T * 8) * 0.4 : 0; A.a2.rotation.x = 1.3 + (work ? Math.sin(T * 12) * 0.3 : 0); A.arm2a.rotation.z = work ? Math.sin(T * 8 + 1.5) * 0.4 : 0; }
-  stepTest(dt, T);
+  if (TS) stepTest(dt, T); stepAct(dt, T);
   if (OF) { const o = near(new THREE.Vector3(8.4, 0, -3.6), 2.6) ? 0.2 : Math.PI / 2; OF.door.rotation.y += (o - OF.door.rotation.y) * Math.min(1, dt * 6); }
   if (rubberPile) { TM.rt -= dt; if (TM.rt <= 0) { TM.rt = 1.8 * Math.pow(0.85, lv('pres')) * UB(); if (!rubberPile.full()) { const o = makeItem('rubber'); scene.add(o); o.position.copy(rubberPile.slot(rubberPile.n)); o.scale.setScalar(0.01); rubberPile.items.push(o); popIn(o); } }
     TM.t -= dt; const work = TM.inR > 0 && !TM.out.full(); TM.ball.rotation.y += dt * (work ? 8 : 0.5); TM.ball.rotation.x += dt * (work ? 5 : 0);
@@ -903,7 +944,7 @@ function stepWorld(dt, T) {
   for (const o of padObjs) { const p = o.p; if (near(new THREE.Vector3(p.x, 0, p.z), p.big ? 1.6 : 1.3) && SV.money >= 1) { o.t -= dt; if (o.t <= 0) { o.t = 0.05; const step = Math.min(Math.floor(SV.money), Math.max(1, Math.ceil(p.cost / 40)), p.cost - o.paid); SV.money -= step; o.paid += step; SV.paid[p.id] = o.paid; SFX.tick(); o.mesh.material.map = padTex(p, o.paid); if (o.paid >= p.cost) { unlock(p); break; } } } }
   for (const tk of turkeys) { tk.wait -= dt; const d = tk.tgt.clone().sub(tk.o.position); const dist = d.length();
     if (tk.wait <= 0 && dist > 0.1) { d.normalize(); tk.o.position.addScaledVector(d, dt * 1.2); tk.o.rotation.y = Math.atan2(d.x, d.z); tk.o.userData.body.position.y = Math.abs(Math.sin(T * 9)) * 0.05; }
-    else if (dist <= 0.1) { tk.tgt = tkPos(); tk.wait = rnd(1, 3); }
+    else if (dist <= 0.1) { tk.tgt = tk.pen ? penPos() : tkPos(); tk.wait = rnd(1, 3); }
     tk.peck = Math.max(0, tk.peck - dt * 1.5); tk.o.userData.body.rotation.x = Math.sin(tk.peck * Math.PI * 3) * 0.35 + (tk.wait > 0 ? Math.max(0, Math.sin(T * 3 + tk.o.position.x)) * 0.25 : 0); }
   for (const W of workers) stepWorker(W, dt);
   cashiers.forEach((c, i) => { c.H.body.position.y = Math.abs(Math.sin(T * 2 + i)) * 0.03; });
@@ -926,17 +967,32 @@ function interact() {
   for (const pile of allCash()) if (pile && near(pile.pos, 1.8) && pile.n) { for (let k = 0; k < 3 && pile.n; k++) { const o = pile.pop(); const v = o.userData.v || 5; fly(o, o.position, P.o.position.clone().add(new THREE.Vector3(0, 1.5, 0)), 0.25, () => { scene.remove(o); SV.money += v; bumpMoney(); }); } SFX.coin(); haptic(8); return; }
   for (const A of asm) if (near(A.inZone, 1.5)) { const o = stackPop(x => x.userData.type === 'feather' || x.userData.type === 'base'); if (o) { dropTo(A, o); SFX.drop(); return; } }
   if (TM && near(TM.inZone, 1.5)) { const o = stackPop(x => x.userData.type === 'rubber'); if (o) { dropTop(o); SFX.drop(); return; } }
-  if (near(TS.inZone, 1.5) && TS.q.length < 16) { const o = stackPop(untested); if (o) { dropTest(o); SFX.drop(); return; } }
+  if (TS && near(TS.inZone, 1.5) && TS.q.length < 16) { const o = stackPop(untested); if (o) { dropTest(o); SFX.drop(); return; } }
   if (GS && near(GS.inZone, 1.5) && GS.inV.length < 9) { const o = stackPop(x => x.userData.type === 'toy' && x.userData.ok); if (o) { dropGift(o); SFX.drop(); return; } }
+  if (P.act) return;
+  for (const C of K) if (near(C.zone, 1.7) && !C.pile.full()) { const u = stackPop(untested); if (u) { startTest(u, C); return; }
+    const f = P.stack.find(o => o.userData.type === 'feather'), b = P.stack.find(o => o.userData.type === 'base'); if (f && b) { stackPop(o => o === f); stackPop(o => o === b); startBuild(f, b, C); return; } }
   for (const C of K) if (near(C.zone, 1.7) && !C.pile.full()) { const o = stackPop(tested); if (o) { C.pile.push(o, o.position); SV.del = 1; SFX.drop(); return; } }
   if (RC && near(RC.inZone, 1.5)) { const o = stackPop(x => x.userData.type === 'reject'); if (o) { dropRecycle(o); SFX.drop(); return; } }
   if (PL && near(PL.inZone, 1.5) && PL.inF.length < 12) { const o = stackPop(x => x.userData.type === 'feather'); if (o) { dropPlush(o); SFX.drop(); return; } }
   if (TR && TR.state === 'dock' && near(TR.zone, 1.8) && TR.load.length < truckCap()) { const o = stackPop(tested); if (o) { loadTruck(o); return; } }
   if (P.stack.length >= cap) return;
   const hasProd = P.stack.some(isProd), hasRaw = P.stack.some(isRaw);
-  if (!hasProd) for (const pile of [farmPile, farmPile2, pressPile, pressPile2, rubberPile]) if (pile && near(pile.zone, 1.6) && pile.n && !(pile !== rubberPile && P.stack.filter(o => o.userData.type === pile.type).length >= Math.ceil(cap / 2))) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
-  if (!hasRaw) for (const pile of asm.map(a => a.out).concat(TM ? [TM.out] : [], [TS.out, REJ], GS ? [GS.out] : [], RC ? [RC.out] : [], PL ? [PL.out] : [])) if (near(pile.zone, 1.6) && pile.n) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
+  if (!hasProd) for (const pile of [penPile, miniPile, farmPile, farmPile2, pressPile, pressPile2, rubberPile]) if (pile && near(pile.zone, 1.6) && pile.n && !(pile !== rubberPile && P.stack.filter(o => o.userData.type === pile.type).length >= Math.ceil(cap / 2))) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
+  if (!hasRaw) for (const pile of asm.map(a => a.out).concat(TM ? [TM.out] : [], TS ? [TS.out, REJ] : [], GS ? [GS.out] : [], RC ? [RC.out] : [], PL ? [PL.out] : [])) if (near(pile.zone, 1.6) && pile.n) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
 }
+// ---- the hero does the work by hand at the stand: build + box, then kick-test, then place it ----
+const handPos = () => P.o.position.clone().add(new THREE.Vector3(Math.sin(P.o.rotation.y) * 0.7, 1.15, Math.cos(P.o.rotation.y) * 0.7));
+function startBuild(f, b, C) { const hp = handPos(); fly(f, f.position, hp, 0.22); fly(b, b.position, hp.clone().setY(1.0), 0.22); P.act = { kind: 'build', f, b, col: f.userData.col, C, t: 0, dur: 0.85 * Math.pow(0.9, lv('mont')) * (bonusOn('uret') ? 0.6 : 1) }; SFX.drop(); }
+function startTest(o, C) { P.act = { kind: 'test', o, C, t: 0, kd: 0.34 * Math.pow(0.92, lv('test')) * (bonusOn('uret') ? 0.6 : 1), n: 0 }; o.scale.setScalar(0.75); }
+function stepAct(dt, T) { const A = P.act; if (!A) return; A.t += dt;
+  if (A.kind === 'build') { const hp = handPos(); if (A.t > 0.25) { A.f.position.copy(hp).add(new THREE.Vector3(0, Math.sin(T * 30) * 0.05, 0)); A.b.position.copy(hp).setY(1.0); A.f.rotation.y += dt * 9; }
+    if (A.t >= A.dur) { scene.remove(A.f); scene.remove(A.b); const toy = makeItem('toy', A.col); scene.add(toy); toy.position.copy(hp); popIn(toy); SFX.pop(); floatText('Kuruldu · kutulandı', '#ffffff'); startTest(toy, A.C); } }
+  else if (A.kind === 'test') { const e = (A.t / A.kd) % 1, base = P.o.position; A.o.position.set(base.x + Math.sin(P.o.rotation.y) * 0.45, 0.6 + Math.sin(e * Math.PI) * 1.9, base.z + Math.cos(P.o.rotation.y) * 0.45); A.o.rotation.y += dt * 8;
+    if (A.t >= A.kd * (A.n + 1)) { A.n++; SFX.pop(); if (A.n >= 3) { const o = A.o; o.rotation.set(0, 0, 0); o.scale.setScalar(1); markTested(o); popSprite('ok', base.clone().add(new THREE.Vector3(0, 3.2, 0))); SFX.chime && SFX.chime(2); P.act = null; SV.del = 1;
+        if (!A.C.pile.full()) A.C.pile.push(o, o.position); else stackPush(o); haptic(10); } } } }
+function actPose(T) { const A = P.act; if (A.kind === 'build') { const h = Math.sin(T * 22); pose(H, { kickL: 0, kickR: 0, kneeL: 0.25, kneeR: 0.25, armL: [-1.3 + h * 0.35, 0.2, -0.3], armR: [-1.3 - h * 0.35, 0.2, -0.3] }); H.body.position.y = Math.abs(h) * 0.03; }
+  else { const e = (A.t / A.kd) % 1, k = Math.max(0, 1 - Math.min(e, 1 - e) * 6); pose(H, { kickL: 0, kickR: k * 1.3, kneeL: 0.2, kneeR: 0.2 + k * 0.4, armL: [0.3, 0.6, -0.4], armR: [0.3, 0.6, -0.4] }); H.body.position.y = 0; } }
 // ---- worker AI: picks the most useful job each round ----
 function wTake(W, o) { W.stack.push(o); W.hold.attach(o); o.scale.setScalar(1 / 0.68); o.rotation.set(0, 0, 0); let h = 0; W.stack.forEach(s => { s.position.set(0, h / 0.68, 0); h += hOf(s); }); }
 function wDrop(W) { const o = W.stack.pop(); const w = o.getWorldPosition(new THREE.Vector3()); scene.add(o); o.position.copy(w); o.scale.setScalar(1); o.rotation.set(0, 0, 0); return o; }
@@ -977,17 +1033,17 @@ function pickTask(W) {
   const cap = wcap(), n = workers.length, role = n < 2 ? 'all' : n === 2 && W.id === 1 ? 'mix' : ROLES[W.id % 8];
   const truckOk = TR && TR.state === 'dock' && TR.load.length < truckCap(), gp = W.H.g.position;
   const freeK = () => K.filter(C => !C.pile.full()).sort((a, b) => a.pile.n - b.pile.n || Math.abs(a.x - gp.x) - Math.abs(b.x - gp.x))[0];
-  const sell = () => { const src = [TS.out, GS && GS.out, RC && RC.out, PL && PL.out].filter(p => p && avail(p, W) > 0).sort((a, b) => b.n - a.n)[0]; if (!src) return null;
+  const sell = () => { const src = [TS && TS.out, GS && GS.out, RC && RC.out, PL && PL.out].filter(p => p && avail(p, W) > 0).sort((a, b) => b.n - a.n)[0]; if (!src) return null;
     W.alt = !W.alt; const C = freeK(); if (truckOk && (!C || (W.alt && (C.pile.n >= 2 || W.id % 2)))) return { src: [src], dst: 'truck', max: cap }; if (C) return { src: [src], dst: 'counter', C, max: cap }; return null; };
-  const test = () => { const outs = (konv ? asm.slice(2) : asm).map(a => a.out).concat(TM ? [TM.out] : []).filter(p => avail(p, W) > 0).sort((a, b) => b.n - a.n);
+  const test = () => { if (!TS) return null; const outs = (konv ? asm.slice(2) : asm).map(a => a.out).concat(TM ? [TM.out] : []).filter(p => avail(p, W) > 0).sort((a, b) => b.n - a.n);
     return outs.length && TS.q.length < 10 ? { src: [outs[0]], dst: 'test', max: cap } : null; };
   const reject = () => RC && avail(REJ, W) > 0 && RC.vals.length < 6 ? { src: [REJ], dst: 'recycle', max: cap } : null;
-  const gift = () => GS && GS.inV.length < 3 && (TS.out.n >= 2 || GS.inV.length > 0) && avail(TS.out, W) > 0 ? { src: [TS.out], dst: 'gift', max: Math.min(cap, 3 - GS.inV.length), only: 'toy' } : null;
+  const gift = () => GS && TS && GS.inV.length < 3 && (TS.out.n >= 2 || GS.inV.length > 0) && avail(TS.out, W) > 0 ? { src: [TS.out], dst: 'gift', max: Math.min(cap, 3 - GS.inV.length), only: 'toy' } : null;
   const top = () => TM && avail(rubberPile, W) > 0 && TM.inR < 4 ? { src: [rubberPile], dst: 'top', max: cap } : null;
-  const crate = () => [farmPile, farmPile2].filter(p => p && avail(p, W) > 0).sort((a, b) => b.n - a.n)[0];
+  const crate = () => [farmPile, farmPile2, penPile].filter(p => p && avail(p, W) > 0).sort((a, b) => b.n - a.n)[0];
   const plush = () => { const c = crate(); return PL && c && PL.inF.length < 6 && !workers.some(X => X !== W && X.task && X.task.dst === 'plush') ? { src: [c], dst: 'plush', max: Math.min(cap, 6 - PL.inF.length) } : null; };
-  const press = () => [pressPile, pressPile2].filter(p => p).sort((a, b) => avail(b, W) - avail(a, W) || a.zone.distanceTo(gp) - b.zone.distanceTo(gp))[0];
-  const feed = () => { const f = asm.reduce((a, A) => a + A.inF.length, 0), b = asm.reduce((a, A) => a + A.inB, 0); if (f + b >= asm.length * 14) return null; const c = crate(), pp = press();
+  const press = () => [pressPile, pressPile2, miniPile].filter(p => p).sort((a, b) => avail(b, W) - avail(a, W) || a.zone.distanceTo(gp) - b.zone.distanceTo(gp))[0];
+  const feed = () => { const f = asm.reduce((a, A) => a + A.inF.length, 0), b = asm.reduce((a, A) => a + A.inB, 0); if (f + b >= asm.length * 14) return null; const c = crate(), pp = press(); if (!pp || !asm.length) return null;
     if (f > b + 2 && avail(pp, W) > 0) return { src: [pp], dst: 'asm', max: cap }; if (b > f + 2 && c) return { src: [c], dst: 'asm', max: cap }; if (!c && !pp.n) return null; return { src: [c || farmPile, pp], dst: 'asm', max: cap, half: true }; };
   const order = { all: [sell, test, reject, top, gift, plush, feed], sell: [sell, test, reject, gift, feed], line: [gift, reject, test, top, plush, sell, feed], mix: [feed, test, top, sell, reject, plush], feed: [feed, plush, test, top, sell, reject] }[role];
   for (const f of order) { const t = f(); if (t) return t; }
@@ -1055,7 +1111,7 @@ function frame(now) {
   if (moving) { const sp = P.speed * (1 + spdPct(lv('spd')) / 100 + cosB().spd) * (bonusOn('hiz') ? 1.5 : 1) * mag; const nx = P.o.position.x + ix / Math.hypot(ix, iz) * sp * dt, nz = P.o.position.z + iz / Math.hypot(ix, iz) * sp * dt; const p = resolve(nx, nz); P.o.position.x = p.x; P.o.position.z = p.z;
     const ang = Math.atan2(ix, iz); let da = ang - P.o.rotation.y; da = Math.atan2(Math.sin(da), Math.cos(da)); P.o.rotation.y += da * Math.min(1, dt * 14); P.walk += dt * 13 * mag;
     if (lv('spd') >= 2) { dustT -= dt; if (dustT <= 0) { dustT = 0.1; const m = new THREE.Mesh(dustGeo, dustMat.clone()); m.position.copy(P.o.position).setY(0.15); scene.add(m); dust.push({ m, t: 0 }); } } }
-  animWalk(H, P.walk, moving, P.stack.length > 0);
+  if (P.act && !moving) actPose(T); else animWalk(H, P.walk, moving, P.stack.length > 0);
   P.stack.forEach((o, i) => { o.rotation.z = Math.sin(T * 6 + i * 0.3) * 0.02 * i * (moving ? 1 : 0.3); });
   for (let k = 0; k < SIM; k++) { stepWorld(dt, T + k * dt); stepCustomers(dt); stepTweens(dt); }
   stepTutorial(); stepZones(T);
@@ -1065,7 +1121,7 @@ function frame(now) {
   if (guideTarget) { const d = guideTarget.clone().sub(P.o.position); d.y = 0; const dist = d.length(); arrow.visible = dist > 2.5; beacon.visible = true; beacon.position.set(guideTarget.x, 0.05, guideTarget.z); beacon.scale.setScalar(1 + Math.sin(T * 5) * 0.08);
     arrow.position.copy(P.o.position).addScaledVector(d.normalize(), 1.6); arrow.position.y = 0; arrow.rotation.y = Math.atan2(d.x, d.z) + Math.PI; arrow.children[0].material.opacity = 0.7 + Math.sin(T * 6) * 0.25; }
   else { arrow.visible = false; beacon.visible = false; }
-  if (inMenu) { menuT += dt * 0.12; const cx = has('genis') ? 8 : 1.5; camLook.lerp(new THREE.Vector3(cx, 0, -3), Math.min(1, dt * 2)); const R = has('genis') ? 34 : 28; camera.position.lerp(new THREE.Vector3(cx + Math.sin(menuT) * R * 0.55, 22, -3 + Math.cos(menuT) * R * 0.75), Math.min(1, dt * 2)); camera.lookAt(camLook); }
+  if (inMenu) { menuT += dt * 0.12; const small = !has('atolye'), cx = has('genis') ? 8 : small ? 2 : 1.5, cz = small ? 12 : -3; camLook.lerp(new THREE.Vector3(cx, 0, cz), Math.min(1, dt * 2)); const R = has('genis') ? 34 : small ? 15 : 28; camera.position.lerp(new THREE.Vector3(cx + Math.sin(menuT) * R * 0.55, small ? 13 : 22, cz + Math.cos(menuT) * R * 0.75), Math.min(1, dt * 2)); camera.lookAt(camLook); }
   else { // calm follow: dead zone around the player + frame-rate independent damping, no double smoothing
     const tx = P.o.position.x * 0.85, tz = P.o.position.z - 1.5, DX = 1.4, DZ = 1.1; const ex = tx - camGoal.x, ez = tz - camGoal.z;
     if (Math.abs(ex) > DX) camGoal.x += ex - Math.sign(ex) * DX; if (Math.abs(ez) > DZ) camGoal.z += ez - Math.sign(ez) * DZ;
@@ -1091,12 +1147,12 @@ function resolve(x, z) { x = Math.max(BOUNDS.x0 + 0.5, Math.min(BOUNDS.x1 - 0.5,
   const card = (top, bot, txt) => M(0xffffff, { roughness: 0.6, map: tex(256, 320, (c, w, h) => { const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, top); g.addColorStop(1, bot); c.fillStyle = g; c.fillRect(0, 0, w, h); c.fillStyle = 'rgba(255,255,255,.12)'; for (let i = -h; i < w; i += 36) { c.beginPath(); c.moveTo(i, h); c.lineTo(i + h, 0); c.lineTo(i + h + 14, 0); c.lineTo(i + 14, h); c.fill(); } if (LOGO) c.drawImage(LOGO, 58, 8, 140, 124); c.fillStyle = '#ffc20e'; c.font = 'italic 900 34px BC'; c.textAlign = 'center'; c.fillText(txt, w / 2, h - 18); }) });
   TOYM.back = card('#ff3a22', '#b01608', 'KICK · FLICK'); TOYM.backTop = card('#2f8fe0', '#123f78', 'FLIX TOP');
   setFloor(SV.cos.floor);
-  buildWorld(); buildPlayer(); for (const id of SV.unl) { const p = PADS.find(q => q.id === id); if (p) actPad(p); } spawnStaff(); applyTiers(); stepDecor(false); refreshPads(); syncPatron(false); resize();
+  buildWorld(); buildPlayer(); for (const id of SV.unl) { const p = PADS.find(q => q.id === id); if (p) actPad(p); } spawnStaff(); applyTiers(); { const q = P.o.position; if (q.x < BOUNDS.x0 || q.x > BOUNDS.x1 || q.z < BOUNDS.z0 || q.z > 18.5) q.set(has('atolye') ? 0 : 1.0, 0, has('atolye') ? 3 : 11.5); } stepDecor(false); refreshPads(); syncPatron(false); resize();
   initUI();
   camLook.set(P.o.position.x * 0.85, 0, P.o.position.z - 1.5); camGoal.copy(camLook); camera.position.copy(camLook).add(camOff); requestAnimationFrame(frame); document.body.classList.add('ready');
   offlinePopup();
   window.__fb = { get W() { return workers.map(w => ({ t: w.task && w.task.dst, si: w.si, n: w.stack.length, x: +w.H.g.position.x.toFixed(1), z: +w.H.g.position.z.toFixed(1) })); }, get SV() { return SV; }, get P() { return P; }, setMoney: m => { SV.money = m; }, tp: (x, z) => { P.o.position.set(x, 0, z); camGoal.set(x * 0.85, 0, z - 1.5); camLook.copy(camGoal); },
-    get counter() { return counter.n; }, get cash() { return cashPile.n; }, get K() { return K.map(C => [C.pile.n, C.cash.n, C.cust.length]); }, get rej() { return REJ && REJ.n; }, get rc() { return RC && [RC.vals.length, RC.out.n]; }, get pl() { return PL && [PL.inF.length, PL.out.n]; }, get wk() { return workers.map(W => [W.task && W.task.dst, +W.H.g.position.x.toFixed(1), +W.H.g.position.z.toFixed(1), W.stuckN || 0]); }, get asm() { return asm.map(a => [a.inF.length, a.inB, a.out.n]); }, get test() { return [TS.q.length, testBusy(), TS.out.n]; }, get truck() { return TR && [TR.state, TR.load.length, TR.cash.n]; }, get top() { return TM && [rubberPile.n, TM.inR, TM.out.n]; }, get gift() { return GS && [GS.inV.length, GS.out.n]; },
+    get counter() { return counter.n; }, get cash() { return cashPile.n; }, get K() { return K.map(C => [C.pile.n, C.cash.n, C.cust.length]); }, get rej() { return REJ && REJ.n; }, get rc() { return RC && [RC.vals.length, RC.out.n]; }, get pl() { return PL && [PL.inF.length, PL.out.n]; }, get wk() { return workers.map(W => [W.task && W.task.dst, +W.H.g.position.x.toFixed(1), +W.H.g.position.z.toFixed(1), W.stuckN || 0]); }, get act() { return P.act && P.act.kind; }, padPos: (id) => { const o = padObjs.find(q => q.p.id === id); return o ? [o.p.x, o.p.z] : null; }, get asm() { return asm.map(a => [a.inF.length, a.inB, a.out.n]); }, get test() { return TS ? [TS.q.length, testBusy(), TS.out.n] : null; }, get truck() { return TR && [TR.state, TR.load.length, TR.cash.n]; }, get top() { return TM && [rubberPile.n, TM.inR, TM.out.n]; }, get gift() { return GS && [GS.inV.length, GS.out.n]; },
     get tgt() { const s = TUT[SV.tut]; if (!s) return null; const v = s.tgt(); return [v.x, v.z]; },
     sim: (k) => { SIM = k; }, person: (x, z, kid) => { const o = personMesh(kid); o.position.set(x, 0, z); scene.add(o); }, testQ: (n) => { for (let i = 0; i < n; i++) TS.q.push(makeItem('toy', 'mavi', 8)); syncTestQ(); }, truckLoad: (n) => { for (let i = 0; i < n; i++) TR.load.push(8); },
     get cust() { return customers.length; }, get rob() { return ROB.map(R => [R.st, R.load.length]); }, get ct() { return SV.ct; }, get dpr() { return dpr; }, get ords() { return customers.map(c => c.ord); }, get cdbg() { return K.map(C => C.cust[0] && [C.cust[0].state, +C.cust[0].o.position.x.toFixed(1), +C.cust[0].o.position.z.toFixed(1), C.cust[0].ord, C.cust[0].got, C.cust[0].want, +C.cust[0].pat.toFixed(1), C.x]); }, get turkeys() { return turkeys.length; }, get zone() { return zoneLock; }, zoom: (f) => camOff.multiplyScalar(f), look: (s, a) => { SV.cos.skin = s; SV.cos.acc = a; setLook(); } };
