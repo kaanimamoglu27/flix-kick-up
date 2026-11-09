@@ -69,3 +69,10 @@ Three.js r170 + esbuild, tek HTML dosyası üretir: `python3 build.py` (yanında
 - Tüyler yakında: kümes işe alıma kadar avluda kalıyor; çiftliğin tüy sandığı kapının hemen arkasında.
 - Oynanış görselleri: elle kurarken kıvılcım, kutulayınca duman ve yıldız, test sektirmelerinde toz, testten geçince yıldızlar, tüy alırken tüy uçuşması, para toplarken altın; yürürken hafif toz; yığın halkaları üstündeyken parlıyor.
 - Stantta dalgalanan FLIX bayrakları, saksılar, vitrin FLIX'leri. Kümeste su yalağı, yem kabı, KÜMES tabelası; mini makinede yanıp sönen lamba ve dumanlı baca; avluda taş yol, çiçek kasaları, sokak lambaları, bank, ağaçlar, ışık zinciri.
+
+## 1.8 (2026-11-09)
+- İlerleme hızlandı: erken pedler %25 ucuz, Yeni salon ve sonrası yaklaşık %40 ucuz, geliştirmeler %20 ucuz, satışlar %25 fazla kazandırıyor.
+- Montaj masası her malzemeden en fazla 20 tane alıyor ve önce eksik olanı alıyor (bir masa tüyle, öbürü tabanla dolup tıkanmıyor).
+- Reklamla boost: arada bir oyuncunun yakınında dönen bir reklam kutusu çıkıyor (25 sn). Üstüne basınca "Reklam izle, boost al" kartı açılıyor: 2x kazanç, Turbo hız, Çift üretim, Müşteri akını ya da Para mıknatısı.
+- Endgame modu sakin: tüm alanlar açık ama geliştirmeler orta seviyede, 6 taşıyıcı, kalıcı bonus yok. Eski Endgame kaydı da bu ayara çekilir.
+- Bot testi (kaynak/bot.js, kaynak/bot.cjs): 0'dan tüm alanlar açılana kadar oyun süresi; çok hızlı 80 dk, hızlı 86 dk, orta 1 sa 42 dk, yavaş 1 sa 47 dk (1.7'de 2 sa 17 dk ile 2 sa 53 dk arası). Reklam boostu kullanılmadan ölçüldü.

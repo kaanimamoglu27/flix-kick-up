@@ -6,7 +6,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { hero, pose, leafGeo, ink } from './hero.js';
 import { SFX } from './sfx.js';
 import { COLS, PADS, COS, PROD, BONUS, UPS, SUPS, STAFF, KICKN, spdPct, PROMO, ORDERS } from './config.js';
-import { initUI, openPanel, closePanel, panelOpen, toast, refreshHUD, maybeInter, offlinePopup, haptic } from './ui.js';
+import { boostOffer, initUI, openPanel, closePanel, panelOpen, toast, refreshHUD, maybeInter, offlinePopup, haptic } from './ui.js';
 
 const $ = (s) => document.querySelector(s);
 const rnd = (a = 0, b = 1) => a + Math.random() * (b - a);
@@ -20,12 +20,14 @@ export const ENDGAME = (() => { try { return localStorage.getItem('flix_fab_mode
 const KEY = ENDGAME ? 'flix_fabrika_end' : 'flix_fabrika3';
 export function setEndgame(on) { try { localStorage.setItem('flix_fab_mode', on ? 'end' : 'normal'); } catch {} save(); location.reload(); }
 function endSave() { const d = DEF(), far = Date.now() + 3650 * 864e5; d.tut = 99; d.del = 1; d.money = 1e6; d.gems = 99999; d.unl = PADS.map(p => p.id);
-  for (const u of UPS.concat(SUPS)) d.up[u.id] = u.max === Infinity ? 40 : u.max; d.staff = { tas: STAFF.find(q => q.id === 'tas').max, kas: STAFF.find(q => q.id === 'kas').max };
-  d.cos = { skin: 'galaksi', acc: 'hale', floor: 'gece', wskin: 'altin', wacc: 'kask', own: Object.values(COS).flat().map(c => c.id) }; d.vip = 1; d.noads = 1; d.boostUntil = far; for (const b of BONUS) if (b.id !== 'x2') d.bonus[b.id] = far; return d; }
+  // calm endgame: every area open, but mid-level upgrades, 6 carriers and no permanent bonuses (it was too fast and busy)
+  const EL = { spd: 6, cap: 14, kar: 12, pres: 8, mont: 8, kumes: 8, bant: 6, test: 6, truck: 6, tez: 8, robot: 4, cek: 8, pazar: 10, wspd: 3, wcap: 4 };
+  for (const u of UPS.concat(SUPS)) d.up[u.id] = Math.min(u.max, EL[u.id] ?? 6); d.staff = { tas: 6, kas: STAFF.find(q => q.id === 'kas').max }; d.calm = 1;
+  d.cos = { skin: 'galaksi', acc: 'hale', floor: 'gece', wskin: 'altin', wacc: 'kask', own: Object.values(COS).flat().map(c => c.id) }; d.vip = 1; d.noads = 1; return d; }
 export let SV = (() => { const d = DEF(); try {
   const o = JSON.parse(localStorage.getItem(KEY) || 'null');
   if (ENDGAME && !(o && o.v === 3)) return endSave();
-  if (o && o.v === 3) { const s = { ...d, ...o, cos: { ...d.cos, ...o.cos }, staff: { ...d.staff, ...o.staff }, ads: { ...d.ads, ...o.ads } }; if (!o.t2) { if (s.tut >= 6) s.tut = 99; s.t2 = 1; } if (!o.t3) { s.t3 = 1; if (s.tut < 99) s.tut = 0; if (s.unl.length) for (const id of ['park', 'pres', 'ciftlik0', 'masa', 'atolye']) if (!s.unl.includes(id)) s.unl.unshift(id); } if (!o.t4) { s.t4 = 1; const i = s.unl.indexOf('atolye'); if (i >= 0) for (const id of ['bina', 'depo']) if (!s.unl.includes(id)) s.unl.splice(i + 1, 0, id); } for (const f of ['karisik', 'kask', 'yok']) if (!s.cos.own.includes(f)) s.cos.own.push(f); if (ENDGAME) { const e = endSave(); for (const id of e.unl) if (!s.unl.includes(id)) s.unl.push(id); for (const k in e.up) s.up[k] = Math.max(s.up[k] || 0, e.up[k]); s.staff = e.staff; for (const id of e.cos.own) if (!s.cos.own.includes(id)) s.cos.own.push(id); } return s; }
+  if (o && o.v === 3) { const s = { ...d, ...o, cos: { ...d.cos, ...o.cos }, staff: { ...d.staff, ...o.staff }, ads: { ...d.ads, ...o.ads } }; if (!o.t2) { if (s.tut >= 6) s.tut = 99; s.t2 = 1; } if (!o.t3) { s.t3 = 1; if (s.tut < 99) s.tut = 0; if (s.unl.length) for (const id of ['park', 'pres', 'ciftlik0', 'masa', 'atolye']) if (!s.unl.includes(id)) s.unl.unshift(id); } if (!o.t4) { s.t4 = 1; const i = s.unl.indexOf('atolye'); if (i >= 0) for (const id of ['bina', 'depo']) if (!s.unl.includes(id)) s.unl.splice(i + 1, 0, id); } for (const f of ['karisik', 'kask', 'yok']) if (!s.cos.own.includes(f)) s.cos.own.push(f); if (ENDGAME) { const e = endSave(); for (const id of e.unl) if (!s.unl.includes(id)) s.unl.push(id); if (!s.calm) { s.up = { ...e.up }; s.bonus = {}; s.boostUntil = 0; s.calm = 1; } else for (const k in e.up) s.up[k] = Math.max(s.up[k] || 0, e.up[k]); s.staff = e.staff; for (const id of e.cos.own) if (!s.cos.own.includes(id)) s.cos.own.push(id); } return s; }
   if (ENDGAME) return endSave();
   const o2 = JSON.parse(localStorage.getItem('flix_fabrika2') || 'null');
   if (o2 && o2.v === 2) { d.money = (o2.money || 0) + 300; d.tut = (o2.tut || 0) >= 6 ? 99 : 0; d.made = o2.made || 0; d.del = o2.del || 0; if ((o2.unl || []).includes('asm2')) d.unl.push('ofis', 'mavi', 'asm2'); if ((o2.unl || []).includes('isci')) { d.unl.push('ik'); d.staff.tas = 1; } return d; }
@@ -561,6 +563,25 @@ function buildCounter(i, cx) {
   const cash = new Pile(cx + 2.6, 11.9, 'cash', 80, 2, 2, 0.7);
   K.push({ i, x: cx, pile, cash, zone: pile.zone, cust: [] });
 }
+// ---- ad boost drops: a TV crate pops up near you now and then; step on it to watch an ad for a timed boost ----
+let BX = null, bxT = 45;
+const BXW = { x2: 3, hiz: 2, uret: 2, musteri: 2, miknatis: 1 };
+function spawnBX() { const ids = Object.keys(BXW), tot = ids.reduce((a, k) => a + BXW[k], 0); let r = Math.random() * tot, id = ids[0]; for (const k of ids) { r -= BXW[k]; if (r <= 0) { id = k; break; } }
+  if (bonusOn(id)) return; const b = BONUS.find(q => q.id === id); let x, z, ok = false;
+  for (let k = 0; k < 20 && !ok; k++) { const a = rnd(0, Math.PI * 2), d = rnd(3, 5.5); x = P.o.position.x + Math.sin(a) * d; z = P.o.position.z + Math.cos(a) * d; x = Math.max(BOUNDS.x0 + 1.2, Math.min(BOUNDS.x1 - 1.2, x)); z = Math.max(BOUNDS.z0 + 1.2, Math.min(17.5, z)); const q = resolve(x, z); ok = Math.hypot(q.x - x, q.z - z) < 0.01 && !padObjs.some(o => Math.hypot(o.p.x - x, o.p.z - z) < 2); }
+  if (!ok) return;
+  const g = new THREE.Group(); g.position.set(x, 0.6, z); g.scale.setScalar(1.4); scene.add(g);
+  rb(0.95, 0.72, 0.5, M(0x1b1330, { roughness: 0.4 }), g, 0, 0, 0, 0.1); const scr = tex(256, 192, (c, w, h) => { const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, b.col); gr.addColorStop(1, '#1b1330'); c.fillStyle = gr; c.fillRect(0, 0, w, h); c.font = '96px sans-serif'; c.textAlign = 'center'; c.fillText(b.icon, w / 2, 112); c.fillStyle = '#fff'; c.font = 'italic 900 34px BC'; c.fillText('REKLAM', w / 2, 170); });
+  for (const s of [1, -1]) { const p = add(new THREE.PlaneGeometry(0.8, 0.58), new THREE.MeshBasicMaterial({ map: scr }), g, 0, 0, s * 0.26); p.rotation.y = s > 0 ? 0 : Math.PI; p.castShadow = false; }
+  for (const s of [-1, 1]) { const a = rb(0.04, 0.4, 0.04, MT.dark, g, s * 0.18, 0.5, 0); a.rotation.z = -s * 0.5; }
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1.1, 40), new THREE.MeshBasicMaterial({ color: new THREE.Color(b.col), transparent: true, opacity: 0.8, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.05, z); scene.add(ring);
+  BX = { g, ring, id, x, z, life: 25, asked: false }; SFX.chime && SFX.chime(1); fxBurst(new THREE.Vector3(x, 1, z), 'star', 6, 0.8); }
+function removeBX() { if (!BX) return; scene.remove(BX.g); scene.remove(BX.ring); BX = null; }
+function stepBoostDrop(dt, T) { if (BOT || ENDGAME || !tutDone() || inMenu) return;
+  if (BX) { BX.life -= dt; BX.g.position.y = 0.75 + Math.sin(T * 3) * 0.15; BX.g.rotation.y += dt * 1.6; BX.ring.material.opacity = 0.55 + Math.sin(T * 6) * 0.3; BX.ring.scale.setScalar(BX.life < 5 ? 0.6 + 0.4 * (BX.life / 5) : 1);
+    if (!BX.asked && !P.act && Math.hypot(P.o.position.x - BX.x, P.o.position.z - BX.z) < 1.1) { BX.asked = true; joy.on = false; joy.x = joy.y = 0; const at = new THREE.Vector3(BX.x, 1, BX.z); boostOffer(BX.id, (ok) => { if (ok) { confetti(at); fxBurst(at, 'star', 10, 1); } removeBX(); bxT = rnd(90, 140); }); }
+    else if (BX && !BX.asked && BX.life <= 0) { removeBX(); bxT = rnd(60, 100); } return; }
+  bxT -= dt; if (bxT <= 0) { bxT = 20; spawnBX(); } }
 const flags = []; const stepFlags = (T) => { for (const ct of flags) { const a = Math.sin(T * 2.2 + ct.userData.T) * 0.25; if (ct.userData.flagL) ct.userData.flagL.rotation.y = a; if (ct.userData.flagR) ct.userData.flagR.rotation.y = -a; } };
 const allCash = () => K.map(c => c.cash).concat(TR ? [TR.cash] : []);
 // ---- recycling: rejected FLIX become keychains ----
@@ -886,7 +907,7 @@ export const bonusOn = (id) => Date.now() < (id === 'x2' ? SV.boostUntil : (SV.b
 export const bonusLeft = (id) => Math.max(0, (id === 'x2' ? SV.boostUntil : (SV.bonus[id] || 0)) - Date.now());
 export function addBonus(id, min) { const now = Date.now(); if (id === 'x2') SV.boostUntil = Math.max(now, SV.boostUntil) + min * 60000; else SV.bonus[id] = Math.max(now, SV.bonus[id] || 0) + min * 60000; save(); }
 export function cosB() { const r = { spd: 0, cap: 0, kar: 0, ws: 0, wc: 0 }; for (const k of ['skin', 'acc', 'floor', 'wskin', 'wacc']) { const c = COS[k].find(q => q.id === SV.cos[k]); if (c && c.b) for (const x in c.b) r[x] += c.b[x]; } return r; }
-export const profitMult = () => (1 + lv('kar') * 0.1 + cosB().kar + (has('genis') ? 0.1 : 0)) * (SV.vip ? 2 : 1) * (bonusOn('x2') ? 2 : 1);
+export const profitMult = () => 1.25 * (1 + lv('kar') * 0.1 + cosB().kar + (has('genis') ? 0.1 : 0)) * (SV.vip ? 2 : 1) * (bonusOn('x2') ? 2 : 1);
 const canSell = (C) => SV.staff.kas > C.i || near(C.zone, 1.9);
 const slotOf = (C, j) => j < 3 ? new THREE.Vector3(C.x, 0, 15.9 + j * 1.25) : new THREE.Vector3(C.x + 1.2 * (j - 2), 0, 19.6);
 function stepCustomers(dt) {
@@ -1022,7 +1043,9 @@ const tested = (o) => isProd(o) && o.userData.ok;
 function interact() {
   const cap = capOf();
   for (const pile of allCash()) if (pile && near(pile.pos, 1.8) && pile.n) { for (let k = 0; k < 3 && pile.n; k++) { const o = pile.pop(); const v = o.userData.v || 5; fly(o, o.position, P.o.position.clone().add(new THREE.Vector3(0, 1.5, 0)), 0.25, () => { scene.remove(o); SV.money += v; bumpMoney(); }); } if (Math.random() < 0.5) fxBurst(P.o.position.clone().setY(1.8), 'coin', 2, 0.5); SFX.coin(); haptic(8); return; }
-  for (const A of asm) if (near(A.inZone, 1.5)) { const o = stackPop(x => x.userData.type === 'feather' || x.userData.type === 'base'); if (o) { dropTo(A, o); SFX.drop(); return; } }
+  for (const A of asm) if (near(A.inZone, 1.5)) { // each table keeps up to 20 of each; it takes what it is shorter of first
+    const hf = P.stack.some(x => x.userData.type === 'feather') && A.inF.length < 20, hb = P.stack.some(x => x.userData.type === 'base') && A.inB < 20;
+    const T = hf && hb ? (A.inF.length <= A.inB ? 'feather' : 'base') : hf ? 'feather' : hb ? 'base' : null; const o = T && stackPop(x => x.userData.type === T); if (o) { dropTo(A, o); SFX.drop(); return; } }
   if (TM && near(TM.inZone, 1.5)) { const o = stackPop(x => x.userData.type === 'rubber'); if (o) { dropTop(o); SFX.drop(); return; } }
   if (TS && near(TS.inZone, 1.5) && TS.q.length < 16) { const o = stackPop(untested); if (o) { dropTest(o); SFX.drop(); return; } }
   if (GS && near(GS.inZone, 1.5) && GS.inV.length < 9) { const o = stackPop(x => x.userData.type === 'toy' && x.userData.ok); if (o) { dropGift(o); SFX.drop(); return; } }
@@ -1162,7 +1185,9 @@ function stepTweens(dt) {
 const camOff = new THREE.Vector3(0, 24, 16), camLook = new THREE.Vector3(), camGoal = new THREE.Vector3(); let camSettle = 0;
 export let inMenu = false; let menuT = 0; export function setMenu(on) { inMenu = on; joy.x = joy.y = 0; if (!on) { camSettle = 1.2; camGoal.set(P.o.position.x * 0.85, 0, P.o.position.z - 1.5); } }
 function frame(now) {
-  requestAnimationFrame(frame); if (paused || document.hidden) { last = now; return; } const dt = Math.min(0.05, (now - last) / 1000); last = now; const T = now / 1000;
+  requestAnimationFrame(frame); if (paused || document.hidden) { last = now; return; } const dt = Math.min(0.05, (now - last) / 1000); last = now; if (BOT) return; const T = now / 1000; tick(dt, T); renderer.render(scene, camera); }
+let BOT = false, botT = 0;
+function tick(dt, T) {
   let ix = inMenu ? 0 : joy.x, iz = inMenu ? 0 : joy.y; if (keys.ArrowLeft || keys.a) ix = -1; if (keys.ArrowRight || keys.d) ix = 1; if (keys.ArrowUp || keys.w) iz = -1; if (keys.ArrowDown || keys.s) iz = 1;
   const mag = Math.min(1, Math.hypot(ix, iz)); const moving = mag > 0.12;
   if (moving) { const sp = P.speed * (1 + spdPct(lv('spd')) / 100 + cosB().spd) * (bonusOn('hiz') ? 1.5 : 1) * mag; const nx = P.o.position.x + ix / Math.hypot(ix, iz) * sp * dt, nz = P.o.position.z + iz / Math.hypot(ix, iz) * sp * dt; const p = resolve(nx, nz); P.o.position.x = p.x; P.o.position.z = p.z;
@@ -1171,7 +1196,7 @@ function frame(now) {
   if (P.act && !moving) actPose(T); else animWalk(H, P.walk, moving, P.stack.length > 0);
   P.stack.forEach((o, i) => { o.rotation.z = Math.sin(T * 6 + i * 0.3) * 0.02 * i * (moving ? 1 : 0.3); });
   for (let k = 0; k < SIM; k++) { stepWorld(dt, T + k * dt); stepCustomers(dt); stepTweens(dt); }
-  stepTutorial(); stepZones(T); stepFlags(T);
+  stepTutorial(); stepZones(T); stepFlags(T); stepBoostDrop(dt, T);
   for (let i = confettiBits.length - 1; i >= 0; i--) { const c = confettiBits[i]; c.t += dt; c.v.y -= 18 * dt; c.m.position.addScaledVector(c.v, dt); c.m.rotation.x += c.r.x * dt; c.m.rotation.y += c.r.y * dt; if (c.t > 2) { scene.remove(c.m); confettiBits.splice(i, 1); } }
   stepFX(dt); stepRings(dt);
   for (let i = dust.length - 1; i >= 0; i--) { const d = dust[i]; d.t += dt; d.m.scale.setScalar(1 + d.t * 3); d.m.material.opacity = 0.6 * (1 - d.t / 0.5); d.m.position.y += dt * 0.5; if (d.t > 0.5) { scene.remove(d.m); dust.splice(i, 1); } }
@@ -1195,7 +1220,6 @@ function frame(now) {
   minT -= dt; if (minT <= 0) { minT = 60; SV.ipm = SV.ipm ? SV.ipm * 0.7 + earnMin * 0.3 : earnMin; earnMin = 0; }
   saveT -= dt; if (saveT <= 0) { saveT = 4; SV.px = P.o.position.x; SV.pz = P.o.position.z; save(); }
   fpsAcc += dt; fpsN++; fpsT += dt; if (fpsT > 2 && !inMenu) { const avg = fpsAcc / fpsN; fpsAcc = 0; fpsN = 0; fpsT = 0; let nd = dpr; if (avg > 1 / 45 && dpr > 1) nd = Math.max(1, dpr - 0.25); else if (avg < 1 / 58 && dpr < DPR_MAX) nd = Math.min(DPR_MAX, dpr + 0.25); if (nd !== dpr) { dpr = nd; renderer.setPixelRatio(dpr); resize(); } }
-  renderer.render(scene, camera);
 }
 function resolve(x, z) { x = Math.max(BOUNDS.x0 + 0.5, Math.min(BOUNDS.x1 - 0.5, x)); z = Math.max(BOUNDS.z0 + 0.5, Math.min(BOUNDS.z1, z)); const r = 0.45;
   for (const c of colliders) { if (x > c.x0 - r && x < c.x1 + r && z > c.z0 - r && z < c.z1 + r) { const dl = x - (c.x0 - r), dr = (c.x1 + r) - x, du = z - (c.z0 - r), dd = (c.z1 + r) - z, m = Math.min(dl, dr, du, dd); if (m === dl) x = c.x0 - r; else if (m === dr) x = c.x1 + r; else if (m === du) z = c.z0 - r; else z = c.z1 + r; } }
@@ -1211,6 +1235,11 @@ function resolve(x, z) { x = Math.max(BOUNDS.x0 + 0.5, Math.min(BOUNDS.x1 - 0.5,
   offlinePopup();
   window.__fb = { get W() { return workers.map(w => ({ t: w.task && w.task.dst, si: w.si, n: w.stack.length, x: +w.H.g.position.x.toFixed(1), z: +w.H.g.position.z.toFixed(1) })); }, get SV() { return SV; }, get P() { return P; }, setMoney: m => { SV.money = m; }, tp: (x, z) => { P.o.position.set(x, 0, z); camGoal.set(x * 0.85, 0, z - 1.5); camLook.copy(camGoal); },
     get counter() { return counter.n; }, get cash() { return cashPile.n; }, get K() { return K.map(C => [C.pile.n, C.cash.n, C.cust.length]); }, get rej() { return REJ && REJ.n; }, get rc() { return RC && [RC.vals.length, RC.out.n]; }, get pl() { return PL && [PL.inF.length, PL.out.n]; }, get wk() { return workers.map(W => [W.task && W.task.dst, +W.H.g.position.x.toFixed(1), +W.H.g.position.z.toFixed(1), W.stuckN || 0]); }, get act() { return P.act && P.act.kind; }, padPos: (id) => { const o = padObjs.find(q => q.p.id === id); return o ? [o.p.x, o.p.z] : null; }, get asm() { return asm.map(a => [a.inF.length, a.inB, a.out.n]); }, get test() { return TS ? [TS.q.length, testBusy(), TS.out.n] : null; }, get truck() { return TR && [TR.state, TR.load.length, TR.cash.n]; }, get top() { return TM && [rubberPile.n, TM.inR, TM.out.n]; }, get gift() { return GS && [GS.inV.length, GS.out.n]; },
+    bot: (on) => { BOT = on; if (on) { botT = performance.now() / 1000; SIM = 1; } }, tick: (n, dt = 0.05) => { for (let i = 0; i < n; i++) { botT += dt; tick(dt, botT); } }, joy: (x, y) => { joy.x = x; joy.y = y; },
+    I: () => ({ P, SV, K, asm, TS, REJ, padObjs, penPile, miniPile, farmPile, farmPile2, pressPile, pressPile2, ZONES, cap: capOf(), navPath, lv, has, TM, GS, RC, PL, TR, rubberPile, UPS, SUPS, STAFF }),
+    buyUp: (id) => { const u = UPS.concat(SUPS).find(q => q.id === id), l = lv(id), c = Math.round(u.base * Math.pow(u.mult, l)); if (l >= u.max || SV.money < c) return false; SV.money -= c; SV.up[id] = l + 1; applyTiers(); onUpgrade(); return true; },
+    hire: (id) => { const s = STAFF.find(q => q.id === id), n = SV.staff[id]; if (n >= s.max || SV.money < s.costs[n]) return false; SV.money -= s.costs[n]; SV.staff[id] = n + 1; spawnStaff(); return true; },
+    boostNow: () => { bxT = 0; }, get bx() { return BX && { id: BX.id, x: BX.x, z: BX.z }; },
     get tgt() { const s = TUT[SV.tut]; if (!s) return null; const v = s.tgt(); return [v.x, v.z]; },
     sim: (k) => { SIM = k; }, person: (x, z, kid) => { const o = personMesh(kid); o.position.set(x, 0, z); scene.add(o); }, testQ: (n) => { for (let i = 0; i < n; i++) TS.q.push(makeItem('toy', 'mavi', 8)); syncTestQ(); }, truckLoad: (n) => { for (let i = 0; i < n; i++) TR.load.push(8); },
     get cust() { return customers.length; }, get rob() { return ROB.map(R => [R.st, R.load.length]); }, get ct() { return SV.ct; }, get dpr() { return dpr; }, get ords() { return customers.map(c => c.ord); }, get cdbg() { return K.map(C => C.cust[0] && [C.cust[0].state, +C.cust[0].o.position.x.toFixed(1), +C.cust[0].o.position.z.toFixed(1), C.cust[0].ord, C.cust[0].got, C.cust[0].want, +C.cust[0].pat.toFixed(1), C.x]); }, get turkeys() { return turkeys.length; }, get zone() { return zoneLock; }, zoom: (f) => camOff.multiplyScalar(f), look: (s, a) => { SV.cos.skin = s; SV.cos.acc = a; setLook(); } };

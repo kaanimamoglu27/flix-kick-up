@@ -1,4 +1,4 @@
-// Flix Fabrika 1.7 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
+// Flix Fabrika 1.8 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
 import { SFX } from './sfx.js';
 import { UPS, STAFF, SUPS, COS, IAP, AD, COLS, BONUS, bonusTxt, PROMO, ORDERS, spdPct } from './config.js';
 import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel, bonusOn, bonusLeft, addBonus, setMenu, cosB, ENDGAME, setEndgame, patronLv, patronTier, onUpgrade, setWorkerLook, contract, capOf } from './game.js';
@@ -117,7 +117,7 @@ async function onAct(a) {
   else if (k === 'promo') { openPromo(PROMO.find(p => p.id === x)); return; }
   else if (k === 'bad') { const b = BONUS.find(q => q.id === x); const r = await adRewarded(); if (r === 'rewarded') { addBonus(x, b.min); SFX.milestone(); toast(b.name + ' · ' + b.min + ' dakika!'); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
   else if (k === 'bgem') { const b = BONUS.find(q => q.id === x); if (SV.gems < b.gem) { toast('Elmas yetmiyor'); openPanel('shop'); return; } SV.gems -= b.gem; addBonus(x, b.min); SFX.milestone(); toast(b.name + ' · ' + b.min + ' dakika!'); }
-  else if (k === 'endg') { confirmBox(ENDGAME ? '<b>Normal oyuna dönülsün mü?</b><br><small>Endgame kaydı saklanır.</small>' : '<b>Endgame test modu</b><br><small>Her şey açık, tüm geliştirmeler en üstte, tüm bonuslar kalıcı. Normal kaydın ayrı saklanır.</small>', ENDGAME ? 'Normal oyuna dön' : 'Endgame modunu aç', () => setEndgame(!ENDGAME)); return; }
+  else if (k === 'endg') { confirmBox(ENDGAME ? '<b>Normal oyuna dönülsün mü?</b><br><small>Endgame kaydı saklanır.</small>' : '<b>Endgame test modu</b><br><small>Her şey açık, geliştirmeler orta seviyede, sakin tempo. Normal kaydın ayrı saklanır.</small>', ENDGAME ? 'Normal oyuna dön' : 'Endgame modunu aç', () => setEndgame(!ENDGAME)); return; }
   else if (k === 'home') { closePanel(); showMenu(true); return; }
   else if (k === 'restore') { try { const ids = await window.FlixNative.restore(); toast(ids.length ? 'Satın alımlar geri yüklendi' : 'Geri yüklenecek satın alım yok'); } catch { toast('Mağazaya ulaşılamadı'); } }
   refreshHUD(); if (cur) render();
@@ -141,6 +141,10 @@ function confirmBox(html, okTxt, ok, alt) {
   const close = () => { M.classList.remove('show'); setPaused(false); };
   b.onclick = () => { close(); ok && ok(); }; b2.onclick = () => { close(); alt && alt.fn(); }; $('#mX').onclick = close;
 }
+// oyun alanında beliren reklam kutusu: üstüne basınca 'reklam izle, boost al' kartı
+export function boostOffer(id, cb) { const b = BONUS.find(q => q.id === id); let done = false; const fin = (ok) => { if (done) return; done = true; cb(ok); };
+  confirmBox(`<div style="font-size:44px;line-height:1">📺</div><b>Reklam izle, boost al!</b><br><span style="font-size:26px">${b.icon}</span> <b>${b.name}</b> · ${b.min} dakika<br><small>${b.desc}</small>`, 'Hayır', () => fin(false), { txt: '▶ İzle', fn: async () => { const r = await adRewarded(); if (r === 'rewarded') { addBonus(id, b.min); SFX.milestone(); toast(b.icon + ' ' + b.name + ' · ' + b.min + ' dakika!'); fin(true); } else { if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); fin(false); } } });
+  const x = $('#mX'), old = x.onclick; x.onclick = () => { old && old(); fin(false); }; }
 // çevrimdışı kazanç: eleman ya da kasiyer varsa
 export function offlinePopup() {
   if (!SV.lastSeen || !(SV.staff.tas || SV.staff.kas)) return; const away = Math.min(AD.offlineCapMin, (Date.now() - SV.lastSeen) / 60000); if (away < 2) return;
