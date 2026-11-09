@@ -29,7 +29,9 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .bub.ok{background:#3faa3a;font-size:18px}.bub.ok::after{border-top-color:#3faa3a}
 #gems{position:fixed;left:14px;top:calc(var(--st) + 54px);display:flex;align-items:center;gap:6px;padding:3px 12px 3px 4px;border-radius:18px;background:rgba(11,31,63,.45);pointer-events:none}
 #gems i{font-style:normal;font-size:16px;width:24px;text-align:center}#gems b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:20px;line-height:1}
-#vipTag{position:fixed;left:14px;top:calc(var(--st) + 88px);padding:2px 8px;border-radius:8px;background:#ffc20e;color:#3b2508;font-weight:800;font-size:11px;pointer-events:none}
+#lvl{position:fixed;left:14px;top:calc(var(--st) + 88px);padding:3px 10px;border-radius:12px;background:rgba(11,31,63,.45);font-weight:800;font-size:12px;pointer-events:none;display:flex;gap:6px;align-items:center}#lvl i{display:block;width:60px;height:6px;border-radius:3px;background:rgba(255,255,255,.25);overflow:hidden}#lvl i u{display:block;height:100%;background:#ffc20e}
+.bub.truck{background:#0b2a5e;color:#fff}.bub.truck::after{border-top-color:#0b2a5e}
+#vipTag{position:fixed;left:14px;top:calc(var(--st) + 116px);padding:2px 8px;border-radius:8px;background:#ffc20e;color:#3b2508;font-weight:800;font-size:11px;pointer-events:none}
 .fab{position:fixed;right:14px;width:64px;height:64px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.18),0 10px 20px rgba(0,0,0,.18);transition:transform .1s}
 .fab:active{transform:translateY(3px)}.fab b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:22px;line-height:1}.fab small{font-size:10px;font-weight:700;margin-top:2px;opacity:.95}
 #boostB{bottom:calc(var(--sb) + 104px);background:linear-gradient(#9b7bff,#5a36e0)}#boostB.on{background:linear-gradient(#3fe07a,#18a04a)}
@@ -74,6 +76,7 @@ body.moved #hint{opacity:0}
 <div id="toast"></div>
 <div id="joy"><div id="joyk"></div></div>
 <div id="gems"><i>💎</i><b>0</b></div>
+<div id="lvl">Fabrika Sv 1 <i><u></u></i></div>
 <div id="vipTag">VIP · 2x</div>
 <button id="boostB" class="fab"><b>▶ 2x</b><small>Reklam</small></button>
 <button id="shopB" class="fab"><b>🛒</b><small>Mağaza</small></button>

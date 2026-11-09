@@ -10,17 +10,25 @@ export const COLS = {
 };
 // Yerdeki satın alma alanları. req: önce açılması gereken alan ('tut' = eğitim bitti).
 export const PADS = [
-  { id: 'ofis', name: 'Ofis', cost: 40, x: 7.6, z: -3.2, req: 'tut', gem: 0 },
+  { id: 'ofis', name: 'Ofis', cost: 40, x: 7.6, z: -3.2, req: 'tut' },
   { id: 'mavi', name: 'Mavi hindi', cost: 60, x: -3.2, z: -10.9, req: 'tut', col: 'mavi' },
-  { id: 'ik', name: 'İşe alım', cost: 120, x: 8.6, z: 2.8, req: 'ofis' },
+  { id: 'ik', name: 'İşe alım', cost: 120, x: -8.2, z: 1.5, req: 'ofis' },
   { id: 'asm2', name: '2. Montaj', cost: 180, x: -1.0, z: 3.4, req: 'mavi' },
   { id: 'yesil', name: 'Yeşil hindi', cost: 350, x: 0.0, z: -10.9, req: 'asm2', col: 'yesil' },
-  { id: 'sari', name: 'Sarı hindi', cost: 1200, x: 3.2, z: -10.9, req: 'yesil', col: 'sari' },
-  { id: 'asm3', name: '3. Montaj', cost: 2500, x: -6.4, z: 6.4, req: 'sari' },
-  { id: 'kirmizi', name: 'Kırmızı hindi', cost: 4000, x: -3.2, z: -14.2, req: 'sari', col: 'kirmizi' },
-  { id: 'mor', name: 'Mor hindi', cost: 9000, x: 0.0, z: -14.2, req: 'kirmizi', col: 'mor' },
-  { id: 'altin', name: 'Altın hindi', cost: 20000, x: 3.2, z: -14.2, req: 'mor', col: 'altin' },
+  { id: 'genis', name: 'Yeni salon', cost: 900, x: 11.9, z: 0.5, req: 'yesil', big: true },
+  { id: 'kamyon', name: 'Kamyon', cost: 1200, x: 21.5, z: 9.6, req: 'genis' },
+  { id: 'sari', name: 'Sarı hindi', cost: 1500, x: 3.2, z: -10.9, req: 'yesil', col: 'sari' },
+  { id: 'top', name: 'FLIX Top hattı', cost: 2500, x: 18.5, z: -4.5, req: 'kamyon' },
+  { id: 'suru', name: 'Hindi sürüsü', cost: 3000, x: 17.0, z: -12.5, req: 'genis' },
+  { id: 'asm3', name: '3. Montaj', cost: 3500, x: -6.4, z: 6.4, req: 'sari' },
+  { id: 'konv', name: 'Konveyör', cost: 4500, x: 3.4, z: -4.8, req: 'top' },
+  { id: 'kirmizi', name: 'Kırmızı hindi', cost: 5000, x: -3.2, z: -14.2, req: 'sari', col: 'kirmizi' },
+  { id: 'hediye', name: 'Hediye paketi', cost: 7000, x: 18.5, z: 2.5, req: 'top' },
+  { id: 'mor', name: 'Mor hindi', cost: 12000, x: 0.0, z: -14.2, req: 'kirmizi', col: 'mor' },
+  { id: 'altin', name: 'Altın hindi', cost: 25000, x: 3.2, z: -14.2, req: 'mor', col: 'altin' },
 ];
+// Ürünler (satış fiyatı ₺). FLIX'in fiyatı tüy rengine göre (COLS.v), hediye paketi = içindeki 3 FLIX x 1,6
+export const PROD = { top: 30, giftMult: 1.6, truckMult: 1.5 };
 // Ofis geliştirmeleri (para). cost = base * mult^lv
 export const UPS = [
   { id: 'spd', grp: 'Patron', name: 'Yürüme hızı', icon: '👟', max: 6, base: 40, mult: 1.9, desc: (l) => '+' + (l * 12) + '% hız' },
@@ -29,6 +37,8 @@ export const UPS = [
   { id: 'pres', grp: 'Fabrika', name: 'Pres hızı', icon: '⚙️', max: 8, base: 50, mult: 1.8, desc: (l) => (1.6 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/taban' },
   { id: 'mont', grp: 'Fabrika', name: 'Montaj hızı', icon: '🤖', max: 8, base: 60, mult: 1.8, desc: (l) => (1.4 * Math.pow(0.85, l)).toFixed(2).replace('.', ',') + ' sn/FLIX' },
   { id: 'kumes', grp: 'Fabrika', name: 'Kümes verimi', icon: '🦃', max: 8, base: 50, mult: 1.8, desc: (l) => '+' + Math.round((1 / Math.pow(0.85, l) - 1) * 100) + '% tüy' },
+  { id: 'test', grp: 'Fabrika', name: 'Test cihazı', icon: '🧪', max: 6, base: 70, mult: 1.9, desc: (l) => (1.2 * Math.pow(0.85, l)).toFixed(1).replace('.', ',') + ' sn · %' + Math.max(0, 8 - l * 2) + ' hatalı' },
+  { id: 'truck', grp: 'Fabrika', name: 'Kamyon', icon: '🚚', max: 5, base: 300, mult: 2.0, desc: (l) => (10 + l * 4) + ' kutu · ' + Math.round(30 * Math.pow(0.85, l)) + ' sn yol' },
   { id: 'tez', grp: 'Fabrika', name: 'Tezgâh rafı', icon: '🧺', max: 4, base: 80, mult: 2.2, desc: (l) => (12 + l * 4) + ' FLIX' },
 ];
 // İşe alım (para)

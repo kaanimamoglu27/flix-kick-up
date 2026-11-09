@@ -1,7 +1,8 @@
 // Flix Fabrika v3 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
 import { SFX } from './sfx.js';
 import { UPS, STAFF, SUPS, COS, IAP, AD, COLS } from './config.js';
-import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult } from './game.js';
+import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel } from './game.js';
+import { PADS } from './config.js';
 
 const $ = (s) => document.querySelector(s);
 const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
@@ -87,8 +88,8 @@ function render() {
 }
 async function onAct(a) {
   const [k, x, y] = a.split(':');
-  if (k === 'up') { const u = UPS.concat(SUPS).find(q => q.id === x), l = lv(x), c = upCost(u, l); if (l >= u.max) return; if (SV.money < c) { toast('Para yetmiyor'); SFX.nope && SFX.nope(); return; } SV.money -= c; SV.up[x] = l + 1; SFX.buy(); haptic(25); save(); }
-  else if (k === 'adup') { if (freeUpWait() > 0) { toast('Biraz bekle: ' + mins(freeUpWait())); return; } const u = UPS.concat(SUPS).find(q => q.id === x); if (lv(x) >= u.max) return; const r = await adRewarded(); if (r === 'rewarded') { SV.up[x] = lv(x) + 1; SV.freeUpLast = Date.now(); SFX.milestone(); toast(u.name + ' ücretsiz yükseldi!'); save(); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
+  if (k === 'up') { const u = UPS.concat(SUPS).find(q => q.id === x), l = lv(x), c = upCost(u, l); if (l >= u.max) return; if (SV.money < c) { toast('Para yetmiyor'); SFX.nope && SFX.nope(); return; } SV.money -= c; SV.up[x] = l + 1; SFX.buy(); haptic(25); save(); applyTiers(); }
+  else if (k === 'adup') { if (freeUpWait() > 0) { toast('Biraz bekle: ' + mins(freeUpWait())); return; } const u = UPS.concat(SUPS).find(q => q.id === x); if (lv(x) >= u.max) return; const r = await adRewarded(); if (r === 'rewarded') { SV.up[x] = lv(x) + 1; SV.freeUpLast = Date.now(); applyTiers(); SFX.milestone(); toast(u.name + ' ücretsiz yükseldi!'); save(); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
   else if (k === 'hire') { const s = STAFF.find(q => q.id === x), n = SV.staff[x]; if (n >= s.max) return; const c = s.costs[n]; if (SV.money < c) { toast('Para yetmiyor'); return; } SV.money -= c; SV.staff[x] = n + 1; spawnStaff(); SFX.milestone(); haptic(40); toast(s.name + ' işe başladı!'); save(); }
   else if (k === 'cos') { const c = COS[x].find(q => q.id === y); if (!SV.cos.own.includes(y)) { if (c.gem) { if (SV.gems < c.gem) { toast('Elmas yetmiyor, mağazaya bak'); return; } SV.gems -= c.gem; } else if (c.money) { if (SV.money < c.money) { toast('Para yetmiyor'); return; } SV.money -= c.money; } SV.cos.own.push(y); SFX.milestone(); }
     SV.cos[x] = y; if (x === 'floor') setFloor(y); else setLook(); SFX.buy(); save(); }
@@ -106,6 +107,7 @@ export function refreshHUD() {
   if (left > 0) { b.classList.add('on'); b.querySelector('small').textContent = Math.floor(left / 60000) + ':' + String(Math.floor(left / 1000) % 60).padStart(2, '0'); } else { b.classList.remove('on'); b.querySelector('small').textContent = 'Reklam'; }
   b.style.display = tutDone() ? '' : 'none'; $('#shopB').style.display = tutDone() ? '' : 'none';
   $('#vipTag').style.display = SV.vip ? '' : 'none';
+  const fl = factoryLevel(), tot = PADS.length + 1; $('#lvl').innerHTML = 'Fabrika Sv ' + fl + ' <i><u style="width:' + Math.round(fl / tot * 100) + '%"></u></i>'; $('#lvl').style.display = tutDone() ? '' : 'none';
 }
 function confirmBox(html, okTxt, ok, alt) {
   const M = $('#modal'); $('#mBody').innerHTML = html; const b = $('#mOk'), b2 = $('#mAlt'); b.textContent = okTxt; b2.style.display = alt ? '' : 'none'; if (alt) b2.innerHTML = alt.txt;
