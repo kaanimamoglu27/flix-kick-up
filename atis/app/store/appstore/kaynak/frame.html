@@ -1,0 +1,44 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800;900&family=Inter:wght@500;600&display=block" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:430px;height:932px;overflow:hidden;font-family:Inter,sans-serif}
+#f{position:absolute;inset:0;overflow:hidden;background:#d81f10}
+.sun{position:absolute;left:50%;top:560px;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.07) 0 9deg,transparent 9deg 18deg);border-radius:50%}
+.glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 62%,rgba(255,190,40,.35),transparent 55%),linear-gradient(180deg,rgba(120,0,0,.25),transparent 30%,transparent 70%,rgba(80,0,10,.45))}
+.head{position:absolute;left:26px;right:26px;top:30px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.top img{height:40px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.k{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#ffc61a;background:#022753;border-radius:4px;padding:6px 10px;transform:skewX(-8deg)}
+.cap{font-family:'Barlow Condensed';font-weight:900;font-size:56px;line-height:.92;color:#fff;text-transform:uppercase;letter-spacing:.2px;text-shadow:0 3px 0 #8a0f05}
+.cap b{color:#ffc61a;font-weight:900}
+.sub{margin-top:12px;font-size:15px;font-weight:600;color:rgba(255,255,255,.92);line-height:1.38}
+.ph{position:absolute;left:50%;top:268px;width:356px;height:770px;margin-left:-178px;border-radius:56px;background:#05070f;padding:9px;box-shadow:0 0 0 3px #022753,0 0 0 6px #ffc61a,0 30px 60px rgba(60,0,0,.5)}
+.w{width:338px;height:732px;border-radius:47px;overflow:hidden;background:#0a1230}
+.w img{width:338px;display:block}
+</style></head><body>
+<div id="f"><div class="sun"></div><div class="glow"></div>
+<div class="head"><div class="top"><img src="logo.png"><span class="k" id="k"></span></div><div class="cap" id="c"></div><div class="sub" id="s"></div></div>
+<div class="ph"><div class="w"><img id="shot"></div></div></div>
+<script>
+const q=new URLSearchParams(location.search),N=+q.get('s'),L=q.get('l');document.documentElement.lang=L;
+const ORD={1:'1',2:'2',3:'7',4:'4',5:'5',6:'6',7:'6b',8:'8'};
+const T={tr:{1:['Flix Atış','Çek, nişan al,<br><b>kovaya at!</b>','Parmağını aşağı çek, gücü ayarla, FLIX’i kovaya fırlat.'],
+2:['Tüy aç','Havada<br><b>tüyünü aç</b>','Basılı tut, FLIX süzülsün. Rüzgârı ve köprüleri hesaba kat.'],
+3:['9 harita','9 harita,<br><b>180 bölüm</b>','Sokaktan Türkiye’ye, Asya’dan Antarktika’ya. Bölümlerin hepsi ücretsiz.'],
+4:['Amerika','Gökdelenler,<br><b>sarı taksiler</b>','Yangın merdivenleri ve neon tabelalar arasından kovayı bul.'],
+5:['Afrika','Savan köyü,<br><b>baobab ağaçları</b>','Kulübeler, akasyalar ve piramitler. Her harita kendi dünyası.'],
+6:['Uzay','Ayda<br><b>az yerçekimi</b>','Cam kubbeler, roketler, uzaylılar. FLIX çok daha uzağa uçar.'],
+7:['Antarktika','Buzda<br><b>sektir!</b>','İglolar ve kardan adamlar arasında duvardan sektirerek at.'],
+8:['Dükkân','Desenli FLIX’ler,<br><b>yeni kostümler</b>','20 FLIX, uçuş izleri, insan ve hayvan kostümleri.']},
+en:{1:['Flix Flick','Pull, aim,<br><b>flick it in!</b>','Pull down, set the power and launch FLIX into the bucket.'],
+2:['Glide','Open the<br><b>feathers</b>','Hold to glide. Mind the wind and the bridges.'],
+3:['9 worlds','9 worlds,<br><b>180 levels</b>','From the street to Türkiye, from Asia to Antarctica. Every level is free.'],
+4:['America','Skyscrapers,<br><b>yellow cabs</b>','Find the bucket between fire escapes and neon signs.'],
+5:['Africa','Savanna village,<br><b>baobab trees</b>','Huts, acacias and pyramids. Every world feels different.'],
+6:['Space','Low gravity<br><b>on the moon</b>','Glass domes, rockets and aliens. FLIX flies much further.'],
+7:['Antarctica','Bounce it<br><b>off the ice</b>','Bank your shots off walls between igloos and snowmen.'],
+8:['Shop','Patterned FLIX,<br><b>new outfits</b>','20 FLIX skins, flight trails, people and animal outfits.']}};
+const t=T[L][N];k.textContent=t[0];c.innerHTML=t[1];s.textContent=t[2];shot.src='sh/'+ORD[N]+'.png';
+while(c.offsetHeight>110){c.style.fontSize=(parseFloat(getComputedStyle(c).fontSize)-2)+'px'}
+</script></body></html>
