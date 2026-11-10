@@ -23,7 +23,7 @@ export function nearest(tr, x, z, hint) {
 
 export function makeKart(pos, yaw, idx) {
   return { x: pos.x, z: pos.z, h: yaw, s: 0, vl: 0, steer: 0, eng: 0, y: 0, vy: 0, roll: 0, pitch: 0, idx, lap: 0, prog: 0, half: false, done: false,
-    boost: 0, boosting: false, drift: false, driftT: 0, driftLvl: 0, lvlUp: 0, hop: 0, driftDir: 0, padT: 0, hitT: 0, wallHit: 0, speedMul: 1, finishT: 0, skill: 1, laneOff: 0 };
+    boost: 0, boosting: false, drift: false, driftT: 0, driftLvl: 0, lvlUp: 0, hop: 0, driftDir: 0, padT: 0, hitT: 0, wallHit: 0, speedMul: 1, finishT: 0, skill: 1, laneOff: 0, accMul: 1, turnMul: 1, spinT: 0, spinA: 0, shieldT: 0, starT: 0, item: null, itemN: 0, sup: 0, air: 0 };
 }
 // heading h: forward = (-sin h, 0, -cos h)  (yaw 0 faces -z, like the 3D model)
 export const fwdX = (k) => -Math.sin(k.h), fwdZ = (k) => -Math.cos(k.h);
@@ -31,13 +31,15 @@ export const fwdX = (k) => -Math.sin(k.h), fwdZ = (k) => -Math.cos(k.h);
 // ctl: {steer:-1..1 (+ = left), gas:0..1, brake:bool, boost:bool}
 export function drive(k, ctl, dt) {
   const C = KCFG;
+  if (k.shieldT > 0) k.shieldT -= dt; if (k.starT > 0) k.starT -= dt;
+  if (k.spinT > 0) { k.spinT -= dt; k.spinA += dt * 13; ctl = { steer: 0, gas: 0, brake: false, boost: false }; k.s *= Math.exp(-2.4 * dt); k.drift = false; } else if (k.spinA) { k.spinA = 0; }
   const boosting = ctl.boost && k.boost > 0; k.boosting = boosting; if (boosting) k.boost = Math.max(0, k.boost - 40 * dt);
   if (k.padT > 0) k.padT -= dt; else k.padLvl = 0;
   const turbo = boosting || k.padT > 0; k.turbo = turbo;
-  const maxS = C.maxSpeed * (turbo ? C.boostMul : 1) * k.speedMul;
+  const maxS = C.maxSpeed * (turbo ? C.boostMul : 1) * k.speedMul * (k.starT > 0 ? 1.15 : 1);
   // engine smoothing like racing-game: lerp(engine, target, delta * 20)
   // punchy launch, tapering near top speed
-  const target = ctl.gas * C.accel * (turbo ? 1.7 : 1) * (1.35 - 0.6 * Math.min(1, Math.max(0, k.s) / C.maxSpeed));
+  const target = ctl.gas * C.accel * (turbo ? 1.7 : 1) * (1.35 - 0.6 * Math.min(1, Math.max(0, k.s) / C.maxSpeed)) * k.accMul;
   k.eng += (target - k.eng) * Math.min(1, dt * 20);
   // like racing-game: applyEngineForce(speed < maxSpeed ? engine : 0)
   k.s += ((k.s < maxS ? k.eng : 0) - C.drag * k.s * 0.08) * dt;
@@ -45,7 +47,7 @@ export function drive(k, ctl, dt) {
   if (k.s > maxS) k.s += (maxS - k.s) * Math.min(1, dt * 2.5);
   if (k.s < 0) k.s *= Math.exp(-3 * dt);
   // drift = brake + steer at speed: tighter turn, slide, mini turbo on release
-  const wantDrift = ctl.brake && Math.abs(ctl.steer) > 0.3 && k.s > 14;
+  const wantDrift = ctl.brake && Math.abs(ctl.steer) > 0.3 && k.s > 14 && k.y <= 0.3;
   if (wantDrift && !k.drift) { k.drift = true; k.driftDir = Math.sign(ctl.steer); k.driftT = 0; k.driftLvl = 0; if (k.y <= 0) k.vy = 6.5; k.hop = 1; }
   if (k.drift && (!ctl.brake || k.s < 10)) { if (k.driftLvl > 0) { k.padT = [0, 0.7, 1.1, 1.6][k.driftLvl]; k.miniTurbo = k.driftLvl; k.padLvl = k.driftLvl; } k.drift = false; k.driftLvl = 0; }
   if (k.drift) { k.driftT += dt; k.s -= 2.2 * dt; const lv = k.driftT > 2.2 ? 3 : k.driftT > 1.3 ? 2 : k.driftT > 0.6 ? 1 : 0; if (lv > k.driftLvl) { k.driftLvl = lv; k.lvlUp = lv; } }
@@ -53,7 +55,7 @@ export function drive(k, ctl, dt) {
   const st = k.drift ? Math.max(-1, Math.min(1, ctl.steer * 0.55 + k.driftDir * 0.7)) : ctl.steer;
   k.steer += (st - k.steer) * Math.min(1, dt * 14);
   const sf = Math.min(1, Math.abs(k.s) / 9) * (1 - Math.min(0.3, Math.abs(k.s) / 130));
-  const yaw = k.steer * C.turn * sf * (k.drift ? 1.3 : 1) * Math.sign(k.s || 1);
+  const yaw = k.steer * C.turn * k.turnMul * sf * (k.drift ? 1.3 : 1) * Math.sign(k.s || 1) * (k.y > 0.3 ? 0.6 : 1);
   k.h += yaw * dt;
   // lateral slide (outward in turns, more while drifting)
   k.vl += (yaw * k.s * (k.drift ? 0.3 : 0.1)) * dt;
@@ -63,7 +65,7 @@ export function drive(k, ctl, dt) {
   // cosmetic body motion
   k.roll += ((-k.steer * k.s / 70) - k.roll) * Math.min(1, dt * 6);
   k.pitch += (((ctl.brake ? 0.04 : 0) - (k.eng / C.accel) * 0.03) - k.pitch) * Math.min(1, dt * 5);
-  if (k.vy || k.y > 0) { k.vy -= 30 * dt; k.y += k.vy * dt; if (k.y <= 0) { k.y = 0; k.vy = k.vy < -4 ? -k.vy * 0.3 : 0; } }
+  if (k.vy || k.y > 0) { k.vy -= 30 * dt; k.y += k.vy * dt; if (k.y <= 0) { k.y = 0; if (k.vy < -6) k.landed = -k.vy; k.vy = k.vy < -4 ? -k.vy * 0.3 : 0; } }
   if (k.hitT > 0) k.hitT -= dt;
 }
 

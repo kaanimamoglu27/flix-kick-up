@@ -173,6 +173,7 @@ export const DRIVERS = [
   { id: 'flick', tr: 'Flick', en: 'Flick', kart: 0x1f5fbf, cost: 600, sub: ['Hızlı fiske', 'Quick flick'] },
   { id: 'buzul', tr: 'Buzul Flix', en: 'Ice Flix', kart: 0x8fd3ff, cost: 1500, sub: ['Soğukkanlı', 'Ice cold'] },
   { id: 'neon', tr: 'Neon Flix', en: 'Neon Flix', kart: 0xff2d9a, cost: 2500, sub: ['Gece yarışçısı', 'Night racer'] },
+  { id: 'altin', tr: 'Altın Flix', en: 'Golden Flix', kart: 0xd4a000, cost: 6000, sub: ['Fabrikanın patronu', 'Boss of the factory'] },
 ];
 
 // returns {g, anim(dt, st)}; g faces -z (kart forward), hip at y=0, seated
