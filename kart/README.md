@@ -1,4 +1,8 @@
-# Flix Kart v4 (2026-11-10) — araç hissi
+# Flix Kart v5 (2026-11-10) — gerçekçi 3D ve akıcılık
+Düz zemin yerine yolu saran gerçek arazi (tepeler, dağlar, deniz/lav), gökyüzü kubbesi ve bulutlar, hareketli su. 5 doğal dünya: Flix Sahili, Yeşil Vadi, Kızıl Kanyon, Buz Zirvesi, Lav Adası (palmiye, çam, kaktüs, kaya; hepsi tek çizimde instanced). Yol kenarı toprak bankı ve yarış bariyeri, 2K gölge. Zemin takibi artık kesintisiz (örnekler arası harmanlama), toz/duman/alev yumuşak sprite. Kaynak: kaynak/world.js.
+Önceki sürüm: flix-kart-v4.html.
+
+## v4 (2026-11-10) — araç hissi
 Yeni araç fiziği: 4 tekerlekli yay/amortisör süspansiyonu, momentumlu kayma (lastik tutuşu), gaz/fren/virajda ağırlık aktarımı, yokuşta yerçekimi, havada denge, inişte kısa kayma. SergeyMakeev/ArcadeCarPhysics (MIT, Copyright 2018 Sergey Makeev) ArcadeCar.cs'den uyarlandı.
 Pistler artık iniş çıkışlı: tepeler, içe yatık virajlar, düzlüklerde tümsekler ve gerçek rampalar (havada DRİFT = numara + turbo). Yol yükseltilmiş, yanlarında duvar var. Kamera yaylı takip eder ve yokuşa bakar.
 Önceki sürüm: flix-kart-v3.html.

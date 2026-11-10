@@ -35,9 +35,12 @@ export function buildTrack(def) {
 }
 // road surface height at world (x,z) near track index i (plane of that sample: slope along, bank across) + ramps
 export function groundAt(tr, i, x, z) {
-  const P = tr.P[i], T = tr.Tn[i], n = tr.Nm[i], dx = x - P.x, dz = z - P.z, al = dx * T.x + dz * T.z, lat = dx * n.x + dz * n.z;
+  const N = tr.N, P = tr.P[i], T = tr.Tn[i], n = tr.Nm[i], dx = x - P.x, dz = z - P.z, al = dx * T.x + dz * T.z, lat = dx * n.x + dz * n.z;
   let y = tr.Y[i] + tr.S[i] * al + tr.B[i] * lat;
-  for (const r of tr.ramps) { const rx = x - r.x, rz = z - r.z, a = -(rx * r.tx + rz * r.tz) * -1, l = rx * r.nx + rz * r.nz; // a: along travel
+  // blend with the neighbouring sample's plane so the surface is continuous (no steps when the nearest sample changes)
+  const j = al >= 0 ? (i + 1) % N : (i - 1 + N) % N, u = Math.min(0.5, Math.abs(al) / 1.2), Pj = tr.P[j], Tj = tr.Tn[j], nj = tr.Nm[j], ex = x - Pj.x, ez = z - Pj.z;
+  y = y * (1 - u) + (tr.Y[j] + tr.S[j] * (ex * Tj.x + ez * Tj.z) + tr.B[j] * (ex * nj.x + ez * nj.z)) * u;
+  for (const r of tr.ramps) { const rx = x - r.x, rz = z - r.z, a = rx * r.tx + rz * r.tz, l = rx * r.nx + rz * r.nz; // a: along travel
     if (Math.abs(l) < r.w / 2 && a > -r.L / 2 && a < r.L / 2) y = Math.max(y, r.y0 + r.H * (a + r.L / 2) / r.L); }
   return y;
 }
