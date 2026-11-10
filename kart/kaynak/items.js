@@ -37,16 +37,18 @@ function buildItems(tr, g) {
   boxes = []; ramps = []; projs.forEach((p) => scene.remove(p.m)); traps.forEach((p) => scene.remove(p.m)); projs = []; traps = [];
   if (race && race.mode === 'time') return;
   for (const f of [0.06, 0.38, 0.7]) { const i = lowCurveIdx(tr, f, f + 0.1);
-    for (const o of [-0.33, -0.11, 0.11, 0.33]) { const p = tr.P[i].clone().addScaledVector(tr.Nm[i], o * tr.W); const m = new THREE.Mesh(boxGeo, boxMat); m.position.set(p.x, 2, p.z); m.castShadow = true; g.add(m); boxes.push({ m, x: p.x, z: p.z, off: 0, ph: Math.random() * 6 }); } }
-  // jump ramps on two straights
+    for (const o of [-0.33, -0.11, 0.11, 0.33]) { const p = tr.P[i].clone().addScaledVector(tr.Nm[i], o * tr.W); const m = new THREE.Mesh(boxGeo, boxMat); const gy = tr.Y[i] + tr.B[i] * o * tr.W; m.position.set(p.x, gy + 2, p.z); m.castShadow = true; g.add(m); boxes.push({ m, x: p.x, z: p.z, gy, off: 0, ph: Math.random() * 6 }); } }
+  // jump ramps on two straights (physical: the suspension rides up the wedge and the kart takes off at the lip)
   const rampT = canvasTex(128, 256, (c, w, h) => { for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? '#ffd41f' : '#022753'; c.fillRect(0, i * 32, w, 32); } c.fillStyle = '#e22511'; c.beginPath(); c.moveTo(64, 20); c.lineTo(110, 90); c.lineTo(18, 90); c.fill(); });
-  for (const [a, b] of [[0.22, 0.34], [0.52, 0.64]]) { const i = lowCurveIdx(tr, a, b), P = tr.P[i], t = tr.Tn[i];
-    const geo = new THREE.BufferGeometry(), L = 5, Wd = tr.W * 0.55, H = 1.3;
+  tr.ramps = [];
+  for (const [a, b] of [[0.4, 0.5], [0.88, 0.94]]) { const i = lowCurveIdx(tr, a, b), P = tr.P[i], t = tr.Tn[i];
+    const geo = new THREE.BufferGeometry(), L = 6, Wd = tr.W * 0.5, H = 1.5;
     const v = [-Wd / 2, 0, L / 2, Wd / 2, 0, L / 2, -Wd / 2, H, -L / 2, Wd / 2, H, -L / 2, -Wd / 2, 0, -L / 2, Wd / 2, 0, -L / 2];
     geo.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1], 2));
     geo.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4, 3, 5, 4, 0, 2, 4, 1, 5, 3]); geo.computeVertexNormals();
-    const m = new THREE.Mesh(geo, phys(0xffffff, { map: rampT, roughness: 0.5, side: THREE.DoubleSide })); m.position.set(P.x, 0.02, P.z); m.rotation.y = Math.atan2(-t.x, -t.z); m.castShadow = true; m.receiveShadow = true; g.add(m);
-    ramps.push({ i, x: P.x, z: P.z, tx: t.x, tz: t.z, nx: tr.Nm[i].x, nz: tr.Nm[i].z, w: Wd }); }
+    const m = new THREE.Mesh(geo, phys(0xffffff, { map: rampT, roughness: 0.5, side: THREE.DoubleSide })); m.position.set(P.x, tr.Y[i] + 0.02, P.z); m.rotation.y = Math.atan2(-t.x, -t.z); m.castShadow = true; m.receiveShadow = true; g.add(m);
+    tr.ramps.push({ i, x: P.x, z: P.z, tx: t.x, tz: t.z, nx: tr.Nm[i].x, nz: tr.Nm[i].z, w: Wd, L, H, y0: tr.Y[i] }); }
+  ramps = tr.ramps;
 }
 
 // ---------- hits ----------
@@ -82,12 +84,12 @@ function stepProjs(dt) {
     if (p.target && !p.target.done) { const want = lateral(tr, i, p.target.x, p.target.z); p.off += Math.max(-1, Math.min(1, want - p.off)) * dt * 14; }
     const lim = tr.W / 2 - 1; if (Math.abs(p.off) > lim) { p.off = Math.sign(p.off) * lim; }
     const P = tr.P[i].clone().lerp(tr.P[j], u), Nm = tr.Nm[i]; const x = P.x + Nm.x * p.off, z = P.z + Nm.z * p.off;
-    p.m.position.set(x, p.y + (p.type === 'dev' ? 0 : Math.sin(p.life * 12) * 0.2), z);
-    const t = tr.Tn[i]; if (p.type === 'fuze' || p.type === 'ates') { p.m.rotation.set(-Math.PI / 2, 0, -Math.atan2(t.x, -t.z) * (p.v > 0 ? 1 : -1)); if (Math.random() < 0.6) puff(x, p.y, z, p.type === 'ates' ? 'fire' : 'blue', 1, 0.6); }
+    const gyp = tr.Y[i] + tr.B[i] * p.off; p.m.position.set(x, gyp + p.y + (p.type === 'dev' ? 0 : Math.sin(p.life * 12) * 0.2), z);
+    const t = tr.Tn[i]; if (p.type === 'fuze' || p.type === 'ates') { p.m.rotation.set(-Math.PI / 2, 0, -Math.atan2(t.x, -t.z) * (p.v > 0 ? 1 : -1)); if (Math.random() < 0.6) puff(x, gyp + p.y, z, p.type === 'ates' ? 'fire' : 'blue', 1, 0.6); }
     else p.m.rotation.x -= p.v * dt / 2;
     let gone = p.life <= 0;
-    for (const k of karts) { if (gone) break; if (k === p.owner && p.safe > 0) continue; if ((k.x - x) ** 2 + (k.z - z) ** 2 < (p.r + 1.4) ** 2 && k.y < p.y + 2) { hitKart(k, p.owner, p.type === 'dev' ? 'big' : ''); if (p.type !== 'dev') gone = true; } }
-    if (gone) { puff(x, p.y, z, p.type === 'fuze' ? 'blue' : 'spark', 8, 5); scene.remove(p.m); projs.splice(n, 1); }
+    for (const k of karts) { if (gone) break; if (k === p.owner && p.safe > 0) continue; if ((k.x - x) ** 2 + (k.z - z) ** 2 < (p.r + 1.4) ** 2 && k.y < p.y + 1.5) { hitKart(k, p.owner, p.type === 'dev' ? 'big' : ''); if (p.type !== 'dev') gone = true; } }
+    if (gone) { puff(x, gyp + p.y, z, p.type === 'fuze' ? 'blue' : 'spark', 8, 5); scene.remove(p.m); projs.splice(n, 1); }
   }
 }
 // ---------- traps ----------
@@ -95,7 +97,7 @@ const TG = { sakiz: new THREE.SphereGeometry(1.3, 16, 10), buz: new RoundedBoxGe
 const TM = { sakiz: new THREE.MeshStandardMaterial({ color: 0xff6fb5, roughness: 0.25, emissive: 0x330011 }), buz: new THREE.MeshStandardMaterial({ color: 0xbfeaff, roughness: 0.1, transparent: true, opacity: 0.8, emissive: 0x113355 }) };
 function drop(k, type, off = 0) {
   const fx = fwdX(k), fz = fwdZ(k), rx = -fz, rz = fx; const x = k.x - fx * 3.4 + rx * off, z = k.z - fz * 3.4 + rz * off;
-  const m = new THREE.Mesh(TG[type], TM[type]); m.position.set(x, type === 'sakiz' ? 0.5 : 1.2, z); m.scale.y = type === 'sakiz' ? 0.45 : 1; m.rotation.y = k.h; m.castShadow = true; scene.add(m);
+  const m = new THREE.Mesh(TG[type], TM[type]); m.position.set(x, GY(x, z) + (type === 'sakiz' ? 0.5 : 1.2), z); m.scale.y = type === 'sakiz' ? 0.45 : 1; m.rotation.y = k.h; m.castShadow = true; scene.add(m);
   traps.push({ type, m, x, z, life: type === 'buz' ? 14 : 30, owner: k, safe: 0.8 });
 }
 function stepTraps(dt) {
@@ -133,13 +135,13 @@ function useSuper(k) {
 }
 function flash(col = 0xffffff) { const f = $('#flash'); if (!f) return; f.style.background = '#' + new THREE.Color(col).getHexString(); f.style.opacity = 0.7; setTimeout(() => (f.style.opacity = 0), 90); }
 const ringGeo = new THREE.RingGeometry(0.8, 1.2, 40);
-function ring(k, col) { const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.8, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(k.x, 0.6, k.z); scene.add(m); parts.push({ m, vx: 0, vy: 0, vz: 0, life: 0.6, t: 0, g: 0, grow: 20 }); }
+function ring(k, col) { const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.8, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(k.x, k.gy + 0.6, k.z); scene.add(m); parts.push({ m, vx: 0, vy: 0, vz: 0, life: 0.6, t: 0, g: 0, grow: 20 }); }
 
 // ---------- per-frame ----------
 const shieldGeo = new THREE.SphereGeometry(2.7, 20, 14), shieldMat = new THREE.MeshBasicMaterial({ color: 0x6fd8ff, transparent: true, opacity: 0.12, blending: THREE.AdditiveBlending, depthWrite: false }), starMat = new THREE.MeshBasicMaterial({ color: 0xffd41f, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false });
 function stepItems(dt) {
   const tr = world.tr; if (hitToastT > 0) hitToastT -= dt;
-  for (const b of boxes) { if (b.off > 0) { b.off -= dt; b.m.visible = b.off <= 0; } b.m.rotation.y += dt * 1.6; b.m.rotation.x = Math.sin(race.t * 1.3 + b.ph) * 0.3; b.m.position.y = 2.1 + Math.sin(race.t * 2.5 + b.ph) * 0.25;
+  for (const b of boxes) { if (b.off > 0) { b.off -= dt; b.m.visible = b.off <= 0; } b.m.rotation.y += dt * 1.6; b.m.rotation.x = Math.sin(race.t * 1.3 + b.ph) * 0.3; b.m.position.y = b.gy + 2.1 + Math.sin(race.t * 2.5 + b.ph) * 0.25;
     if (b.off > 0) continue;
     for (const k of karts) if ((k.x - b.x) ** 2 + (k.z - b.z) ** 2 < 7.5) { b.off = 2.5; b.m.visible = false; puff(b.x, 2, b.z, 'c' + Math.floor(Math.random() * 4), 8, 6); k.sup = Math.min(100, k.sup + 8);
       if (!k.item) { k.item = rollItem(k); k.itemN = k.item === 'turbo3' ? 3 : 0; k.rollT = k.me ? 0.8 : 0.1; k.botHold = 0.5 + Math.random() * 2.5; if (k.me) AUD.play('itemPickup', { volume: 0.6 }); }
@@ -147,11 +149,10 @@ function stepItems(dt) {
   for (const k of karts) {
     if (k.rollT > 0) k.rollT -= dt;
     if (race.phase === 'go' && !k.done) k.sup = Math.min(100, k.sup + dt * 2.2);
-    // ramps
-    for (const r of ramps) { const dx = k.x - r.x, dz = k.z - r.z, along = -(dx * r.tx + dz * r.tz), lat = dx * r.nx + dz * r.nz;
-      if (Math.abs(along) < 2.6 && Math.abs(lat) < r.w / 2 && k.y < 0.4 && k.s > 10 && !(k.rampCd > 0)) { k.vy = 8 + k.s * 0.16; k.y = 0.5; k.air = 1; k.trick = 0; k.rampCd = 1; if (k.me) AUD.play('uiSelect', { volume: 0.3 }); if (!k.me && Math.random() < 0.6) k.trick = 1; } }
-    if (k.rampCd > 0) k.rampCd -= dt;
-    if (k.landed) { const v = k.landed; k.landed = 0; if (k.air) { k.air = 0; if (k.trick) { k.padT = Math.max(k.padT, 0.9); k.sup = Math.min(100, k.sup + 5); if (k.me) { big(T('HAVADA NUMARA!', 'TRICK!'), 'lap'); AUD.play('driftReleaseMiniBoost', { volume: 0.7 }); } } } if (k.me && v > 7) { AUD.play('landing', { volume: 0.5 }); shake = Math.max(shake, 0.15); } puff(k.x, 0.4, k.z, 'dust', 5, 3); }
+    // air time from crests and ramps: bots sometimes do a trick
+    if (k.air && k.airT > 0.3 && !k.trickRoll) { k.trickRoll = 1; if (!k.me && Math.random() < 0.6) k.trick = 1; }
+    if (k.landed) { const v = k.landed; k.landed = 0; if (k.trick) { k.padT = Math.max(k.padT, 0.9); k.sup = Math.min(100, k.sup + 5); if (k.me) { big(T('HAVADA NUMARA!', 'TRICK!'), 'lap'); AUD.play('driftReleaseMiniBoost', { volume: 0.7 }); } }
+      k.trick = 0; k.trickRoll = 0; if (k.me && v > 8) { AUD.play('landing', { volume: Math.min(0.7, v / 25) }); shake = Math.max(shake, Math.min(0.35, v / 50)); } if (v > 8) puff(k.x, 0.4, k.z, 'dust', 6, 3); }
     // golden FLIX: bump others away
     if (k.starT > 0) for (const o of karts) if (o !== k && (o.x - k.x) ** 2 + (o.z - k.z) ** 2 < 12) hitKart(o, k);
     // visuals

@@ -1,4 +1,9 @@
-# Flix Kart v3 (2026-11-10)
+# Flix Kart v4 (2026-11-10) — araç hissi
+Yeni araç fiziği: 4 tekerlekli yay/amortisör süspansiyonu, momentumlu kayma (lastik tutuşu), gaz/fren/virajda ağırlık aktarımı, yokuşta yerçekimi, havada denge, inişte kısa kayma. SergeyMakeev/ArcadeCarPhysics (MIT, Copyright 2018 Sergey Makeev) ArcadeCar.cs'den uyarlandı.
+Pistler artık iniş çıkışlı: tepeler, içe yatık virajlar, düzlüklerde tümsekler ve gerçek rampalar (havada DRİFT = numara + turbo). Yol yükseltilmiş, yanlarında duvar var. Kamera yaylı takip eder ve yokuşa bakar.
+Önceki sürüm: flix-kart-v3.html.
+
+## v3 (2026-11-10)
 Kariyer: 5 dünya (Mutfak, Oyun Odası, Arka Bahçe, Banyo, FLIX Fabrikası) × 4 etkinlik (yarış, ters pist, zamana karşı, patron düellosu), 60 yıldız.
 Güç kutuları (Üçlü Turbo, Tüy Füzesi, FLIX Topu, Sakız, Kalkan, Altın FLIX, Şimşek) ve sürücüye özel süper güçler; atlama rampası + havada numara.
 Garaj: 5 araç (Klasik, Plaj Buggy, Canavar, Roket, Tüy Jet) + hız/hızlanma/yol tutuş yükseltmeleri. Eşya dağılımı sıraya göre (super-kart-3djs PowerUp.js fikri, MIT).
