@@ -1,7 +1,8 @@
-// Flix Fabrika 1.8 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
+// Flix Fabrika 1.9 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
 import { SFX } from './sfx.js';
+import { LANG, setLang } from './i18n.js';
 import { UPS, STAFF, SUPS, COS, IAP, AD, COLS, BONUS, bonusTxt, PROMO, ORDERS, spdPct } from './config.js';
-import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel, bonusOn, bonusLeft, addBonus, setMenu, cosB, ENDGAME, setEndgame, patronLv, patronTier, onUpgrade, setWorkerLook, contract, capOf } from './game.js';
+import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel, bonusOn, bonusLeft, addBonus, setMenu, cosB, ENDGAME, setEndgame, patronLv, patronTier, onUpgrade, setWorkerLook, contract, capOf, hypeInfo } from './game.js';
 import { PADS } from './config.js';
 
 const $ = (s) => document.querySelector(s);
@@ -93,7 +94,7 @@ function render() {
     h += '<p class="note">Bonuslar üst üste eklenir. Elmasları mağazadan alabilirsin.</p>';
   } else if (cur === 'menu') {
     T.textContent = 'Ayarlar';
-    h += `<div class="set col"><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button><button data-a="home">🏠 Ana menüye dön</button><button data-a="endg">${ENDGAME ? '↩ Normal oyuna dön' : '🧪 Endgame modu (test)'}</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : ''}</div><p class="note">Flix Fabrika · FLIX TOYS</p>`;
+    h += `<div class="set col"><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button><button data-a="lang">🌐 ${LANG === 'tr' ? 'Dil: Türkçe → English' : 'Language: English → Türkçe'}</button><button data-a="home">🏠 Ana menüye dön</button><button data-a="endg">${ENDGAME ? '↩ Normal oyuna dön' : '🧪 Endgame modu (test)'}</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : ''}</div><p class="note">Flix Fabrika · FLIX TOYS</p>`;
   } else if (cur === 'shop') {
     T.textContent = 'Mağaza'; const g = gemAdState();
     h += `<div class="row free"><div class="ic">▶</div><div class="mid"><b>Reklam izle: +${AD.gemsPerAd} 💎</b><span>${g.left <= 0 ? 'Bugünlük bitti' : g.wait > 0 ? mins(g.wait) + ' sonra' : 'Bugün ' + g.left + ' hak'}</span></div><button class="buy" data-a="adgem" ${g.left <= 0 || g.wait > 0 ? 'disabled' : ''}>İZLE</button></div>`;
@@ -114,6 +115,7 @@ async function onAct(a) {
   else if (k === 'adgem') { const r = await adRewarded(); if (r === 'rewarded') { SV.ads.n++; SV.ads.last = Date.now(); SV.gems += AD.gemsPerAd; toast('+' + AD.gemsPerAd + ' 💎'); SFX.coin(); save(); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
   else if (k === 'iap') { const p = IAP.find(q => q.id === x); await buy(p); }
   else if (k === 'snd') setSound(!soundOn());
+  else if (k === 'lang') { save(); setLang(LANG === 'tr' ? 'en' : 'tr'); return; }
   else if (k === 'promo') { openPromo(PROMO.find(p => p.id === x)); return; }
   else if (k === 'bad') { const b = BONUS.find(q => q.id === x); const r = await adRewarded(); if (r === 'rewarded') { addBonus(x, b.min); SFX.milestone(); toast(b.name + ' · ' + b.min + ' dakika!'); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
   else if (k === 'bgem') { const b = BONUS.find(q => q.id === x); if (SV.gems < b.gem) { toast('Elmas yetmiyor'); openPanel('shop'); return; } SV.gems -= b.gem; addBonus(x, b.min); SFX.milestone(); toast(b.name + ' · ' + b.min + ' dakika!'); }
@@ -126,7 +128,7 @@ async function onAct(a) {
 // ---------------- HUD ----------------
 export function refreshHUD() {
   $('#gems b').textContent = fmt(SV.gems);
-  const act = BONUS.filter(q => bonusOn(q.id)); $('#bon').innerHTML = act.map(q => { const l = bonusLeft(q.id); return `<span style="--bc:${q.col}">${q.icon}${l > 864e5 ? '' : `<b>${clock(l)}</b>`}</span>`; }).join('');
+  const act = BONUS.filter(q => bonusOn(q.id)); $('#bon').innerHTML = act.map(q => { const l = bonusLeft(q.id); return `<span style="--bc:${q.col}">${q.icon}${l > 864e5 ? '' : `<b>${clock(l)}</b>`}</span>`; }).join('') + (() => { const h = hypeInfo(); return h ? `<span style="--bc:#ff5ad1">🔥+${Math.round(h.p / 2)}%<b>${Math.ceil(h.t)}s</b></span>` : ''; })();
   $('#boostB').classList.toggle('on', act.length > 0); $('#boostB small').textContent = act.length ? act.length + ' aktif' : 'Bonus';
   for (const id of ['#boostB', '#shopB', '#menuB']) $(id).style.display = tutDone() ? '' : 'none';
   document.querySelectorAll('[data-bl]').forEach(e => { const l = bonusLeft(e.dataset.bl); e.hidden = !l; e.textContent = clock(l); e.closest('.row').classList.toggle('act', !!l); });
@@ -159,6 +161,8 @@ export function initUI() {
   $('#shopB').onclick = () => { SFX.unlock(); if (cur === 'shop') closePanel(); else openPanel('shop'); };
   $('#boostB').onclick = () => { SFX.unlock(); if (cur === 'bonus') closePanel(); else openPanel('bonus'); };
   $('#menuB').onclick = () => { SFX.unlock(); if (cur === 'menu') closePanel(); else openPanel('menu'); };
+  $('#mmLang').onclick = () => { save(); setLang(LANG === 'tr' ? 'en' : 'tr'); };
+  $('#mmLang small').textContent = LANG === 'tr' ? 'ENGLISH' : 'TÜRKÇE';
   $('#mmPlay').onclick = () => { SFX.unlock(); showMenu(false); };
   $('#mmEnd').onclick = () => openPanel('menu');
   document.querySelectorAll('#mm [data-p]').forEach(b => b.onclick = () => { SFX.unlock(); openPanel(b.dataset.p); });

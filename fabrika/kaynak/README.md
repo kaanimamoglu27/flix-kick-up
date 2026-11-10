@@ -76,3 +76,12 @@ Three.js r170 + esbuild, tek HTML dosyası üretir: `python3 build.py` (yanında
 - Reklamla boost: arada bir oyuncunun yakınında dönen bir reklam kutusu çıkıyor (25 sn). Üstüne basınca "Reklam izle, boost al" kartı açılıyor: 2x kazanç, Turbo hız, Çift üretim, Müşteri akını ya da Para mıknatısı.
 - Endgame modu sakin: tüm alanlar açık ama geliştirmeler orta seviyede, 6 taşıyıcı, kalıcı bonus yok. Eski Endgame kaydı da bu ayara çekilir.
 - Bot testi (kaynak/bot.js, kaynak/bot.cjs): 0'dan tüm alanlar açılana kadar oyun süresi; çok hızlı 80 dk, hızlı 86 dk, orta 1 sa 42 dk, yavaş 1 sa 47 dk (1.7'de 2 sa 17 dk ile 2 sa 53 dk arası). Reklam boostu kullanılmadan ölçüldü.
+
+## 1.9 (2026-11-10)
+- Bize özel mekanik: **FLIX Sektirme Şovu.** Oyun parkından sonra açılan Şov sahnesine çıkıp durunca şov başlar: düşen FLIX'e doğru anda dokunarak sektirirsin (tam ortada "MÜKEMMEL!" 2 kat para). Seyirciler her sektirmede para atar; şov bitince kalabalık coşar ("hype"): 60 saniye boyunca satışlar ve müşteri sıklığı sektirme sayısına göre artar (en fazla +%30). Sahne 30 sn dinlenir. HUD'da 🔥 çipi kalan süreyi gösterir.
+- Yeni iş: **Mısır ambarı** (Yeni salondan sonra, büyüyen çiftliğin sağında). Ambar 6 sn'de bir mısır çuvalı üretir; çuvalı yalağa (YEM halkası) götürünce hindiler beslenir: her çuval +25 sn, beslenen hindiler 2 kat hızlı tüy verir ve yalağa yürür.
+- İngilizce dil seçeneği: ana menüde 🌐 ENGLISH/TÜRKÇE düğmesi ve Ayarlar → Dil. İlk açılışta telefonun diline göre seçilir. Menüler, paneller, bildirimler ve 3D tabelalar çevrilir (kaynak/i18n.js).
+- Modeller: hindiler yeniden çizildi (yumurta gövde, iki sıra kuyruk yelpazesi, sakal, ibik, ayaklar), oyuncak kutusu gerçek kutu gibi (kırmızı çerçeve, ön pencere, sarı kapak ve askı).
+- Düzen: 3. ve 4. kasa aralandı (bayraklar üst üste biniyordu), halkalar küçültüldü, balon süsleri kaydırıldı.
+- "FLIX TOYS presents" girişi daha görünür (sarı yazı, en az 1,4 sn, tam 2,8 sn).
+- Bot testi (şov ve mısır kullanılmadan): çok hızlı 81 dk, hızlı 92 dk, orta 95 dk, yavaş 2 sa 3 dk.
