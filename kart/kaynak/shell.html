@@ -31,6 +31,7 @@
 .trk.lock{filter:grayscale(.8);opacity:.7}
 #garageP{background:linear-gradient(180deg,rgba(255,247,230,0) 0%,rgba(255,247,230,0) 34%,var(--cream) 46%)}
 #garageP .gh{display:flex;justify-content:space-between;align-items:center}
+.gi.drv i{display:flex;align-items:center;justify-content:center;font-size:20px}
 #garageP h3{font-weight:800;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;margin:6px 0}
 .gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
 .gi{background:#fff;border:2px solid var(--navy);border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:5px;align-items:stretch;color:var(--navy);text-align:center}
@@ -78,6 +79,35 @@
 #resRew{background:#ffe9a8;border-radius:12px;padding:10px;font-weight:800;font-size:14px;line-height:1.5}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .row2 .btn{font-size:20px;padding:12px 8px}
+.sup2{position:fixed;right:max(14px,var(--sr));bottom:calc(var(--sb) + 124px);display:flex;gap:10px;align-items:flex-end}
+#bI,#bS{width:74px;height:74px;border-radius:50%;background:rgba(2,39,83,.72);border:3px solid rgba(255,255,255,.35);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;touch-action:none}
+#bI{width:84px;height:84px} #bI.ready{background:#fff;border-color:var(--yel);box-shadow:0 0 0 4px rgba(255,212,31,.5)} #itIc{font-size:40px;line-height:1} #itN{position:absolute;right:10px;bottom:6px;font-size:14px;color:var(--navy)}
+#supFill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(0deg,#ff2d9a,#ffd41f);opacity:.55;height:0}
+#bS span{position:relative;font-size:26px;line-height:1} #bS small{position:relative;font-family:var(--d);font-style:italic;font-weight:900;font-size:13px}
+#bS.ready{border-color:var(--yel);animation:pulse .6s infinite alternate} #bS.ready #supFill{opacity:.95}
+@keyframes pulse{to{transform:scale(1.08);box-shadow:0 0 18px #ffd41f}}
+.tt .sup2{display:none}
+#goal{position:fixed;left:0;right:0;top:calc(var(--st) + 120px);text-align:center;font-size:30px;color:var(--yel);text-shadow:0 2px 0 var(--navy);display:none}
+.tt #goal{display:block}
+.spd{left:max(16px,var(--sl));right:auto!important;text-align:left!important}
+#flash{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .25s;z-index:5}
+#resStars{font-size:44px;letter-spacing:6px;color:#d8cdb5;margin-top:-6px}
+#resStars i{font-style:normal;display:inline-block;animation:pop .4s backwards}
+#resStars i.on{color:var(--yel);text-shadow:0 3px 0 var(--navy)}
+#next{width:100%}
+.world{border:3px solid var(--navy);border-radius:18px;padding:12px;margin-bottom:12px;box-shadow:0 5px 0 var(--navy);color:var(--navy)}
+.world.lock{filter:grayscale(.8);opacity:.7}
+.wh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.wh b{font-size:32px} .wh em{font-style:normal;font-weight:800;background:#fff;border-radius:999px;padding:4px 10px}
+.evs{display:grid;gap:6px}
+.ev{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.9);border:2px solid var(--navy);border-radius:12px;padding:8px 10px;color:var(--navy);text-align:left}
+.ev .mi{font-size:24px} .ev .et{flex:1;display:flex;flex-direction:column} .ev b{font-size:15px} .ev small{font-size:12px;font-weight:500}
+.ev .es{color:#e3a900;font-size:18px;letter-spacing:1px} .ev .es i{color:#cfc4ae;font-style:normal}
+.gi.veh .bars{display:flex;flex-direction:column;gap:3px;text-align:left}
+.gi.veh p{display:flex;flex-direction:column;font-size:10px;font-weight:700} .gi.veh u{display:block;height:6px;background:#eadfc8;border-radius:3px;text-decoration:none} .gi.veh s{display:block;height:100%;background:var(--red);border-radius:3px}
+.upr{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--navy);border-radius:12px;padding:8px 10px;margin-bottom:6px}
+.upr b{width:86px;font-size:14px} .upr span{flex:1;display:flex;gap:4px} .upr i{flex:1;height:10px;border-radius:5px;background:#eadfc8} .upr i.on{background:var(--red)} .upr em{font-style:normal;font-weight:900}
+.hb .row2 .btn{font-size:20px}
 #toast{position:fixed;left:50%;top:calc(var(--st) + 160px);transform:translateX(-50%);background:var(--navy);color:#fff;font-weight:700;font-size:14px;padding:10px 14px;border-radius:12px;z-index:30;width:max-content;max-width:86vw;text-align:center;border:2px solid var(--yel)}
 #boot{position:fixed;inset:0;background:var(--red);display:flex;align-items:center;justify-content:center;z-index:50;font-family:var(--d);font-style:italic;font-weight:900;font-size:40px}
 </style></head><body>
@@ -90,13 +120,13 @@
   <div class="hero-s" data-tr="Masada, halıda, mutfakta: FLIX'li mini kartınla yarış!" data-en="Race your FLIX mini kart across tables and playrooms!">Masada, halıda: FLIX'li mini kartınla yarış!</div>
   <div class="sp"></div>
   <div class="hb">
-    <button class="btn y" id="playBtn" data-tr="YARIŞ" data-en="RACE">YARIŞ</button>
-    <button class="btn w" id="garBtn" data-tr="GARAJ" data-en="GARAGE">GARAJ</button>
+    <button class="btn y" id="playBtn" data-tr="KARİYER" data-en="CAREER">KARİYER</button>
+    <div class="row2"><button class="btn w" id="quickBtn" data-tr="HIZLI YARIŞ" data-en="QUICK RACE">HIZLI YARIŞ</button><button class="btn w" id="garBtn" data-tr="GARAJ" data-en="GARAGE">GARAJ</button></div>
   </div>
 </section>
 
 <section class="pane sheet" id="trackP" hidden>
-  <h2 data-tr="PİST SEÇ" data-en="PICK A TRACK">PİST SEÇ</h2>
+  <h2 id="trackH">PİST SEÇ</h2>
   <div class="scroll" id="trackList"></div>
   <button class="btn y back" data-tr="GERİ" data-en="BACK">GERİ</button>
 </section>
@@ -105,6 +135,9 @@
   <div class="gh"><h2 data-tr="GARAJ" data-en="GARAGE">GARAJ</h2><div class="tuy" style="background:var(--navy);color:#fff">🪶 <span class="tuyN">0</span></div></div>
   <div style="flex:0 0 30vh"></div>
   <div class="scroll">
+    <h3 data-tr="Araç" data-en="Vehicle">Araç</h3><div class="gg" id="gV"></div>
+    <h3 data-tr="Yükseltmeler" data-en="Upgrades">Yükseltmeler</h3><div id="gU"></div>
+    <h3 data-tr="Sürücü" data-en="Driver">Sürücü</h3><div class="gg" id="gD"></div>
     <h3 data-tr="Kart rengi" data-en="Kart colour">Kart rengi</h3><div class="gg" id="gC"></div>
     <h3 data-tr="FLIX tüyleri" data-en="FLIX feathers">FLIX tüyleri</h3><div class="gg" id="gF"></div>
   </div>
@@ -118,6 +151,8 @@
     <canvas id="mm" width="220" height="220"></canvas>
     <button id="pauseBtn">II</button>
   </div>
+  <div class="sup2 hud"><button id="bS"><div id="supFill"></div><span id="supIc">🔥</span><small data-tr="SÜPER" data-en="SUPER">SÜPER</small></button><button id="bI"><span id="itIc"></span><b id="itN"></b></button></div>
+  <div id="goal"></div>
   <div class="spd"><span id="spd">0</span> <small data-tr="km/sa" data-en="km/h">km/sa</small></div>
   <div class="rbot hud">
     <button class="sb" id="bL" aria-label="Sol">◀</button>
@@ -128,7 +163,8 @@
 <div id="big" class="hide"></div>
 
 <div class="ov" id="pause" hidden><div class="card"><h2 data-tr="DURAKLADI" data-en="PAUSED">DURAKLADI</h2><button class="btn y" id="resume" data-tr="DEVAM" data-en="RESUME">DEVAM</button><button class="btn w" id="quit" data-tr="ANA MENÜ" data-en="MAIN MENU">ANA MENÜ</button></div></div>
-<div class="ov" id="res" hidden><div class="card"><h2 id="resTitle">1.</h2><div id="resList"></div><div id="resRew"></div><div class="row2"><button class="btn w" id="resHome" data-tr="MENÜ" data-en="MENU">MENÜ</button><button class="btn y" id="again" data-tr="TEKRAR" data-en="AGAIN">TEKRAR</button></div></div></div>
+<div class="ov" id="res" hidden><div class="card"><h2 id="resTitle">1.</h2><div id="resStars"></div><div id="resList"></div><div id="resRew"></div><div class="row2"><button class="btn w" id="resHome" data-tr="MENÜ" data-en="MENU">MENÜ</button><button class="btn y" id="again" data-tr="TEKRAR" data-en="AGAIN">TEKRAR</button></div><button class="btn y" id="next" data-tr="SONRAKİ ▶" data-en="NEXT ▶" hidden>SONRAKİ ▶</button></div></div>
+<div id="flash"></div>
 <div id="toast" hidden></div>
 
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
@@ -140,6 +176,10 @@ const LOGO_URL = '@@LOGO@@';
 @@TOY@@
 @@TRACKS@@
 @@RACE@@
+@@DRIVERS@@
+@@SFX@@
+@@MUSIC@@
+@@AUDIO@@
 @@GAME@@
 </script>
 </body></html>
