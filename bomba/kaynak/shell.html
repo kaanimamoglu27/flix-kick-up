@@ -103,6 +103,18 @@ button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
 @media (max-height:700px){.word{font-size:44px}#home .top img{width:104px}.card{gap:7px;padding:10px 12px}#cAbil{min-height:0}.rc{max-width:56px}}
 @media (hover:hover) and (pointer:fine){#joyHint{display:none}}
 @media (prefers-reduced-motion:reduce){#timer.hot,#banner.show{animation-duration:.01s}}
+.mrow{display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:#fff;border:3px solid var(--navy);border-radius:16px;box-shadow:0 4px 0 var(--navy);padding:10px 14px;text-align:left;width:100%}
+.mrow:active{transform:translateY(3px);box-shadow:0 1px 0 var(--navy)}
+.mrow b{font-family:var(--disp);font-weight:400;font-size:21px;color:var(--navy)}.mrow span{font-size:12.5px;font-weight:600;color:var(--mute)}
+#diff{min-height:38px;margin:-4px 0 0}
+.col{display:flex;flex-direction:column;gap:10px}
+#lvGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+#lvGrid button{aspect-ratio:1;border-radius:14px;background:#fff;border:3px solid var(--navy);font-family:var(--disp);font-size:20px;color:var(--navy)}
+#lvGrid button.ok{background:#d9f7c4}#lvGrid button.cur{background:var(--yel);box-shadow:0 4px 0 var(--navy)}#lvGrid button.lock{opacity:.45;font-size:15px}
+#lobInput{font:inherit;font-size:24px;text-align:center;letter-spacing:.2em;border:3px solid var(--navy);border-radius:16px;padding:10px;background:#fff;color:var(--navy);width:100%;-webkit-user-select:text;user-select:text}
+.big:disabled{opacity:.55}
+.chip.wide{flex:1}.chip.wide span{font-size:14px}.chip.wide em{font-style:normal;font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#myStats .sx{padding-left:8px;background:var(--red)}
 </style>
 @@INTRO@@
 <canvas id="gl"></canvas>
@@ -114,7 +126,7 @@ button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
     <div class="who"><div class="nm"><div id="cName"></div><div id="cTag"></div></div><div id="cStats"></div></div>
     <div id="cAbil"></div>
     <div id="roster"></div>
-    <div class="row"><div id="diff"></div><button id="play" class="big">OYNA</button></div>
+    <button id="play" class="big">OYNA</button>
   </div>
   <div class="links"><button id="howBtn">Nasıl oynanır?</button><button id="setBtn">Ayarlar</button><button data-flixlegal="legal">Yasal Bilgiler</button></div>
 </div>
@@ -134,9 +146,9 @@ button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
     <div class="row"><button id="toHome" class="ghost" style="flex:1">Menü</button><button id="again" class="big" style="flex:1.4">TEKRAR</button></div></div>
 </div>
 
-<div id="pause" class="sheet" hidden><div class="in"><h2>Duraklatıldı</h2><button id="resume" class="big">DEVAM</button><button id="quit" class="ghost">Menüye dön</button></div></div>
+<div id="pause" class="sheet" hidden><div class="in"><h2>Duraklatıldı</h2><button id="resume" class="big">DEVAM</button><button id="restart" class="ghost">Yeniden başla</button><button id="quit" class="ghost">Menüye dön</button></div></div>
 <div id="how" class="sheet" hidden><div class="in"><h2>Nasıl oynanır?</h2>
-  <ul><li>Ekranın solunda parmağını sürükleyerek yürü. Klavyede ok tuşları.</li><li><b>BOMBA</b> ile bomba bırak (klavyede boşluk). Bomba 2,6 saniyede artı şeklinde patlar.</li><li>Turuncu tuğlaları patlat, içinden çıkan güçleri topla: 💣 fazla bomba, 🔥 uzun menzil, ⚡ hız.</li><li>Beyaz yuvarlak tuş karakterinin özel gücü (klavyede Shift). Her karakterin gücü farklı.</li><li>Ayakta kalan son karakter raundu alır. 3 raunt alan şampiyon olur.</li><li>Süre bitince alan kenarlardan daralır.</li></ul>
+  <ul><li>Ekranın solunda parmağını sürükleyerek yürü, <b>BOMBA</b> ile bomba bırak. Klavyede ok tuşları ve boşluk.</li><li>Tuğlaları patlat, güçleri topla: 💣 fazla bomba, 🔥 menzil, ⚡ hız, 👟 tekme (bombaya yürü, it), ✴ delici bomba, 🛡 yelek, MAX tam menzil. 💀 lanetten uzak dur.</li><li>Beyaz yuvarlak tuş karakterinin özel gücü (klavyede Shift).</li><li><b>Macera:</b> canavarları patlat, tuğlaların altındaki kapıyı bul, kapıdan çık.</li><li><b>Arena:</b> 3 bota karşı, ayakta kalan raundu alır. Süre bitince alan daralır.</li><li><b>Bulmaca:</b> sınırlı bombayla bütün altın kasaları patlat. Mor uyuyan bombalar zincirleme patlar.</li><li><b>Online:</b> aynı oda kodunu giren 2-4 kişi birlikte oynar.</li></ul>
   <button class="big" data-close="how">TAMAM</button></div></div>
 <div id="settings" class="sheet" hidden><div class="in"><h2>Ayarlar</h2>
   <button class="srow" id="tSound"><span>Ses efektleri</span><span id="sSound"></span></button>
@@ -145,6 +157,19 @@ button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
   <button class="srow" data-flixlegal="about"><span>Hakkında</span><span>Aç</span></button>
   <p style="text-align:center;color:var(--mute);font-size:12px">Flix Bomba @@VER@@ · FLIX TOYS</p>
   <button class="big" data-close="settings">KAPAT</button></div></div>
+<div id="modes" class="sheet" hidden><div class="in"><h2>Oyun modu</h2>
+  <button class="mrow" data-m="macera"><b>🗺 Macera</b><span id="mMac"></span></button>
+  <button class="mrow" data-m="arena"><b>⚔ Arena</b><span>3 bota karşı. 3 raunt alan şampiyon.</span></button>
+  <div id="diff"></div>
+  <button class="mrow" data-m="bulmaca"><b>🧩 Bulmaca</b><span id="mBul"></span></button>
+  <button class="mrow" data-m="online"><b>🌐 Online</b><span>Oda koduyla arkadaşlarınla, 2-4 kişi.</span></button>
+  <button class="ghost" data-close="modes">Geri</button></div></div>
+<div id="levels" class="sheet" hidden><div class="in"><h2 id="lvTitle"></h2><div id="lvGrid"></div><button class="ghost" data-close="levels">Geri</button></div></div>
+<div id="lobby" class="sheet" hidden><div class="in"><h2>Online</h2>
+  <div id="lobJoin" class="col"><p>Arkadaşınla aynı oda kodunu girin ya da açık odaya katılın.</p><input id="lobInput" inputmode="numeric" maxlength="6" placeholder="Oda kodu" autocomplete="off" aria-label="Oda kodu"><div class="row"><button class="ghost" id="lobNew" style="flex:1">Oda kur</button><button class="big" id="lobGo" style="flex:1">KATIL</button></div><button class="ghost" id="lobQuick">Hızlı eşleş (açık oda)</button><p id="lobErr" style="color:var(--red);text-align:center;min-height:20px"></p></div>
+  <div id="lobRoom" class="col" hidden><p style="text-align:center">Oda kodu: <b id="lobCode" style="font-size:22px;color:var(--red)"></b></p><div id="lobList" class="col"></div><button class="big" id="lobStart"></button><p id="lobWait" style="text-align:center">Oda sahibinin başlatması bekleniyor…</p></div>
+  <button class="ghost" id="lobBack">Geri</button></div></div>
+<div id="res" class="sheet" hidden><div class="in"><h2 id="resT"></h2><p id="resS" style="text-align:center"></p><button class="big" id="resGo">SONRAKİ</button><button class="ghost" id="resRetry">Tekrar dene</button><button class="ghost" id="resHome">Menü</button></div></div>
 <div id="err" hidden></div>
 
 <script>/* FLIX legal */
