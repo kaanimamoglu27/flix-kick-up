@@ -1,0 +1,166 @@
+<title>Flix Bomba</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800;900&display=swap">
+<style>
+/* layout: full-screen 3D arena; character card docked at the bottom on the home screen, thumb controls bottom-right in play */
+:root{--navy:#022753;--navy2:#0b3a7a;--red:#e22511;--yel:#ffd41f;--yel2:#f4a900;--cream:#fff8ea;--sky:#1f9ee8;--ink:#0d1b3a;--mute:#5b6b8c;
+  --disp:'Lilita One','Arial Rounded MT Bold','Arial Black',sans-serif;--body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+html,body{height:100%;overflow:hidden;background:var(--sky);color:var(--ink);font-family:var(--body);font-weight:800;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;overscroll-behavior:none}
+[hidden]{display:none!important}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+.scr{position:fixed;inset:0;display:flex;flex-direction:column;pointer-events:none;padding:calc(env(safe-area-inset-top,0px) + 10px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 12px) max(16px,env(safe-area-inset-left,0px))}
+.scr>*{pointer-events:auto}
+/* ---------- home ---------- */
+#home .top{display:flex;flex-direction:column;align-items:center;gap:0;pointer-events:none}
+#home .top img{width:min(34vw,150px);filter:drop-shadow(0 4px 0 rgba(2,39,83,.35))}
+.word{font-family:var(--disp);font-size:clamp(44px,13vw,72px);line-height:.9;color:var(--yel);letter-spacing:.02em;-webkit-text-stroke:2px var(--navy);text-shadow:0 5px 0 var(--navy),0 9px 14px rgba(2,39,83,.35);transform:rotate(-3deg);margin-top:-4px}
+#wins{font-size:13px;color:#fff;text-shadow:0 2px 0 rgba(2,39,83,.5);margin-top:8px;min-height:18px}
+.sp{flex:1;min-height:0}
+.card{width:100%;max-width:440px;margin:0 auto;background:var(--cream);border:3px solid var(--navy);border-radius:26px;box-shadow:0 7px 0 var(--navy);padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px}
+.who{display:flex;gap:12px;align-items:flex-start}
+.who .nm{flex:1;min-width:0}
+#cName{font-family:var(--disp);font-size:28px;line-height:1;color:var(--navy)}
+#cTag{font-size:12px;color:var(--mute);margin-top:2px}
+#cStats{width:46%;display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--mute)}
+#cStats div{display:flex;align-items:center;gap:6px}#cStats span{width:44px}
+#cStats i{flex:1;height:9px;border-radius:9px;background:#e6dcc6;position:relative;overflow:hidden}
+#cStats i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--v);background:var(--red);border-radius:9px;transition:width .25s}
+#cAbil{font-size:13px;line-height:1.3;font-weight:600;color:var(--ink);background:#fff;border-radius:14px;padding:8px 10px;min-height:56px}
+#cAbil b{display:block;font-weight:900;color:var(--red);font-size:14px}
+#roster{display:flex;gap:8px;justify-content:space-between}
+.rc{flex:1;aspect-ratio:1;max-width:76px;border-radius:18px;background:color-mix(in srgb,var(--c) 22%,#fff);border:3px solid transparent;padding:0;overflow:hidden;transition:transform .12s}
+.rc img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.25) translateY(4%)}
+.rc.on{border-color:var(--navy);background:var(--c);transform:translateY(-4px);box-shadow:0 4px 0 var(--navy)}
+.row{display:flex;gap:10px;align-items:stretch}
+#diff{display:flex;background:#e6dcc6;border-radius:16px;padding:3px;flex:1}
+#diff button{flex:1;background:none;border-radius:13px;font-size:13px;padding:0 4px;color:var(--mute)}
+#diff button.on{background:var(--navy);color:#fff}
+.big{font-family:var(--disp);font-size:26px;letter-spacing:.03em;background:var(--yel);color:var(--navy);border:3px solid var(--navy);border-radius:18px;box-shadow:0 5px 0 var(--navy);padding:9px 26px;min-height:54px}
+.big:active{transform:translateY(4px);box-shadow:0 1px 0 var(--navy)}
+.links{display:flex;justify-content:center;gap:18px;margin-top:10px}
+.links button{background:none;color:#fff;font-size:13px;text-shadow:0 2px 0 rgba(2,39,83,.55);padding:8px 4px;text-decoration:underline;text-underline-offset:3px}
+/* ---------- hud ---------- */
+#touch{position:fixed;inset:0;pointer-events:auto;touch-action:none}
+#chips{display:flex;gap:6px;position:relative}
+.chip{flex:1;min-width:0;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.94);border-radius:14px;padding:3px 6px 3px 3px;border:2.5px solid var(--navy);box-shadow:0 3px 0 var(--navy)}
+.chip.me{border-color:var(--yel2);box-shadow:0 3px 0 var(--yel2)}
+.chip img{width:32px;height:32px;border-radius:10px;background:var(--c);object-fit:cover;flex:none}
+.chip div{min-width:0;display:flex;flex-direction:column;gap:3px}
+.chip span{font-size:11px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--navy)}
+.chip i{display:flex;gap:3px}.chip u{width:9px;height:9px;border-radius:50%;background:#d5d9e6;text-decoration:none}.chip u.on{background:var(--yel2);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.chip.dead{opacity:.5;filter:grayscale(1)}
+.mid{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:8px;position:relative}
+#timer{font-family:var(--disp);font-size:22px;color:#fff;background:var(--navy);border-radius:14px;padding:3px 14px;min-width:78px;text-align:center;font-variant-numeric:tabular-nums}
+#timer.hot{background:var(--red);animation:pul .5s infinite alternate}
+@keyframes pul{to{transform:scale(1.08)}}
+#myStats{display:flex;gap:5px}
+#myStats b{font-size:12px;color:#fff;border-radius:10px;padding:4px 8px 4px 22px;position:relative;background:var(--navy2)}
+#myStats b::before{position:absolute;left:6px;top:3px;font-size:11px}
+#myStats .s1::before{content:"💣"}#myStats .s2::before{content:"🔥"}#myStats .s3::before{content:"⚡"}
+#bPause{width:36px;height:34px;border-radius:12px;background:rgba(255,255,255,.94);border:2.5px solid var(--navy);font-size:13px;color:var(--navy);letter-spacing:1px}
+#joy{position:fixed;width:112px;height:112px;margin:-56px 0 0 -56px;border-radius:50%;border:3px solid rgba(255,255,255,.75);background:rgba(2,39,83,.18);opacity:0;transition:opacity .12s;pointer-events:none}
+#joy.on{opacity:1}
+#knob{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;background:#fff;border:3px solid var(--navy);transform:translate(-50%,-50%)}
+#joyHint{position:fixed;left:max(22px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 34px);width:104px;height:104px;border-radius:50%;border:3px dashed rgba(255,255,255,.6);display:grid;place-items:center;color:rgba(255,255,255,.85);font-size:11px;text-align:center;pointer-events:none}
+.pad{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 22px);width:176px;height:160px;pointer-events:none}
+.pad button{position:absolute;border-radius:50%;pointer-events:auto;border:3px solid var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
+#bBomb{right:0;bottom:0;width:104px;height:104px;background:var(--yel);box-shadow:0 6px 0 var(--navy);font-family:var(--disp);font-size:21px;color:var(--navy)}
+#bBomb span{font-size:30px;line-height:1}
+#bAbil{left:0;top:0;width:76px;height:76px;background:#fff;box-shadow:0 5px 0 var(--navy);--cd:0deg;overflow:hidden}
+#bAbil::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(2,39,83,.62) var(--cd),transparent 0);pointer-events:none}
+#bAbil span{font-size:26px;line-height:1.1}#bAbil small{font-size:8.5px;line-height:1;color:var(--navy);max-width:62px;text-align:center}
+#bAbil.rdy{background:#eaffd8;border-color:#1f9a3a;box-shadow:0 5px 0 #1f9a3a}
+.pad button.dn{transform:translateY(4px) scale(.96)}#bAbil.no{animation:shk .2s}
+@keyframes shk{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+#banner{position:fixed;left:0;right:0;top:34%;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;opacity:0;transform:scale(.7)}
+#banner.show{animation:ban .35s cubic-bezier(.2,1.5,.4,1) forwards}
+@keyframes ban{to{opacity:1;transform:scale(1)}}
+#banner b{font-family:var(--disp);font-weight:400;font-size:clamp(34px,11vw,64px);color:var(--yel);-webkit-text-stroke:2px var(--navy);text-shadow:0 5px 0 var(--navy);text-align:center;line-height:1;padding:0 12px}
+#banner span{background:var(--navy);color:#fff;border-radius:12px;padding:5px 14px;font-size:14px}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 200px);transform:translate(-50%,10px);background:#fff;border:2.5px solid var(--navy);border-radius:14px;padding:5px 14px;font-size:14px;color:var(--navy);opacity:0;transition:.15s;pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+/* ---------- sheets ---------- */
+.sheet{position:fixed;inset:0;background:rgba(2,20,50,.6);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20;touch-action:pan-y}
+.sheet .in{width:100%;max-width:400px;max-height:100%;overflow:auto;background:var(--cream);border:3px solid var(--navy);border-radius:26px;box-shadow:0 7px 0 var(--navy);padding:18px;display:flex;flex-direction:column;gap:12px}
+.sheet h2{font-family:var(--disp);font-weight:400;font-size:28px;margin:0;color:var(--navy);text-align:center}
+.sheet p{margin:0;font-weight:600;font-size:14px;line-height:1.4}
+.sheet ul{margin:0;padding-left:18px;font-weight:600;font-size:14px;line-height:1.45;display:flex;flex-direction:column;gap:6px}
+.srow{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:14px;padding:12px 14px;font-size:15px;width:100%;color:var(--navy)}
+.srow span:last-child{color:var(--red)}
+.ghost{background:#fff;border:3px solid var(--navy);border-radius:16px;padding:10px;font-size:16px;color:var(--navy);min-height:48px}
+#end{align-items:center;justify-content:flex-end}
+#end .card{align-items:stretch}
+#endTitle{font-family:var(--disp);font-size:30px;color:var(--navy);text-align:center;line-height:1}
+#endSub{text-align:center;font-size:13px;color:var(--mute);font-weight:600}
+.erow{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:5px 12px 5px 5px;font-size:14px}
+.erow img{width:34px;height:34px;border-radius:10px;background:#e6dcc6}.erow span{flex:1}.erow b{font-family:var(--disp);font-weight:400;font-size:20px;color:var(--navy)}
+.erow.me{outline:3px solid var(--yel2)}
+#err{position:fixed;left:8px;right:8px;bottom:6px;font-size:11px;color:#fff;background:rgba(160,0,0,.8);border-radius:8px;padding:4px 8px;z-index:50}
+@media (min-aspect-ratio:1/1){#home .top{align-self:flex-start;margin-left:4vw}#home .card,#end .card{margin:0 5vw 0 auto}#home .links{justify-content:flex-end;margin-right:5vw;width:auto}#end{justify-content:center}}
+@media (max-height:700px){.word{font-size:44px}#home .top img{width:104px}.card{gap:7px;padding:10px 12px}#cAbil{min-height:0}.rc{max-width:56px}}
+@media (hover:hover) and (pointer:fine){#joyHint{display:none}}
+@media (prefers-reduced-motion:reduce){#timer.hot,#banner.show{animation-duration:.01s}}
+</style>
+@@INTRO@@
+<canvas id="gl"></canvas>
+
+<div id="home" class="scr">
+  <div class="top"><img alt="FLIX" src="@@LOGO@@"><div class="word">BOMBA</div><div id="wins"></div></div>
+  <div class="sp"></div>
+  <div class="card">
+    <div class="who"><div class="nm"><div id="cName"></div><div id="cTag"></div></div><div id="cStats"></div></div>
+    <div id="cAbil"></div>
+    <div id="roster"></div>
+    <div class="row"><div id="diff"></div><button id="play" class="big">OYNA</button></div>
+  </div>
+  <div class="links"><button id="howBtn">Nasıl oynanır?</button><button id="setBtn">Ayarlar</button><button data-flixlegal="legal">Yasal Bilgiler</button></div>
+</div>
+
+<div id="hud" class="scr" hidden>
+  <div id="touch"></div>
+  <div id="chips"></div>
+  <div class="mid"><div id="myStats"></div><div id="timer">2:00</div><button id="bPause" aria-label="Duraklat">II</button></div>
+  <div id="joyHint">sürükle<br>yürü</div>
+  <div id="joy"><div id="knob"></div></div>
+  <div class="pad"><button id="bAbil"><span></span><small></small></button><button id="bBomb"><span>💣</span>BOMBA</button></div>
+  <div id="banner"></div><div id="toast"></div>
+</div>
+
+<div id="end" class="scr" hidden>
+  <div class="card"><div id="endTitle"></div><div id="endSub"></div><div id="endRows" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div class="row"><button id="toHome" class="ghost" style="flex:1">Menü</button><button id="again" class="big" style="flex:1.4">TEKRAR</button></div></div>
+</div>
+
+<div id="pause" class="sheet" hidden><div class="in"><h2>Duraklatıldı</h2><button id="resume" class="big">DEVAM</button><button id="quit" class="ghost">Menüye dön</button></div></div>
+<div id="how" class="sheet" hidden><div class="in"><h2>Nasıl oynanır?</h2>
+  <ul><li>Ekranın solunda parmağını sürükleyerek yürü. Klavyede ok tuşları.</li><li><b>BOMBA</b> ile bomba bırak (klavyede boşluk). Bomba 2,6 saniyede artı şeklinde patlar.</li><li>Turuncu tuğlaları patlat, içinden çıkan güçleri topla: 💣 fazla bomba, 🔥 uzun menzil, ⚡ hız.</li><li>Beyaz yuvarlak tuş karakterinin özel gücü (klavyede Shift). Her karakterin gücü farklı.</li><li>Ayakta kalan son karakter raundu alır. 3 raunt alan şampiyon olur.</li><li>Süre bitince alan kenarlardan daralır.</li></ul>
+  <button class="big" data-close="how">TAMAM</button></div></div>
+<div id="settings" class="sheet" hidden><div class="in"><h2>Ayarlar</h2>
+  <button class="srow" id="tSound"><span>Ses efektleri</span><span id="sSound"></span></button>
+  <button class="srow" id="tMusic"><span>Müzik</span><span id="sMusic"></span></button>
+  <button class="srow" data-flixlegal="legal"><span>Yasal Bilgiler</span><span>Aç</span></button>
+  <button class="srow" data-flixlegal="about"><span>Hakkında</span><span>Aç</span></button>
+  <p style="text-align:center;color:var(--mute);font-size:12px">Flix Bomba @@VER@@ · FLIX TOYS</p>
+  <button class="big" data-close="settings">KAPAT</button></div></div>
+<div id="err" hidden></div>
+
+<script>/* FLIX legal */
+@@LEGAL@@
+FlixLegal.init({game:'bomba',name:'Flix Bomba',version:'@@VER@@',theme:{font:"Nunito,system-ui,sans-serif",head:"'Lilita One',Impact,sans-serif",ink:'#022753',card:'#fff8ea',soft:'#fff',accent:'#022753',accentInk:'#fff',btn:'#ffd41f',btnInk:'#022753',shadow:'rgba(2,39,83,.35)',border:'3px solid #022753',line:'rgba(2,39,83,.3)',link:'#e22511'},oss:['three.js (MIT)','html5-bombergirl · Matouš Skála (MIT)','super-kart-3djs music engine · Feco Linhares (MIT)','Lilita One, Nunito (SIL OFL 1.1)']});
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const { MusicEngine } = (() => {
+@@MUSIC@@
+return { MusicEngine };
+})();
+@@CHARS@@
+@@WORLD@@
+@@GAME@@
+</script>
