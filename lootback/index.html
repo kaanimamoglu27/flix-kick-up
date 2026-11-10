@@ -1945,12 +1945,13 @@ const INTRO = {
   17: ['necro', 'Yeni iskelet çağırır ve iyileştirir. Önce onu indir!']
 };
 const STORY_LEN = 40;
+// v41: boss health raised (Kaan: bosses were too easy, the first one fell in 2-12 s); a boss fight now lasts about half a minute or more
 const BOSSES = {
-  10: {kind: 'king',   name: 'İskelet Kral',   hp: 1100,  r: 2.0, col: 0xc4b89c},
-  20: {kind: 'dragon', name: 'Kemik Ejderha',  hp: 2800,  r: 2.0, col: 0xb3a587},
-  30: {kind: 'golem',  name: 'Dev Zombi',      hp: 6000,  r: 2.3, col: 0x86a06a},
-  40: {kind: 'tyrant', name: 'Kıyamet Lordu',  hp: 10500, r: 2.4, col: 0x3a3f4c},
-  50: {kind: 'vortex', name: 'VORTEKS', sub: 'Ekranın ele geçirdiği eski kahraman!', hp: 26000, r: 2.4, col: 0x2b2638, final: true, spd: 3.1}
+  10: {kind: 'king',   name: 'İskelet Kral',   hp: 4000,  r: 2.0, col: 0xc4b89c},
+  20: {kind: 'dragon', name: 'Kemik Ejderha',  hp: 7000,  r: 2.0, col: 0xb3a587},
+  30: {kind: 'golem',  name: 'Dev Zombi',      hp: 10000, r: 2.3, col: 0x86a06a},
+  40: {kind: 'tyrant', name: 'Kıyamet Lordu',  hp: 16000, r: 2.4, col: 0x3a3f4c},
+  50: {kind: 'vortex', name: 'VORTEKS', sub: 'Ekranın ele geçirdiği eski kahraman!', hp: 36000, r: 2.4, col: 0x2b2638, final: true, spd: 3.1}
 };
 // a boss guards every tenth wave; endless keeps cycling them, stronger each lap
 function bossFor(n) { if (n % 10) return null; if (G.mode === 'story' && !G.endless && n <= STORY_LEN) return BOSSES[n === STORY_LEN ? 50 : n]; return BOSSES[((n / 10 - 1) % 5 + 1) * 10]; }
