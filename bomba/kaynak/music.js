@@ -74,82 +74,94 @@ const TRACKS = [
   {
     name: 'Turbo Circuit',
     key: 'C',
-    bpm: 124,
+    bpm: 156,
     chords: ['Cmaj7', 'Am7', 'Fmaj7', 'G7'],
     barsPerChord: 1,
     cycles: 8,
     padType: 'triangle',
-    padFilter: 1300,
+    padFilter: 1700,
     padWobble: 0.35,
-    padGain: 0.9,
-    chimeVol: 0.13,
-    chimeDensity: 0.5,
-    bassVol: 0.26,
-    drumVol: 0.2,
-    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
-    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    hatPattern: [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1],
-    bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    padGain: 0.7,
+    chimeVol: 0.15,
+    chimeDensity: 0.8,
+    bassVol: 0.34,
+    drumVol: 0.26,
+    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],
+    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    hatPattern: [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1],
+    bassPattern: [1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 2],
+    swing: 0.5,
+    arp: [0, -1, 1, -1, 2, -1, 1, -1, 3, -1, 2, -1, 1, -1, 2, -1],
+    arpVol: 0.05,
   },
   {
     name: 'Rainbow Drift',
     key: 'Dm',
-    bpm: 138,
+    bpm: 160,
     chords: ['Dm7', 'Bbmaj7', 'Fmaj7', 'A7'],
-    barsPerChord: 2,
-    cycles: 4,
-    padType: 'sawtooth',
-    padFilter: 850,
+    barsPerChord: 1,
+    cycles: 8,
+    padType: 'triangle',
+    padFilter: 1500,
     padWobble: 0.55,
-    padGain: 1.0,
-    chimeVol: 0.11,
-    chimeDensity: 0.4,
-    bassVol: 0.28,
-    drumVol: 0.22,
-    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],
-    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    hatPattern: [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
-    bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    padGain: 0.75,
+    chimeVol: 0.14,
+    chimeDensity: 0.7,
+    bassVol: 0.34,
+    drumVol: 0.26,
+    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    hatPattern: [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+    bassPattern: [1, 0, 0, 2, 0, 0, 1, 0, 1, 0, 0, 2, 0, 1, 2, 0],
+    swing: 0.5,
+    arp: [0, 1, 2, 3, 2, 1, 0, 1, 2, 3, 2, 1, 3, 2, 1, 0],
+    arpVol: 0.042,
   },
   {
     name: 'Star Sprint',
     key: 'Am',
-    bpm: 150,
+    bpm: 168,
     chords: ['Am7', 'Fmaj7', 'Cmaj7', 'G7'],
-    barsPerChord: 2,
-    cycles: 4,
+    barsPerChord: 1,
+    cycles: 8,
     padType: 'sawtooth',
     padFilter: 1500,
     padWobble: 0.3,
-    padGain: 1.1,
+    padGain: 0.8,
     chimeVol: 0.14,
-    chimeDensity: 0.55,
-    bassVol: 0.26,
-    drumVol: 0.24,
-    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
-    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    hatPattern: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-    bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    chimeDensity: 0.8,
+    bassVol: 0.33,
+    drumVol: 0.27,
+    kickPattern: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],
+    snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    hatPattern: [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+    bassPattern: [1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 0, 1, 0, 2, 2],
+    swing: 0.5,
+    arp: [0, -1, 2, 1, -1, 2, 3, -1, 0, -1, 2, 1, -1, 3, 2, 1],
+    arpVol: 0.05,
   },
   {
     name: 'Neon Nights',
     key: 'Dm',
-    bpm: 142,
+    bpm: 152,
     chords: ['Dm7', 'Bbmaj7', 'Fmaj7', 'E7'],
     barsPerChord: 1,
     cycles: 8,
     padType: 'sawtooth',
-    padFilter: 700,
+    padFilter: 1300,
     padWobble: 0.6,
-    padGain: 1.0,
+    padGain: 0.8,
     chimeVol: 0.12,
-    chimeDensity: 0.45,
-    bassVol: 0.3,
-    drumVol: 0.24,
+    chimeDensity: 0.7,
+    bassVol: 0.34,
+    drumVol: 0.27,
     kickPattern: [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0],
     snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    hatPattern: [1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1],
-    bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    hatPattern: [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+    bassPattern: [1, 0, 0, 2, 0, 0, 1, 0, 1, 0, 0, 2, 0, 1, 2, 0],
+    swing: 0.54,
+    arp: [0, -1, 1, -1, 2, -1, 1, -1, 3, -1, 2, -1, 1, -1, 2, -1],
+    arpVol: 0.045,
   },
 ];
 
@@ -160,22 +172,25 @@ const TRACKS = [
 const MENU_TRACK = {
   name: 'Menu Cruise',
   key: 'C',
-  bpm: 86,
+  bpm: 118,
   chords: ['Cmaj7', 'Am7', 'Fmaj7', 'G7'],
-  barsPerChord: 2,
+  barsPerChord: 1,
   cycles: Infinity,
   padType: 'triangle',
-  padFilter: 900,
+  padFilter: 1300,
   padWobble: 0.22,
-  padGain: 0.7,
-  chimeVol: 0.09,
-  chimeDensity: 0.3,
-  bassVol: 0.15,
-  drumVol: 0.11,
-  kickPattern: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-  snarePattern: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-  hatPattern: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  bassPattern: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  padGain: 0.75,
+  chimeVol: 0.13,
+  chimeDensity: 0.75,
+  bassVol: 0.3,
+  drumVol: 0.2,
+  kickPattern: [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+  snarePattern: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+  hatPattern: [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1],
+  bassPattern: [1, 0, 0, 2, 0, 0, 1, 0, 0, 0, 2, 0, 1, 0, 2, 0],
+  swing: 0.56,
+  arp: [0, -1, -1, 2, -1, -1, 1, -1, 3, -1, -1, 2, -1, 1, -1, -1],
+  arpVol: 0.04,
 };
 
 const STEPS_PER_BEAT = 4; // 16th notes
@@ -539,7 +554,7 @@ export class MusicEngine {
   _swingTime(step, time) {
     // Offbeats (odd steps) land late — lo-fi swing.
     if (step % 2 === 1) {
-      return time + this._stepDuration() * (SWING - 0.5);
+      return time + this._stepDuration() * ((this._currentTrack.swing || SWING) - 0.5);
     }
     return time;
   }
@@ -578,8 +593,10 @@ export class MusicEngine {
 
     // Bass groove.
     if (t.bassPattern[stepInBar]) {
-      this._playBass(CHORDS[t.chords[chordIdx]][0] - 12, time, t, 0.9);
+      this._playBass(CHORDS[t.chords[chordIdx]][0] - (t.bassPattern[stepInBar] === 2 ? 0 : 12), time, t, t.bassPattern[stepInBar] === 2 ? 0.7 : 0.9, t.arp ? 0.2 : 0.42);
     }
+    // Arpeggio pluck (Bomba): chord tones on a 16th pattern, an octave up.
+    if (t.arp && t.arp[stepInBar] >= 0) { const ch = CHORDS[t.chords[chordIdx]]; this._playArp(ch[t.arp[stepInBar] % ch.length] + 12 + (stepInBar % 8 === 6 ? 12 : 0), this._swingTime(step, time), t); }
   }
 
   /* ---------------- Instruments ---------------- */
@@ -639,7 +656,16 @@ export class MusicEngine {
     }
   }
 
-  _playBass(noteMidi, time, track, vel = 1) {
+  _playArp(noteMidi, time, track) {
+    const ctx = this._ctx, osc = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    osc.type = 'square'; osc.frequency.value = midiHz(noteMidi);
+    f.type = 'lowpass'; f.frequency.setValueAtTime(2600 + 1800 * this._intensity, time); f.frequency.exponentialRampToValueAtTime(700, time + 0.14); f.Q.value = 2;
+    const vol = (track.arpVol || 0.04) * (0.7 + 0.5 * this._intensity);
+    g.gain.setValueAtTime(0.0001, time); g.gain.linearRampToValueAtTime(vol, time + 0.006); g.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
+    osc.connect(f); f.connect(g); g.connect(this._bus); osc.start(time); osc.stop(time + 0.18);
+  }
+
+  _playBass(noteMidi, time, track, vel = 1, len = 0.42) {
     const ctx = this._ctx;
     const osc = ctx.createOscillator();
     osc.type = 'sine';
@@ -649,11 +675,11 @@ export class MusicEngine {
     const vol = 0.2 * track.bassVol * vel * (0.7 + 0.4 * this._intensity);
     g.gain.setValueAtTime(0.0001, time);
     g.gain.linearRampToValueAtTime(vol, time + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.001, time + 0.42);
+    g.gain.exponentialRampToValueAtTime(0.001, time + len);
     osc.connect(g);
     g.connect(this._bus);
     osc.start(time);
-    osc.stop(time + 0.5);
+    osc.stop(time + len + 0.08);
   }
 
   _playChime(chord, time, track) {

@@ -1,7 +1,7 @@
 // ===== Flix Bomba game =====
 // Grid rules and the bot's "flee / bomb the crate / hunt" loop follow MattSkala/html5-bombergirl (MIT); rewritten for 3D with pathfinding.
 const $ = (id) => document.getElementById(id);
-const VERSION = '1.3';
+const VERSION = '1.3.1';
 const SAVE_KEY = 'flix_bomba1';
 let SV = { char: 'flix', diff: 1, sound: true, music: true, wins: 0, games: 0, seenHow: false, mac: 0, bul: 0 };
 try { Object.assign(SV, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) {}
@@ -189,7 +189,7 @@ const AUD = {
     this.want = kind; if (!this.ctx) return;
     if (this.mus) { try { this.mus.stop(); } catch (e) {} this.mus = null; }
     if (!kind || !SV.music) return;
-    try { this.mus = new MusicEngine(this.ctx, { output: this.out, volume: kind === 'menu' ? 0.16 : 0.22, menu: kind === 'menu', track: 'Rainbow Drift', intensity: kind === 'menu' ? 0 : 0.5 }); this.mus.start(); } catch (e) {}
+    try { this.mus = new MusicEngine(this.ctx, { output: this.out, volume: kind === 'menu' ? 0.18 : 0.22, menu: kind === 'menu', track: ['Turbo Circuit', 'Rainbow Drift', 'Star Sprint', 'Neon Nights'][Math.floor(Math.random() * 4)], intensity: kind === 'menu' ? 0.45 : 0.75 }); this.mus.start(); } catch (e) {}
   },
 };
 addEventListener('pointerdown', () => AUD.init(), { passive: true }); addEventListener('keydown', () => AUD.init());
@@ -513,7 +513,7 @@ function update(dt) {
   const playing = G.state === 'play';
   if (playing) {
     if (mode !== 'bulmaca') {
-      G.time -= dt; if (G.time <= 0) { if (mode === 'macera') { if (me0.alive) { me0.vest = false; killPlayer(me0, true); finish(false, T('SÜRE DOLDU', 'TIME IS UP')); } } else sdUpdate(dt); }
+      G.time -= dt; if (AUD.mus && AUD.mus.setIntensity) AUD.mus.setIntensity(G.time < 30 ? 1 : 0.75); if (G.time <= 0) { if (mode === 'macera') { if (me0.alive) { me0.vest = false; killPlayer(me0, true); finish(false, T('SÜRE DOLDU', 'TIME IS UP')); } } else sdUpdate(dt); }
       const sec = Math.ceil(Math.max(0, G.time)); if (sec !== lastTick) { lastTick = sec; $('timer').textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); if (sec <= 10 && sec > 0) { AUD.play('tick'); $('timer').classList.add('hot'); } }
     }
     if (mode === 'macera') monUpdate(dt);

@@ -1,6 +1,6 @@
 import base64,os,re,sys
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-VER='1.3'
+VER='1.3.1'
 def strip(s): return re.sub(r'^export ','',s,flags=re.M)
 logo='data:image/webp;base64,'+base64.b64encode(open('logo_s.webp','rb').read()).decode()
 h=open('shell.html').read()
