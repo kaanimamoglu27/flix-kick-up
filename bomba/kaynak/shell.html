@@ -189,21 +189,81 @@ button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
 .note{font-size:11.5px!important;color:var(--mute);font-weight:600}
 @media (max-height:700px){.hbar{margin-bottom:0}#home .top img{width:90px}}
 .erow .av{flex:none!important}
+/* ---------- v1.3 ---------- */
+#home .links{justify-content:flex-start;gap:6px;margin:0 0 4px;width:auto}
+#home .links button{background:rgba(2,39,83,.5);border-radius:12px;padding:6px 10px;text-decoration:none;font-size:12px;text-shadow:none;border:1.5px solid rgba(255,255,255,.35)}
+#home .top img{width:min(31vw,128px);animation:flt 3.2s ease-in-out infinite}
+@keyframes flt{50%{transform:translateY(-7px) rotate(-2.5deg)}}
+.word span{display:inline-block;animation:wob 2.6s ease-in-out infinite;animation-delay:calc(var(--i)*.13s)}
+@keyframes wob{0%,55%,100%{transform:translateY(0) scale(1)}25%{transform:translateY(-9px) scale(1.06)}}
+#play{position:relative;overflow:hidden;animation:pp 1.5s ease-in-out infinite}
+@keyframes pp{50%{transform:scale(1.035)}}
+#play::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:38%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);animation:shine 2.8s infinite}
+@keyframes shine{0%,55%{left:-60%}100%{left:130%}}
+#fz{position:absolute;inset:0;overflow:hidden;pointer-events:none!important;z-index:-1}
+#fz i{position:absolute;top:-40px;font-style:normal;font-size:20px;opacity:.75;animation:fall linear infinite}
+@keyframes fall{to{transform:translate(40px,105vh) rotate(420deg)}}
+#home{isolation:isolate}
+.pill{background:var(--yel);border:2.5px solid var(--navy);border-radius:14px;box-shadow:0 3px 0 var(--navy);font-size:13px;color:var(--navy);padding:6px 12px;position:absolute;right:14px;top:-20px}
+.card{position:relative}
+.word{font-size:clamp(38px,11.5vw,60px)!important}
+.pill small{color:var(--mute);font-size:11px}
+#lvTabs{display:flex;gap:6px}
+#lvTabs button{flex:1;font-size:22px;padding:6px 0;border-radius:14px;background:#fff;border:3px solid transparent}
+#lvTabs button.on{border-color:var(--navy);box-shadow:0 3px 0 var(--navy);background:var(--yel)}#lvTabs button.lock{filter:grayscale(1);opacity:.6}
+#lvInfo{font-size:13px!important;color:var(--ink)!important;line-height:1.35}
+#lvGrid button{position:relative;aspect-ratio:1/1.08;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0}
+#lvGrid small{font-size:9.5px;color:#e09a00;letter-spacing:-1px;font-family:var(--body)}
+#resStars{text-align:center;font-size:44px;line-height:1;color:var(--yel2);-webkit-text-stroke:1.5px var(--navy);letter-spacing:4px}
+#skBig{display:flex;gap:12px;align-items:center;background:linear-gradient(160deg,#fff,color-mix(in srgb,var(--rc) 30%,#fff));border:3px solid var(--rc);border-radius:18px;padding:6px 10px}
+#skBig img{width:132px;height:132px;flex:none}
+#skBig div{display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
+#skBig b{font-family:var(--disp);font-weight:400;font-size:22px;color:var(--navy);line-height:1}
+#skBig span{color:#fff;font-size:11px;border-radius:8px;padding:3px 8px}
+#skBig small{font-size:11px;color:var(--mute);font-weight:600}
+#skGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.skt{background:#fff;border:3px solid var(--rc);border-radius:14px;padding:2px 2px 4px;display:flex;flex-direction:column;align-items:center;min-width:0;position:relative}
+.skt img{width:100%;aspect-ratio:1;object-fit:contain}
+.skt small{font-size:9.5px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.skt.on{box-shadow:0 0 0 3px var(--navy);transform:translateY(-2px)}.skt.lock{background:#efe8d6}
+#how .in{position:relative;gap:10px}
+#howB{overflow:auto;display:flex;flex-direction:column;gap:10px;min-height:300px}
+#howB ul{gap:7px}
+.hrow{display:flex;align-items:center;justify-content:center;gap:8px}
+.mg{flex:1;min-width:0;border-radius:10px;border:3px solid var(--navy);display:block}
+.har{font-size:22px;color:var(--navy);flex:none}
+.hs{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}.hs p{font-size:11.5px;text-align:center;line-height:1.25}
+.ph{width:78%;max-width:260px;align-self:center}
+.pug{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pug div{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:5px 8px;font-size:12.5px;line-height:1.2}
+.pug img{width:36px;height:36px;flex:none}
+.chl,.thl{display:flex;flex-direction:column;gap:6px}
+.chl div,.thl div{display:flex;align-items:center;gap:9px;background:#fff;border-radius:12px;padding:5px 8px}
+.chl img{width:46px;height:46px;border-radius:12px;flex:none;object-fit:cover}
+.chl p,.thl p{font-size:12px;line-height:1.25;font-weight:600}.chl b,.thl b{display:block;color:var(--navy);font-weight:900}
+.thl .mg{flex:none;width:84px;border-width:2px}
+#howDots{display:flex;justify-content:center;gap:6px}#howDots i{width:8px;height:8px;border-radius:50%;background:#d8ccb0}#howDots i.on{background:var(--navy);width:20px;border-radius:6px}
+.xbtn{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:50%;background:#fff;border:2.5px solid var(--navy);color:var(--navy);font-size:14px}
+#vsMap{color:#fff;text-align:center;font-size:14px;margin:-6px 0 0;min-height:20px}#vsMap b{color:var(--yel)}
+@media (max-height:700px){#home .top img{width:92px}}
+@media (prefers-reduced-motion:reduce){#home .top img,.word span,#play,#play::after,#fz i{animation:none}}
+
+#howT{padding-right:44px;font-size:19px}
 </style>
 @@INTRO@@
 <canvas id="gl"></canvas>
 
 <div id="home" class="scr">
   <div class="hbar"><button id="pChip" aria-label="Profil"></button><span class="sp"></span><button id="dayBtn" aria-label="Günlük ödül">🎁</button><button id="tuyBtn" aria-label="Mağaza">🪶 <b id="tuyN">0</b><u>+</u></button></div>
-  <div class="top"><img alt="FLIX" src="@@LOGO@@"><div class="word">BOMBA</div></div>
+  <div id="fz"></div><div class="links"><button id="howBtn">❓ <span data-en="How to play">Nasıl oynanır</span></button><button id="setBtn">⚙ <span data-en="Settings">Ayarlar</span></button><button data-flixlegal="legal">📄 <span data-en="Legal">Yasal</span></button></div>
+  <div class="top"><img alt="FLIX" src="@@LOGO@@"><div class="word"><span style="--i:0">B</span><span style="--i:1">O</span><span style="--i:2">M</span><span style="--i:3">B</span><span style="--i:4">A</span></div></div>
   <div class="sp"></div>
-  <div class="card">
+  <div class="card"><button id="skinBtn" class="pill"></button>
     <div class="who"><div class="nm"><div id="cName"></div><div id="cTag"></div></div><div id="cStats"></div></div>
     <div id="cAbil"></div>
     <div id="roster"></div>
     <button id="play" class="big">OYNA</button>
   </div>
-  <div class="links"><button id="howBtn" data-en="How to play?">Nasıl oynanır?</button><button id="setBtn" data-en="Settings">Ayarlar</button><button data-flixlegal="legal" data-en="Legal">Yasal Bilgiler</button></div>
 </div>
 
 <div id="hud" class="scr" hidden>
@@ -224,10 +284,7 @@ button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
 </div>
 
 <div id="pause" class="sheet" hidden><div class="in"><h2 data-en="Menu">Menü</h2><button id="resume" class="big" data-en="RESUME">DEVAM</button><button id="restart" class="ghost" data-en="Restart">Yeniden başla</button><button id="quit" class="ghost" data-en="Leave to menu">Menüye dön</button></div></div>
-<div id="how" class="sheet" hidden><div class="in"><h2 data-en="How to play?">Nasıl oynanır?</h2>
-  <ul data-en="<li><b>The idea:</b> drop a bomb and get away. The blast spreads in a plus (+) shape. Orange bricks break, grey stones never do. Your own bomb hurts you too.</li><li><b>Controls:</b> drag your finger on the left to walk, press <b>BOMB</b> to drop one. The white round button is your character's special power. Keyboard: arrows, space, Shift.</li><li><b>Power-ups</b> pop out of bricks: 💣 more bombs, 🔥 longer blast, ⚡ speed, 👟 kick (walk into a bomb to push it), ✴ piercing bomb, 🛡 vest, MAX full range. Stay away from 💀.</li><li><b>🗺 Adventure:</b> 1) blast every monster, 2) break bricks to find the hidden door, 3) the door opens when the monsters are gone, walk in. Beat the clock. 20 levels.</li><li><b>⚔ Arena:</b> 4 players. Last one standing takes the round, first to 3 rounds wins. After 2 minutes the arena closes in.</li><li><b>🧩 Puzzle:</b> blow up every gold crate with a few bombs. Purple sleeping bombs chain when a blast touches them.</li><li><b>🌐 Online:</b> quick match, or a private room with a shared code for 2-4 friends.</li><li><b>🪶 Feathers and level:</b> every match and level pays feathers and XP. Spend feathers on new characters and avatar items. Claim the daily reward every day.</li></ul>"><li><b>Oyunun mantığı:</b> bombayı bırak ve uzaklaş. Patlama artı (+) şeklinde yayılır. Turuncu tuğlalar kırılır, gri taşlar kırılmaz. Kendi bomban seni de yakar.</li><li><b>Kontroller:</b> ekranın solunda parmağını sürükleyerek yürü, <b>BOMBA</b> ile bomba bırak. Beyaz yuvarlak tuş karakterinin özel gücü. Klavyede ok tuşları, boşluk, Shift.</li><li><b>Güçler</b> tuğlalardan çıkar: 💣 fazla bomba, 🔥 uzun patlama, ⚡ hız, 👟 tekme (bombaya yürü, it), ✴ delici bomba, 🛡 yelek, MAX tam menzil. 💀 lanetten uzak dur.</li><li><b>🗺 Macera:</b> 1) bütün canavarları patlat, 2) tuğlaları kırıp gizli kapıyı bul, 3) canavarlar bitince kapı açılır, içine gir. Süre dolmadan bitir. 20 bölüm.</li><li><b>⚔ Arena:</b> 4 oyuncu. Son ayakta kalan raundu alır, 3 raunt alan maçı kazanır. 2 dakika sonra alan daralır.</li><li><b>🧩 Bulmaca:</b> az sayıda bombayla bütün altın kasaları patlat. Mor uyuyan bombalar patlama değince zincirleme patlar.</li><li><b>🌐 Online:</b> hızlı eşleşme ya da 2-4 arkadaşla aynı kodu girip özel oda.</li><li><b>🪶 Tüy ve seviye:</b> her maç ve bölüm tüy ile XP kazandırır. Tüyle yeni karakter ve avatar parçaları alınır. Günlük ödülü her gün topla.</li></ul>
-  <p class="note" data-en="When there are not enough players around, matches are completed with computer-controlled players.">Yeterli oyuncu bulunamadığında maçlar bilgisayarın yönettiği oyuncularla tamamlanır.</p>
-  <button class="big" data-close="how" data-en="GOT IT">TAMAM</button></div></div>
+<div id="how" class="sheet" hidden><div class="in"><button class="xbtn" data-close="how" aria-label="Kapat">✕</button><h2 id="howT"></h2><div id="howB"></div><div id="howDots"></div><div class="row"><button class="ghost" id="howPrev" style="flex:1"></button><button class="big" id="howNext" style="flex:1.4"></button></div></div></div>
 <div id="settings" class="sheet" hidden><div class="in"><h2 data-en="Settings">Ayarlar</h2>
   <button class="srow" id="tLang"><span>Dil / Language</span><span id="sLang"></span></button>
   <button class="srow" id="tSound"><span data-en="Sound effects">Ses efektleri</span><span id="sSound"></span></button>
@@ -242,17 +299,18 @@ button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
   <button class="mrow" data-m="bulmaca"><b data-en="🧩 Puzzle">🧩 Bulmaca</b><span id="mBul"></span></button>
   <button class="mrow" data-m="online"><b>🌐 Online</b><span data-en="Quick match or a private room with friends.">Hızlı eşleş ya da arkadaşlarınla özel oda.</span></button>
   <button class="ghost" data-close="modes" data-en="Back">Geri</button></div></div>
-<div id="levels" class="sheet" hidden><div class="in"><h2 id="lvTitle"></h2><div id="lvGrid"></div><button class="ghost" data-close="levels" data-en="Back">Geri</button></div></div>
+<div id="levels" class="sheet" hidden><div class="in"><h2 id="lvTitle"></h2><div id="lvTabs"></div><p id="lvInfo" style="text-align:center"></p><div id="lvGrid"></div><div id="lvLock" class="col" hidden><p id="lvLockT" style="text-align:center"></p><button class="big buy" id="lvBuy"></button></div><button class="ghost" data-close="levels" data-en="Back">Geri</button></div></div>
 <div id="lobby" class="sheet" hidden><div class="in"><h2>Online</h2>
   <div id="lobJoin" class="col"><button class="big" id="lobQuick" data-en="QUICK MATCH">HIZLI EŞLEŞ</button><p style="text-align:center" data-en="or play with friends: everyone types the same room code">ya da arkadaşlarınla: herkes aynı oda kodunu yazsın</p><input id="lobInput" inputmode="numeric" maxlength="6" placeholder="Oda kodu" autocomplete="off" aria-label="Oda kodu"><div class="row"><button class="ghost" id="lobNew" style="flex:1" data-en="Create room">Oda kur</button><button class="ghost" id="lobGo" style="flex:1" data-en="Join">Katıl</button></div><p id="lobErr" style="color:var(--red);text-align:center;min-height:20px"></p></div>
   <div id="lobRoom" class="col" hidden><p style="text-align:center"><span data-en="Room code: ">Oda kodu: </span><b id="lobCode" style="font-size:22px;color:var(--red)"></b></p><div id="lobList" class="col"></div><button class="big" id="lobStart"></button><p id="lobWait" style="text-align:center" data-en="Waiting for the host to start…">Oda sahibinin başlatması bekleniyor…</p></div>
   <button class="ghost" id="lobBack" data-en="Back">Geri</button></div></div>
-<div id="res" class="sheet" hidden><div class="in"><h2 id="resT"></h2><p id="resS" style="text-align:center"></p><div id="resR" class="rw"></div><button id="resAd" class="adb"></button><button class="big" id="resGo" data-en="NEXT">SONRAKİ</button><button class="ghost" id="resRetry">Tekrar dene</button><button class="ghost" id="resHome" data-en="Menu">Menü</button></div></div>
-<div id="vs" class="sheet" hidden><div class="vsin"><h2 id="vsT"></h2><div id="vsGrid"></div><button class="ghost" id="vsX" data-en="Cancel">Vazgeç</button></div></div>
+<div id="res" class="sheet" hidden><div class="in"><h2 id="resT"></h2><div id="resStars" hidden></div><p id="resS" style="text-align:center"></p><div id="resR" class="rw"></div><button id="resAd" class="adb"></button><button class="big" id="resGo" data-en="NEXT">SONRAKİ</button><button class="ghost" id="resRetry">Tekrar dene</button><button class="ghost" id="resHome" data-en="Menu">Menü</button></div></div>
+<div id="vs" class="sheet" hidden><div class="vsin"><h2 id="vsT"></h2><div id="vsGrid"></div><p id="vsMap"></p><button class="ghost" id="vsX" data-en="Cancel">Vazgeç</button></div></div>
 <div id="prof" class="sheet" hidden><div class="in"><div class="hd"><h2 data-en="Profile">Profil</h2><span id="pfTuy"></span></div>
   <div class="pfTop"><div id="pfAv"></div><div><input id="pfName" maxlength="14" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="İsim"><div id="pfLv"></div></div></div>
   <div id="pfStats"></div><div id="pfTabs"></div><div id="pfGrid"></div>
   <button class="big buy" id="pfBuy" hidden></button><button class="ghost" data-close="prof" data-en="Close">Kapat</button></div></div>
+<div id="skins" class="sheet" hidden><div class="in"><div class="hd"><h2 id="skT"></h2><span id="skTuy"></span></div><div id="skBig"></div><div id="skGrid"></div><button class="big" id="skGo"></button><button class="ghost" data-close="skins" data-en="Close">Kapat</button></div></div>
 <div id="shop" class="sheet" hidden><div class="in"><div class="hd"><h2 data-en="Shop">Mağaza</h2><span id="shopTuy"></span></div><div id="shopRows" class="col"></div><button class="ghost" data-close="shop" data-en="Close">Kapat</button></div></div>
 <div id="daily" class="sheet" hidden><div class="in"><h2 data-en="Daily reward">Günlük ödül</h2><div id="dayGrid"></div><p id="dayMsg" style="text-align:center"></p><button class="big" id="dayGo"></button><button class="adb" id="dayAd" hidden data-en="🎬 Watch an ad, double it">🎬 Reklam izle, 2 katını al</button><button class="ghost" data-close="daily" data-en="Close">Kapat</button></div></div>
 <div id="goal" class="sheet" hidden><div class="in"><h2 id="goalT"></h2><ul id="goalL"></ul><button class="big" id="goalGo" data-en="START">BAŞLA</button></div></div>
