@@ -32,9 +32,11 @@ window.mkBot = (skill) => {
     B.wait = 0.5;
   }
   const THREE_V = function (x, z) { const v = __fb.I().P.o.position.clone(); v.set(x, 0, z); return v; };
+  B.nInter = 0; B.lastI = -1; B.inter = () => { if (!(SV0().tut >= 4 || SV0().tut >= 99)) return; if (B.lastI < 0) { B.lastI = B.T; return; } if (B.T - B.lastI >= 240) { B.lastI = B.T; B.nInter++; } };
+  const SV0 = () => __fb.SV;
   B.step = (dt) => { B.T += dt; const I = __fb.I(), P = I.P, SV = I.SV;
     if (I.padObjs.length === 0 && !B.done && SV.unl.length > 10) { B.done = B.T; }
-    if (SV.unl.length !== B.nPads) { B.nPads = SV.unl.length; B.log[SV.unl[SV.unl.length - 1]] = Math.round(B.T); }
+    if (SV.unl.length !== B.nPads) { B.inter(); B.nPads = SV.unl.length; B.log[SV.unl[SV.unl.length - 1]] = Math.round(B.T); }
     if (B.wait > 0) { B.wait -= dt; __fb.joy(0, 0); return; }
     if (!B.tgt) { decide(); if (B.tgt && Math.random() < S.idle) B.wait = S.idleT; if (!B.tgt) return; }
     const p = P.o.position;
@@ -46,7 +48,7 @@ window.mkBot = (skill) => {
         for (const s of I.STAFF) { const n = SV.staff[s.id]; if (n < s.max && (s.id !== 'kas' || n < I.K.length)) ups.push({ id: s.id, c: s.costs[n], hire: 1 }); }
         ups.sort((a, c) => a.c - c.c); const pads = I.padObjs.map(o => o.p.cost - o.paid).sort((a, c) => a - c); const lim = Math.min(SV.money, pads.length ? S.upF * pads[0] : SV.money);
         if (ups.length && ups[0].c <= lim) { any = ups[0].hire ? __fb.hire(ups[0].id) : __fb.buyUp(ups[0].id); } }
-      B.tgt = null; B.wait = S.think; return; }
+      B.inter(); B.tgt = null; B.wait = S.think; return; }
     const sig = P.stack.length + '|' + (P.act ? 1 : 0) + '|' + Math.floor(SV.money) + '|' + (B.kind === 'pad' ? I.has(B.extra) : '');
     if (sig !== B.sig) { B.sig = sig; B.still = 0; } else B.still += dt; B.tl -= dt;
     if (B.kind === 'pad' && I.has(B.extra)) { B.tgt = null; B.wait = S.think; return; }

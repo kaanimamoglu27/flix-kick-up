@@ -3,6 +3,11 @@
 export const LANG = (() => { try { const s = localStorage.getItem('flix_fab_lang'); if (s) return s; } catch {} return (navigator.language || 'tr').toLowerCase().startsWith('tr') ? 'tr' : 'en'; })();
 export function setLang(l) { try { localStorage.setItem('flix_fab_lang', l); } catch {} location.reload(); }
 const EN = {
+  'Oyuncak treni': 'Toy train', 'Mağazada tur atar · müşteri +%15': 'Loops around the store · customers +15%',
+  'C Blok': 'Block C', 'FLIX Mağazası açılır · alan sağa büyür': 'FLIX Store opens · area grows right', '6. Kasa': '6th Register', '7. Kasa': '7th Register', 'Mağaza kasası · müşteri +%20': 'Store register · customers +20%',
+  'Elmas hindi': 'Diamond turkey', 'Elmas': 'Diamond', 'Gökkuşağı hindi': 'Rainbow turkey', 'FLIX Müzesi': 'FLIX Museum', 'Tüm satışlar +%15': 'All sales +15%', '5. Montaj': '5th Assembly', 'Üretim +%25': 'Production +25%',
+  'Şov stadyumu': 'Show stadium', 'Şovda 2 kat para · daha büyük coşku': 'Show pays 2x · bigger hype', 'Müşteri +%15': 'Customers +15%', 'Dev FLIX Anıtı': 'Giant FLIX Monument', 'Tüm satışlar +%25 · büyük kutlama': 'All sales +25% · big celebration',
+  'FLIX MAĞAZASI': 'FLIX STORE', 'FLIX MÜZESİ': 'FLIX MUSEUM', 'ŞOV STADYUMU': 'SHOW STADIUM', 'Elmas FLIX': 'Diamond FLIX', 'Gökkuşağı FLIX': 'Rainbow FLIX',
   'Oyna': 'Play', 'OYUN PARKI': 'PLAYGROUND', 'FLIX TOP': 'FLIX BALL', 'KASA': 'CASHIER',
   // menu / hud
   'OYNA': 'PLAY', 'DEVAM': 'CONTINUE', 'Ayarlar': 'Settings', 'Dolap': 'Wardrobe', 'Mağaza': 'Shop', 'Bonus': 'Boost', 'Tamam': 'OK', 'Hayır': 'No', '▶ İzle': '▶ Watch',
@@ -74,20 +79,22 @@ const EN = {
   'GERİ DÖNÜŞÜM': 'RECYCLING', 'HEDİYE PAKETİ': 'GIFT PACK', 'KAUÇUK': 'RUBBER', 'PELUŞ ATÖLYESİ': 'PLUSH WORKSHOP', 'OYUNCAKÇILARA SEVKİYAT': 'SHIPPING TO TOY SHOPS', 'SEVKİYAT': 'SHIPPING', 'PRES': 'PRESS', 'ROBOT GARAJI': 'ROBOT GARAGE',
   'YAKINDA: YENİ SALON': 'SOON: NEW HALL', 'YENİ SALON': 'NEW HALL', 'ÇİFTLİK YAKINDA': 'FARM SOON', 'SEKTİRME ŞOVU': 'KICK-UP SHOW', 'ŞOV': 'SHOW', 'MISIR': 'CORN', 'YEM': 'FEED', 'HATALI': 'FAULTY', 'B BLOK': 'BLOCK B',
   'tüy + taban': 'feather + base', 'bırak': 'drop', 'test için': 'to test', 'test edilmiş': 'tested', 'FLIX bırak': 'drop FLIX', 'kauçuk': 'rubber', 'GELİR ↑': 'INCOME ↑', 'Fabrika Sv': 'Factory Lv', 'Sv': 'Lv', 'sn': 's', 'dk': 'min',
-  'Sahne': 'Stage', 'Dil': 'Language', '🌐 Türkçe': '🌐 Türkçe', 'İngilizce': 'English',
+  'Sahne': 'Stage', 'Nasıl?': 'Help', 'Nasıl oynanır': 'How to play', 'Senin': 'Owned', 'Giyili': 'Worn', 'Yasal Bilgiler': 'Legal', 'Hakkında': 'About', 'Tüm taşıyıcılar bunu giyer. Giydiklerinden gelen toplam bonus:': 'All carriers wear this. Total bonus from what you wear:', 'kârı': 'profit', 'satış kârı': 'sales profit', 'Dil': 'Language', '🌐 Türkçe': '🌐 Türkçe', 'İngilizce': 'English',
 };
 const KEYS = Object.keys(EN).filter(k => EN[k] !== k).sort((a, b) => b.length - a.length);
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const RX = new RegExp('(?<![\\p{L}])(' + KEYS.map(esc).join('|') + ')(?![\\p{L}])', 'gu');
-const cache = new Map();
+const UP = {}; for (const k of Object.keys(EN)) { const u = k.toLocaleUpperCase('tr'); if (u !== k && EN[u] === undefined) UP[u] = EN[k].toUpperCase(); }
+try { localStorage.setItem('flixLegalLang', LANG); } catch {}
+const cache = new Map(); try { if (location.search.includes('miss')) { window.__i18nMiss = new Set(); setTimeout(() => { window.__T_ = T_; }); } } catch {}
 export function T_(s) { if (LANG === 'tr' || s == null) return s; s = String(s); const hit = cache.get(s); if (hit !== undefined) return hit;
-  const t = s.trim(); let out = EN[t] !== undefined ? s.replace(t, EN[t]) : s.replace(RX, (m) => EN[m]); if (cache.size < 4000) cache.set(s, out); return out; }
+  const t = s.trim(); let out = EN[t] !== undefined ? s.replace(t, EN[t]) : UP[t] !== undefined ? s.replace(t, UP[t]) : s.replace(RX, (m) => EN[m]); out = out.replace(/(\d),(\d{1,2})(?!\d)/g, '$1.$2'); if (cache.size < 4000) cache.set(s, out); if (window.__i18nMiss && /[çğıöşüÇĞİÖŞÜâ]|(?<![\p{L}])(ve|sn|dk|bir|için|ile|Senin|kâr|hız|Sv|yok|Bin)(?![\p{L}])/u.test(out)) window.__i18nMiss.add(out); return out; }
 if (LANG === 'en') {
   // canvas text on 3D signs, pads and labels
   const P = CanvasRenderingContext2D.prototype, f = P.fillText, st = P.strokeText, mt = P.measureText;
   P.fillText = function (s, ...a) { return f.call(this, T_(s), ...a); }; P.strokeText = function (s, ...a) { return st.call(this, T_(s), ...a); }; P.measureText = function (s) { return mt.call(this, T_(s)); };
   // DOM text: translate now and whenever the UI changes
-  const fix = (n) => { if (n.nodeType === 3) { const v = n.data; if (/[A-Za-zÇĞİÖŞÜçğıöşü]{2,}/.test(v)) { const t = T_(v); if (t !== v) n.data = t; } } else if (n.nodeType === 1 && n.tagName !== 'SCRIPT' && n.tagName !== 'STYLE') { for (const c of n.childNodes) fix(c); } };
+  const fix = (n) => { if (n.nodeType === 3) { const pt = n.parentNode && n.parentNode.tagName; if (pt === 'SCRIPT' || pt === 'STYLE') return; const v = n.data; if (/[A-Za-zÇĞİÖŞÜçğıöşüâÂ]{2,}|\d,\d/.test(v)) { const t = T_(v); if (t !== v) n.data = t; } } else if (n.nodeType === 1 && n.tagName !== 'SCRIPT' && n.tagName !== 'STYLE') { for (const c of n.childNodes) fix(c); } };
   const start = () => { document.documentElement.lang = 'en'; fix(document.body); new MutationObserver(ms => { for (const m of ms) { if (m.type === 'characterData') fix(m.target); else m.addedNodes.forEach(fix); } }).observe(document.body, { childList: true, subtree: true, characterData: true }); };
   if (document.body) start(); else addEventListener('DOMContentLoaded', start);
 }

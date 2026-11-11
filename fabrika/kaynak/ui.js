@@ -62,6 +62,27 @@ function row({ icon, name, desc, lvl, btn, btnCls = '', act, ad, adAct, dis }) {
   return `<div class="row"><div class="ic">${icon}</div><div class="mid"><b>${name}${lvl ? ` <em>${lvl}</em>` : ''}</b><span>${desc}</span></div>${ad ? `<button class="ad" data-a="${adAct}">▶<small>${ad}</small></button>` : ''}<button class="buy ${btnCls}" data-a="${act}" ${dis ? 'disabled' : ''}>${btn}</button></div>`;
 }
 const money = (n) => '₺' + fmt(n);
+
+// ---- How to play: 6 illustrated steps (pictures are real game shots, one set per language) ----
+const HOWTO = {
+  tr: [['Tüy topla', 'Hindinin yanındaki tüy sandığına yürü, tüyler sırtına dizilir. Sandığa her yönden yaklaşabilirsin.'],
+    ['Taban al', 'Makine (sonra Büyük Pres) FLIX tabanı basar. Yanına git, tabanları sırtına al.'],
+    ['Montaj masası', 'Tüy ve tabanı masanın önündeki halkaya bırak. Robot kol FLIX\'i kurar, biteni masanın yanından al.'],
+    ['Test et', 'FLIX\'leri oyun parkına bırak. Çocuklar sektirip test eder, sağlam olanlar satışa hazır.'],
+    ['Sat ve parayı topla', 'Test edilmiş FLIX\'leri satış tezgahına koy, müşteriler alır. Biriken paranın üstünden geç, cebine girer.'],
+    ['Fabrikayı büyüt', 'Kesik çizgili alanın içinde dur, para akar ve yeni hindi, makine ya da bölüm açılır. Üstteki hedef çubuğu sıradaki işi gösterir.']],
+  en: [['Collect feathers', 'Walk to the feather crate next to the turkey and the feathers stack on your back. You can reach the crate from any side.'],
+    ['Pick up bases', 'The machine (later the Big Press) makes FLIX bases. Walk up to it and pick them up.'],
+    ['Assembly table', 'Drop feathers and bases in the ring in front of the table. The robot arm builds a FLIX; pick it up next to the table.'],
+    ['Test', 'Drop the FLIX at the playground. Kids kick them to test them, and the good ones are ready to sell.'],
+    ['Sell and collect cash', 'Put tested FLIX on the shop counter and customers buy them. Walk over the cash pile to collect it.'],
+    ['Grow your factory', 'Stand inside a dashed square: money flows in and a new turkey, machine or hall opens. The goal bar at the top shows the next job.']]
+};
+const HOWTIP = { tr: ['💡 İpuçları', 'Ofiste geliştirme al, İK\'dan eleman işe al: onlar senin yerine taşır.', '⚡ Bonus kutuları kısa süre 2 kat kazanç ya da hız verir.', 'Oyunda değilken de fabrika bir süre para kazanır.'],
+  en: ['💡 Tips', 'Buy upgrades in the office and hire crew at HR: they carry for you.', '⚡ Boost crates give double cash or speed for a short time.', 'Your factory keeps earning for a while when you are away.'] };
+function howHTML() { const L = LANG === 'en' ? 'en' : 'tr', im = window['HOWTO_' + L.toUpperCase()] || [];
+  let h = '<div class="howto" translate="no">'; HOWTO[L].forEach(([t, d], i) => { h += `<div class="hw">${im[i] ? `<img src="${im[i]}" alt="">` : ''}<div><b><em>${i + 1}</em>${t}</b><span>${d}</span></div></div>`; });
+  const tp = HOWTIP[L]; h += `<div class="hwt"><b>${tp[0]}</b>${tp.slice(1).map(x => `<span>• ${x}</span>`).join('')}</div></div>`; return h; }
 function render() {
   const T = $('#shT'), B = $('#shBody'), TB = $('#shTabs'); TB.innerHTML = ''; let h = '';
   const fw = freeUpWait(); const adLbl = fw > 0 ? mins(fw) : 'Ücretsiz';
@@ -92,9 +113,11 @@ function render() {
     for (const b of BONUS) { const left = bonusLeft(b.id);
       h += `<div class="row bonus ${left ? 'act' : ''}" style="--bc:${b.col}"><div class="ic">${b.icon}</div><div class="mid"><b>${b.name}<em class="on" data-bl="${b.id}" ${left ? '' : 'hidden'}>${clock(left)}</em></b><span>${b.desc} · ${b.min} dk</span></div><button class="ad" data-a="bad:${b.id}">▶<small>Reklam</small></button><button class="buy gem" data-a="bgem:${b.id}">${b.gem} 💎</button></div>`; }
     h += '<p class="note">Bonuslar üst üste eklenir. Elmasları mağazadan alabilirsin.</p>';
+  } else if (cur === 'howto') {
+    T.textContent = LANG === 'en' ? 'How to play' : 'Nasıl oynanır'; h += howHTML();
   } else if (cur === 'menu') {
     T.textContent = 'Ayarlar';
-    h += `<div class="set col"><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button><button data-a="lang">🌐 ${LANG === 'tr' ? 'Dil: Türkçe → English' : 'Language: English → Türkçe'}</button><button data-a="home">🏠 Ana menüye dön</button><button data-a="endg">${ENDGAME ? '↩ Normal oyuna dön' : '🧪 Endgame modu (test)'}</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : ''}<button data-flixlegal="legal">📜 Yasal Bilgiler · Legal</button><button data-flixlegal="about">ℹ️ Hakkında · About</button></div><p class="note">Flix Fabrika · FLIX TOYS</p>`;
+    h += `<div class="set col"><button data-a="howto">❓ ${LANG === 'en' ? 'How to play' : 'Nasıl oynanır'}</button><button data-a="snd">${soundOn() ? '🔊 Ses açık' : '🔇 Ses kapalı'}</button><button data-a="lang">🌐 ${LANG === 'tr' ? 'Dil: Türkçe → English' : 'Language: English → TR'}</button><button data-a="home">🏠 Ana menüye dön</button><button data-a="endg">${ENDGAME ? '↩ Normal oyuna dön' : '🧪 Endgame modu (test)'}</button>${NATIVE ? '<button data-a="restore">Satın alımları geri yükle</button>' : ''}<button data-flixlegal="legal">📜 Yasal Bilgiler</button><button data-flixlegal="about">ℹ️ Hakkında</button></div><p class="note">Flix Fabrika · FLIX TOYS</p>`;
   } else if (cur === 'shop') {
     T.textContent = 'Mağaza'; const g = gemAdState();
     h += `<div class="row free"><div class="ic">▶</div><div class="mid"><b>Reklam izle: +${AD.gemsPerAd} 💎</b><span>${g.left <= 0 ? 'Bugünlük bitti' : g.wait > 0 ? mins(g.wait) + ' sonra' : 'Bugün ' + g.left + ' hak'}</span></div><button class="buy" data-a="adgem" ${g.left <= 0 || g.wait > 0 ? 'disabled' : ''}>İZLE</button></div>`;
@@ -115,6 +138,7 @@ async function onAct(a) {
   else if (k === 'adgem') { const r = await adRewarded(); if (r === 'rewarded') { SV.ads.n++; SV.ads.last = Date.now(); SV.gems += AD.gemsPerAd; toast('+' + AD.gemsPerAd + ' 💎'); SFX.coin(); save(); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }
   else if (k === 'iap') { const p = IAP.find(q => q.id === x); await buy(p); }
   else if (k === 'snd') setSound(!soundOn());
+  else if (k === 'howto') { openPanel('howto'); return; }
   else if (k === 'lang') { save(); setLang(LANG === 'tr' ? 'en' : 'tr'); return; }
   else if (k === 'promo') { openPromo(PROMO.find(p => p.id === x)); return; }
   else if (k === 'bad') { const b = BONUS.find(q => q.id === x); const r = await adRewarded(); if (r === 'rewarded') { addBonus(x, b.min); SFX.milestone(); toast(b.name + ' · ' + b.min + ' dakika!'); } else if (r !== 'busy') toast('Reklam şu an yok, biraz sonra dene'); }

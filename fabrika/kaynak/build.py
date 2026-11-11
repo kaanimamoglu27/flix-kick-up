@@ -15,6 +15,11 @@ logo = 'data:image/webp;base64,' + base64.b64encode(open(os.path.join(here, 'log
 html = open(os.path.join(here, 'shell.html')).read().replace('/*FONTS*/', fonts).replace('/*LOGO*/', logo)
 js = open(os.path.join(here, 'bundle.js')).read().replace('</script', '<\\/script')
 ads = ''.join('window.AD_%s="data:image/webp;base64,%s";' % (k, base64.b64encode(open(os.path.join(here, f), 'rb').read()).decode()) for k, f in [('RUSH', 'ad_rush.webp'), ('KICKUP', 'ad_kickup.webp')])
-html = html.replace('/*ADS*/', ads)
+import glob
+hw = ''
+for L in ('tr', 'en'):
+    fs = [os.path.join(here, 'howto', 'w', '%s_%s.webp' % (L, n)) for n in ('tuy', 'makine', 'montaj', 'test', 'kasa', 'pad')]
+    hw += 'window.HOWTO_%s=[%s];' % (L.upper(), ','.join('"data:image/webp;base64,%s"' % base64.b64encode(open(f, 'rb').read()).decode() for f in fs if os.path.exists(f)))
+html = html.replace('/*ADS*/', ads).replace('/*HOWTO*/', hw)
 html = html.replace('/*INTRO*/', open(os.path.join(here, 'intro.html')).read()).replace('/*GAME*/', js)
 open(out, 'w').write(html); print(out, len(html) // 1024, 'KB')

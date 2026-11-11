@@ -1,0 +1,43 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800;900&family=Inter:wght@500;600&display=block" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:430px;height:932px;overflow:hidden;font-family:Inter,sans-serif}
+#f{position:absolute;inset:0;overflow:hidden;background:#d81f10}
+.sun{position:absolute;left:50%;top:560px;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.07) 0 9deg,transparent 9deg 18deg);border-radius:50%}
+.glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 62%,rgba(255,190,40,.35),transparent 55%),linear-gradient(180deg,rgba(120,0,0,.25),transparent 30%,transparent 70%,rgba(80,0,10,.45))}
+.head{position:absolute;left:26px;right:26px;top:30px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.top img{height:40px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.k{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#ffc61a;background:#022753;border-radius:4px;padding:6px 10px;transform:skewX(-8deg)}
+.cap{font-family:'Barlow Condensed';font-weight:900;font-size:56px;line-height:.92;color:#fff;text-transform:uppercase;letter-spacing:.2px;text-shadow:0 3px 0 #8a0f05}
+.cap b{color:#ffc61a;font-weight:900}
+.sub{margin-top:12px;font-size:15px;font-weight:600;color:rgba(255,255,255,.92);line-height:1.38}
+.ph{position:absolute;left:50%;top:268px;width:356px;height:770px;margin-left:-178px;border-radius:56px;background:#05070f;padding:9px;box-shadow:0 0 0 3px #022753,0 0 0 6px #ffc61a,0 30px 60px rgba(60,0,0,.5)}
+.w{width:338px;height:732px;border-radius:47px;overflow:hidden;background:#0a1230}
+.w img{width:338px;display:block}
+</style></head><body>
+<div id="f"><div class="sun"></div><div class="glow"></div>
+<div class="head"><div class="top"><img src="logo.png"><span class="k" id="k"></span></div><div class="cap" id="c"></div><div class="sub" id="s"></div></div>
+<div class="ph"><div class="w"><img id="shot"></div></div></div>
+<script>
+const q=new URLSearchParams(location.search),N=+q.get('s'),L=q.get('l');document.documentElement.lang=L;
+const T={tr:{1:['Flix Fabrika','Kendi oyuncak<br><b>fabrikanı kur!</b>','Hindiden tüy topla, FLIX üret, kutula ve sat. Fabrikan adım adım büyüsün.'],
+2:['Çiftlik','Renkli hindiler,<br><b>değerli tüyler</b>','Mavi, altın, elmas, gökkuşağı. Her yeni hindi FLIX’in değerini artırır.'],
+3:['Test parkı','Çocuklar<br><b>test etsin</b>','Her FLIX satılmadan önce oyun parkında sektirilip test edilir.'],
+4:['Sektirme Şovu','Sahneye çık,<br><b>FLIX’i sektir!</b>','Doğru anda dokun, kalabalık para atsın, satışlar coşsun.'],
+5:['FLIX Mağazası','C Blok’u aç,<br><b>mağazanı büyüt</b>','Müze, oyuncak treni, dev FLIX anıtı ve yeni kasalar.'],
+6:['Ofis','Geliştir,<br><b>daha hızlı üret</b>','Hızını, taşıma gücünü ve kârını artır. Kupaları topla.'],
+7:['Satış','Müşteriler<br><b>sıraya girsin</b>','Kasiyer ve taşıyıcı tut, iş sen yokken de yürüsün.'],
+8:['Dolap','Kostümler,<br><b>şapkalar, zeminler</b>','Patronu ve ekibini giydir, her kostüm bonus verir.']},
+en:{1:['Flix Factory','Build your own<br><b>toy factory!</b>','Collect turkey feathers, make FLIX, box them and sell. Grow step by step.'],
+2:['Farm','Colourful turkeys,<br><b>precious feathers</b>','Blue, golden, diamond, rainbow. Every new turkey makes FLIX worth more.'],
+3:['Test park','Let the kids<br><b>test them</b>','Every FLIX is kick-tested at the playground before it is sold.'],
+4:['Kick-up Show','Hit the stage,<br><b>keep FLIX up!</b>','Tap on the beat, the crowd throws money and sales get hyped.'],
+5:['FLIX Store','Open Block C,<br><b>grow your store</b>','Museum, toy train, a giant FLIX monument and new registers.'],
+6:['Office','Upgrade and<br><b>produce faster</b>','Boost your speed, carry more and earn more. Collect trophies.'],
+7:['Sales','Customers<br><b>line up</b>','Hire cashiers and carriers so work goes on while you are away.'],
+8:['Wardrobe','Outfits,<br><b>hats and floors</b>','Dress up the boss and the crew, every outfit gives a bonus.']}};
+const t=T[L][N];k.textContent=t[0];c.innerHTML=t[1];s.textContent=t[2];shot.src='sh/'+L+'_'+N+'.png';
+while(c.offsetHeight>110){c.style.fontSize=(parseFloat(getComputedStyle(c).fontSize)-2)+'px'}
+</script></body></html>

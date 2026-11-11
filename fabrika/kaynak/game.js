@@ -6,13 +6,13 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { hero, pose, leafGeo, ink } from './hero.js';
 import { SFX } from './sfx.js';
-import { T_ } from './i18n.js';
+import { T_, LANG as LNG } from './i18n.js';
 import { COLS, PADS, COS, PROD, BONUS, UPS, SUPS, STAFF, KICKN, spdPct, PROMO, ORDERS } from './config.js';
 import { boostOffer, initUI, openPanel, closePanel, panelOpen, toast, refreshHUD, maybeInter, offlinePopup, haptic } from './ui.js';
 
 const $ = (s) => document.querySelector(s);
 const rnd = (a = 0, b = 1) => a + Math.random() * (b - a);
-export const fmt = (n) => n < 10000 ? Math.floor(n).toLocaleString('tr-TR') : n < 1e6 ? (n / 1e3).toFixed(1).replace('.', ',') + ' B' : (n / 1e6).toFixed(2).replace('.', ',') + ' M';
+export const fmt = (n) => LNG === 'en' ? (n < 10000 ? Math.floor(n).toLocaleString('en-US') : n < 1e6 ? (n / 1e3).toFixed(1) + 'K' : (n / 1e6).toFixed(2) + 'M') : n < 10000 ? Math.floor(n).toLocaleString('tr-TR') : n < 1e6 ? (n / 1e3).toFixed(1).replace('.', ',') + ' B' : (n / 1e6).toFixed(2).replace('.', ',') + ' M';
 
 // ---------------- save ----------------
 const DEF = () => ({ v: 3, t2: 1, t3: 1, t4: 1, money: 0, gems: 0, unl: [], tut: 0, made: 0, up: {}, staff: { tas: 0, kas: 0 }, cos: { skin: 'kraliyet', acc: 'yok', floor: 'nane', wskin: 'karisik', wacc: 'kask', own: ['kraliyet', 'yok', 'nane', 'karisik', 'kask'] }, ct: null, ctDone: 0,
@@ -29,7 +29,7 @@ function endSave() { const d = DEF(), far = Date.now() + 3650 * 864e5; d.tut = 9
 export let SV = (() => { const d = DEF(); try {
   const o = JSON.parse(localStorage.getItem(KEY) || 'null');
   if (ENDGAME && !(o && o.v === 3)) return endSave();
-  if (o && o.v === 3) { const s = { ...d, ...o, cos: { ...d.cos, ...o.cos }, staff: { ...d.staff, ...o.staff }, ads: { ...d.ads, ...o.ads } }; if (!o.t2) { if (s.tut >= 6) s.tut = 99; s.t2 = 1; } if (!o.t3) { s.t3 = 1; if (s.tut < 99) s.tut = 0; if (s.unl.length) for (const id of ['park', 'pres', 'ciftlik0', 'masa', 'atolye']) if (!s.unl.includes(id)) s.unl.unshift(id); } if (!o.t4) { s.t4 = 1; const i = s.unl.indexOf('atolye'); if (i >= 0) for (const id of ['bina', 'depo']) if (!s.unl.includes(id)) s.unl.splice(i + 1, 0, id); } for (const f of ['karisik', 'kask', 'yok']) if (!s.cos.own.includes(f)) s.cos.own.push(f); if (ENDGAME) { const e = endSave(); for (const id of e.unl) if (!s.unl.includes(id)) s.unl.push(id); if (!s.calm) { s.up = { ...e.up }; s.bonus = {}; s.boostUntil = 0; s.calm = 1; } else for (const k in e.up) s.up[k] = Math.max(s.up[k] || 0, e.up[k]); s.staff = e.staff; for (const id of e.cos.own) if (!s.cos.own.includes(id)) s.cos.own.push(id); } return s; }
+  if (o && o.v === 3) { const s = { ...d, ...o, cos: { ...d.cos, ...o.cos }, staff: { ...d.staff, ...o.staff }, ads: { ...d.ads, ...o.ads } }; if (ENDGAME) { for (const p of PADS) if (!s.unl.includes(p.id)) s.unl.push(p.id); s.staff.kas = STAFF.find(q => q.id === 'kas').max; } if (!o.t2) { if (s.tut >= 6) s.tut = 99; s.t2 = 1; } if (!o.t3) { s.t3 = 1; if (s.tut < 99) s.tut = 0; if (s.unl.length) for (const id of ['park', 'pres', 'ciftlik0', 'masa', 'atolye']) if (!s.unl.includes(id)) s.unl.unshift(id); } if (!o.t4) { s.t4 = 1; const i = s.unl.indexOf('atolye'); if (i >= 0) for (const id of ['bina', 'depo']) if (!s.unl.includes(id)) s.unl.splice(i + 1, 0, id); } for (const f of ['karisik', 'kask', 'yok']) if (!s.cos.own.includes(f)) s.cos.own.push(f); if (ENDGAME) { const e = endSave(); for (const id of e.unl) if (!s.unl.includes(id)) s.unl.push(id); if (!s.calm) { s.up = { ...e.up }; s.bonus = {}; s.boostUntil = 0; s.calm = 1; } else for (const k in e.up) s.up[k] = Math.max(s.up[k] || 0, e.up[k]); s.staff = e.staff; for (const id of e.cos.own) if (!s.cos.own.includes(id)) s.cos.own.push(id); } return s; }
   if (ENDGAME) return endSave();
   const o2 = JSON.parse(localStorage.getItem('flix_fabrika2') || 'null');
   if (o2 && o2.v === 2) { d.money = (o2.money || 0) + 300; d.tut = (o2.tut || 0) >= 6 ? 99 : 0; d.made = o2.made || 0; d.del = o2.del || 0; if ((o2.unl || []).includes('asm2')) d.unl.push('ofis', 'mavi', 'asm2'); if ((o2.unl || []).includes('isci')) { d.unl.push('ik'); d.staff.tas = 1; } return d; }
@@ -203,7 +203,7 @@ function buildWorld() {
   add(new THREE.PlaneGeometry(200, 6), MT.road, null, 0, 0.01, 23).rotation.x = -Math.PI / 2;
   for (let x = -40; x < 60; x += 4) add(new THREE.PlaneGeometry(2, 0.25), M(0xffffff), null, x, 0.02, 23).rotation.x = -Math.PI / 2;
   add(new THREE.PlaneGeometry(200, 2.4), M(0xd8d2c8), null, 0, 0.015, 19.9).rotation.x = -Math.PI / 2;
-  for (const [x, z] of [[-27.5, -4], [-28, 4], [28, -2], [28.5, 6], [-27.5, 14], [28, -12], [-27.6, -14]]) { add(new THREE.CylinderGeometry(0.2, 0.28, 1.6, 8), MT.woodD, null, x, 0.8, z); add(new THREE.IcosahedronGeometry(1.4, 1), M(0x4fae5a, { flatShading: true, roughness: 0.9 }), null, x, 2.4, z); }
+  for (const [x, z] of [[-27.5, -4], [-28, 4], [42, -2], [42.5, 6], [-27.5, 14], [28, -12], [-27.6, -14]]) { add(new THREE.CylinderGeometry(0.2, 0.28, 1.6, 8), MT.woodD, null, x, 0.8, z); add(new THREE.IcosahedronGeometry(1.4, 1), M(0x4fae5a, { flatShading: true, roughness: 0.9 }), null, x, 2.4, z); }
   buildOutside();
   arrow = new THREE.Group(); scene.add(arrow); const ag = new THREE.Shape(); ag.moveTo(0, 0.6); ag.lineTo(0.45, 0); ag.lineTo(0.17, 0); ag.lineTo(0.17, -0.5); ag.lineTo(-0.17, -0.5); ag.lineTo(-0.17, 0); ag.lineTo(-0.45, 0); ag.closePath();
   const am = new THREE.Mesh(new THREE.ShapeGeometry(ag), new THREE.MeshBasicMaterial({ color: 0xffd84a, transparent: true, opacity: 0.95, depthWrite: false })); am.rotation.x = -Math.PI / 2; am.position.y = 0.06; arrow.add(am);
@@ -234,7 +234,7 @@ function buildStarter() {
     for (const [x, z] of [[-5.7, 17.8], [9.8, 17.8]]) { rb(0.14, 2.8, 0.14, MT.navy, yd, x, 1.4, z, 0.04); add(G('Sphere', 0.24, 12, 8), M(0xfff2b0, { emissive: 0xffe08a, emissiveIntensity: 1.1 }), yd, x, 2.9, z).castShadow = false; }
     rb(1.5, 0.12, 0.5, MT.wood, yd, -4.4, 0.45, 17.4, 0.04); rb(1.5, 0.5, 0.1, MT.wood, yd, -4.4, 0.75, 17.62, 0.03); for (const sx of [-0.6, 0.6]) rb(0.1, 0.45, 0.4, MT.dark, yd, -4.4 + sx, 0.22, 17.4, 0.02);
     potTree(yd, -5.6, 7.0, 0.8); potTree(yd, 10.0, 7.0, 0.8); }
-  penPile = new Pile(-1.0, 8.2, 'feather', 8, 2, 2, 0.4); penPile.base = 0.46; markZone(penPile, new THREE.Vector3(-0.7, 0, 10.0));
+  penPile = new Pile(-1.0, 8.2, 'feather', 8, 2, 2, 0.4); penPile.base = 0.46; markZone(penPile, new THREE.Vector3(-0.7, 0, 10.0)); penPile.rect = [-1.6, -0.4, 7.7, 8.7];
   const penCol = box(-5.4, -1.8, 7.4, 10.6), crCol = box(-1.6, -0.4, 7.7, 8.7);
   // the little machine: makes FLIX bases one by one
   const mini = new THREE.Group(); mini.position.set(2.2, 0, 8.0); scene.add(mini);
@@ -244,7 +244,7 @@ function buildStarter() {
   const gear = add(new THREE.TorusGeometry(0.22, 0.07, 8, 6), MT.red, mini, 0.45, 0.85, 0.67); const pis = add(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 12), MT.steel, mini, 0.35, 1.7, 0);
   rb(0.6, 0.35, 0.05, M(0x0f1c33, { emissive: 0x2fe06a, emissiveIntensity: 0.6 }), mini, -0.3, 0.75, 0.66, 0.02); rb(0.6, 0.06, 0.5, MT.steel, mini, 1.05, 0.55, 0, 0.02);
   sign('MİNİ MAKİNE', '#0b2a5e', mini, 0, 1.15, 0.67, 1.3); outl(mini);
-  const miCol = box(1.3, 3.1, 7.3, 8.7); miniPile = new Pile(3.95, 8.0, 'base', 8, 2, 2, 0.6); markZone(miniPile, new THREE.Vector3(3.95, 0, 9.8));
+  const miCol = box(1.3, 3.1, 7.3, 8.7); miniPile = new Pile(3.95, 8.0, 'base', 8, 2, 2, 0.6); markZone(miniPile, new THREE.Vector3(3.95, 0, 9.8)); miniPile.rect = [1.3, 4.55, 7.3, 8.7];
   ST = { pen, mini, gear, pis, lamp, penCol, crCol, miCol, t: 0, hit: 0 };
   const n = 1 + (has('kumes2') ? 1 : 0) + (has('kumes3') ? 1 : 0); if (!has('ciftlik0')) for (let k = 0; k < n; k++) addTurkey('dogal', true);
 }
@@ -310,7 +310,7 @@ function buildFarm() { if (farmGate) { scene.remove(farmGate); farmGate = null; 
   for (const [x, z] of [[-8, -18.5], [-6.8, -18.6], [-7.4, -18.4]]) { const h = add(new THREE.CylinderGeometry(0.6, 0.6, 1.0, 18), M(0xe8c66a, { roughness: 1 }), null, x, 0.6, z); h.rotation.z = Math.PI / 2; }
   rb(3, 0.5, 0.8, MT.woodD, null, -2, 0.25, -18.8);
   rb(2.4, 0.5, 2.0, MT.wood, null, -4.0, 0.25, -10.4); box(-5.4, -2.6, -11.6, -9.2);
-  farmPile = new Pile(-4.0, -10.4, 'feather', 16, 2, 2, 0.75); farmPile.base = 0.55; markZone(farmPile, new THREE.Vector3(-1.6, 0, -9.2));
+  farmPile = new Pile(-4.0, -10.4, 'feather', 16, 2, 2, 0.75); farmPile.base = 0.55; markZone(farmPile, new THREE.Vector3(-1.6, 0, -9.2)); farmPile.rect = [-5.4, -2.6, -11.6, -9.2];
   if (has('ik')) retirePen(); for (let i = 0; i < 4; i++) addTurkey('dogal');
 }
 function buildPress() { retireMini();
@@ -319,7 +319,7 @@ function buildPress() { retireMini();
   press.userData.pis = add(new THREE.CylinderGeometry(0.22, 0.22, 1.2, 16), MT.steel, press, 0, 3.5, 0);
   rb(1.2, 0.6, 0.06, M(0x0f1c33, { emissive: 0x2fe06a, emissiveIntensity: 0.5 }), press, 0, 1.6, 1.12, 0.03);
   press.userData.stars = starRow(press, 0, 2.15, 1.13);
-  box(-9.8, -7.0, -4.8, -2.2); pressPile = new Pile(-6.2, -3.5, 'base', 12, 2, 2, 0.8); markZone(pressPile);
+  box(-9.8, -7.0, -4.8, -2.2); pressPile = new Pile(-6.2, -3.5, 'base', 12, 2, 2, 0.8); markZone(pressPile); pressPile.rect = [-9.8, -5.4, -4.8, -2.2];
   outl(press); stationsAnim.press = press;
 }
 // silos, chimneys with smoke, water tower and the two big billboards for the other FLIX games
@@ -328,7 +328,7 @@ let chimneys = [];
 function buildOutside() {
   const sm = M(0xdfe5ee, { metalness: 0.5, roughness: 0.35 }), band = M(0xffffff, { map: tex(512, 64, (c, w, h) => { c.fillStyle = '#e22511'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = 'italic 900 48px BC'; for (let x = 10; x < w; x += 128) c.fillText('FLIX', x, 50); }) });
   for (const [x, z] of [[-29.5, -2], [-29.5, 2.4], [-29.5, 6.8]]) { const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g); add(new THREE.CylinderGeometry(1.6, 1.6, 7, 24), sm, g, 0, 3.5, 0); add(new THREE.ConeGeometry(1.7, 1.2, 24), M(0xe22511, { roughness: 0.5 }), g, 0, 7.6, 0); add(new THREE.CylinderGeometry(1.62, 1.62, 0.9, 24, 1, true), band, g, 0, 4.6, 0); for (const sx of [-1.1, 1.1]) rb(0.15, 1.2, 0.15, MT.dark, g, sx, 0.6, 1.1, 0.03); outl(g); }
-  for (const [x, z] of [[29.5, -6], [29.5, 0.5]]) { const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g); add(new THREE.CylinderGeometry(0.75, 1.0, 9, 18), M(0xb8432e, { roughness: 0.8, map: tex(64, 128, (c, w, h) => { c.fillStyle = '#b8432e'; c.fillRect(0, 0, w, h); c.strokeStyle = 'rgba(0,0,0,.18)'; c.lineWidth = 2; for (let y = 0; y < h; y += 8) { c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); for (let xx = (y / 8 % 2) * 8; xx < w; xx += 16) { c.beginPath(); c.moveTo(xx, y); c.lineTo(xx, y + 8); c.stroke(); } } }) }), g, 0, 4.5, 0); for (const y of [7.6, 8.4]) add(new THREE.CylinderGeometry(0.82, 0.82, 0.3, 18), MT.wallTop, g, 0, y, 0); outl(g); chimneys.push(new THREE.Vector3(x, 9.2, z)); }
+  for (const [x, z] of [[43.5, -6], [43.5, 0.5]]) { const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g); add(new THREE.CylinderGeometry(0.75, 1.0, 9, 18), M(0xb8432e, { roughness: 0.8, map: tex(64, 128, (c, w, h) => { c.fillStyle = '#b8432e'; c.fillRect(0, 0, w, h); c.strokeStyle = 'rgba(0,0,0,.18)'; c.lineWidth = 2; for (let y = 0; y < h; y += 8) { c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); for (let xx = (y / 8 % 2) * 8; xx < w; xx += 16) { c.beginPath(); c.moveTo(xx, y); c.lineTo(xx, y + 8); c.stroke(); } } }) }), g, 0, 4.5, 0); for (const y of [7.6, 8.4]) add(new THREE.CylinderGeometry(0.82, 0.82, 0.3, 18), MT.wallTop, g, 0, y, 0); outl(g); chimneys.push(new THREE.Vector3(x, 9.2, z)); }
   const wt = new THREE.Group(); wt.position.set(-29, 0, 15); scene.add(wt); for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) rb(0.18, 6, 0.18, MT.navy, wt, x, 3, z, 0.04); add(new THREE.CylinderGeometry(1.8, 1.8, 2.4, 22), MT.yel, wt, 0, 7.2, 0); add(new THREE.ConeGeometry(1.95, 1.0, 22), MT.navy, wt, 0, 8.9, 0); sign('FLIX', '#e22511', wt, 0, 7.2, 1.82, 2.4); outl(wt);
   // billboards for Flix Rush and Flix Kick Up across the road
   PROMO.forEach((pr, i) => { const g = new THREE.Group(); g.position.set(i ? 15 : -9, 0, 26.9); scene.add(g); for (const sx of [-2.2, 2.2]) rb(0.22, 2.6, 0.22, MT.steel, g, sx, 1.3, -0.1, 0.05);
@@ -353,11 +353,11 @@ export function applyTiers() {
   if (TR) setStars(TR.stars, lv('truck'));
   setBounds();
 }
-function setBounds() { BOUNDS.x0 = has('bblok') ? -24.5 : has('depo') ? -11 : -6.3; BOUNDS.x1 = has('genis') ? 25.5 : has('bina') ? 12.6 : has('atolye') ? 10.7 : 10.3; BOUNDS.z0 = has('ciftlik0') ? farmZ() - 1 : has('bina') ? -7.3 : has('atolye') ? -4.9 : 6.6; NAV.dirty = true; }
+function setBounds() { BOUNDS.x0 = has('bblok') ? -24.5 : has('depo') ? -11 : -6.3; BOUNDS.x1 = has('cblok') ? 39.5 : has('genis') ? 25.5 : has('bina') ? 12.6 : has('atolye') ? 10.7 : 10.3; BOUNDS.z0 = has('ciftlik0') ? farmZ() - 1 : has('bina') ? -7.3 : has('atolye') ? -4.9 : 6.6; NAV.dirty = true; }
 function zoneRing(x, z, col, txt) { const r = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.25, 48), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.85, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(x, 0.045, z); scene.add(r); floorText(txt, x, z);
   return { pos: new THREE.Vector3(x, 0, z), r: 1.2, ring: r }; }
 function markZone(pile, at, col = 0xffffff) { const p = at || pile.pos; const r = new THREE.Mesh(G('Ring', 0.95, 1.12, 40), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.34, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(p.x, 0.04, p.z); scene.add(r); pile.zone = at ? at.clone() : pile.pos.clone(); pile.ring = r; ZR.push({ r, p: pile }); return r; }
-function inRing(x, z, txt1, txt2) { const ring = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.2, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.34, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.04, z); scene.add(ring);
+function inRing(x, z, txt1, txt2) { if (LNG === 'en' && txt2 === 'bırak') { txt2 = txt1; txt1 = 'bırak'; } const ring = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.2, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.34, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.04, z); scene.add(ring);
   const lbl = tex(256, 96, (c, w) => { c.fillStyle = '#fff'; c.font = 'bold 30px R, sans-serif'; c.textAlign = 'center'; c.fillText(txt1, w / 2, 40); c.fillText(txt2, w / 2, 76); });
   const lm = add(new THREE.PlaneGeometry(1.4, 0.52), new THREE.MeshBasicMaterial({ map: lbl, transparent: true, depthWrite: false }), null, x, 0.05, z + 1.6); lm.rotation.x = -Math.PI / 2; lm.castShadow = false; }
 function buildAssembly(i, x, z) {
@@ -459,15 +459,15 @@ function buildHR() { const g = new THREE.Group(); g.position.set(-10.1, 0, 1.5);
 function buildHall() {
   scene.remove(teaser); farmRight.visible = false;
   rb(14.4, 0.3, 25.5, MT.white, null, 18.0, -0.14, 5.25, 0.1); floorPlane(14.2, 25.1, 18.0, 5.25);
-  rb(0.5, 1.4, 25.5, MT.wall, null, 25.0, 0.7, 5.25); rb(0.56, 0.18, 25.56, MT.wallTop, null, 25.0, 1.45, 5.25);
+  if (!CBDONE) EW = [rb(0.5, 1.4, 25.5, MT.wall, null, 25.0, 0.7, 5.25), rb(0.56, 0.18, 25.56, MT.wallTop, null, 25.0, 1.45, 5.25)];
   rb(14.0, 1.4, 0.5, MT.wall, null, 18.0, 0.7, -7.5); rb(14.06, 0.18, 0.56, MT.wallTop, null, 18.0, 1.45, -7.5);
-  box(24.7, 25.6, -8, 18.6); box(10.9, 25.6, -7.8, -7.2);
+  if (EW) EW.push(box(24.7, 25.6, -8, 18.6)); box(10.9, 25.6, -7.8, -7.2);
   // farm grows to the right too
   add(new THREE.PlaneGeometry(14.5, 12), MT.grass, null, 18.0, 0.005, -14).rotation.x = -Math.PI / 2;
   buildHallFence();
   const sg = tex(1024, 256, (c, w, h) => { c.fillStyle = '#0b2a5e'; c.beginPath(); c.roundRect(0, 0, w, h, 40); c.fill(); c.fillStyle = '#ffc20e'; c.font = 'italic 900 140px BC'; c.textAlign = 'center'; c.fillText('YENİ SALON', w / 2, 180); });
   add(new THREE.PlaneGeometry(5, 1.25), M(0xffffff, { map: sg, transparent: true }), null, 18.0, 2.3, -7.24).castShadow = false;
-  BOUNDS.x1 = 25.5; NAV.dirty = true;
+  BOUNDS.x1 = has('cblok') ? 39.5 : 25.5; NAV.dirty = true;
 }
 function buildHallFence() {
   const FZ = farmZ(); hallFence = new THREE.Group(); scene.add(hallFence);
@@ -590,7 +590,8 @@ function stepBoostDrop(dt, T) { if (BOT || ENDGAME || !tutDone() || inMenu) retu
   bxT -= dt; if (bxT <= 0) { bxT = 20; spawnBX(); } }
 // ===== FLIX SEKTİRME ŞOVU: our own mechanic. Stand still on the stage, tap in rhythm to keep the FLIX in the air;
 // the crowd throws money for every kick and the show's hype makes the shop busier and pricier for a minute =====
-let SG = null; export const SH = { on: false, cd: 0, combo: 0, y: 0, v: 0, g: 12, ball: null, crowd: [], hype: 0, hypeT: 0, kick: 0, earned: 0, still: 0, el: null, leaveT: 0, cdMsg: 0 };
+let CBDONE = false, EW = null, MUS = null, ANIT = null;
+let SG = null; export const SH = { on: false, cd: 0, combo: 0, y: 0, v: 0, g: 12, ball: null, crowd: [], hype: 0, hypeT: 0, fans: [], kick: 0, earned: 0, still: 0, el: null, leaveT: 0, cdMsg: 0 };
 const bestCol = () => { let c = 'dogal'; for (const p of PADS) if (p.col && has(p.id)) c = p.col; return c; };
 function buildStage() { const x = 8.8, z = 6.0, g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
   const top = tex(256, 256, (c, w, h) => { const gr = c.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, w / 2); gr.addColorStop(0, '#ff5a3a'); gr.addColorStop(1, '#a8140a'); c.fillStyle = gr; c.fillRect(0, 0, w, h); c.fillStyle = 'rgba(255,214,74,.35)'; for (let i = 0; i < 12; i++) { c.save(); c.translate(w / 2, h / 2); c.rotate(i * Math.PI / 6); c.beginPath(); c.moveTo(0, 0); c.lineTo(-16, w / 2); c.lineTo(16, w / 2); c.fill(); c.restore(); } if (LOGO) c.drawImage(LOGO, w / 2 - 50, h / 2 - 46, 100, 92); });
@@ -604,22 +605,24 @@ function buildStage() { const x = 8.8, z = 6.0, g = new THREE.Group(); g.positio
   SH.el = document.createElement('div'); SH.el.style.cssText = 'position:fixed;left:0;right:0;top:22%;text-align:center;pointer-events:none;z-index:40;font-family:BC,sans-serif;font-style:italic;font-weight:900;color:#fff;text-shadow:0 4px 0 #1b1330,0 0 18px rgba(0,0,0,.4);display:none'; document.body.appendChild(SH.el); }
 function showStart() { SH.on = true; SH.combo = 0; SH.earned = 0; SH.y = 2.4; SH.v = 0; SH.g = 11; SH.still = 0; P.act = { kind: 'show', t: 0 }; joy.on = false; joy.x = joy.y = 0;
   P.o.position.set(SG.zone.x, 0, SG.zone.z); P.o.rotation.y = 0; SH.ball = makeFlix(bestCol(), 0.7); scene.add(SH.ball);
-  SH.crowd.forEach(c => scene.remove(c.o)); SH.crowd = []; for (let i = 0; i < 6; i++) { const o = personMesh(i % 3 === 0); o.position.set(6.9 + i * 0.75 + rnd(-0.15, 0.15), 0, 8.3 + (i % 2) * 0.55); o.rotation.y = Math.PI; scene.add(o); SH.crowd.push({ o, ph: rnd(0, 6) }); }
+  SH.crowd.forEach(c => scene.remove(c.o)); SH.crowd = []; const nC = has('stadyum') ? 9 : 6; for (let i = 0; i < nC; i++) { const o = personMesh(i % 3 === 0); o.position.set(8.8 - (nC - 1) * 0.33 + i * 0.66 + rnd(-0.12, 0.12), 0, 8.3 + (i % 2) * 0.55); o.rotation.y = Math.PI; scene.add(o); SH.crowd.push({ o, ph: rnd(0, 6) }); }
   SG.beams.forEach(b => b.visible = true); SH.el.style.display = 'block'; showTxt(T_('DOKUN, FLIX DÜŞMESİN!'), ''); SFX.milestone(); haptic(30); }
 function showTxt(a, b) { SH.el.innerHTML = `<div style="font-size:64px;line-height:1">${a}</div><div style="font-size:26px;margin-top:6px;color:#ffc20e">${b}</div>`; }
 function showTap() { if (!SH.on) return; const inWin = SH.v < 0 && SH.y < 1.3 && SH.y > 0.22; if (!inWin) { showEnd(); return; }
   const perfect = Math.abs(SH.y - 0.65) < 0.2; SH.combo++; SH.g = Math.min(24, 11 + SH.combo * 0.45); SH.v = Math.sqrt(2 * SH.g * (2.1 + Math.random() * 0.4)); SH.kick = 0.25;
-  const per = Math.max(1, Math.round(COLS[bestCol()].v * 0.5 * (1 + lv('kar') * 0.1) * (1 + SH.combo * 0.03) * (perfect ? 2 : 1))); SH.earned += per;
+  const per = Math.max(1, Math.round(COLS[bestCol()].v * 0.5 * (1 + lv('kar') * 0.1) * (1 + SH.combo * 0.03) * (perfect ? 2 : 1) * (has('stadyum') ? 2 : 1))); SH.earned += per;
   const c = SH.crowd[Math.floor(Math.random() * SH.crowd.length)]; if (c) { const o = makeItem('cash'); scene.add(o); o.position.copy(c.o.position).setY(1.6); fly(o, o.position, P.o.position.clone().setY(1.5), 0.35, () => { scene.remove(o); SV.money += per; bumpMoney(); }, 1.2); }
   fxBurst(SH.ball.position, perfect ? 'star' : 'spark', perfect ? 6 : 4, 0.8); SFX.pop(); if (perfect && SFX.coin) SFX.coin(); haptic(perfect ? 16 : 8);
   showTxt('x' + SH.combo, perfect ? T_('MÜKEMMEL!') : '+₺' + per); }
 function showEnd() { if (!SH.on) return; SH.on = false; P.act = null; if (SH.ball) { const b = SH.ball; fly(b, b.position, b.position.clone().setY(0.1), 0.3, () => scene.remove(b)); SH.ball = null; }
-  SG.beams.forEach(b => b.visible = false); SH.leaveT = 1.6; SH.cd = 30; SH.cdMsg = 1e9; const hype = Math.min(60, SH.combo * 2);
+  SG.beams.forEach(b => b.visible = false); SH.leaveT = 1.6; SH.cd = 30; SH.cdMsg = 1e9; const hype = has('stadyum') ? Math.min(80, SH.combo * 3) : Math.min(60, SH.combo * 2);
   if (hype > 0) { SH.hype = Math.max(SH.hype, hype); SH.hypeT = 60; } SV.showBest = Math.max(SV.showBest || 0, SH.combo);
   showTxt(SH.combo + ' ' + T_('sektirme'), (SH.earned ? '+₺' + SH.earned : '') + (hype ? ' · 🔥 +%' + Math.round(hype / 2) + ' ' + T_('satış') : '')); setTimeout(() => { if (!SH.on) SH.el.style.display = 'none'; }, 2200);
   if (SH.combo >= 10) confetti(P.o.position.clone().setY(1)); SFX.chime && SFX.chime(2); save(); }
 export const hypeInfo = () => SH.hypeT > 0 ? { p: SH.hype, t: SH.hypeT } : null;
-function stepShow(dt, T) { if (!SG) return; SH.cd = Math.max(0, SH.cd - dt); if (SH.hypeT > 0) { SH.hypeT -= dt; if (SH.hypeT <= 0) SH.hype = 0; }
+function stepShow(dt, T) { stepTrain(dt); if (MUS) MUS.spin.forEach((f, i) => f.rotation.y = T * 1.2 + i); if (ANIT) { ANIT.f.rotation.y = T * 0.5; ANIT.f.position.y = 1.1 + Math.sin(T * 1.5) * 0.12; }
+  for (const F of SH.fans) F.o.position.y = F.y + Math.abs(Math.sin(T * (SH.on ? 7 : 2) + F.ph)) * (SH.on ? 0.25 : 0.05);
+  if (!SG) return; SH.cd = Math.max(0, SH.cd - dt); if (SH.hypeT > 0) { SH.hypeT -= dt; if (SH.hypeT <= 0) SH.hype = 0; }
   SG.ring.ring.material.opacity = SH.cd > 0 ? 0.25 : 0.6 + Math.sin(T * 4) * 0.3;
   if (SH.leaveT > 0) { SH.leaveT -= dt; for (const c of SH.crowd) c.o.position.z += dt * 2.5; if (SH.leaveT <= 0) { SH.crowd.forEach(c => scene.remove(c.o)); SH.crowd = []; } }
   if (!SH.on) { const inZ = Math.hypot(P.o.position.x - SG.zone.x, P.o.position.z - SG.zone.z) < 1.0, idle = Math.hypot(joy.x, joy.y) < 0.12;
@@ -629,6 +632,66 @@ function stepShow(dt, T) { if (!SG) return; SH.cd = Math.max(0, SH.cd - dt); if 
   for (let i = 0; i < SH.crowd.length; i++) { const c = SH.crowd[i]; c.o.position.y = Math.abs(Math.sin(T * 7 + c.ph)) * (SH.kick > 0 ? 0.35 : 0.12); }
   for (const b of SG.beams) b.material.opacity = 0.12 + Math.sin(T * 9) * 0.05;
   if (SH.y < 0.12) showEnd(); }
+// ===== C Blok: FLIX Mağazası — the hall grows right: doors in the old wall, shop shelves, carpet, sign =====
+function buildCBlok() {
+  CBDONE = true; if (EW) { scene.remove(EW[0]); scene.remove(EW[1]); unbox(EW[2]); EW = null; }
+  for (const [z0, z1] of [[-7.5, -1.5], [2.0, 9.0], [11.0, 11.6], [16.4, 18.0]]) { const L = z1 - z0, zc = (z0 + z1) / 2; rb(0.5, 1.4, L, MT.wall, null, 25.0, 0.7, zc); rb(0.56, 0.18, L + 0.06, MT.wallTop, null, 25.0, 1.45, zc); box(24.7, 25.4, z0 - 0.3, z1); }
+  for (const z of [-1.5, 2.0, 9.0, 11.0, 11.6, 16.4]) rb(0.62, 1.9, 0.3, MT.yel, null, 25.0, 0.95, z, 0.06);
+  rb(14.8, 0.3, 25.5, MT.white, null, 32.3, -0.14, 5.25, 0.1); floorPlane(14.6, 25.1, 32.3, 5.25);
+  rb(0.5, 1.4, 25.5, MT.wall, null, 39.5, 0.7, 5.25); rb(0.56, 0.18, 25.56, MT.wallTop, null, 39.5, 1.45, 5.25); box(39.2, 40.0, -8, 18.6);
+  rb(14.5, 1.4, 0.5, MT.wall, null, 32.25, 0.7, -7.5); rb(14.56, 0.18, 0.56, MT.wallTop, null, 32.25, 1.45, -7.5); box(25.0, 40.0, -7.8, -7.2);
+  const sg = tex(1024, 256, (c, w, h) => { c.fillStyle = '#e22511'; c.beginPath(); c.roundRect(0, 0, w, h, 40); c.fill(); c.fillStyle = '#ffc20e'; c.font = 'italic 900 118px BC'; c.textAlign = 'center'; c.fillText(T_('FLIX MAĞAZASI'), w / 2, 168); });
+  add(new THREE.PlaneGeometry(5.6, 1.4), M(0xffffff, { map: sg, transparent: true }), null, 32.5, 2.5, -7.24).castShadow = false;
+  // red carpet path from the doors to the counters
+  const cp = add(new THREE.PlaneGeometry(2.2, 17), M(0xc81e12, { roughness: 0.9 }), null, 32.5, 0.03, 7.5); cp.rotation.x = -Math.PI / 2; cp.castShadow = false;
+  for (const s of [-1, 1]) { const e = add(new THREE.PlaneGeometry(0.14, 17), MT.yel, null, 32.5 + s * 1.12, 0.032, 7.5); e.rotation.x = -Math.PI / 2; e.castShadow = false; }
+  // toy shelves full of FLIX boxes along the right wall
+  const shelfCols = ['mavi', 'yesil', 'sari', 'kirmizi', 'mor', 'altin'];
+  for (let r = 0; r < 3; r++) { const g = new THREE.Group(); g.position.set(38.4, 0, -5.0 + r * 3.6); scene.add(g);
+    for (const sz of [-1.4, 1.4]) for (const sx of [-0.5, 0.5]) rb(0.1, 2.6, 0.1, MT.navy, g, sx, 1.3, sz, 0.03);
+    for (const [k, y] of [0.2, 1.05, 1.9].entries()) { rb(1.1, 0.08, 2.9, MT.yel, g, 0, y, 0, 0.02); for (let j = 0; j < 3; j++) { const t = makeItem('toy', shelfCols[(r * 3 + k + j) % 6]); t.position.set(0, y + 0.05, -0.95 + j * 0.95); t.rotation.y = -Math.PI / 2; t.scale.setScalar(0.9); g.add(t); } } }
+  box(37.8, 39.2, -6.6, 4.5);
+  // plants and balloons at the doors
+  for (const [x, z] of [[26.0, -2.4], [26.0, 9.8]]) { add(G('Cylinder', 0.3, 0.24, 0.5, 12), MT.yel, null, x, 0.25, z); add(G('Icosahedron', 0.45, 1), M(0x3fa84f, { flatShading: true }), null, x, 0.8, z); box(x - 0.4, x + 0.4, z - 0.4, z + 0.4); }
+  BOUNDS.x1 = 39.5; NAV.dirty = true;
+}
+// ---- FLIX Müzesi: one glass case per turkey colour, the FLIX inside spin; +15% sales ----
+function buildMuseum() { const g = new THREE.Group(); g.position.set(33.0, 0, -4.2); scene.add(g); const cols = Object.keys(COLS); MUS = { g, spin: [] };
+  rb(7.6, 0.3, 2.6, MT.navy, g, 0, 0.15, 0, 0.06); const glass = new THREE.MeshPhysicalMaterial({ color: 0xcfefff, transparent: true, opacity: 0.25, roughness: 0.05, depthWrite: false });
+  cols.forEach((c, i) => { const x = -3.3 + i * (6.6 / (cols.length - 1)); rb(0.62, 0.7, 0.62, MT.white, g, x, 0.65, 0.2, 0.05); const gl = add(new THREE.BoxGeometry(0.6, 0.8, 0.6), glass, g, x, 1.4, 0.2); gl.castShadow = false;
+    const f = makeFlix(c, 0.7); f.position.set(x, 1.05, 0.2); g.add(f); MUS.spin.push(f); });
+  const sg = tex(1024, 200, (c, w, h) => { c.fillStyle = '#0b2a5e'; c.beginPath(); c.roundRect(0, 0, w, h, 36); c.fill(); c.fillStyle = '#ffc20e'; c.font = 'italic 900 120px BC'; c.textAlign = 'center'; c.fillText(T_('FLIX MÜZESİ'), w / 2, 145); });
+  add(new THREE.PlaneGeometry(4.0, 0.8), M(0xffffff, { map: sg, transparent: true }), g, 0, 2.3, -1.0).castShadow = false; rb(0.1, 2.2, 0.1, MT.steel, g, -1.9, 1.1, -1.05); rb(0.1, 2.2, 0.1, MT.steel, g, 1.9, 1.1, -1.05);
+  outl(g); box(29.0, 37.0, -5.6, -2.8); }
+// ---- Şov stadyumu: stands around the stage, bigger crowd, double show money ----
+function buildStadium() { if (!SG) return;
+  for (const [x, rot] of [[5.5, Math.PI / 2], [12.2, -Math.PI / 2]]) { const g = new THREE.Group(); g.position.set(x, 0, 6.6); g.rotation.y = rot; scene.add(g);
+    for (let k = 0; k < 3; k++) { rb(3.2, 0.35 + k * 0.4, 0.7, k % 2 ? MT.red : MT.navy, g, 0, (0.35 + k * 0.4) / 2, -k * 0.7, 0.05); }
+    for (let k = 0; k < 4; k++) { const o = personMesh(k % 2 === 0); o.position.set(-1.2 + k * 0.8, 0.35 + 0.4 * (k % 3), -(k % 3) * 0.7); g.add(o); SH.fans.push({ o, ph: Math.random() * 6, y: o.position.y }); }
+    outl(g); box(x - 1.2, x + 1.2, 5.0, 8.2); }
+  const sg = tex(1024, 200, (c, w, h) => { c.fillStyle = '#ff3ad0'; c.beginPath(); c.roundRect(0, 0, w, h, 36); c.fill(); c.fillStyle = '#fff'; c.font = 'italic 900 120px BC'; c.textAlign = 'center'; c.fillText(T_('ŞOV STADYUMU'), w / 2, 145); });
+  add(new THREE.PlaneGeometry(3.6, 0.7), M(0xffffff, { map: sg, transparent: true }), SG.g, 0, 2.75, -1.38).castShadow = false; }
+// ---- Oyuncak treni: a little FLIX train runs on an overhead rail around the store ----
+let TRN = null;
+function buildTrain() { const x0 = 26.2, x1 = 38.6, z0 = -6.4, z1 = 11.6, y = 2.3, rail = M(0x2b2e36, { roughness: 0.4, metalness: 0.5 });
+  for (const [ax, az, bx, bz] of [[x0, z0, x1, z0], [x1, z0, x1, z1], [x1, z1, x0, z1], [x0, z1, x0, z0]]) { const L = Math.hypot(bx - ax, bz - az), r = rb(bx === ax ? 0.3 : L + 0.3, 0.12, bz === az ? 0.3 : L + 0.3, rail, null, (ax + bx) / 2, y, (az + bz) / 2, 0.03); r.castShadow = false; }
+  for (const [x, z] of [[x0, z0], [x1, z0], [x1, z1], [x0, z1], [x0, (z0 + z1) / 2], [x1, (z0 + z1) / 2]]) rb(0.14, y, 0.14, MT.steel, null, x, y / 2, z, 0.03);
+  const cars = []; const cols = ['kirmizi', 'sari', 'mavi', 'yesil'];
+  for (let k = 0; k < 4; k++) { const g = new THREE.Group(); scene.add(g);
+    if (k === 0) { rb(0.9, 0.5, 0.55, MT.red, g, 0, 0.35, 0, 0.08); add(G('Cylinder', 0.12, 0.14, 0.35, 10), MT.dark, g, 0.25, 0.75, 0); rb(0.35, 0.35, 0.5, MT.navy, g, -0.25, 0.75, 0, 0.05); }
+    else { rb(0.8, 0.3, 0.5, [MT.yel, MT.navy, MT.red][k % 3], g, 0, 0.27, 0, 0.06); const f = makeFlix(cols[k], 0.5); f.position.set(0, 0.42, 0); g.add(f); }
+    for (const s of [-1, 1]) for (const sx of [-0.28, 0.28]) { const w = add(G('Cylinder', 0.1, 0.1, 0.06, 10), MT.dark, g, sx, 0.12, s * 0.28); w.rotation.x = Math.PI / 2; }
+    g.position.y = y; cars.push(g); }
+  const P0 = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], seg = [], per = P0.map((p, i) => { const q = P0[(i + 1) % 4]; return Math.hypot(q[0] - p[0], q[1] - p[1]); }), tot = per.reduce((a, b) => a + b, 0);
+  TRN = { cars, s: 0, P0, per, tot, toot: 8 }; }
+function stepTrain(dt) { if (!TRN) return; TRN.s = (TRN.s + dt * 2.2) % TRN.tot;
+  TRN.cars.forEach((g, k) => { let s = (TRN.s - k * 1.0 + TRN.tot) % TRN.tot, i = 0; while (s > TRN.per[i]) { s -= TRN.per[i]; i++; } const a = TRN.P0[i], b = TRN.P0[(i + 1) % 4], t = s / TRN.per[i];
+    g.position.x = a[0] + (b[0] - a[0]) * t; g.position.z = a[1] + (b[1] - a[1]) * t; g.rotation.y = -Math.atan2(b[1] - a[1], b[0] - a[0]); }); }
+// ---- Dev FLIX Anıtı: a giant golden FLIX on a plinth in the shop, fireworks when bought; +25% sales ----
+function buildMonument() { const g = new THREE.Group(); g.position.set(34.0, 0, 7.0); scene.add(g);
+  add(G('Cylinder', 1.5, 1.7, 0.6, 32), MT.navy, g, 0, 0.3, 0); add(G('Cylinder', 1.2, 1.3, 0.5, 32), MT.yel, g, 0, 0.85, 0);
+  const f = makeFlix('altin', 3.2); f.position.set(0, 1.1, 0); g.add(f); ANIT = { g, f };
+  outl(g); box(32.4, 35.6, 5.4, 8.6); }
 // ===== Corn silo: carry corn sacks to the trough, fed turkeys lay feathers twice as fast =====
 let CS = null, cornPile = null;
 function buildCorn() { const g = new THREE.Group(); g.position.set(13.8, 0, -12.6); scene.add(g);
@@ -712,8 +775,8 @@ function buildBigFarm() {
   const pond = add(new THREE.CircleGeometry(2.2, 32), M(0x5ab8f0, { roughness: 0.1, metalness: 0.2 }), null, -6, 0.02, -24); pond.rotation.x = -Math.PI / 2; pond.castShadow = false; box(-8.1, -3.9, -26.1, -21.9);
   for (const [x, z] of [[4, -25.5], [5.2, -25.6]]) { const h = add(new THREE.CylinderGeometry(0.6, 0.6, 1.0, 18), M(0xe8c66a, { roughness: 1 }), null, x, 0.6, z); h.rotation.z = Math.PI / 2; }
   rb(2.4, 0.5, 2.0, MT.wood, null, 7.6, 0.25, -10.9); box(6.4, 8.8, -12.1, -9.7);
-  farmPile2 = new Pile(7.6, -10.9, 'feather', 16, 2, 2, 0.75); farmPile2.base = 0.55; markZone(farmPile2, new THREE.Vector3(7.6, 0, -8.8));
-  const cols = ['dogal', 'mavi', 'yesil', 'sari', 'kirmizi', 'mor', 'altin'].filter(c => c === 'dogal' || has(c)); for (let k = 0; k < 8; k++) addTurkey(cols[k % cols.length]);
+  farmPile2 = new Pile(7.6, -10.9, 'feather', 16, 2, 2, 0.75); farmPile2.base = 0.55; markZone(farmPile2, new THREE.Vector3(7.6, 0, -8.8)); farmPile2.rect = [6.4, 8.8, -12.1, -9.7];
+  const cols = ['dogal', 'mavi', 'yesil', 'sari', 'kirmizi', 'mor', 'altin', 'elmas', 'gokkusagi'].filter(c => c === 'dogal' || has(c)); for (let k = 0; k < 8; k++) addTurkey(cols[k % cols.length]);
   beltCrate2();
 }
 // ---- B Blok: the factory grows left — doors in the old wall, warehouse racks, forklift, 4th assembly, 2nd press, 5th counter ----
@@ -752,7 +815,7 @@ function buildPress2() {
   press.userData.body = rb(2.4, 2.6, 2.2, M(0xff7a1a, { roughness: 0.35 }), press, 0, 1.3, 0, 0.18); rb(1.8, 0.35, 1.6, MT.steel, press, 0, 2.8, 0, 0.08);
   press.userData.pis = add(new THREE.CylinderGeometry(0.22, 0.22, 1.2, 16), MT.steel, press, 0, 3.5, 0);
   sign('PRES 2', '#ff7a1a', press, 0, 1.6, 1.12, 1.4);
-  box(-21.0, -18.2, -5.1, -2.5); pressPile2 = new Pile(-17.4, -3.8, 'base', 12, 2, 2, 0.8); markZone(pressPile2); outl(press); PR2 = { press, t: 0 };
+  box(-21.0, -18.2, -5.1, -2.5); pressPile2 = new Pile(-17.4, -3.8, 'base', 12, 2, 2, 0.8); markZone(pressPile2); pressPile2.rect = [-21.0, -16.6, -5.1, -2.5]; outl(press); PR2 = { press, t: 0 };
 }
 // ---- feather robots: little vacuum bots drive to turkeys, collect feathers, unload into the crates ----
 function makeRobot() { const g = new THREE.Group(), body = new THREE.Group(); g.add(body);
@@ -897,6 +960,14 @@ function actPad(p) {
   if (p.id === 'depo') buildDepo();
   if (p.id === 'sahne') buildStage();
   if (p.id === 'misir') buildCorn();
+  if (p.id === 'cblok') buildCBlok();
+  if (p.id === 'muze') buildMuseum();
+  if (p.id === 'stadyum') buildStadium();
+  if (p.id === 'anit') buildMonument();
+  if (p.id === 'tren') buildTrain();
+  if (p.id === 'kasa6') buildCounter(5, 29.5);
+  if (p.id === 'kasa7') buildCounter(6, 36.2);
+  if (p.id === 'asm5') buildAssembly(4, 29.0, 3.0);
   if (p.id === 'bina') buildBina();
   if (p.id === 'kumes3' && penPile) addTurkey('dogal', true);
   if (p.id === 'ik' && farmPile) retirePen();
@@ -981,12 +1052,12 @@ export const bonusOn = (id) => Date.now() < (id === 'x2' ? SV.boostUntil : (SV.b
 export const bonusLeft = (id) => Math.max(0, (id === 'x2' ? SV.boostUntil : (SV.bonus[id] || 0)) - Date.now());
 export function addBonus(id, min) { const now = Date.now(); if (id === 'x2') SV.boostUntil = Math.max(now, SV.boostUntil) + min * 60000; else SV.bonus[id] = Math.max(now, SV.bonus[id] || 0) + min * 60000; save(); }
 export function cosB() { const r = { spd: 0, cap: 0, kar: 0, ws: 0, wc: 0 }; for (const k of ['skin', 'acc', 'floor', 'wskin', 'wacc']) { const c = COS[k].find(q => q.id === SV.cos[k]); if (c && c.b) for (const x in c.b) r[x] += c.b[x]; } return r; }
-export const profitMult = () => 1.25 * (1 + SH.hype / 200) * (1 + lv('kar') * 0.1 + cosB().kar + (has('genis') ? 0.1 : 0)) * (SV.vip ? 2 : 1) * (bonusOn('x2') ? 2 : 1);
+export const profitMult = () => 1.25 * (1 + SH.hype / 200) * (1 + lv('kar') * 0.1 + cosB().kar + (has('genis') ? 0.1 : 0) + (has('muze') ? 0.15 : 0) + (has('anit') ? 0.25 : 0)) * (SV.vip ? 2 : 1) * (bonusOn('x2') ? 2 : 1);
 const canSell = (C) => SV.staff.kas > C.i || near(C.zone, 1.9);
 const slotOf = (C, j) => j < 3 ? new THREE.Vector3(C.x, 0, 15.9 + j * 1.25) : new THREE.Vector3(C.x + 1.2 * (j - 2), 0, 19.6);
 function stepCustomers(dt) {
   const L = factoryLevel(), perK = 3 + Math.min(2, Math.floor(L / 7)) + (has('genis') ? 1 : 0);
-  custT -= dt; if (custT <= 0) { custT = rnd(2.0, 4.0) * (1 - SH.hype / 200) * Math.max(0.45, 1 - L * 0.035) * (bonusOn('musteri') ? 0.5 : 1) * Math.max(0.45, Math.pow(0.94, lv('cek'))) / Math.sqrt(K.length);
+  custT -= dt; if (custT <= 0) { custT = rnd(2.0, 4.0) * (1 - SH.hype / 200) * Math.max(0.45, 1 - L * 0.035) * (bonusOn('musteri') ? 0.5 : 1) * (has('tren') ? 0.87 : 1) * Math.max(0.45, Math.pow(0.94, lv('cek'))) / Math.sqrt(K.length);
     const C = K.reduce((a, b) => b.cust.length < a.cust.length ? b : a, K[0]);
     if (C.cust.length < perK) { const o = personMesh(); o.position.set(32, 0, 20.3); scene.add(o);
       const want = tutDone() ? Math.min(7, 1 + Math.floor(rnd(0, 2 + L * 0.3)) + (bonusOn('musteri') ? 1 : 0)) : 1; const oc = ['mavi', 'sari', 'kirmizi'].filter(has), ord = tutDone() && oc.length && Math.random() < 0.6 ? oc[Math.floor(rnd(0, oc.length))] : 'mix';
@@ -1007,7 +1078,7 @@ function stepCustomers(dt) {
   for (let i = customers.length - 1; i >= 0; i--) { const c = customers[i]; if (c.state === 'leave' && c.o.position.x < -29) { scene.remove(c.o); c.bub.remove(); customers.splice(i, 1); } }
 }
 // ---- endless contracts ("sipariş"): N FLIX of one colour, sold anywhere, pays a bonus + gems ----
-const CT_COLS = ['dogal', 'mavi', 'yesil', 'sari', 'kirmizi', 'mor', 'altin'];
+const CT_COLS = ['dogal', 'mavi', 'yesil', 'sari', 'kirmizi', 'mor', 'altin', 'elmas', 'gokkusagi'];
 function newContract() { const own = CT_COLS.filter(c => c === 'dogal' || has(c)), top = own.slice(-3), col = top[Math.floor(rnd(0, top.length))], d = SV.ctDone || 0;
   const n = Math.min(60, 6 + Math.floor(d * 1.5) + Math.floor(factoryLevel() / 3) * 2); const rw = Math.round(n * COLS[col].v * (3 + Math.min(4, d * 0.15)) * (1 + lv('pazar') * 0.15));
   SV.ct = { col, n, got: 0, rw, gem: Math.min(10, 2 + Math.floor(d / 4)) }; }
@@ -1062,6 +1133,9 @@ function stepTutorial() {
 
 // ---------------- simulation ----------------
 let feT = 0, prT = 0;
+function nearRect(R, d) { const a = P.o.position, dx = Math.max(R[0] - a.x, 0, a.x - R[1]), dz = Math.max(R[2] - a.z, 0, a.z - R[3]); return Math.hypot(dx, dz) < d; }
+// pick up from a pile: its ring, or any side of its crate / machine
+function nearPile(p) { if (near(p.zone, 1.6)) return true; const R = p.rect || [p.pos.x - p.cols * p.gap / 2, p.pos.x + p.cols * p.gap / 2, p.pos.z - p.rows * p.gap / 2, p.pos.z + p.rows * p.gap / 2]; return nearRect(R, 1.15); }
 function near(p, r) { const a = P.o.position; return Math.hypot(a.x - p.x, a.z - p.z) < r; }
 let zoneLock = null;
 function stepZones(T) {
@@ -1133,8 +1207,8 @@ function interact() {
   if (TR && TR.state === 'dock' && near(TR.zone, 1.8) && TR.load.length < truckCap()) { const o = stackPop(tested); if (o) { loadTruck(o); return; } }
   if (P.stack.length >= cap) return;
   const hasProd = P.stack.some(isProd), hasRaw = P.stack.some(isRaw);
-  if (!hasProd) for (const pile of [penPile, miniPile, farmPile, farmPile2, pressPile, pressPile2, rubberPile, cornPile]) if (pile && near(pile.zone, 1.6) && pile.n && !(pile !== rubberPile && P.stack.filter(o => o.userData.type === pile.type).length >= Math.ceil(cap / 2))) { if (pile.type === 'feather') fxBurst(pile.pos.clone().setY(1.0), 'fluff', 2, 0.7); stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
-  if (!hasRaw) for (const pile of asm.map(a => a.out).concat(TM ? [TM.out] : [], TS ? [TS.out, REJ] : [], GS ? [GS.out] : [], RC ? [RC.out] : [], PL ? [PL.out] : [])) if (near(pile.zone, 1.6) && pile.n) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
+  if (!hasProd) for (const pile of [penPile, miniPile, farmPile, farmPile2, pressPile, pressPile2, rubberPile, cornPile]) if (pile && pile.n && nearPile(pile) && !(pile !== rubberPile && P.stack.filter(o => o.userData.type === pile.type).length >= Math.ceil(cap / 2))) { if (pile.type === 'feather') fxBurst(pile.pos.clone().setY(1.0), 'fluff', 2, 0.7); stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
+  if (!hasRaw) for (const pile of asm.map(a => a.out).concat(TM ? [TM.out] : [], TS ? [TS.out, REJ] : [], GS ? [GS.out] : [], RC ? [RC.out] : [], PL ? [PL.out] : [])) if (pile.n && nearPile(pile)) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
 }
 // ---- the hero does the work by hand at the stand: build + box, then kick-test, then place it ----
 const handPos = () => P.o.position.clone().add(new THREE.Vector3(Math.sin(P.o.rotation.y) * 0.7, 1.15, Math.cos(P.o.rotation.y) * 0.7));
@@ -1308,7 +1382,23 @@ function resolve(x, z) { x = Math.max(BOUNDS.x0 + 0.5, Math.min(BOUNDS.x1 - 0.5,
   initUI();
   camLook.set(P.o.position.x * 0.85, 0, P.o.position.z - 1.5); camGoal.copy(camLook); camera.position.copy(camLook).add(camOff); requestAnimationFrame(frame); document.body.classList.add('ready');
   offlinePopup();
-  window.__fb = { get W() { return workers.map(w => ({ t: w.task && w.task.dst, si: w.si, n: w.stack.length, x: +w.H.g.position.x.toFixed(1), z: +w.H.g.position.z.toFixed(1) })); }, get SV() { return SV; }, get P() { return P; }, setMoney: m => { SV.money = m; }, tp: (x, z) => { P.o.position.set(x, 0, z); camGoal.set(x * 0.85, 0, z - 1.5); camLook.copy(camGoal); },
+  window.__fb = { cfg: () => ({ PADS, COS, BONUS, COLS, UPS, SUPS, STAFF, TUT }), iconShot: (v = 'A', S = 1024) => { const sc = new THREE.Scene(); sc.environment = scene.environment; sc.environmentIntensity = 0.5;
+      const cv = document.createElement('canvas'); cv.width = cv.height = 1024; const x = cv.getContext('2d'); const bg = { A: ['#ff5a2a', '#e22511', '#8a0c05'], B: ['#ffd23a', '#ff8a1a', '#e22511'], C: ['#5ab8ff', '#1d5aa8', '#0b2a5e'] }[v];
+      const gr = x.createRadialGradient(512, 560, 40, 512, 540, 760); gr.addColorStop(0, bg[0]); gr.addColorStop(0.45, bg[1]); gr.addColorStop(1, bg[2]); x.fillStyle = gr; x.fillRect(0, 0, 1024, 1024);
+      x.save(); x.translate(512, 560); for (let i = 0; i < 24; i++) { x.rotate(Math.PI / 12); x.fillStyle = 'rgba(255,255,255,.08)'; x.beginPath(); x.moveTo(0, 0); x.lineTo(900, -110); x.lineTo(900, 110); x.fill(); } x.restore();
+      const bgT = new THREE.CanvasTexture(cv); bgT.colorSpace = THREE.SRGBColorSpace; sc.background = bgT;
+      const sun = new THREE.DirectionalLight(0xffffff, 2.6); sun.position.set(-3, 6, 5); sc.add(sun); sc.add(new THREE.HemisphereLight(0xffffff, 0x884422, 1.1));
+      const tk = turkeyMesh(v === 'C' ? 'altin' : 'dogal'), box = makeItem('toy', v === 'B' ? 'mavi' : 'kirmizi'), fl = makeFlix(v === 'C' ? 'gokkusagi' : 'sari', 1.0);
+      if (v === 'A') { tk.scale.setScalar(1.26); tk.position.set(-0.55, -1.05, 0); tk.rotation.y = 0.55; box.scale.setScalar(0.85); box.position.set(0.95, -1.05, 0.5); box.rotation.y = -0.35; fl.scale.setScalar(0.80); fl.position.set(0.85, 0.35, 0.6); fl.rotation.set(0.25, 0.4, -0.3); }
+      else if (v === 'B') { box.scale.setScalar(1.32); box.position.set(0.15, -1.3, 0.4); box.rotation.y = -0.25; tk.scale.setScalar(0.94); tk.position.set(-0.95, -1.2, -0.4); tk.rotation.y = 0.7; fl.scale.setScalar(0.69); fl.position.set(1.05, 0.45, 0.5); fl.rotation.set(0.2, 0.3, -0.35); }
+      else { tk.scale.setScalar(1.43); tk.position.set(0.25, -1.15, -0.2); tk.rotation.y = 0.35; box.scale.setScalar(0.66); box.position.set(1.25, -1.25, 0.8); box.rotation.y = -0.5; fl.scale.setScalar(0.72); fl.position.set(-0.95, 0.35, 0.9); fl.rotation.set(0.2, -0.4, 0.35); }
+      sc.add(tk, box, fl); const sh = new THREE.Mesh(new THREE.CircleGeometry(2.4, 40), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.18 })); sh.rotation.x = -Math.PI / 2; sh.position.y = -1.04; sc.add(sh);
+      const cam = new THREE.PerspectiveCamera(36, 1, 0.1, 100); cam.position.set(0.25, 1.1, 7.0); cam.lookAt(0, -0.15, 0);
+      const was = renderer.getPixelRatio(), ws = renderer.getSize(new THREE.Vector2()); renderer.setPixelRatio(1); renderer.setSize(S, S, false); renderer.render(sc, cam);
+      const out = document.createElement('canvas'); out.width = out.height = S; const o = out.getContext('2d'); o.drawImage(renderer.domElement, 0, 0, S, S);
+      if (LOGO) { const w = S * 0.27, h = w * LOGO.height / LOGO.width; o.drawImage(LOGO, S * 0.045, S * 0.04, w, h); }
+      renderer.setPixelRatio(was); renderer.setSize(ws.x, ws.y, false); return out.toDataURL('image/png'); },
+    probe: (x0, x1, z0, z1) => { const r = []; scene.traverse(o => { if (!o.isMesh) return; const p = o.getWorldPosition(new THREE.Vector3()); if (p.x > x0 && p.x < x1 && p.z > z0 && p.z < z1) { o.geometry.computeBoundingBox(); const b = o.geometry.boundingBox; r.push([+p.x.toFixed(2), +p.y.toFixed(2), +p.z.toFixed(2), +(b.max.x - b.min.x).toFixed(2), +(b.max.y - b.min.y).toFixed(2), +(b.max.z - b.min.z).toFixed(2), o.parent === scene]); } }); return r; }, get W() { return workers.map(w => ({ t: w.task && w.task.dst, si: w.si, n: w.stack.length, x: +w.H.g.position.x.toFixed(1), z: +w.H.g.position.z.toFixed(1) })); }, get SV() { return SV; }, get P() { return P; }, setMoney: m => { SV.money = m; }, tp: (x, z) => { P.o.position.set(x, 0, z); camGoal.set(x * 0.85, 0, z - 1.5); camLook.copy(camGoal); },
     get counter() { return counter.n; }, get cash() { return cashPile.n; }, get K() { return K.map(C => [C.pile.n, C.cash.n, C.cust.length]); }, get rej() { return REJ && REJ.n; }, get rc() { return RC && [RC.vals.length, RC.out.n]; }, get pl() { return PL && [PL.inF.length, PL.out.n]; }, get wk() { return workers.map(W => [W.task && W.task.dst, +W.H.g.position.x.toFixed(1), +W.H.g.position.z.toFixed(1), W.stuckN || 0]); }, get act() { return P.act && P.act.kind; }, padPos: (id) => { const o = padObjs.find(q => q.p.id === id); return o ? [o.p.x, o.p.z] : null; }, get asm() { return asm.map(a => [a.inF.length, a.inB, a.out.n]); }, get test() { return TS ? [TS.q.length, testBusy(), TS.out.n] : null; }, get truck() { return TR && [TR.state, TR.load.length, TR.cash.n]; }, get top() { return TM && [rubberPile.n, TM.inR, TM.out.n]; }, get gift() { return GS && [GS.inV.length, GS.out.n]; },
     bot: (on) => { BOT = on; if (on) { botT = performance.now() / 1000; SIM = 1; } }, tick: (n, dt = 0.05) => { for (let i = 0; i < n; i++) { botT += dt; tick(dt, botT); } }, joy: (x, y) => { joy.x = x; joy.y = y; },
     I: () => ({ P, SV, K, asm, TS, REJ, padObjs, penPile, miniPile, farmPile, farmPile2, pressPile, pressPile2, ZONES, cap: capOf(), navPath, lv, has, TM, GS, RC, PL, TR, rubberPile, UPS, SUPS, STAFF }),
@@ -1321,5 +1411,5 @@ function resolve(x, z) { x = Math.max(BOUNDS.x0 + 0.5, Math.min(BOUNDS.x1 - 0.5,
     boostNow: () => { bxT = 0; }, get bx() { return BX && { id: BX.id, x: BX.x, z: BX.z }; },
     get tgt() { const s = TUT[SV.tut]; if (!s) return null; const v = s.tgt(); return [v.x, v.z]; },
     sim: (k) => { SIM = k; }, person: (x, z, kid) => { const o = personMesh(kid); o.position.set(x, 0, z); scene.add(o); }, testQ: (n) => { for (let i = 0; i < n; i++) TS.q.push(makeItem('toy', 'mavi', 8)); syncTestQ(); }, truckLoad: (n) => { for (let i = 0; i < n; i++) TR.load.push(8); },
-    get cust() { return customers.length; }, get rob() { return ROB.map(R => [R.st, R.load.length]); }, get ct() { return SV.ct; }, get dpr() { return dpr; }, get ords() { return customers.map(c => c.ord); }, get cdbg() { return K.map(C => C.cust[0] && [C.cust[0].state, +C.cust[0].o.position.x.toFixed(1), +C.cust[0].o.position.z.toFixed(1), C.cust[0].ord, C.cust[0].got, C.cust[0].want, +C.cust[0].pat.toFixed(1), C.x]); }, get turkeys() { return turkeys.length; }, get zone() { return zoneLock; }, zoom: (f) => camOff.multiplyScalar(f), look: (s, a) => { SV.cos.skin = s; SV.cos.acc = a; setLook(); } };
+    get stackN() { return P.stack.length; }, get pxz() { return [+P.o.position.x.toFixed(2), +P.o.position.z.toFixed(2)]; }, dropAll: () => { P.stack.forEach(o => scene.remove(o)); P.stack.length = 0; }, get cust() { return customers.length; }, get rob() { return ROB.map(R => [R.st, R.load.length]); }, get ct() { return SV.ct; }, get dpr() { return dpr; }, get ords() { return customers.map(c => c.ord); }, get cdbg() { return K.map(C => C.cust[0] && [C.cust[0].state, +C.cust[0].o.position.x.toFixed(1), +C.cust[0].o.position.z.toFixed(1), C.cust[0].ord, C.cust[0].got, C.cust[0].want, +C.cust[0].pat.toFixed(1), C.x]); }, get turkeys() { return turkeys.length; }, get zone() { return zoneLock; }, zoom: (f) => camOff.multiplyScalar(f), look: (s, a) => { SV.cos.skin = s; SV.cos.acc = a; setLook(); } };
 })();
