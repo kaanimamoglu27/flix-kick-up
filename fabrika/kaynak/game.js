@@ -18,7 +18,9 @@ export const fmt = (n) => LNG === 'en' ? (n < 10000 ? Math.floor(n).toLocaleStri
 const DEF = () => ({ v: 3, t2: 1, t3: 1, t4: 1, money: 0, gems: 0, unl: [], tut: 0, made: 0, up: {}, staff: { tas: 0, kas: 0 }, cos: { skin: 'kraliyet', acc: 'yok', floor: 'nane', wskin: 'karisik', wacc: 'kask', own: ['kraliyet', 'yok', 'nane', 'karisik', 'kask'] }, ct: null, ctDone: 0,
   noads: 0, vip: 0, starter: 0, boostUntil: 0, ads: { day: '', n: 0, last: 0 }, freeUpLast: 0, lastInter: 0, lastSeen: 0, ipm: 0, del: 0, paid: {}, txn: [], bonus: {} });
 // Endgame test modu (Kaan için): ayrı kayıt, her şey açık, tüm geliştirmeler en üstte, tüm bonuslar kalıcı
-export const ENDGAME = (() => { try { return localStorage.getItem('flix_fab_mode') === 'end'; } catch { return false; } })();
+// Endgame test mode is for Kaan's web tests only: never in the App Store app
+export const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+export const ENDGAME = (() => { if (IS_NATIVE) return false; try { return localStorage.getItem('flix_fab_mode') === 'end'; } catch { return false; } })();
 const KEY = ENDGAME ? 'flix_fabrika_end' : 'flix_fabrika3';
 export function setEndgame(on) { try { localStorage.setItem('flix_fab_mode', on ? 'end' : 'normal'); } catch {} save(); location.reload(); }
 function endSave() { const d = DEF(), far = Date.now() + 3650 * 864e5; d.tut = 99; d.del = 1; d.money = 1e6; d.gems = 99999; d.unl = PADS.map(p => p.id);

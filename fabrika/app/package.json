@@ -1,6 +1,6 @@
 {
   "name": "flix-fabrika",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "description": "Flix Fabrika by Flix - Capacitor 8 wrapper",
   "scripts": {
