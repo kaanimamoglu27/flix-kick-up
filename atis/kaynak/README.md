@@ -1,5 +1,11 @@
 Flix Atış kaynak dosyaları.
 
+v10 (1.5.2): çamaşır ipleri artık FLIX'i durdurmuyor, sadece yavaşlatıyor (kind 'slow': her ipte bir kez hız x0.72, yukarı hız en fazla 1.5, içinden geçer, hışırtı sesi).
+Dükkân vitrinleri dükkânın türüne göre çiziliyor (shops10.js: shopKind ada göre 18 tür; eczane = beyaz raflar, ilaç kutuları, yeşil haç, kırmızı tabela ve "E" amblemi;
+fırın simit/ekmek, kasap asılı et, dönerci döner, kafe çay bardağı/fincan, berber ayna/koltuk, oyuncakçı ayıcık/top/FLIX, nalbur alet panosu, manav kasalar,
+şekerci kavanoz/lolipop, terzi elbise, lokanta masa + MENÜ, balıkçı buz tezgâhı, market raflar, sörf, çizgi roman, çamaşırhane). Tabelanın solunda tür amblemi.
+game10.js = game9.js + `python3 patch10.py`; derleme `GAME_F=game10.js python3 build8.py` ve sonra `python3 /mnt/project-files/flix/yasal_menu/integrate.py atis flix-atis.html`.
+
 v9 (1.5.1): gerçek AdMob (sadece iOS uygulamasında; web'de FLIX tanıtım kartı aynen kalır). Kimlikler app/www/ads-config.js'te.
 Geçiş reklamı her 3 biten bölümde bir (kazanma ya da 8 atışın bitmesi, 3. bölümden sonra), ödüllü reklamdan sonraki 90 sn içinde hiç çıkmaz.
 Ödüllü +60 tüy (dükkân, günde 6) ve 2x tüy / günlük hediye x2 aynı birimi, "+2 atış hakkı" ayrı birimi kullanır; ödül sadece AdMob'un ödül bildiriminden sonra verilir.
