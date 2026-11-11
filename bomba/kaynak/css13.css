@@ -58,3 +58,7 @@
 @media (prefers-reduced-motion:reduce){#home .top img,.word span,#play,#play::after,#fz i{animation:none}}
 
 #howT{padding-right:44px;font-size:19px}
+
+/* v1.4 */
+html,body{position:fixed;inset:0;width:100%}img{-webkit-user-drag:none}
+.xad #resAd,.xad #endAd,.xad #dayAd{display:none!important}.xon [data-m="online"]{display:none!important}

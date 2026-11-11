@@ -20,7 +20,7 @@ g=open('game_v12.js').read()
 def R(old,new,n=1):
     global g
     assert g.count(old)==n,(old[:70],g.count(old)); g=g.replace(old,new)
-R("const VERSION = '1.2';","const VERSION = '1.3.1';")
+R("const VERSION = '1.2';","const VERSION = '1.4';")
 R("if (SV.lang !== 'tr' && SV.lang !== 'en')","const PER = 25;\n{ const d = { st: null, wOwn: [0], sk: {}, skOwn: {}, lastW: 0 }; for (const k in d) if (SV[k] === undefined || SV[k] === null) SV[k] = d[k]; }\nif (!SV.st) { SV.st = {}; for (let i = 1; i <= Math.min(PER, SV.mac || 0); i++) SV.st[i] = 2; }\nfor (const c of CHARS) { if (!Array.isArray(SV.skOwn[c.id])) SV.skOwn[c.id] = [0]; if (!(SV.sk[c.id] >= 0)) SV.sk[c.id] = 0; }\nif (SV.lang !== 'tr' && SV.lang !== 'en')")
 R("const myPf = () => ({ n: SV.name, lv: myLv(), av: SV.av });","const myPf = () => ({ n: SV.name, lv: myLv(), av: SV.av, sk: SV.sk[SV.char] | 0 });")
 R("av: normAv({ f: a[0], bg: a[1], fr: a[2], st: a[3] }) }; }","av: normAv({ f: a[0], bg: a[1], fr: a[2], st: a[3] }), sk: p.k >= 0 && p.k < 8 ? p.k | 0 : 0 }; }")
@@ -76,6 +76,13 @@ R("camLook.set(STAGE.x + ox, h > w ? 0.2 : 0.95, 0);","camLook.set(STAGE.x + ox,
 # v1.3.1: livelier music (music.js reworked: faster tracks, arpeggio, bouncing bass)
 R("volume: kind === 'menu' ? 0.16 : 0.22, menu: kind === 'menu', track: 'Rainbow Drift', intensity: kind === 'menu' ? 0 : 0.5 });","volume: kind === 'menu' ? 0.18 : 0.22, menu: kind === 'menu', track: ['Turbo Circuit', 'Rainbow Drift', 'Star Sprint', 'Neon Nights'][Math.floor(Math.random() * 4)], intensity: kind === 'menu' ? 0.45 : 0.75 });")
 R("      G.time -= dt; if (G.time <= 0) {","      G.time -= dt; if (AUD.mus && AUD.mus.setIntensity) AUD.mus.setIntensity(G.time < 30 ? 1 : 0.75); if (G.time <= 0) {")
+# v1.4: iOS app / App Store pass
+R("let lastRewardAt = 0;","let lastRewardAt = 0;\nconst hasAds = () => !!window.FlixAds || !NATIVE, hasIap = () => !NATIVE || !!(window.FlixNative && window.FlixNative.buy);\nfunction gate() { const c = document.documentElement.classList; c.toggle('app', NATIVE); c.toggle('xad', !hasAds()); c.toggle('xon', NATIVE); }\ngate(); setTimeout(gate, 1200); setTimeout(gate, 4000);\ndocument.addEventListener('gesturestart', (e) => e.preventDefault()); document.addEventListener('dblclick', (e) => e.preventDefault());")
+R("  let h = '<button class=\"prow\" data-s=\"ad\"' + (left > 0 ? '' : ' disabled')","  gate(); let h = !hasAds() ? '' : '<button class=\"prow\" data-s=\"ad\"' + (left > 0 ? '' : ' disabled')")
+R("  PACKS.forEach((p, i) => { h += ","  if (hasIap()) PACKS.forEach((p, i) => { h += ")
+R("  h += '<button class=\"prow\" data-s=\"noads\"'","  if (hasIap() && (!NATIVE || window.FlixAds)) h += '<button class=\"prow\" data-s=\"noads\"'")
+R("  if (NATIVE) h += '<button class=\"prow\" data-s=\"rest\">","  if (NATIVE && hasIap() && window.FlixNative.restore) h += '<button class=\"prow\" data-s=\"rest\">")
+R("  $('shopRows').innerHTML = h;\n}","  if (!h) h = '<p style=\"text-align:center;margin:6px 0\">' + T('Tüy kazanmak için maç oyna, bölümleri geç ve günlük ödülünü topla.', 'Play matches, clear levels and collect your daily reward to earn feathers.') + '</p>';\n  $('shopRows').innerHTML = h;\n}")
 open('game.js','w').write(g)
-b=open('build.py').read().replace("VER='1.2'","VER='1.3.1'"); open('build.py','w').write(b)
+b=open('build.py').read().replace("VER='1.2'","VER='1.4'"); open('build.py','w').write(b)
 print('ok',len(g))
