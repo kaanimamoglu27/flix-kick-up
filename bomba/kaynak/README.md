@@ -1,5 +1,5 @@
-# Flix Bomba (v1.4)
-3D bomba-labirent oyunu. Tek dosya: `index.html` (kaynaklar `kaynak/`). Önceki sürümler: `v131.html`, `v12.html`, `v11.html`, `v1.html`. App Store görselleri ve ikon: `store/`. iOS paketi: `app/` (Capacitor, kök `index.html` ve `store/icon-1024.png` dosyalarını kullanır).
+# Flix Bomba (v1.4.1)
+3D bomba-labirent oyunu. Tek dosya: `index.html` (kaynaklar `kaynak/`). Önceki sürümler: `v14.html`, `v131.html`, `v12.html`, `v11.html`, `v1.html`. App Store görselleri ve ikon: `store/`. iOS paketi: `app/` (Capacitor, kök `index.html` ve `store/icon-1024.png` dosyalarını kullanır).
 
 Modlar: Macera (5 harita x 25 = 125 bölüm: canavarları patlat, gizli kapıyı bul, çık), Arena (4 kişilik maç), Bulmaca (12 bölüm, sınırlı bomba), Online (hızlı eşleşme ya da oda koduyla 2-4 kişi).
 Online yalnızca oyunun claude.ai bağlantısında çalışır (sayfanın canlı oda özelliğini kullanır). Hızlı eşleşmede 10 saniye içinde kimse gelmezse maç bilgisayar oyuncularıyla başlar.
@@ -10,8 +10,10 @@ v1.3: 5 harita (Çimen, Karlı: fitil daha yavaş, Çöl: alev daha uzun sürer,
 
 v1.4 (iOS uygulaması için): `index.html` artık tam bir belge (doctype + telefon viewport ayarı; eksikliği uygulamada arayüzü 980 piksel genişlikte çizdiriyordu). three.js ve yazı tipleri dosyanın içine gömülü, hiçbir ağ isteği yok, uygulama internetsiz açılır. Uygulamada (Capacitor) Online modu gizlenir (claude.ai sayfasının oda özelliğine bağlı). Mağazada tüy paketleri ve Geri Yükle yalnızca `window.FlixNative.buy` varsa, reklam düğmeleri ve Reklamları Kaldır yalnızca `window.FlixAds` varsa görünür. Köprüler: `FlixNative.buy(id)`, `.restore()`, `.price(id)`; teslim için `window.__fkuGrant(id, txId)`; `FlixAds.showRewarded()` -> 'rewarded', `.showInterstitial()`, `.setScreen(n)`, `.setAdsRemoved(v)`. Ürünler: `bomba_tuy_1000/3500/7000/16000` (tüketilen), `bomba_noads` (kalıcı).
 
+v1.4.1: `build.py` artık tam sayfayı kendisi üretiyor (TestFlight derlemesi ham sayfayı paketlediği için arayüz bozuk çıkıyordu). Flix logosu kırmızı zeminli; app ikonu ve mağaza görselleri yeni logoyla yenilendi.
+
 ## Derleme
-`kaynak/` içinde: `python3 patch12.py` (game_v11.js + meta.js + ui12.js -> game.js, shell_v11.html + css12.css + body12.html -> shell.html), sonra `python3 patch13.py` (game_v12.js + ui13.js -> game.js, shell_v12.html + css13.css -> shell.html; game_v12.js ve shell_v12.html patch12 çıktısının kopyasıdır), sonra `python3 build.py`, sonra `python3 pack.py` (three.js'i esbuild ile paketler, `fonts.css`'i gömer, belge başlığını ekler; `ESBUILD_DIR` klasöründe `npm i esbuild three@0.170.0` gerekir).
+`kaynak/` içinde: `python3 patch12.py` (game_v11.js + meta.js + ui12.js -> game.js, shell_v11.html + css12.css + body12.html -> shell.html), sonra `python3 patch13.py` (game_v12.js + ui13.js -> game.js, shell_v12.html + css13.css -> shell.html; game_v12.js ve shell_v12.html patch12 çıktısının kopyasıdır), sonra `python3 build.py [çıktı.html]`. `build.py` tek başına tam sayfayı üretir (doctype, UTF-8, telefon viewport ayarı, gömülü `fonts.css`, gömülü `vendor_three.js`); sadece Python gerekir. iOS iş akışı da bunu çağırır. Uygulamaya ham `shell.html` ya da başlıksız bir sayfa koymayın: viewport ve charset eksik olunca arayüz 980 piksel genişlikte çizilir ve emojiler bozuk karakter olur. `vendor_three.js` = three 0.170 + RoundedBoxGeometry + RoomEnvironment, esbuild ile `--format=iife --global-name=__T3` olarak bir kez üretildi.
 
 - `kaynak/chars.js`: karakter modelleri ve özellikleri (Flix, Usta Wu, Kick, Flick, Buzul Flix).
 - `kaynak/world.js`: ada haritası, bloklar, bomba, patlama, güçler, canavarlar, kapı.

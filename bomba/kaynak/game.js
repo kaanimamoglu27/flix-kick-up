@@ -1,7 +1,7 @@
 // ===== Flix Bomba game =====
 // Grid rules and the bot's "flee / bomb the crate / hunt" loop follow MattSkala/html5-bombergirl (MIT); rewritten for 3D with pathfinding.
 const $ = (id) => document.getElementById(id);
-const VERSION = '1.4';
+const VERSION = '1.4.1';
 const SAVE_KEY = 'flix_bomba1';
 let SV = { char: 'flix', diff: 1, sound: true, music: true, wins: 0, games: 0, seenHow: false, mac: 0, bul: 0 };
 try { Object.assign(SV, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) {}

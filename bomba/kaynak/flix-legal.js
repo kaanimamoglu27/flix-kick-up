@@ -2,7 +2,7 @@
    One self-contained panel: legal links (official pages on flixtoysofficial.com) + About / Hakkında.
    Links open outside the game: window.open(_blank) -> new browser tab on the web, Safari on iOS (Capacitor hands
    new-window requests to the system browser), so no in-game WebView and the game keeps running underneath.
-   Usage: FlixLegal.init({game:'atis'|'fabrika'|'arkana'|'direktor', name, version, mount, theme, oss})
+   Usage: FlixLegal.init({game:'atis'|'fabrika'|'arkana'|'direktor'|'bomba', name, version, mount, theme, oss})
           any element with data-flixlegal="legal" or "about" opens the panel; FlixLegal.open('legal'|'about'). */
 (function () {
   if (window.FlixLegal) return;
@@ -11,7 +11,8 @@
     atis: 'flix-atis-terms-of-service-kullanim-sartlari',
     fabrika: 'flix-fabrika-terms-of-service-kullanim-sartlari',
     arkana: 'flix-arkana-terms-of-service-kullanim-sartlari',
-    direktor: 'flix-direktor-terms-of-service-kullanim-sartlari'
+    direktor: 'flix-direktor-terms-of-service-kullanim-sartlari',
+    bomba: 'flix-bomb-terms-of-service-kullanim-sartlari'
   };
   var SITE = 'https://www.flixtoysofficial.com', MAIL = 'flixofficial2025@gmail.com';
   var T = {
