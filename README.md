@@ -1,6 +1,24 @@
+# FLIX oyunları: hangi oyun hangi repoda
+
+Her oyunun kendi reposu var. Bir oyunla çalışırken o oyunun reposunu kullan. Bu repo (flix-kick-up) Flix Kick Up'ın reposudur; ayrıca tüm iOS paketlerini ve TestFlight iş akışlarını barındırdığı için diğer oyunların birer kopyası da klasör olarak burada durur.
+
+| Oyun | Kendi reposu | Bu repodaki klasör |
+|---|---|---|
+| Flix Kick Up | [flix-kick-up](https://github.com/kaanimamoglu27/flix-kick-up) | kök dizin, `app/` |
+| Flix Arkana | [Flix-Arkana](https://github.com/kaanimamoglu27/Flix-Arkana) | `lootback/` |
+| Flix Atış | [Flix-Atis](https://github.com/kaanimamoglu27/Flix-Atis) | `atis/` |
+| Flix Sen Olsaydın | [Flix-Sen-Olsaydin](https://github.com/kaanimamoglu27/Flix-Sen-Olsaydin) | `flix-sen-olsaydin/`, `direktor/` |
+| Flix Fabrika | [Flix-Fabrika](https://github.com/kaanimamoglu27/Flix-Fabrika) | `fabrika/` |
+| Flix Bomba | [Flix-Bomba](https://github.com/kaanimamoglu27/Flix-Bomba) | `bomba/` |
+| Flix Birleştir | [Flix-Birlestir](https://github.com/kaanimamoglu27/Flix-Birlestir) | `birlestir/` |
+
+Geliştirilmeyen oyunlar: Flix Kart (`kart/`), Flix Çember (`cember/`), Flix Kayıp Tüyler (`kayip-tuyler/`). `321/` klasöründe yalnızca tanıtım videoları var.
+
+---
+
 ## ⚽ Flix Sen Olsaydın (eski adı Flix Direktör)
 
-**Kendi reposu:** https://github.com/kaanimamoglu27/Flix-ember (adı Flix-Sen-Olsaydin olacak) · **Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/flix-sen-olsaydin/ · iOS paketi: [`direktor/app/`](direktor/app/)
+**Kendi reposu:** https://github.com/kaanimamoglu27/Flix-Sen-Olsaydin · **Oyna:** https://kaanimamoglu27.github.io/flix-kick-up/flix-sen-olsaydin/ · iOS paketi: [`direktor/app/`](direktor/app/)
 
 Gerçek maçlarda hocanın yerine geç: üstte canlı maç, altta kararlar. Kariyer modu (2010'dan bugüne), her hafta kendiliğinden yenilenen gerçek Süper Lig maçları, canlı bülten ve skor tahmini.
 
