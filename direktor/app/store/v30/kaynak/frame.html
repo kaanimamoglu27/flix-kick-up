@@ -1,0 +1,45 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800;900&family=Inter:wght@500;600&display=block" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:430px;height:932px;overflow:hidden;font-family:Inter,sans-serif}
+#f{position:absolute;inset:0;overflow:hidden;background:#0a1230}
+.pitch{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 20%,rgba(40,80,190,.45),transparent 60%),radial-gradient(ellipse at 100% 100%,rgba(220,30,40,.35),transparent 55%)}
+.lines{position:absolute;left:50%;top:330px;width:560px;height:560px;margin-left:-280px;border:2px solid rgba(255,255,255,.07);border-radius:50%}
+.lines:after{content:"";position:absolute;left:-200px;right:-200px;top:50%;border-top:2px solid rgba(255,255,255,.07)}
+.head{position:absolute;left:26px;right:26px;top:30px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.top img{height:40px}
+.k{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:#e0242c;border-radius:4px;padding:6px 10px;transform:skewX(-8deg)}
+.cap{font-family:'Barlow Condensed';font-weight:900;font-size:52px;line-height:.92;color:#fff;text-transform:uppercase;letter-spacing:.2px}
+.cap b{color:#ffc61a;font-weight:900}
+.sub{margin-top:12px;font-size:15px;font-weight:500;color:rgba(255,255,255,.78);line-height:1.38}
+.ph{position:absolute;left:50%;top:268px;width:356px;height:770px;margin-left:-178px;border-radius:56px;background:#05070f;padding:9px;box-shadow:0 0 0 1.5px rgba(255,255,255,.25),0 30px 60px rgba(0,0,0,.55),0 0 90px rgba(60,110,255,.18)}
+.w{width:338px;height:732px;border-radius:47px;overflow:hidden;background:#0a1230}
+.w img{width:338px;display:block}
+</style></head><body>
+<div id="f"><div class="pitch"></div><div class="lines"></div>
+<div class="head"><div class="top"><img src="logo.png"><span class="k" id="k"></span></div><div class="cap" id="c"></div><div class="sub" id="s"></div></div>
+<div class="ph"><div class="w"><img id="shot"></div></div></div>
+<script>
+const q=new URLSearchParams(location.search),N=+q.get('s'),L=q.get('l');document.documentElement.lang=L;
+const ORD={1:2,2:3,3:1,4:4,5:7,6:5,7:6,8:8};
+const T={tr:{1:['Sen Olsaydın','Kritik dakika,<br><b>kararı sen ver</b>','Gerçek maçta hocanın yerine geç. Gol atma ve gol yeme şansını kartta gör.'],
+2:['Karşılaştır','Gerçek hoca<br><b>ne yaptı?</b>','Kararını gerçek hocanınkiyle ve diğer oyuncularınkiyle karşılaştır.'],
+3:['Canlı maç','Maçı<br><b>canlı izle</b>','Kuşbakışı sahada paslar, şutlar, kurtarışlar ve baskı grafiği.'],
+4:['Puanın','Hocadan<br><b>iyi misin?</b>','Maç sonunda skorun gerçek skorla yan yana. Direktör puanını topla.'],
+5:['Rüya maçı','İki sezon,<br><b>tek maç</b>','2020-21 Kanarya mı, 2015-16 Aslanspor mu? İki ayrı sezonun kadrosunu karşılaştır.'],
+6:['Kariyer','Derbiler ve<br><b>sezon görevleri</b>','2010’dan bugüne bir sezon seç, takımını şampiyonluğa taşı.'],
+7:['Basın toplantısı','Mikrofonlar<br><b>senin için</b>','Kendi yarattığın hocanla basına konuş, takımın moralini sen belirle.'],
+8:['Ödüller','Ayın hocası<br><b>sen ol</b>','Seri yakala, görevleri bitir, Flix Coin kazan.']},
+en:{1:['If You Were','Big minute.<br><b>Your call.</b>','Take the coach’s seat in a real match. See your scoring and conceding odds on every card.'],
+2:['Compare','What did the<br><b>real coach do?</b>','Compare your call with the real coach and with other players.'],
+3:['Live match','Watch it<br><b>live</b>','A top-down pitch with passes, shots, saves and a live pressure graph.'],
+4:['Your score','Better than<br><b>the coach?</b>','Your score next to the real one at full time. Collect your manager points.'],
+5:['Dream match','Two seasons,<br><b>one match</b>','Pick any two squads from any seasons since 2010 and play them against each other.'],
+6:['Career','Derbies and<br><b>season goals</b>','Pick any season since 2010 and take your club to the title.'],
+7:['Press','The mics are<br><b>yours</b>','Face the press with your own coach and set the dressing-room mood.'],
+8:['Awards','Become<br><b>coach of the month</b>','Build a streak, finish goals, earn Flix Coins.']}};
+const t=T[L][N];k.textContent=t[0];c.innerHTML=t[1];s.textContent=t[2];shot.src='sh/'+ORD[N]+'.png'; if([2,7,8].includes(N))shot.style.marginTop='-80px';
+while(c.offsetHeight>100){c.style.fontSize=(parseFloat(getComputedStyle(c).fontSize)-2)+'px'}
+</script></body></html>
