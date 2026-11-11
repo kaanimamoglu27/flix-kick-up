@@ -43,6 +43,7 @@ button{font-family:inherit;color:var(--ink);cursor:pointer}
 #xpBar{position:absolute;left:62px;right:calc(100% - 62px - 26%);top:7px;height:18px;border-radius:999px;background:#fff;box-shadow:0 3px 0 var(--ink);overflow:hidden}
 #xpBar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--sky),var(--purple));border-radius:999px;transition:width .15s}
 #xpBar b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink)}
+#tRec{position:absolute;left:calc(26% + 70px);top:30px;background:rgba(255,255,255,.88);padding:0 9px;border-radius:999px;font-weight:700;font-size:11.5px;line-height:17px;border:1.5px solid #120d14;box-shadow:1px 2px 0 #120d14;white-space:nowrap}#tRec:empty{display:none}#tRec.new{background:#ffd23f;animation:wob .7s ease-in-out 3}
 #topInfo{position:absolute;left:calc(26% + 70px);right:10px;top:7px;display:flex;justify-content:flex-start;gap:4px;flex-wrap:nowrap;overflow:hidden}#tSoul{display:none!important}
 #tSoul{color:#0d6b8a}#tSoul.bump{animation:sbump .25s}@keyframes sbump{50%{transform:scale(1.18);background:#d8f6ff}}
 #topInfo span{background:rgba(255,255,255,.88);padding:0 8px;border-radius:999px;font-weight:700;font-size:11.5px;line-height:17px;box-shadow:0 3px 0 rgba(42,35,80,.25)}
@@ -263,6 +264,7 @@ h2{font-family:Bangers,Fredoka,sans-serif;font-weight:400;letter-spacing:2px;col
   <div id="hud">
     <div id="xpBar"><i id="xpFill"></i><b id="xpTxt">Sv 1</b></div>
     <div id="topInfo"><span id="tTime">0:00</span><span id="tWave">Dalga 1</span><span id="tKills">💀 0</span><span id="tScore">⭐ 0</span><span id="tSoul" style="display:none">🕊️ 0</span></div>
+    <div id="tRec"></div>
     <div id="abil"></div><button id="bBag" aria-label="Çanta">🎒</button>
     <button id="bFlix" aria-label="Flix süper vuruş"><span><img data-logo alt="FLIX"></span></button>
     <button id="bDash" aria-label="Atıl"><span>💨</span><i></i></button>
@@ -633,7 +635,7 @@ function applyRes() {
   // Ultra = the screen's full native resolution (capped at 4K pixels), 2K = sharp but lighter, Hızlı = no post effects
   // the 2K mode is capped at ~2.4 million pixels so a big iPad screen costs about the same as a phone
   const hi = save.q !== 'fast', dpr = (window.devicePixelRatio || 1) * UI, px = Math.max(1, LW * LH), cap4k = Math.sqrt(3840 * 2160 / px), cap2k = Math.sqrt(2.4e6 / px);
-  const pr = save.q === 'ultra' ? Math.min(3 * UI, dpr, cap4k) * (R.prScale || 1) : hi ? Math.min(2 * UI, dpr, cap2k) * (R.prScale || 1) : Math.min(1.25 * UI, dpr, Math.sqrt(1.2e6 / px));
+  const pr = save.q === 'ultra' ? Math.min(3 * UI, dpr, cap4k) * (R.prScale || 1) : hi ? Math.min((isTouch ? 1.7 : 2) * UI, dpr, cap2k) * (R.prScale || 1) : Math.min(1.25 * UI, dpr, Math.sqrt(1.2e6 / px));
   if (pr === R.pr && R.resW === LW && R.resH === LH) return; R.pr = pr; R.resW = LW; R.resH = LH;
   R.renderer.setPixelRatio(pr); R.renderer.setSize(LW, LH, false);
   if (R.post) { R.post.setPixelRatio(pr); R.post.setSize(LW, LH); if (R.bloom) R.bloom.resolution.set(LW / 2, LH / 2); if (R.grade) R.grade.uniforms.uPx.value.set(1 / (LW * pr), 1 / (LH * pr)); }
@@ -1888,7 +1890,9 @@ function buildSkeletons() {
   DR.ring = inst(new THREE.TorusGeometry(0.52, 0.05, 6, 28), metal, MAXE, true);
   DR.eye = inst(new THREE.SphereGeometry(0.1, 10, 8), new THREE.MeshBasicMaterial({color: 0xffffff}), MAXE, true);
   DR.gun = inst(new THREE.BoxGeometry(0.08, 0.08, 0.4), lam(0x222228), MAXE * 2);
-  for (const m of [SK.skull, SK.ribs, ZB.torso, ZB.head, RB.torso, RB.head, DR.body]) m.castShadow = true;
+  // phones: the horde keeps its soft blob shadows but is left out of the sun's shadow map (a whole second draw of
+  // up to 170 enemies every other frame was a big part of the heat and stutter)
+  if (!isTouch) for (const m of [SK.skull, SK.ribs, ZB.torso, ZB.head, RB.torso, RB.head, DR.body]) m.castShadow = true;
   SK.pool = inst(new THREE.CircleGeometry(1, 24), addGlow(0x6dff3a, 0.4), 60);
   // bats, burrow mounds and elite auras
   BT.body = inst(new THREE.SphereGeometry(0.24, 14, 10), new THREE.MeshPhongMaterial({color: 0xffffff, shininess: 40}), MAXE, true);
@@ -1947,11 +1951,11 @@ const INTRO = {
 const STORY_LEN = 40;
 // v41: boss health raised (Kaan: bosses were too easy, the first one fell in 2-12 s); a boss fight now lasts about half a minute or more
 const BOSSES = {
-  10: {kind: 'king',   name: 'İskelet Kral',   hp: 4000,  r: 2.0, col: 0xc4b89c},
-  20: {kind: 'dragon', name: 'Kemik Ejderha',  hp: 7000,  r: 2.0, col: 0xb3a587},
-  30: {kind: 'golem',  name: 'Dev Zombi',      hp: 10000, r: 2.3, col: 0x86a06a},
-  40: {kind: 'tyrant', name: 'Kıyamet Lordu',  hp: 16000, r: 2.4, col: 0x3a3f4c},
-  50: {kind: 'vortex', name: 'VORTEKS', sub: 'Ekranın ele geçirdiği eski kahraman!', hp: 36000, r: 2.4, col: 0x2b2638, final: true, spd: 3.1}
+  10: {kind: 'king',   name: 'İskelet Kral',   hp: 3400,  r: 2.0, col: 0xc4b89c},
+  20: {kind: 'dragon', name: 'Kemik Ejderha',  hp: 6000,  r: 2.0, col: 0xb3a587},
+  30: {kind: 'golem',  name: 'Dev Zombi',      hp: 8500,  r: 2.3, col: 0x86a06a},
+  40: {kind: 'tyrant', name: 'Kıyamet Lordu',  hp: 14000, r: 2.4, col: 0x3a3f4c},
+  50: {kind: 'vortex', name: 'VORTEKS', sub: 'Ekranın ele geçirdiği eski kahraman!', hp: 32000, r: 2.4, col: 0x2b2638, final: true, spd: 3.1}
 };
 // a boss guards every tenth wave; endless keeps cycling them, stronger each lap
 function bossFor(n) { if (n % 10) return null; if (G.mode === 'story' && !G.endless && n <= STORY_LEN) return BOSSES[n === STORY_LEN ? 50 : n]; return BOSSES[((n / 10 - 1) % 5 + 1) * 10]; }
@@ -2045,6 +2049,7 @@ function tierUp(t) {
 function newRun(mode) {
   clearWorld(); mode = MODES[mode] ? mode : G.mode || 'story';
   Object.assign(G, {
+    recB: (save.bw && save.bw[mode]) || 0, recNew: false,
     state: 'play', time: 0, wave: 1, waveT: 0, kills: 0, level: 1, xp: 0, xpNext: 5, hp: curHero().hp, maxHp: curHero().hp, px: 0, pz: 0, fx: 0, fz: 1, inv: 0, flix: 0,
     enemies: [], shots: [], eshots: [], gems: [], items: [], tels: [], zaps: [], pools: [], grab: 0, paid: 0, spawnT: 1, weps: Object.assign({toss: 1, [curHero().start]: 1}, curHero().start2 ? {[curHero().start2]: 1} : {}), pas: {}, ws: {}, pending: mode === 'boss' ? 4 : mode === 'hell' ? 3 : 0, boss: null, endless: mode === 'endless' || mode === 'hell', mode, picks: [], score: 0, combo: 0, comboT: 0, flixGot: 0, runCoins: 0, riftO: null, riftT: 35, riftsClosed: 0, huntT: 240, bestCombo: 0,
     dmgMul: 1, hpBonus: 0, spdBonus: 0, cdBonus: 0, barr: [], fuses: [], carFires: [], traf: null, trafT: 12, dashT: 0, dashCd: 0, mines: [], torns: [], swipeFx: null, carsBlown: 0, comicQ: null, tier: 0, fis: [], revived: false, fell: false, rockets: [], slash: null, slam: null, gearFx: null, gunOn: false, toss: [], tq: [], bombs: [], whips: [], turrets: [], throwT: 0, aimT: 0, aimA: 0, epiT: 0, finalT: 0, bossKills: 0, paidG: 0, boosts: [], bst: null, bstT: 20, trail: [], camp: null,
@@ -2328,7 +2333,7 @@ function bossDown(e) {
 function hurt(dmg, src) {
   if (G.inv > 0 || G.state !== 'play' || (G.bst && G.bst.k === 'star')) return;
   const wv = G.mode === 'boss' ? G.wave * 10 : G.mode === 'hell' ? hellWave(G.wave) : isEnd() ? Math.min(G.wave, 50) : G.wave; dmg *= Math.min(1, 0.55 + wv * 0.075) * (1 + tierOf(wv) * 0.2 + Math.max(0, wv - 9) * 0.018); // early waves forgive more, every 10 waves bite harder
-  const sty = G.mode === 'story' && !G.endless; dmg *= (1 - 0.07 * (G.pas.armor || 0)) * (G.mode === 'hell' ? 1.15 : 1) * (sty ? 1.1 + G.wave * 0.008 : 1) * (isEnd() ? 1.3 * endStep(G.wave) : 1) * DF().dmg * END25(); G.hp -= dmg; G.inv = (sty && G.wave > 8) || (isEnd() && G.wave > 4) ? 0.4 : 0.5; G.shake = Math.max(G.shake, 0.35);
+  const sty = G.mode === 'story' && !G.endless; dmg *= (1 - 0.07 * (G.pas.armor || 0)) * (G.mode === 'hell' ? 1.15 : 1) * (sty ? 1.1 + G.wave * 0.008 : 1) * (isEnd() ? 0.8 * endStep(G.wave) : 1) * DF().dmg * END25(); G.hp -= dmg; G.inv = (sty && G.wave > 8) || (isEnd() && G.wave > 4) ? 0.4 : 0.5; G.shake = Math.max(G.shake, 0.35);
   SFX.hurt(); buzz(40); $('flash').style.opacity = 1; setTimeout(() => $('flash').style.opacity = 0, 140);
   if (src) { const l = Math.hypot(G.px - src.x, G.pz - src.z) || 1; G.kx = (G.px - src.x) / l * 6; G.kz = (G.pz - src.z) / l * 6; }
   if (G.hp <= 0) { G.hp = 0; G.state = 'dying'; G.dieT = 0; G.fell = true; G.slowT = 1.2; banner('', curHero().n + ' yere düştü...', 1.4); }
@@ -2572,7 +2577,7 @@ function update(dt) {
       case 'bot': case 'dronebot': {
         const dr = e.type === 'dronebot';
         if (dr) { want = d < 5 ? -0.5 : d < 7.5 ? 0.2 : 1; const w = 0.9; gx += -gz * w; gz += gx * w; }
-        if (e.burst > 0) { want = dr ? want : 0; e.bT -= dt; if (e.bT <= 0) { e.bT = 0.14; e.burst--; G.eshots.push({x: e.x, z: e.z, vx: e.ax * 15, vz: e.az * 15, life: 1.3, dmg: Math.round(e.dmg * 0.6), col: 0xff3030, laser: 1}); SFX.bow(); } }
+        if (e.burst > 0) { want = dr ? want : 0; e.bT -= dt; if (e.bT <= 0) { e.bT = 0.14; e.burst--; G.eshots.push({x: e.x, z: e.z, vx: e.ax * 15, vz: e.az * 15, life: 1.3, dmg: Math.round(e.dmg * 0.45), col: 0xff3030, laser: 1}); SFX.bow(); } }
         else if (e.aim > 0) { want = dr ? want : 0; e.aim -= dt; if (e.aim <= 0) { e.burst = dr ? 1 : 3; e.bT = 0; } }
         else if ((e.los || dr) && d < 12) { if (!dr) want = d < 6 ? -0.5 : d < 9 ? 0 : 1; e.cd -= dt; if (e.cd <= 0) { e.aim = dr ? 0.5 : 0.7; e.ax = dx / d; e.az = dz / d; e.cd = rnd(2.4, 3.4); } }
         break; }
@@ -2590,7 +2595,7 @@ function update(dt) {
     e.x += e.vx * dt; e.z += e.vz * dt; e.moving = Math.hypot(e.vx, e.vz) > 0.4;
     if (e.type !== 'ghost' && e.type !== 'dronebot' && e.type !== 'bat' && !e.under && pushOut(e, e.r) && e.st === 'charge') { e.st = 'stun'; e.stT = 1.7; e.vx = e.vz = 0; bldDamage(e.x + (e.cx || 0) * (e.r + 0.8), e.z + (e.cz || 0) * (e.r + 0.8), 140); G.shake = Math.max(G.shake, 0.3); SFX.boom(); confetti(e.x, 1.5, e.z, 10, 1); hit(e, Math.round(e.max * 0.25), '255,210,63'); FX.nums.push({x: e.x, y: 3.6, z: e.z, t: 1, txt: 'SERSEM!', col: '255,210,63', big: true}); }
     if (d > 38) { const [nx, nz] = spawnPos(); e.x = nx; e.z = nz; e.st = 'walk'; e.navT = 0; }
-    if (d < e.r + (G.bst && G.bst.k === 'mini' ? 0.2 : G.bst && G.bst.k === 'giant' ? 0.75 : 0.45) && !(G.bst && G.bst.k === 'fly' && !e.fly) && e.type !== 'bomber' && !e.under && e.st !== 'emerge' && !(e.type === 'ghost' && e.phase > 0)) hurt(e.st === 'charge' ? e.dmg * 1.4 : e.dmg, e);
+    if (d < e.r + (G.bst && G.bst.k === 'mini' ? 0.2 : G.bst && G.bst.k === 'giant' ? 0.75 : 0.45) && !(G.bst && G.bst.k === 'fly' && !e.fly) && e.type !== 'bomber' && !e.under && e.st !== 'emerge' && !(e.type === 'ghost' && e.phase > 0)) hurt(e.st === 'charge' ? e.dmg * 1.15 : e.dmg, e);
   }
   updateComp(dt);
   // shots
@@ -2921,9 +2926,9 @@ function gameOver(won) {
   G.state = 'over'; $('stickBase').classList.remove('on'); $('bPause').style.display = 'none';
   const best = G.wave > save.bestWave || (G.wave === save.bestWave && G.kills > save.bestKills);
   save.bestWave = Math.max(save.bestWave, G.wave); save.bestKills = Math.max(save.bestKills, G.kills); save.bestTime = Math.max(save.bestTime, Math.floor(G.time)); persist();
-  save.best = save.best || {}; const bestS = G.score > (save.best[G.mode] || 0); if (bestS) save.best[G.mode] = G.score; persist();
+  save.best = save.best || {}; const bestS = G.score > (save.best[G.mode] || 0); if (bestS) save.best[G.mode] = G.score; recSave(); persist();
   $('overTitle').textContent = won ? (G.mode === 'hunt' ? 'Tüm Flix\'ler toplandı!' : 'New York kurtuldu!') : G.mode === 'hunt' && G.huntT <= 0 ? 'Süre bitti!' : curHero().n + ' düştü!';
-  $('overNote').textContent = (won && G.mode !== 'hunt' ? 'VORTEKS kurtarıldı, şehir özgür! ' : '') + (bestS ? `Yeni ${MODES[G.mode].n} rekoru! 🎉` : `${MODES[G.mode].n} rekoru: ${fmtN(save.best[G.mode] || 0)}`);
+  $('overNote').textContent = (won && G.mode !== 'hunt' ? 'VORTEKS kurtarıldı, şehir özgür! ' : '') + (bestS ? `Yeni ${MODES[G.mode].n} rekoru! 🎉` : `${MODES[G.mode].n} rekoru: ${fmtN(save.best[G.mode] || 0)}`) + ` · En fazla: ${recTxt(G.mode, recBest(G.mode))}`;
   $('overStats').innerHTML = `<span>Skor</span><b>${fmtN(G.score)}</b><span>${G.mode === 'boss' ? 'Patron' : G.mode === 'story' ? 'Seviye' : 'Dalga'}</span><b>${G.wave}</b><span>Flix</span><b>${G.flixGot}</b><span>Süre</span><b>${fmt(G.time)}</b><span>Güç</span><b>${G.level}</b><span>Yenilen düşman</span><b>${G.kills}</b><span>En uzun kombo</span><b>x${G.bestCombo || 0}</b>`;
   const gain = runReward(won) - (G.paid || 0); G.paid = (G.paid || 0) + gain; addCoins(gain); const gg = runGems(won) - (G.paidG || 0); G.paidG = (G.paidG || 0) + gg; addGems(gg); $('overCoins').textContent = '+🪙 ' + fmtN(gain) + (gg > 0 ? '  ·  +💎 ' + fmtN(gg) : '') + ' kazandın';
   $('bEndless').style.display = won && G.mode === 'story' && !G.endless ? '' : 'none';
@@ -3241,7 +3246,7 @@ function render(dt, rdt) {
     if (G.state === 'epilogue' || (G.state === 'over' && G.epiT > 0)) { const a = (G.epiT || 0) * 0.22 + (G.state === 'over' ? performance.now() / 9000 : 0); R.cam.position.set(G.px + Math.sin(a) * 12, 5.2, G.pz + Math.cos(a) * 12); R.cam.lookAt(G.px, 1.3, G.pz); menuTrick(H, rdt); }
   }
   if (G.state === 'menu' && R.sun && (R.sun.target.position.x !== 0 || R.sun.target.position.z !== 0)) { R.sun.position.set(-18, 26, 12); R.sun.target.position.set(0, 0, 0); R.renderer.shadowMap.needsUpdate = true; }
-  R.shF = (R.shF || 0) + 1; if (G.state === 'menu' || R.shF % (isTouch && G.enemies.length > 90 ? 3 : 2) === 0 || (R.fps && R.fps > 58 && save.q === 'hi' && !isTouch)) R.renderer.shadowMap.needsUpdate = true;
+  R.shF = (R.shF || 0) + 1; if (G.state === 'menu' || R.shF % (isTouch ? 3 : 2) === 0 || (R.fps && R.fps > 58 && save.q === 'hi' && !isTouch)) R.renderer.shadowMap.needsUpdate = true;
   chrTick();
   instRanges();
   if (R.post && save.q !== 'fast') R.post.render(); else R.renderer.render(R.scene, R.cam);
@@ -3516,6 +3521,17 @@ const MODES = {
   hunt:    {n: 'Flix Avı', ic: '🔥', d: '4 dakikada şehre dağılmış 40 Flix figürünü topla!'},
   hell:    {n: 'Cehennem', ic: '😈', d: 'Lav arenası: ateş yağmuru, lav taşması, 5 dalgada bir patron. Çok zor!'}
 };
+// per-mode record: furthest wave / level / boss reached (Flix Avı: most Flix collected), shown at the top while playing
+function recVal() { return G.mode === 'hunt' ? (G.flixGot || 0) : G.wave; }
+function recTxt(m, n) { return m === 'hunt' ? n + ' Flix' : m === 'story' ? 'seviye ' + n : m === 'boss' ? n + '. patron' : 'dalga ' + n; }
+function recBest(m) { return (save.bw && save.bw[m]) || 0; }
+function recTick() {
+  const v = recVal();
+  if (G.recB > 0 && v > G.recB && !G.recNew) { G.recNew = true; banner('', '🏆 Yeni rekor!', 1.2); SFX.card(); }
+  if (_hc.rn !== G.recNew) { _hc.rn = G.recNew; $('tRec').classList.toggle('new', G.recNew); }
+  setT('tRec', G.recB > 0 ? (G.recNew ? '🏆 YENİ REKOR · ' + recTxt(G.mode, v) : '🏆 Rekorun: ' + recTxt(G.mode, G.recB)) : '');
+}
+function recSave() { save.bw = save.bw || {}; const v = recVal(); if (v > (save.bw[G.mode] || 0)) save.bw[G.mode] = v; }
 function makeFlixFig(col) {
   const g = new THREE.Group(), body = new THREE.Group(); body.position.y = -0.55; g.add(body);
   const red = new THREE.MeshPhongMaterial({color: col || 0xe22511, shininess: 90, specular: 0x664444, emissive: 0x2a0400, side: THREE.DoubleSide});
@@ -3623,7 +3639,7 @@ function updateHUD() {
   setT('xpTxt', '⚡ ' + G.level + (G.level >= 50 ? ' MAKS' : '') + (G.tier ? ' · ⭐' + G.tier : ''));
   setT('tTime', '⏱ ' + fmt(G.time));
   setT('tWave', G.mode === 'hunt' ? `🔥 ${G.flixGot}/${HUNT_GOAL} · ${fmt(G.huntT)}` : G.mode === 'boss' ? 'Patron ' + G.wave : G.mode === 'story' && !G.endless ? `Sv ${G.wave}/${STORY_LEN} · 👑${G.wave % 10 ? Math.ceil(G.wave / 10) * 10 : '!'}` : (G.mode === 'hell' ? '😈 ' : '') + 'Dalga ' + G.wave + (G.wave > 10 ? ' · ☠️' + (tierOf(G.wave) + 1) : ''));
-  setT('tScore', '⭐ ' + fmtN(G.score));
+  setT('tScore', '⭐ ' + fmtN(G.score)); recTick();
   setT('tKills', '💀 ' + G.kills);
   if (DOOM.on) setT('tSoul', `🕊️ ${fmtN(DOOM.freed)} · %${DOOM.satT >= 1 ? 100 : Math.round((G.wave - 1) / STORY_LEN * 100)} renk`);
   setS('bDash', '--c', (G.dashCd / 3.2).toFixed(2)); if (_hc.ab !== (_hc.ab = document.documentElement.classList.contains('abOpen')) || _hc.ab) abilLive();
@@ -5125,7 +5141,7 @@ $('bAgain').onclick = () => newRun(G.mode);
 $('bEndless').onclick = () => { for (const c of DOOM.civ) { c.play = false; c.t = 99; } G.epiT = 0; G.endless = true; G.state = 'play'; hideScreens(); $('bPause').style.display = 'block'; startWave(G.wave + 1); };
 function modesOpen() {
   const b = save.best || {};
-  $('modeList').innerHTML = Object.keys(MODES).map(k => `<button class="mode" data-m="${k}"><i>${MODES[k].ic}</i><b>${MODES[k].n}</b><span>${MODES[k].d}</span>${b[k] ? `<small>Rekor ${fmtN(b[k])}</small>` : ''}</button>`).join('');
+  $('modeList').innerHTML = Object.keys(MODES).map(k => `<button class="mode" data-m="${k}"><i>${MODES[k].ic}</i><b>${MODES[k].n}</b><span>${MODES[k].d}</span>${b[k] || recBest(k) ? `<small>${[recBest(k) ? '🏆 En fazla ' + recTxt(k, recBest(k)) : '', b[k] ? 'Rekor ' + fmtN(b[k]) : ''].filter(Boolean).join(' · ')}</small>` : ''}</button>`).join('');
   for (const el of document.querySelectorAll('.mode')) el.onclick = () => { const m = el.dataset.m; SFX.card(); if (!save.seenHow) { save.seenHow = true; persist(); screen('how'); $('bHowOk').onclick = () => newRun(m); } else newRun(m); };
   screen('modes');
 }
@@ -5147,7 +5163,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) { pau
 setInterval(() => $('bFlip').classList.toggle('show', !!ROT && G.state === 'menu'), 300);
 window.addEventListener('resize', layout);
 function resizeGL() {
-  const c = $('fx'), d = Math.min(isTouch ? 2 : 2.4, (window.devicePixelRatio || 1) * UI); c.width = LW * d; c.height = LH * d; FX.d = d;
+  const c = $('fx'), d = Math.min(isTouch ? 1.5 : 2.4, (window.devicePixelRatio || 1) * UI); c.width = LW * d; c.height = LH * d; FX.d = d;
   if (!R.on) return; R.cam.aspect = LW / LH; R.cam.updateProjectionMatrix(); applyQuality();
 }
 
