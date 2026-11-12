@@ -36,32 +36,12 @@ jobs:
           npx cap sync ios
           python3 tools/ios_setup.py
           grep 'TARGETED_DEVICE_FAMILY' ios/App/App.xcodeproj/project.pbxproj
-      - name: Add screenshot navigation to generated test copy only
+      - name: Disable tracking prompt in disposable simulator build only
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          f = Path('ios/App/App/public/index.html')
-          html = f.read_text(encoding='utf-8')
-          assert '</body>' in html, 'No HTML body found'
-          # AdMob triggers a native ATT permission sheet on first launch. Disable ads only
-          # in the disposable simulator app, leaving shipping source/build untouched.
-          Path('ios/App/App/public/ads.js').write_text('/* Screenshot test: ads disabled */\\n', encoding='utf-8')
-          script = """
-          <script>
-          window.addEventListener('load', () => {
-            const click = (selector) => {
-              const el = document.querySelector(selector);
-              if (!el) { console.error('Screenshot test missing:', selector); return; }
-              el.click();
-            };
-            // Allow cold simulator startup before capturing; then open each sheet.
-            setTimeout(() => click('[data-open="skin"]'), 25000);
-            setTimeout(() => { click('#sheetBack'); click('[data-open="scene"]'); }, 34000);
-            setTimeout(() => { click('#sheetBack'); click('#openSettings'); }, 43000);
-          });
-          </script>
-          """
-          f.write_text(html.replace('</body>', script + '</body>'), encoding='utf-8')
+          p = Path('ios/App/App/public/ads.js')
+          p.write_text('/* Screenshot-test copy only: disable AdMob / ATT prompt. */\n', encoding='utf-8')
           PY
       - name: Build unsigned iOS simulator application
         run: |
@@ -93,20 +73,42 @@ jobs:
           test -n "$IPAD_UDID" || { echo "::error::iPad simulator UDID not set"; exit 1; }
           xcrun simctl boot "$IPAD_UDID"
           xcrun simctl bootstatus "$IPAD_UDID" -b
-      - name: Install, launch, and capture iPad screenshots
+      - name: Capture one isolated launch per screen
         run: |
+          set -euo pipefail
           mkdir -p "$GITHUB_WORKSPACE/ipad-screenshots"
           xcrun simctl status_bar "$IPAD_UDID" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100 || true
-          xcrun simctl install "$IPAD_UDID" "$TEST_APP"
-          xcrun simctl launch "$IPAD_UDID" com.flixtoys.kickup
-          sleep 7
-          xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/01-home.png"
-          sleep 8
-          xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/02-dolap.png"
-          sleep 8
-          xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/03-sahneler.png"
-          sleep 8
-          xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/04-ayarlar.png"
+          cp "$TEST_APP/public/index.html" "$RUNNER_TEMP/kickup-base.html"
+          for stage in home dolap sahneler ayarlar; do
+            echo "::group::Capturing $stage"
+            STAGE="$stage" python3 - <<'PY'
+          from pathlib import Path
+          import os
+          html=Path(os.environ['RUNNER_TEMP'], 'kickup-base.html').read_text(encoding='utf-8')
+          selector={'home':None,'dolap':'[data-open="skin"]','sahneler':'[data-open="scene"]','ayarlar':'#openSettings'}[os.environ['STAGE']]
+          if selector:
+              script=('<script>window.addEventListener("load",function(){'
+                      'setTimeout(function(){'
+                      'var el=document.querySelector('+repr(selector)+');'
+                      'if(el)el.click();else console.error("Missing screenshot selector");'
+                      '},6500);});</script>')
+              html=html.replace('</body>',script+'</body>')
+          Path(os.environ['TEST_APP'],'public','index.html').write_text(html,encoding='utf-8')
+          PY
+            xcrun simctl terminate "$IPAD_UDID" com.flixtoys.kickup || true
+            xcrun simctl uninstall "$IPAD_UDID" com.flixtoys.kickup || true
+            xcrun simctl install "$IPAD_UDID" "$TEST_APP"
+            xcrun simctl launch "$IPAD_UDID" com.flixtoys.kickup
+            sleep 18
+            case "$stage" in
+              home) name="01-home";;
+              dolap) name="02-dolap";;
+              sahneler) name="03-sahneler";;
+              ayarlar) name="04-ayarlar";;
+            esac
+            xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/$name.png"
+            echo "::endgroup::"
+          done
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
