@@ -45,7 +45,8 @@ jobs:
           assert '</body>' in html, 'No HTML body found'
           # AdMob triggers a native ATT permission sheet on first launch. Disable ads only
           # in the disposable simulator app, leaving shipping source/build untouched.
-          Path('ios/App/App/public/ads.js').write_text('/* Screenshot test: ads disabled */\\n', encoding='utf-8')\n          script = """
+          Path('ios/App/App/public/ads.js').write_text('/* Screenshot test: ads disabled */\\n', encoding='utf-8')
+          script = """
           <script>
           window.addEventListener('load', () => {
             const click = (selector) => {
