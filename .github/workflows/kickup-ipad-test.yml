@@ -79,13 +79,15 @@ jobs:
           for runtime, items in j['devices'].items():
               for d in items:
                   if d.get('isAvailable',True) and d['name'].startswith('iPad'):
-                      candidates.append((('iPad Air' in d['name']), runtime, d['name'], d['udid']))
+                      candidates.append((('iPad Air' in d['name'] and '11-inch' in d['name']), ('iPad Air' in d['name']), runtime, d['name'], d['udid']))
           if not candidates: raise SystemExit('No available iPad simulator on this macOS runner')
           candidates.sort(reverse=True)
-          _,runtime,name,udid=candidates[0]
+          _,_,runtime,name,udid=candidates[0]
           print('Selected:',name, runtime, udid)
           with open(os.environ['GITHUB_ENV'],'a') as f: f.write('IPAD_UDID='+udid+'\n')
           PY
+          IPAD_UDID=$(sed -n 's/^IPAD_UDID=//p' "$GITHUB_ENV" | tail -1)
+          test -n "$IPAD_UDID" || { echo "::error::iPad simulator UDID not set"; exit 1; }
           xcrun simctl boot "$IPAD_UDID"
           xcrun simctl bootstatus "$IPAD_UDID" -b
       - name: Install, launch, and capture iPad screenshots
