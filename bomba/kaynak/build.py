@@ -26,3 +26,4 @@ head='<!doctype html>\n<html lang="tr"><head><meta charset="utf-8">\n<meta name=
 h=head+h
 out=out or 'flix-bomba.html'
 open(out,'w',encoding='utf-8').write(h); print(out,len(h))
+import subprocess; subprocess.run([sys.executable,'check_page.py',out],check=True)   # fail the build if the page is not app-safe
