@@ -1,0 +1,112 @@
+name: Kick Up iPad compatibility screenshots
+run-name: Kick Up iPad compatibility test
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ipad-screenshots:
+    runs-on: macos-15-intel
+    timeout-minutes: 55
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Pick installed stable Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_*.app | grep -vi beta | sort -V | tail -1)
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+          xcrun simctl list devices available
+      - name: Install dependencies and build web content
+        run: |
+          npm ci
+          npm run build
+      - name: Generate and configure iPhone-only iOS project
+        run: |
+          npx cap add ios --packagemanager CocoaPods
+          npx cap sync ios
+          python3 tools/ios_setup.py
+          grep 'TARGETED_DEVICE_FAMILY' ios/App/App.xcodeproj/project.pbxproj
+      - name: Add screenshot navigation to generated test copy only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          f = Path('ios/App/App/public/index.html')
+          html = f.read_text(encoding='utf-8')
+          assert '</body>' in html, 'No HTML body found'
+          script = """
+          <script>
+          window.addEventListener('load', () => {
+            const click = (selector) => {
+              const el = document.querySelector(selector);
+              if (!el) { console.error('Screenshot test missing:', selector); return; }
+              el.click();
+            };
+            // Capture home at 7s, then each selection sheet after navigation.
+            setTimeout(() => click('[data-open="skin"]'), 10000);
+            setTimeout(() => { click('#sheetBack'); click('[data-open="scene"]'); }, 18000);
+            setTimeout(() => { click('#sheetBack'); click('#openSettings'); }, 26000);
+          });
+          </script>
+          """
+          f.write_text(html.replace('</body>', script + '</body>'), encoding='utf-8')
+          PY
+      - name: Build unsigned iOS simulator application
+        run: |
+          set -o pipefail
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/kickup-ipad-dd" \
+            CODE_SIGNING_ALLOWED=NO build | tail -n 100
+          APP="$RUNNER_TEMP/kickup-ipad-dd/Build/Products/Debug-iphonesimulator/App.app"
+          test -d "$APP"
+          echo "TEST_APP=$APP" >> "$GITHUB_ENV"
+      - name: Choose and boot available iPad simulator
+        run: |
+          python3 - <<'PY'
+          import json, subprocess, os
+          j=json.loads(subprocess.check_output(['xcrun','simctl','list','devices','available','-j']))
+          candidates=[]
+          for runtime, items in j['devices'].items():
+              for d in items:
+                  if d.get('isAvailable',True) and d['name'].startswith('iPad'):
+                      candidates.append((('iPad Air' in d['name']), runtime, d['name'], d['udid']))
+          if not candidates: raise SystemExit('No available iPad simulator on this macOS runner')
+          candidates.sort(reverse=True)
+          _,runtime,name,udid=candidates[0]
+          print('Selected:',name, runtime, udid)
+          with open(os.environ['GITHUB_ENV'],'a') as f: f.write('IPAD_UDID='+udid+'\n')
+          PY
+          xcrun simctl boot "$IPAD_UDID"
+          xcrun simctl bootstatus "$IPAD_UDID" -b
+      - name: Install, launch, and capture iPad screenshots
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/ipad-screenshots"
+          xcrun simctl status_bar "$IPAD_UDID" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100 || true
+          xcrun simctl install "$IPAD_UDID" "$TEST_APP"
+          xcrun simctl launch "$IPAD_UDID" com.flixtoys.kickup
+          sleep 7
+          xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/01-home.png"
+          sleep 8
+          xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/02-dolap.png"
+          sleep 8
+          xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/03-sahneler.png"
+          sleep 8
+          xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/04-ayarlar.png"
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kickup-ipad-compatibility-screenshots
+          path: ipad-screenshots/*.png
+          if-no-files-found: warn
+          retention-days: 7
