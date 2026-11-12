@@ -43,7 +43,7 @@ jobs:
           f = Path('ios/App/App/public/index.html')
           html = f.read_text(encoding='utf-8')
           assert '</body>' in html, 'No HTML body found'
-          script = """
+          # AdMob triggers a native ATT permission sheet on first launch. Disable ads only\n          # in the disposable simulator app, leaving shipping source/build untouched.\n          Path('ios/App/App/public/ads.js').write_text('/* Screenshot test: ads disabled */\\n', encoding='utf-8')\n          script = """
           <script>
           window.addEventListener('load', () => {
             const click = (selector) => {
@@ -51,10 +51,10 @@ jobs:
               if (!el) { console.error('Screenshot test missing:', selector); return; }
               el.click();
             };
-            // Capture home at 7s, then each selection sheet after navigation.
-            setTimeout(() => click('[data-open="skin"]'), 10000);
-            setTimeout(() => { click('#sheetBack'); click('[data-open="scene"]'); }, 18000);
-            setTimeout(() => { click('#sheetBack'); click('#openSettings'); }, 26000);
+            // Allow cold simulator startup before capturing; then open each sheet.
+            setTimeout(() => click('[data-open="skin"]'), 25000);
+            setTimeout(() => { click('#sheetBack'); click('[data-open="scene"]'); }, 34000);
+            setTimeout(() => { click('#sheetBack'); click('#openSettings'); }, 43000);
           });
           </script>
           """
