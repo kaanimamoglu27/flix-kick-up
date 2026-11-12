@@ -450,6 +450,34 @@ svg { display: block; }
 .moderow:disabled { opacity: .55; }
 .hflix { flex: 1; align-self: stretch; position: relative; min-height: 90px; pointer-events: auto; cursor: pointer; touch-action: none; }
 .hflix canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* v13: short screens (iPhone SE, and iPad running this iPhone app in compatibility mode = 375x667 pt or smaller).
+   The home column used to be taller than the screen there, so the bottom tile row (Dolap, Sahneler, Borular, Nasıl?) was cut off.
+   The logo now scales with the screen height and the column tightens step by step so every control stays on screen. */
+.logo-img { width: min(76vw, 300px, 40vh); }
+.home-actions { flex: none; }
+@media (max-height: 760px) {
+  .hflix { min-height: 56px; }
+  .home-actions { gap: 10px; }
+  .btn.big { font-size: 26px; padding: 14px 22px; }
+  .home-actions .btn.alt { padding: 13px 22px; }
+  .tile { padding: 9px 4px 9px; gap: 5px; }
+}
+@media (max-height: 600px) {
+  .home { padding-top: calc(8px + env(safe-area-inset-top, 0px)); padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .logo { margin-top: 4px; gap: 4px; }
+  .logo-img { width: min(76vw, 300px, 30vh); }
+  .slogan { margin-top: 6px; font-size: 12px; }
+  .hflix { min-height: 24px; }
+  .home-actions { gap: 8px; }
+  .btn.big { font-size: 22px; padding: 11px 22px; }
+  .home-actions .btn.alt { font-size: 16px; padding: 10px 22px; }
+  .tile { padding: 7px 4px 7px; gap: 3px; font-size: 12px; }
+  .tile svg { width: 24px; height: 24px; }
+}
+@media (max-height: 500px) {
+  .slogan { display: none; }
+  .hflix { min-height: 0; }
+}
 </style>
 </head>
 <body>
