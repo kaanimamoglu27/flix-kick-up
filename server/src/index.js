@@ -4,6 +4,7 @@
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const { Hub } = require('./game');
+const net = require('./net');
 
 function start(overrides = {}) {
   const cfg = { ...require('./config'), ...overrides };
@@ -19,14 +20,22 @@ function start(overrides = {}) {
     const path = (req.url || '/').split('?')[0];
     if (path === '/' || path === '/health') {
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
-      return res.end(JSON.stringify({ ok: true, service: 'flix-kick-up-online', uptime: Math.round((Date.now() - started) / 1000), ...hub.stats() }));
+      return res.end(JSON.stringify({ ok: true, service: 'flix-kick-up-online', uptime: Math.round((Date.now() - started) / 1000), ...hub.stats(), ...net.stats() }));
     }
     res.writeHead(404, { 'Content-Type': 'application/json' }); res.end('{"ok":false}');
   });
 
-  const wss = new WebSocketServer({
-    server, path: '/ws', maxPayload: 2048,
-    verifyClient: (info, done) => (originOk(info.origin) ? done(true) : done(false, 403, 'origin not allowed')),
+  // Two WebSocket endpoints on one port: /ws = Kick Up 1v1 (game.js), /net = shared FLIX online for Direktör + Bomb (net.js).
+  // ws rejects any path but its own when attached with `server`, so upgrades are routed here by path.
+  const verifyClient = (info, done) => (originOk(info.origin) ? done(true) : done(false, 403, 'origin not allowed'));
+  const wss = new WebSocketServer({ noServer: true, maxPayload: 2048, verifyClient });
+  const netWss = new WebSocketServer({ noServer: true, maxPayload: 128 * 1024, verifyClient });
+  const netApp = net.attach(netWss, log);
+  server.on('upgrade', (req, socket, head) => {
+    const p = (req.url || '/').split('?')[0];
+    const target = p === '/ws' ? wss : p === '/net' ? netWss : null;
+    if (!target) { socket.write('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); socket.destroy(); return; }
+    target.handleUpgrade(req, socket, head, (ws) => target.emit('connection', ws, req));
   });
 
   wss.on('connection', (ws) => {
@@ -59,7 +68,7 @@ function start(overrides = {}) {
       log('flix kick up online server on port', server.address().port, '| origins:', cfg.allowedOrigins.join(','));
       resolve({
         server, wss, hub, port: server.address().port,
-        close: () => new Promise((r) => { clearInterval(beat); for (const ws of wss.clients) ws.terminate(); wss.close(); server.close(() => r()); }),
+        close: () => new Promise((r) => { clearInterval(beat); netApp.stop(); for (const ws of wss.clients) ws.terminate(); for (const ws of netWss.clients) ws.terminate(); wss.close(); netWss.close(); server.close(() => r()); }),
       });
     });
   });
