@@ -532,6 +532,60 @@ function buildGift() {
   outl(g); GS = { g, roll, inV: [], t: 0, out, inZone: new THREE.Vector3(16.0, 0, 2.5), bufObjs: [] };
 }
 function syncGift() { GS.bufObjs.forEach(o => scene.remove(o)); GS.bufObjs = []; GS.inV.slice(0, 3).forEach((v, k) => { const o = makeItem('toy', v.col); o.scale.setScalar(0.55); o.position.set(17.8 + k * 0.6, 1.12, 2.8); scene.add(o); GS.bufObjs.push(o); }); }
+
+// ---- 2.1 paint shop: a tested FLIX goes in, a sparkly painted FLIX (1.5x value) comes out ----
+let BY = null, DRN = null;
+function buildPaint() {
+  const g = new THREE.Group(); g.position.set(22.8, 0, 9.7); scene.add(g);
+  rb(2.4, 1.0, 1.2, M(0xff5ad1, { roughness: 0.45 }), g, 0, 0.5, 0, 0.14); rb(2.6, 0.12, 1.4, MT.top, g, 0, 1.06, 0, 0.05);
+  for (const s of [-1, 1]) rb(0.14, 2.3, 0.14, MT.navy, g, s * 1.15, 1.15, -0.45, 0.04); rb(2.44, 0.22, 0.3, MT.navy, g, 0, 2.3, -0.45, 0.05);
+  const arm = new THREE.Group(); arm.position.set(0, 2.15, -0.1); g.add(arm); rb(0.16, 0.5, 0.16, MT.steel, arm, 0, -0.25, 0, 0.04); add(G('Cone', 0.12, 0.22, 10), MT.dark, arm, 0, -0.6, 0).rotation.x = Math.PI;
+  ['#e22511', '#ffc20e', '#2a80dc', '#2fa043'].forEach((c, k) => { add(G('Cylinder', 0.16, 0.16, 0.3, 14), M(c, { roughness: 0.4 }), g, -0.9 + k * 0.6, 1.27, 0.38); });
+  sign('BOYA ATÖLYESİ', '#e84aa0', g, 0, 0.55, 0.61, 1.9); box(21.6, 24.0, 9.1, 10.3);
+  inRing(20.4, 9.8, 'test edilmiş', 'FLIX bırak');
+  const out = new Pile(23.2, 7.8, 'toy', 8, 2, 2, 0.8); markZone(out);
+  outl(g); BY = { g, arm, inV: [], t: 0, out, inZone: new THREE.Vector3(20.4, 0, 9.8), bufObjs: [] };
+}
+const PAINTM = M(0xffd84a, { metalness: 0.6, roughness: 0.25, emissive: 0x6a4a00, emissiveIntensity: 0.4 });
+function paintItem(v, col) { const it = makeItem('toy', col, Math.round(v * PROD.paintMult)); markTested(it); it.userData.paint = 1; const r = add(G('Torus', 0.36, 0.05, 6, 20), PAINTM, it, 0, 0.62, 0); r.rotation.x = Math.PI / 2; return it; }
+function syncPaint() { BY.bufObjs.forEach(o => scene.remove(o)); BY.bufObjs = []; BY.inV.slice(0, 3).forEach((v, k) => { const o = makeItem('toy', v.col); o.scale.setScalar(0.5); o.position.set(22.0 + k * 0.55, 1.12, 9.95); scene.add(o); BY.bufObjs.push(o); }); }
+function dropPaint(o) { fly(o, o.position, new THREE.Vector3(22.8, 1.3, 9.9), 0.25, () => { scene.remove(o); BY.inV.push({ v: o.userData.v || 5, col: o.userData.col }); syncPaint(); }); }
+const paintable = (o) => o.userData.type === 'toy' && o.userData.ok && !o.userData.paint;
+function stepPaint(dt) { if (!BY) return; BY.t -= dt; BY.arm.position.x = BY.inV.length ? Math.sin(BY.t * 6) * 0.8 : BY.arm.position.x * 0.9;
+  if (BY.inV.length && !BY.out.full() && BY.t <= 0) { BY.t = 1.6; const v = BY.inV.shift(); const it = paintItem(v.v, v.col); scene.add(it); it.position.set(22.8, 1.3, 9.7); const to = BY.out.slot(BY.out.n); BY.out.items.push(it); fly(it, it.position, to, 0.4); fxBurst(it.position.clone().setY(1.6), 'star', 5, 0.8); syncPaint(); } }
+// ---- 2.1 cargo drone: flies to the counters, takes FLIX and sells them (passive), money lands at its pad ----
+function buildDrone() {
+  const g = new THREE.Group(); g.position.set(22.6, 0, -0.9); scene.add(g);
+  add(G('Cylinder', 1.0, 1.1, 0.2, 28), MT.dark, g, 0, 0.1, 0); add(G('Cylinder', 0.75, 0.75, 0.04, 28), MT.yel, g, 0, 0.22, 0); floorText('H', 22.6, -0.9, 1.2);
+  sign('KARGO DRONU', '#2a80dc', g, 0, 0.65, 1.12, 1.6); box(21.7, 23.5, -1.8, 0.0);
+  const d = new THREE.Group(); scene.add(d); d.position.set(22.6, 0.45, -0.9); rb(0.9, 0.28, 0.9, MT.red, d, 0, 0, 0, 0.1); add(G('Sphere', 0.22, 12, 8), M(0x0f1c33, { emissive: 0x2fe06a, emissiveIntensity: 0.5 }), d, 0, 0.12, 0.38);
+  const props = []; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { rb(0.6, 0.06, 0.08, MT.dark, d, sx * 0.4, 0.05, sz * 0.4, 0.02).rotation.y = Math.atan2(sz, sx); const p = add(new THREE.BoxGeometry(0.7, 0.02, 0.08), MT.white, d, sx * 0.62, 0.14, sz * 0.62); props.push(p); }
+  const cash = new Pile(24.0, 0.9, 'cash', 60, 2, 2, 0.7);
+  DRN = { g, d, props, state: 'home', t: 6, load: [], from: null, to: null, k: 0, cash, home: new THREE.Vector3(22.6, 0.45, -0.9) };
+}
+function stepDrone(dt, T) { if (!DRN) return; const D = DRN; D.props.forEach((p, i) => p.rotation.y += dt * (D.state === 'home' ? 4 : 30) * (i % 2 ? 1 : -1));
+  if (D.state === 'home') { D.d.position.y = 0.45; D.t -= dt; if (D.t <= 0) { const src = [TS && TS.out, GS && GS.out, PL && PL.out, BY && BY.out, RC && RC.out].concat(K.map(c => c.pile)).filter(p => p && p.n >= 1).sort((a, b) => b.n - a.n)[0]; if (src) { D.C = src; D.state = 'go'; D.k = 0; D.from = D.d.position.clone(); D.to = new THREE.Vector3(src.pos.x, 2.6, src.pos.z); } else D.t = 3; } return; }
+  D.k = Math.min(1, D.k + dt / Math.max(0.6, D.from.distanceTo(D.to) / 7)); const p = D.from.clone().lerp(D.to, D.k); p.y += Math.sin(D.k * Math.PI) * 2.2; D.d.position.copy(p); D.d.rotation.z = Math.sin(T * 3) * 0.06;
+  if (D.k < 1) return;
+  if (D.state === 'go') { const n = Math.min(4, D.C.n); for (let i = 0; i < n; i++) { const o = D.C.pop(); if (!o) break; ctSold(o); D.load.push(o.userData.v || 5); scene.remove(o); } SFX.pick(); D.state = 'back'; D.k = 0; D.from = D.d.position.clone(); D.to = D.home.clone(); }
+  else { const v = D.load.reduce((a, b) => a + b, 0) * PROD.droneMult * profitMult(); D.load = []; if (v) payCash(v, D.cash, new THREE.Vector3(22.6, 1.2, -0.9)); D.state = 'home'; D.t = 9; }
+}
+// ---- 2.1 golden feather hunt: a shining feather appears somewhere now and then; walk over it for a reward ----
+let GF = null, gfT = 75;
+const GFM = M(0xffd84a, { metalness: 0.7, roughness: 0.2, emissive: 0xb07800, emissiveIntensity: 0.6 });
+function gfReward() { const nxt = PADS.filter(p => !has(p.id) && (!p.req || has(p.req))).reduce((a, p) => Math.min(a, p.cost), Infinity); return Math.max(25, Math.round((isFinite(nxt) ? nxt : SV.money * 0.1 + 500) * 0.12)); }
+function stepGolden(dt, T) { if (BOT || inMenu || !tutDone() || !has('ciftlik0')) return;
+  if (!GF) { gfT -= dt; if (gfT > 0) return; gfT = 150 + Math.random() * 90;
+    const pts = [penPile && penPile.zone, farmPile && farmPile.zone, farmPile2 && farmPile2.zone, pressPile && pressPile.zone, TS && TS.inZone, GS && GS.inZone, PL && PL.inZone, BY && BY.inZone].concat(asm.map(a => a.inZone), K.map(c => c.zone)).filter(p => p && p.distanceTo(P.o.position) > 6);
+    if (!pts.length) return; const at = pts[Math.floor(Math.random() * pts.length)];
+    const o = new THREE.Group(); o.position.set(at.x + (Math.random() - 0.5) * 1.2, 0, at.z + (Math.random() - 0.5) * 1.2); scene.add(o);
+    const f = new THREE.Mesh(featherGeo, GFM); f.scale.setScalar(2.2); f.rotation.set(0, 0, 0.3); f.position.y = 1.0; o.add(f);
+    const beam = add(G('Cylinder', 0.35, 0.6, 7, 16, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe27a, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide }), o, 0, 3.5, 0); beam.castShadow = false;
+    GF = { o, f, life: 60 }; toast('✨ ' + T_('Altın tüy belirdi! Işığı bul.')); SFX.chime && SFX.chime(3); return; }
+  GF.life -= dt; GF.f.rotation.y = T * 2.5; GF.f.position.y = 1.0 + Math.sin(T * 3) * 0.15;
+  if (Math.hypot(P.o.position.x - GF.o.position.x, P.o.position.z - GF.o.position.z) < 1.3) { const r = gfReward(); SV.money += r; earnMin += r; bumpMoney(); fxBurst(GF.o.position.clone().setY(1.2), 'star', 14, 1.4); fxBurst(GF.o.position.clone().setY(1.2), 'coin', 10, 1.2); SFX.milestone && SFX.milestone(); haptic(30);
+    let gem = 0; if (Math.random() < 0.35) { gem = 1 + Math.floor(Math.random() * 2); SV.gems += gem; } SV.gold = (SV.gold || 0) + 1; toast('✨ ' + T_('Altın tüy') + ': +₺' + fmt(r) + (gem ? ' · +' + gem + ' 💎' : '')); scene.remove(GF.o); GF = null; save(); return; }
+  if (GF.life <= 0) { scene.remove(GF.o); GF = null; } }
 // ---- conveyor: assembly 1 & 2 outputs ride to the test station by themselves ----
 function buildConveyor() {
   const tx = tex(64, 64, (c) => { c.fillStyle = '#2b2e36'; c.fillRect(0, 0, 64, 64); c.fillStyle = '#ffc20e'; c.beginPath(); c.moveTo(10, 8); c.lineTo(32, 32); c.lineTo(10, 56); c.lineTo(22, 56); c.lineTo(44, 32); c.lineTo(22, 8); c.fill(); }, true);
@@ -707,7 +761,7 @@ function stepCorn(dt, T) { if (!CS) return; CS.t -= dt; if (CS.t <= 0) { CS.t = 
   if (CS.feedT > 0) { CS.feedT -= dt; if (Math.random() < dt * 2) fxBurst(new THREE.Vector3(rnd(-3, -1), 0.7, -18.6), 'fluff', 1, 0.5); }
   CS.fill.scale.x = Math.max(0.01, Math.min(1, CS.feedT / 120)); CS.ring.material.opacity = 0.55 + Math.sin(T * 4) * 0.25; }
 const flags = []; const stepFlags = (T) => { for (const ct of flags) { const a = Math.sin(T * 2.2 + ct.userData.T) * 0.25; if (ct.userData.flagL) ct.userData.flagL.rotation.y = a; if (ct.userData.flagR) ct.userData.flagR.rotation.y = -a; } };
-const allCash = () => K.map(c => c.cash).concat(TR ? [TR.cash] : []);
+const allCash = () => K.map(c => c.cash).concat(TR ? [TR.cash] : [], DRN ? [DRN.cash] : []);
 // ---- recycling: rejected FLIX become keychains ----
 function buildRecycle() {
   const g = new THREE.Group(); g.position.set(-5.2, 0, 10.2); scene.add(g);
@@ -988,6 +1042,8 @@ function actPad(p) {
   if (p.id === 'kamyon') buildTruck();
   if (p.id === 'top') buildTopLine();
   if (p.id === 'hediye') buildGift();
+  if (p.id === 'boya') buildPaint();
+  if (p.id === 'dron') buildDrone();
   if (p.id === 'konv') buildConveyor();
   if (p.id === 'kasa2') buildCounter(1, -3.0);
   if (p.id === 'kasa3') buildCounter(2, 12.4);
@@ -1166,6 +1222,7 @@ function stepWorld(dt, T) {
   if (rubberPile) { TM.rt -= dt; if (TM.rt <= 0) { TM.rt = 1.8 * Math.pow(0.85, lv('pres')) * UB(); if (!rubberPile.full()) { const o = makeItem('rubber'); scene.add(o); o.position.copy(rubberPile.slot(rubberPile.n)); o.scale.setScalar(0.01); rubberPile.items.push(o); popIn(o); } }
     TM.t -= dt; const work = TM.inR > 0 && !TM.out.full(); TM.ball.rotation.y += dt * (work ? 8 : 0.5); TM.ball.rotation.x += dt * (work ? 5 : 0);
     if (work && TM.t <= 0) { TM.t = 2.0 * Math.pow(0.85, lv('mont')) * UB(); TM.inR--; const it = makeItem('top'); scene.add(it); it.position.set(TM.x, 1.8, TM.z); const to = TM.out.slot(TM.out.n); TM.out.items.push(it); fly(it, it.position, to, 0.45); SFX.pop(); } }
+  stepPaint(dt);
   if (GS) { GS.t -= dt; GS.roll.rotation.x += dt * (GS.inV.length >= 3 ? 6 : 0); if (GS.inV.length >= 3 && !GS.out.full() && GS.t <= 0) { GS.t = 2.2; const vs = GS.inV.splice(0, 3); const it = makeItem('gift', 'dogal', Math.round(vs.reduce((a, b) => a + b.v, 0) * PROD.giftMult)); scene.add(it); it.position.set(18.5, 1.3, 2.5); const to = GS.out.slot(GS.out.n); GS.out.items.push(it); fly(it, it.position, to, 0.45); SFX.chime && SFX.chime(4); syncGift(); } }
   stepConveyor(dt); stepTruck(dt); stepSmoke(dt);
   P.tick -= dt; if (P.tick <= 0) { P.tick = 0.09; interact(); }
@@ -1198,6 +1255,7 @@ function interact() {
     const T = hf && hb ? (A.inF.length <= A.inB ? 'feather' : 'base') : hf ? 'feather' : hb ? 'base' : null; const o = T && stackPop(x => x.userData.type === T); if (o) { dropTo(A, o); SFX.drop(); return; } }
   if (TM && near(TM.inZone, 1.5)) { const o = stackPop(x => x.userData.type === 'rubber'); if (o) { dropTop(o); SFX.drop(); return; } }
   if (TS && near(TS.inZone, 1.5) && TS.q.length < 16) { const o = stackPop(untested); if (o) { dropTest(o); SFX.drop(); return; } }
+  if (BY && near(BY.inZone, 1.5) && BY.inV.length < 6) { const o = stackPop(paintable); if (o) { dropPaint(o); SFX.drop(); return; } }
   if (GS && near(GS.inZone, 1.5) && GS.inV.length < 9) { const o = stackPop(x => x.userData.type === 'toy' && x.userData.ok); if (o) { dropGift(o); SFX.drop(); return; } }
   if (CS && near(CS.zone, 1.4)) { const o = stackPop(x => x.userData.type === 'corn'); if (o) { fly(o, o.position, CS.tr.clone().setY(0.6), 0.3, () => scene.remove(o)); CS.feedT = Math.min(180, CS.feedT + 25); fxBurst(CS.tr.clone().setY(0.8), 'puff', 4, 0.6); floatText('🌽 +25 sn', '#ffd84a'); SFX.drop(); return; } }
   if (P.act) return;
@@ -1210,7 +1268,7 @@ function interact() {
   if (P.stack.length >= cap) return;
   const hasProd = P.stack.some(isProd), hasRaw = P.stack.some(isRaw);
   if (!hasProd) for (const pile of [penPile, miniPile, farmPile, farmPile2, pressPile, pressPile2, rubberPile, cornPile]) if (pile && pile.n && nearPile(pile) && !(pile !== rubberPile && P.stack.filter(o => o.userData.type === pile.type).length >= Math.ceil(cap / 2))) { if (pile.type === 'feather') fxBurst(pile.pos.clone().setY(1.0), 'fluff', 2, 0.7); stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
-  if (!hasRaw) for (const pile of asm.map(a => a.out).concat(TM ? [TM.out] : [], TS ? [TS.out, REJ] : [], GS ? [GS.out] : [], RC ? [RC.out] : [], PL ? [PL.out] : [])) if (pile.n && nearPile(pile)) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
+  if (!hasRaw) for (const pile of asm.map(a => a.out).concat(TM ? [TM.out] : [], TS ? [TS.out, REJ] : [], GS ? [GS.out] : [], RC ? [RC.out] : [], PL ? [PL.out] : [], BY ? [BY.out] : [])) if (pile.n && nearPile(pile)) { stackPush(pile.pop()); SFX.pick(); haptic(6); return; }
 }
 // ---- the hero does the work by hand at the stand: build + box, then kick-test, then place it ----
 const handPos = () => P.o.position.clone().add(new THREE.Vector3(Math.sin(P.o.rotation.y) * 0.7, 1.15, Math.cos(P.o.rotation.y) * 0.7));
@@ -1264,19 +1322,20 @@ function pickTask(W) {
   const cap = wcap(), n = workers.length, role = n < 2 ? 'all' : n === 2 && W.id === 1 ? 'mix' : ROLES[W.id % 8];
   const truckOk = TR && TR.state === 'dock' && TR.load.length < truckCap(), gp = W.H.g.position;
   const freeK = () => K.filter(C => !C.pile.full()).sort((a, b) => a.pile.n - b.pile.n || Math.abs(a.x - gp.x) - Math.abs(b.x - gp.x))[0];
-  const sell = () => { const src = [TS && TS.out, GS && GS.out, RC && RC.out, PL && PL.out].filter(p => p && avail(p, W) > 0).sort((a, b) => b.n - a.n)[0]; if (!src) return null;
+  const sell = () => { const src = [TS && TS.out, GS && GS.out, RC && RC.out, PL && PL.out, BY && BY.out].filter(p => p && avail(p, W) > 0).sort((a, b) => b.n - a.n)[0]; if (!src) return null;
     W.alt = !W.alt; const C = freeK(); if (truckOk && (!C || (W.alt && (C.pile.n >= 2 || W.id % 2)))) return { src: [src], dst: 'truck', max: cap }; if (C) return { src: [src], dst: 'counter', C, max: cap }; return null; };
   const test = () => { if (!TS) return null; const outs = (konv ? asm.slice(2) : asm).map(a => a.out).concat(TM ? [TM.out] : []).filter(p => avail(p, W) > 0).sort((a, b) => b.n - a.n);
     return outs.length && TS.q.length < 10 ? { src: [outs[0]], dst: 'test', max: cap } : null; };
   const reject = () => RC && avail(REJ, W) > 0 && RC.vals.length < 6 ? { src: [REJ], dst: 'recycle', max: cap } : null;
   const gift = () => GS && TS && GS.inV.length < 3 && (TS.out.n >= 2 || GS.inV.length > 0) && avail(TS.out, W) > 0 ? { src: [TS.out], dst: 'gift', max: Math.min(cap, 3 - GS.inV.length), only: 'toy' } : null;
+  const paint = () => BY && TS && BY.inV.length < 3 && avail(TS.out, W) > 0 && !workers.some(X => X !== W && X.task && X.task.dst === 'paint') ? { src: [TS.out], dst: 'paint', max: Math.min(cap, 3 - BY.inV.length), only: 'toy' } : null;
   const top = () => TM && avail(rubberPile, W) > 0 && TM.inR < 4 ? { src: [rubberPile], dst: 'top', max: cap } : null;
   const crate = () => [farmPile, farmPile2, penPile].filter(p => p && avail(p, W) > 0).sort((a, b) => b.n - a.n)[0];
   const plush = () => { const c = crate(); return PL && c && PL.inF.length < 6 && !workers.some(X => X !== W && X.task && X.task.dst === 'plush') ? { src: [c], dst: 'plush', max: Math.min(cap, 6 - PL.inF.length) } : null; };
   const press = () => [pressPile, pressPile2, miniPile].filter(p => p).sort((a, b) => avail(b, W) - avail(a, W) || a.zone.distanceTo(gp) - b.zone.distanceTo(gp))[0];
   const feed = () => { const f = asm.reduce((a, A) => a + A.inF.length, 0), b = asm.reduce((a, A) => a + A.inB, 0); if (f + b >= asm.length * 14) return null; const c = crate(), pp = press(); if (!pp || !asm.length) return null;
     if (f > b + 2 && avail(pp, W) > 0) return { src: [pp], dst: 'asm', max: cap }; if (b > f + 2 && c) return { src: [c], dst: 'asm', max: cap }; if (!c && !pp.n) return null; return { src: [c || farmPile, pp], dst: 'asm', max: cap, half: true }; };
-  const order = { all: [sell, test, reject, top, gift, plush, feed], sell: [sell, test, reject, gift, feed], line: [gift, reject, test, top, plush, sell, feed], mix: [feed, test, top, sell, reject, plush], feed: [feed, plush, test, top, sell, reject] }[role];
+  const order = { all: [sell, test, reject, top, gift, paint, plush, feed], sell: [sell, test, reject, gift, paint, feed], line: [gift, paint, reject, test, top, plush, sell, feed], mix: [feed, test, top, sell, reject, plush], feed: [feed, plush, test, top, sell, reject] }[role];
   for (const f of order) { const t = f(); if (t) return t; }
   return null;
 }
@@ -1290,10 +1349,10 @@ function stepWorker(W, dt) {
   else if (T) { if (!W.stack.length) { W.task = null; W.wait = 0.1; }
     else { let A = null; if (T.dst === 'asm') { if (!W.A) { const nb = W.stack.filter(o => o.userData.type === 'base').length, nf = W.stack.length - nb, need = (X) => Math.max(0, X.inF.length - X.inB) * nb + Math.max(0, X.inB - X.inF.length) * nf - (X.inF.length + X.inB) * 0.3 - X.inZone.distanceTo(g.position) * 0.05; W.A = asm.reduce((a, b) => need(b) > need(a) ? b : a, asm[W.id % asm.length]); } A = W.A; }
       if (T.dst === 'counter' && (!T.C || T.C.pile.full())) T.C = K.filter(C => !C.pile.full()).sort((a, b) => a.pile.n - b.pile.n)[0] || T.C || K[0];
-      tgt = T.dst === 'counter' ? T.C.zone : T.dst === 'truck' ? TR.zone : T.dst === 'test' ? TS.inZone : T.dst === 'top' ? TM.inZone : T.dst === 'gift' ? GS.inZone : T.dst === 'recycle' ? RC.inZone : T.dst === 'plush' ? PL.inZone : A.inZone;
+      tgt = T.dst === 'counter' ? T.C.zone : T.dst === 'truck' ? TR.zone : T.dst === 'test' ? TS.inZone : T.dst === 'top' ? TM.inZone : T.dst === 'gift' ? GS.inZone : T.dst === 'recycle' ? RC.inZone : T.dst === 'plush' ? PL.inZone : T.dst === 'paint' ? BY.inZone : A.inZone;
       if (at(tgt, 1.25)) { if (T.dst === 'counter') { if (!T.C.pile.full()) { const o = wDrop(W); T.C.pile.push(o, o.position); } else if (TR && TR.state === 'dock') T.dst = 'truck'; }
         else if (T.dst === 'truck') { if (TR.state === 'dock' && TR.load.length < truckCap()) loadTruck(wDrop(W)); else { T.dst = 'counter'; T.C = null; } }
-        else if (T.dst === 'test') dropTest(wDrop(W)); else if (T.dst === 'gift') { if (GS.inV.length < 3) dropGift(wDrop(W)); else { T.dst = 'counter'; T.C = null; } } else if (T.dst === 'top') dropTop(wDrop(W));
+        else if (T.dst === 'test') dropTest(wDrop(W)); else if (T.dst === 'gift') { if (GS.inV.length < 3) dropGift(wDrop(W)); else { T.dst = 'counter'; T.C = null; } } else if (T.dst === 'top') dropTop(wDrop(W)); else if (T.dst === 'paint') { const o = W.stack[W.stack.length - 1]; if (BY.inV.length < 6 && paintable(o)) dropPaint(wDrop(W)); else { T.dst = 'counter'; T.C = null; } }
         else if (T.dst === 'recycle') dropRecycle(wDrop(W)); else if (T.dst === 'plush') { if (PL.inF.length < 12) dropPlush(wDrop(W)); else { T.dst = 'asm'; } } else dropTo(A, wDrop(W));
         if (!W.stack.length) { W.task = null; W.A = null; W.wait = 0.05; W.path = null; } } } }
   if (!tgt) { W.spd = 0; idleLook(W, dt); animWalk(W.H, 0, false, W.stack.length > 0); return; }
@@ -1347,7 +1406,7 @@ function tick(dt, T) {
   if (P.act && !moving) actPose(T); else animWalk(H, P.walk, moving, P.stack.length > 0);
   P.stack.forEach((o, i) => { o.rotation.z = Math.sin(T * 6 + i * 0.3) * 0.02 * i * (moving ? 1 : 0.3); });
   for (let k = 0; k < SIM; k++) { stepWorld(dt, T + k * dt); stepCustomers(dt); stepTweens(dt); }
-  stepTutorial(); stepZones(T); stepFlags(T); stepBoostDrop(dt, T); stepShow(dt, T); stepCorn(dt, T);
+  stepTutorial(); stepZones(T); stepFlags(T); stepBoostDrop(dt, T); stepShow(dt, T); stepCorn(dt, T); stepDrone(dt, T); stepGolden(dt, T);
   for (let i = confettiBits.length - 1; i >= 0; i--) { const c = confettiBits[i]; c.t += dt; c.v.y -= 18 * dt; c.m.position.addScaledVector(c.v, dt); c.m.rotation.x += c.r.x * dt; c.m.rotation.y += c.r.y * dt; if (c.t > 2) { scene.remove(c.m); confettiBits.splice(i, 1); } }
   stepFX(dt); stepRings(dt);
   for (let i = dust.length - 1; i >= 0; i--) { const d = dust[i]; d.t += dt; d.m.scale.setScalar(1 + d.t * 3); d.m.material.opacity = 0.6 * (1 - d.t / 0.5); d.m.position.y += dt * 0.5; if (d.t > 0.5) { scene.remove(d.m); dust.splice(i, 1); } }
@@ -1413,5 +1472,5 @@ function resolve(x, z) { x = Math.max(BOUNDS.x0 + 0.5, Math.min(BOUNDS.x1 - 0.5,
     boostNow: () => { bxT = 0; }, get bx() { return BX && { id: BX.id, x: BX.x, z: BX.z }; },
     get tgt() { const s = TUT[SV.tut]; if (!s) return null; const v = s.tgt(); return [v.x, v.z]; },
     sim: (k) => { SIM = k; }, person: (x, z, kid) => { const o = personMesh(kid); o.position.set(x, 0, z); scene.add(o); }, testQ: (n) => { for (let i = 0; i < n; i++) TS.q.push(makeItem('toy', 'mavi', 8)); syncTestQ(); }, truckLoad: (n) => { for (let i = 0; i < n; i++) TR.load.push(8); },
-    get stackN() { return P.stack.length; }, get pxz() { return [+P.o.position.x.toFixed(2), +P.o.position.z.toFixed(2)]; }, dropAll: () => { P.stack.forEach(o => scene.remove(o)); P.stack.length = 0; }, get cust() { return customers.length; }, get rob() { return ROB.map(R => [R.st, R.load.length]); }, get ct() { return SV.ct; }, get dpr() { return dpr; }, get ords() { return customers.map(c => c.ord); }, get cdbg() { return K.map(C => C.cust[0] && [C.cust[0].state, +C.cust[0].o.position.x.toFixed(1), +C.cust[0].o.position.z.toFixed(1), C.cust[0].ord, C.cust[0].got, C.cust[0].want, +C.cust[0].pat.toFixed(1), C.x]); }, get turkeys() { return turkeys.length; }, get zone() { return zoneLock; }, zoom: (f) => camOff.multiplyScalar(f), look: (s, a) => { SV.cos.skin = s; SV.cos.acc = a; setLook(); } };
+    get by() { return BY && [BY.inV.length, BY.out.n, TS && TS.out.n, workers.filter(w => w.task && w.task.dst === 'paint').length, workers.length]; }, get drn() { return DRN && [DRN.state, DRN.cash.n, +DRN.d.position.y.toFixed(1)]; }, gold: () => { gfT = 0; }, get gf() { return GF && [GF.o.position.x, GF.o.position.z]; }, get stackN() { return P.stack.length; }, get pxz() { return [+P.o.position.x.toFixed(2), +P.o.position.z.toFixed(2)]; }, dropAll: () => { P.stack.forEach(o => scene.remove(o)); P.stack.length = 0; }, get cust() { return customers.length; }, get rob() { return ROB.map(R => [R.st, R.load.length]); }, get ct() { return SV.ct; }, get dpr() { return dpr; }, get ords() { return customers.map(c => c.ord); }, get cdbg() { return K.map(C => C.cust[0] && [C.cust[0].state, +C.cust[0].o.position.x.toFixed(1), +C.cust[0].o.position.z.toFixed(1), C.cust[0].ord, C.cust[0].got, C.cust[0].want, +C.cust[0].pat.toFixed(1), C.x]); }, get turkeys() { return turkeys.length; }, get zone() { return zoneLock; }, zoom: (f) => camOff.multiplyScalar(f), look: (s, a) => { SV.cos.skin = s; SV.cos.acc = a; setLook(); } };
 })();

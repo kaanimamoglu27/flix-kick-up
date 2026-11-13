@@ -1,4 +1,4 @@
-// Flix Fabrika 1.9 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
+// Flix Fabrika 2.1 — arayüz: geliştirme/eleman/dolap panelleri, mağaza, reklamlar, satın almalar, çevrimdışı kazanç
 import { SFX } from './sfx.js';
 import { LANG, setLang } from './i18n.js';
 import { UPS, STAFF, SUPS, COS, IAP, AD, COLS, BONUS, bonusTxt, PROMO, ORDERS, spdPct } from './config.js';
@@ -78,8 +78,8 @@ const HOWTO = {
     ['Sell and collect cash', 'Put tested FLIX on the shop counter and customers buy them. Walk over the cash pile to collect it.'],
     ['Grow your factory', 'Stand inside a dashed square: money flows in and a new turkey, machine or hall opens. The goal bar at the top shows the next job.']]
 };
-const HOWTIP = { tr: ['💡 İpuçları', 'Ofiste geliştirme al, İK\'dan eleman işe al: onlar senin yerine taşır.', '⚡ Bonus kutuları kısa süre 2 kat kazanç ya da hız verir.', 'Oyunda değilken de fabrika bir süre para kazanır.'],
-  en: ['💡 Tips', 'Buy upgrades in the office and hire crew at HR: they carry for you.', '⚡ Boost crates give double cash or speed for a short time.', 'Your factory keeps earning for a while when you are away.'] };
+const HOWTIP = { tr: ['💡 İpuçları', 'Ofiste geliştirme al, İK\'dan eleman işe al: onlar senin yerine taşır.', '⚡ Bonus kutuları kısa süre 2 kat kazanç ya da hız verir.', 'Oyunda değilken de fabrika bir süre para kazanır.', '✨ Haritada parlayan altın tüyü bul: para ve bazen elmas verir.'],
+  en: ['💡 Tips', 'Buy upgrades in the office and hire crew at HR: they carry for you.', '⚡ Boost crates give double cash or speed for a short time.', 'Your factory keeps earning for a while when you are away.', '✨ Find the shining golden feather on the map: cash and sometimes gems.'] };
 function howHTML() { const L = LANG === 'en' ? 'en' : 'tr', im = window['HOWTO_' + L.toUpperCase()] || [];
   let h = '<div class="howto" translate="no">'; HOWTO[L].forEach(([t, d], i) => { h += `<div class="hw">${im[i] ? `<img src="${im[i]}" alt="">` : ''}<div><b><em>${i + 1}</em>${t}</b><span>${d}</span></div></div>`; });
   const tp = HOWTIP[L]; h += `<div class="hwt"><b>${tp[0]}</b>${tp.slice(1).map(x => `<span>• ${x}</span>`).join('')}</div></div>`; return h; }

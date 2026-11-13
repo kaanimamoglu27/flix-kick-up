@@ -44,6 +44,7 @@ export const PADS = [
   { id: 'kirmizi', name: 'Kırmızı hindi', cost: 3000, fx: 'FLIX değeri 26', x: -3.2, z: -14.2, req: 'sari', col: 'kirmizi' },
   { id: 'ciftlik', name: 'Büyük çiftlik', cost: 3500, fx: '+8 hindi · 2. tüy sandığı', x: 1.0, z: -18.0, req: 'sari', big: true },
   { id: 'hediye', name: 'Hediye paketi', cost: 4250, fx: '3 FLIX = 1,6 kat set', x: 18.5, z: 2.5, req: 'top' },
+  { id: 'boya', name: 'Boya atölyesi', cost: 5000, fx: 'Test edilmiş FLIX boyanır: 1,5 kat değer', x: 22.8, z: 9.7, req: 'pelus' },
   { id: 'kasa4', name: '4. Kasa', cost: 5500, fx: 'Müşteri +%33', x: 19.8, z: 14.0, req: 'kasa3', big: true },
   { id: 'bblok', name: 'B Blok', cost: 6000, fx: 'Fabrika sola büyür', x: -9.2, z: 12.4, req: 'ciftlik', big: true },
   { id: 'asm4', name: '4. Montaj', cost: 8500, fx: 'Üretim +%33', x: -17.5, z: 3.0, req: 'bblok' },
@@ -51,6 +52,7 @@ export const PADS = [
   { id: 'mor', name: 'Mor hindi', cost: 7250, fx: 'FLIX değeri 38', x: 0.0, z: -14.2, req: 'kirmizi', col: 'mor' },
   { id: 'kasa5', name: '5. Kasa', cost: 12000, fx: 'Müşteri +%25', x: -17.5, z: 14.0, req: 'bblok', big: true },
   { id: 'robot2', name: 'Robot garajı', cost: 18000, fx: '+3 robot · hızlı toplama', x: -18.5, z: -12.0, req: 'pres2' },
+  { id: 'dron', name: 'Kargo dronu', cost: 22000, fx: 'FLIX toplayıp 1,3 kat fiyata satar', x: 22.6, z: -0.9, req: 'robot2' },
   { id: 'altin', name: 'Altın hindi', cost: 15000, fx: 'FLIX değeri 60', x: 3.2, z: -14.2, req: 'mor', col: 'altin' },
   // ---- 2. bölüm: C Blok FLIX Mağazası ve yeni hindiler ----
   { id: 'cblok', name: 'C Blok', cost: 130000, fx: 'FLIX Mağazası açılır · alan sağa büyür', x: 23.0, z: 5.0, req: 'kasa5', big: true },
@@ -65,7 +67,7 @@ export const PADS = [
   { id: 'anit', name: 'Dev FLIX Anıtı', cost: 1120000, fx: 'Tüm satışlar +%25 · büyük kutlama', x: 34.0, z: 6.5, req: 'gokkusagi', big: true },
 ];
 // Ürünler (satış fiyatı ₺). FLIX'in fiyatı tüy rengine göre (COLS.v), hediye paketi = içindeki 3 FLIX x 1,6
-export const PROD = { top: 30, giftMult: 1.6, truckMult: 1.5, plushMult: 0.6, keyMult: 0.5 };
+export const PROD = { top: 30, giftMult: 1.6, paintMult: 1.5, droneMult: 1.3, truckMult: 1.5, plushMult: 0.6, keyMult: 0.5 };
 // Ofis geliştirmeleri (para). cost = base * mult^lv
 export const UPS = [
   { id: 'spd', grp: 'Patron', name: 'Yürüme hızı', icon: '👟', max: 12, base: 32, mult: 1.8, desc: (l) => '+' + spdPct(l) + '% hız' },
