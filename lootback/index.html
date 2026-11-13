@@ -2050,6 +2050,7 @@ function newRun(mode) {
   clearWorld(); mode = MODES[mode] ? mode : G.mode || 'story';
   Object.assign(G, {
     recB: (save.bw && save.bw[mode]) || 0, recNew: false,
+    wepPick: mode === 'hell' ? 3 : 0,
     state: 'play', time: 0, wave: 1, waveT: 0, kills: 0, level: 1, xp: 0, xpNext: 5, hp: curHero().hp, maxHp: curHero().hp, px: 0, pz: 0, fx: 0, fz: 1, inv: 0, flix: 0,
     enemies: [], shots: [], eshots: [], gems: [], items: [], tels: [], zaps: [], pools: [], grab: 0, paid: 0, spawnT: 1, weps: Object.assign({toss: 1, [curHero().start]: 1}, curHero().start2 ? {[curHero().start2]: 1} : {}), pas: {}, ws: {}, pending: mode === 'boss' ? 4 : mode === 'hell' ? 3 : 0, boss: null, endless: mode === 'endless' || mode === 'hell', mode, picks: [], score: 0, combo: 0, comboT: 0, flixGot: 0, runCoins: 0, riftO: null, riftT: 35, riftsClosed: 0, huntT: 240, bestCombo: 0,
     dmgMul: 1, hpBonus: 0, spdBonus: 0, cdBonus: 0, barr: [], fuses: [], carFires: [], traf: null, trafT: 12, dashT: 0, dashCd: 0, mines: [], torns: [], swipeFx: null, carsBlown: 0, comicQ: null, tier: 0, fis: [], revived: false, fell: false, rockets: [], slash: null, slam: null, gearFx: null, gunOn: false, toss: [], tq: [], bombs: [], whips: [], turrets: [], throwT: 0, aimT: 0, aimA: 0, epiT: 0, finalT: 0, bossKills: 0, paidG: 0, boosts: [], bst: null, bstT: 20, trail: [], camp: null,
@@ -2067,11 +2068,12 @@ let bannerT = 0;
 function banner(txt, sub, dur) { $('banner').innerHTML = (txt ? `<b>${txt}</b>` : '') + (sub ? `<small>${sub}</small>` : ''); $('banner').classList.add('on'); bannerT = dur || 1.8; }
 function waveGift(n) {
   if (G.mode === 'boss' || n < 2) return;
-  const own = Object.keys(G.weps), fresh = Object.keys(WEAP).filter(id => !G.weps[id]); let id, isNew = false;
-  if (own.length < MAXW && fresh.length) { id = fresh[Math.floor(Math.random() * fresh.length)]; G.weps[id] = 1; isNew = true; }
-  else { if (n % 3) return; const up = own.filter(i => G.weps[i] < 5); if (!up.length) return; id = up[Math.floor(Math.random() * up.length)]; G.weps[id]++; }
-  recompute(); updateAbilBar(); G.gearFx = {id, t: 0}; ringFx(G.px, G.pz, 2.6, 0xffd23f, 0.5); confetti(G.px, 2, G.pz, 24, 1); SFX.level();
-  FX.nums.push({x: G.px, y: 3.8, z: G.pz, t: 2.2, t0: 2.2, txt: (isNew ? '🎁 ' : '⬆️ ') + WEAP[id].ic + ' ' + WEAP[id].n + (isNew ? '' : ' ' + G.weps[id]), col: '255,210,63', big: true});
+  // v43 (Kaan): weapons only come every 5 waves, as two weapon cards (a new weapon or a weapon upgrade);
+  // the level-ups in between are passive only. Fewer guns firing at once = less load on the phone.
+  if (n % 5) return;
+  G.wepPick = (G.wepPick || 0) + 2; G.pending += 2;
+  ringFx(G.px, G.pz, 2.6, 0xffd23f, 0.5); confetti(G.px, 2, G.pz, 24, 1);
+  FX.nums.push({x: G.px, y: 3.8, z: G.pz, t: 2.2, t0: 2.2, txt: '🎁 Silah seçimi!', col: '255,210,63', big: true});
 }
 function WNAME() { return G.mode === 'story' && !G.endless ? 'Seviye' : 'Dalga'; }
 function startWave(n) {
@@ -2259,12 +2261,15 @@ function query(x, z, r, fn) {
 function nearest(x, z, maxD, skip) { let best = null, bd = (maxD || 1e9) ** 2; for (const e of G.enemies) { if (e.dead || e.under || e.los === false || e.rise > 0.3 || (e.type === 'ghost' && e.phase > 0) || (skip && skip.has(e))) continue; const d = (e.x - x) ** 2 + (e.z - z) ** 2; if (d < bd) { bd = d; best = e; } } return best; }
 
 /* ---------- damage ---------- */
+// v43: with weapons only every 5 waves the hero carries fewer, lower-level guns, so each hit is stronger
+// (same kill speed as before, but far fewer projectiles and effects on screen)
+function wPow() { return G.mode === 'boss' ? 1 : 1.15 + Math.min(0.75, G.wave * 0.028); }
 function hit(e, dmg, col, kb, kx, kz, proj) {
   if (e.dead || e.rise > 0.3 || e.shieldT > 0) return;
   if (e.type === 'ghost' && e.phase > 0) return;
   if (e.under) return;
   // early power: the hero feels mighty for the first levels, then it eases back to normal (no sudden spikes)
-  let d = dmg * (G.dmgMul || 1) * (G.bst ? (G.bst.k === 'giant' ? 1.25 : G.bst.k === 'mini' ? 0.9 : 1) : 1) * (1 + 0.7 * clamp((15 - G.level) / 10, 0, 1)); const crit = Math.random() < G.stat.crit; if (crit) d *= 2;
+  let d = dmg * (G.dmgMul || 1) * wPow() * (G.bst ? (G.bst.k === 'giant' ? 1.25 : G.bst.k === 'mini' ? 0.9 : 1) : 1) * (1 + 0.7 * clamp((15 - G.level) / 10, 0, 1)); const crit = Math.random() < G.stat.crit; if (crit) d *= 2;
   let blocked = false, weak = false; const T = ET[e.type], el = EL[col];
   if (T) { if (el && el === T.weak) { d *= 1.6; weak = true; } if (T.armor && el !== 'zap') d *= 1 - T.armor; }
   if (e.kind === 'tyrant' && el === 'zap') { d *= 1.3; weak = true; }
@@ -2842,7 +2847,9 @@ function openChest() {
 /* ---------- cards ---------- */
 function cardOptions() {
   const o = [], wn = Object.keys(G.weps).length, pn = Object.keys(G.pas).length;
-  for (const id in WEAP) { const L = G.weps[id] || 0; if (L >= 5 || (!L && wn >= MAXW)) continue; o.push({type: 'w', id, ic: WEAP[id].ic, name: WEAP[id].n, lv: L + 1, desc: WEAP[id].d[L]}); }
+  const wOk = G.mode === 'boss' || (G.wepPick || 0) > 0;
+  if (wOk) for (const id in WEAP) { const L = G.weps[id] || 0; if (L >= 5 || (!L && wn >= MAXW)) continue; o.push({type: 'w', id, ic: WEAP[id].ic, name: WEAP[id].n, lv: L + 1, desc: WEAP[id].d[L]}); }
+  if ((G.wepPick || 0) > 0 && o.length) return o; // a weapon pick shows weapons only
   for (const id in PASV) { const L = G.pas[id] || 0; if (L >= 5 || (!L && pn >= 6)) continue; o.push({type: 'p', id, ic: PASV[id].ic, name: PASV[id].n, lv: L + 1, desc: PASV[id].d}); }
   if (G.comp && (G.compL || 1) < 5) { const C = COMP[G.comp.kind], L = G.compL || 1; o.push({type: 'c', id: G.comp.kind, ic: C.ic, name: C.n, lv: L + 1, desc: C.d[L]}); }
   return o;
@@ -2856,7 +2863,7 @@ function applyCard(c) {
 }
 function showCards() {
   G.state = 'cards'; G.pending--; $('banner').classList.remove('on'); bannerT = 0;
-  let opts = cardOptions(); const pick = [];
+  let opts = cardOptions(); const pick = [], wp = (G.wepPick || 0) > 0; if (wp) G.wepPick--;
   // favour new weapons early so every level brings something fresh
   const fresh = opts.filter(o => o.lv === 1 && o.type === 'w');
   if (fresh.length && Object.keys(G.weps).length < 5) pick.push(fresh.splice(Math.floor(Math.random() * fresh.length), 1)[0]);
@@ -2865,7 +2872,7 @@ function showCards() {
   // when the build is full (or past level 25) the cards keep coming as endless power-ups
   const extra = [{type: 'dmg', ic: '💥', name: 'Güç Kristali', lv: 0, desc: 'Tüm hasar +4%'}, {type: 'mhp', ic: '❤️', name: 'Dev Kalp', lv: 0, desc: '+10 maksimum can, canın yarısı dolar'}, {type: 'spd2', ic: '💨', name: 'Rüzgar Tüyü', lv: 0, desc: 'Hız +4%'}, {type: 'cd2', ic: '⏳', name: 'Zaman Kumu', lv: 0, desc: 'Güçler %4 daha sık'}, {type: 'heal', ic: '🍓', name: 'Çilek', lv: 0, desc: 'Canın tamamen dolar'}, {type: 'gold', ic: '🪙', name: 'Altın Kesesi', lv: 0, desc: '+40 altın'}];
   while (pick.length < 3) pick.push(extra.splice(Math.floor(Math.random() * extra.length), 1)[0]);
-  const lvShow = G.level - G.pending; $('cardsTitle').textContent = lvShow > 25 ? `Seviye ${lvShow}! Sonsuz güç` : `Seviye ${lvShow}!`;
+  const lvShow = G.level - G.pending; $('cardsTitle').textContent = wp ? '🎁 Silah seçimi!' : lvShow > 25 ? `Seviye ${lvShow}! Sonsuz güç` : `Seviye ${lvShow}!`;
   const list = $('cardList'); list.innerHTML = '';
   for (const c of pick) {
     const b = document.createElement('button'); b.className = 'card ' + (c.type === 'p' || c.type === 'c' ? 'p' : 'w');
@@ -2928,7 +2935,7 @@ function gameOver(won) {
   save.bestWave = Math.max(save.bestWave, G.wave); save.bestKills = Math.max(save.bestKills, G.kills); save.bestTime = Math.max(save.bestTime, Math.floor(G.time)); persist();
   save.best = save.best || {}; const bestS = G.score > (save.best[G.mode] || 0); if (bestS) save.best[G.mode] = G.score; recSave(); persist();
   $('overTitle').textContent = won ? (G.mode === 'hunt' ? 'Tüm Flix\'ler toplandı!' : 'New York kurtuldu!') : G.mode === 'hunt' && G.huntT <= 0 ? 'Süre bitti!' : curHero().n + ' düştü!';
-  $('overNote').textContent = (won && G.mode !== 'hunt' ? 'VORTEKS kurtarıldı, şehir özgür! ' : '') + (bestS ? `Yeni ${MODES[G.mode].n} rekoru! 🎉` : `${MODES[G.mode].n} rekoru: ${fmtN(save.best[G.mode] || 0)}`) + ` · En fazla: ${recTxt(G.mode, recBest(G.mode))}`;
+  $('overNote').textContent = (won && G.mode !== 'hunt' ? 'VORTEKS kurtarıldı, şehir özgür! ' : '') + (bestS ? `Yeni ${MODES[G.mode].n} rekoru! 🎉 · ` : save.best[G.mode] ? `${MODES[G.mode].n} rekoru: ${fmtN(save.best[G.mode])} · ` : '') + `En fazla: ${recTxt(G.mode, recBest(G.mode))}`;
   $('overStats').innerHTML = `<span>Skor</span><b>${fmtN(G.score)}</b><span>${G.mode === 'boss' ? 'Patron' : G.mode === 'story' ? 'Seviye' : 'Dalga'}</span><b>${G.wave}</b><span>Flix</span><b>${G.flixGot}</b><span>Süre</span><b>${fmt(G.time)}</b><span>Güç</span><b>${G.level}</b><span>Yenilen düşman</span><b>${G.kills}</b><span>En uzun kombo</span><b>x${G.bestCombo || 0}</b>`;
   const gain = runReward(won) - (G.paid || 0); G.paid = (G.paid || 0) + gain; addCoins(gain); const gg = runGems(won) - (G.paidG || 0); G.paidG = (G.paidG || 0) + gg; addGems(gg); $('overCoins').textContent = '+🪙 ' + fmtN(gain) + (gg > 0 ? '  ·  +💎 ' + fmtN(gg) : '') + ' kazandın';
   $('bEndless').style.display = won && G.mode === 'story' && !G.endless ? '' : 'none';
