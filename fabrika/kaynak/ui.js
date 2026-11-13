@@ -2,7 +2,7 @@
 import { SFX } from './sfx.js';
 import { LANG, setLang } from './i18n.js';
 import { UPS, STAFF, SUPS, COS, IAP, AD, COLS, BONUS, bonusTxt, PROMO, ORDERS, spdPct } from './config.js';
-import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel, bonusOn, bonusLeft, addBonus, setMenu, cosB, ENDGAME, setEndgame, patronLv, patronTier, onUpgrade, setWorkerLook, contract, capOf, hypeInfo } from './game.js';
+import { SV, save, lv, fmt, spawnStaff, setLook, setFloor, setSound, soundOn, bumpMoney, setPaused, tutDone, profitMult, applyTiers, factoryLevel, bonusOn, bonusLeft, addBonus, setMenu, cosB, ENDGAME, setEndgame, patronLv, patronTier, onUpgrade, setWorkerLook, contract, capOf, hypeInfo , flipRot } from './game.js';
 import { PADS } from './config.js';
 
 const $ = (s) => document.querySelector(s);
@@ -189,6 +189,7 @@ export function initUI() {
   $('#mmLang small').textContent = LANG === 'tr' ? 'ENGLISH' : 'TÜRKÇE';
   $('#mmPlay').onclick = () => { SFX.unlock(); showMenu(false); };
   $('#mmEnd').onclick = () => openPanel('menu');
+  $('#bFlip').onclick = () => { SFX.click(); flipRot(); };
   document.querySelectorAll('#mm [data-p]').forEach(b => b.onclick = () => { SFX.unlock(); openPanel(b.dataset.p); });
   $('#mmPromo').innerHTML = PROMO.map(p => `<button data-g="${p.id}" style="background:${p.bg}"><img src="${window['AD_' + p.id.toUpperCase()] || ''}" alt=""><span><b>${p.name}</b><small>${p.id === 'rush' ? 'App Store' : 'Oyna'}</small></span></button>`).join('');
   document.querySelectorAll('#mmPromo [data-g]').forEach(b => b.onclick = () => openPromo(PROMO.find(p => p.id === b.dataset.g)));

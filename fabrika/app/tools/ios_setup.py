@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Prepares the iOS project after `npx cap add ios` / `npx cap sync ios`. Works on Mac, Linux and GitHub Actions.
-- locks Flix Fabrika to portrait and makes it an iPhone-only app (no iPad screenshots needed)
+- locks Flix Fabrika to landscape (2.2: the game is played sideways) and makes it an iPhone-only app (no iPad screenshots needed)
 - hides the status bar, declares no non-exempt encryption (skips the export-compliance question on every upload)
 - lets ProMotion iPhones run at 120 Hz
 - copies the app icon (store/icon-1024.png) and launch screen (store/acilis_ekrani.png)
@@ -13,7 +13,7 @@ app = pathlib.Path(__file__).resolve().parent.parent
 ios = app / 'ios' / 'App'
 pl_path = ios / 'App' / 'Info.plist'
 with open(pl_path, 'rb') as f: pl = plistlib.load(f)
-pl['UISupportedInterfaceOrientations'] = ['UIInterfaceOrientationPortrait']
+pl['UISupportedInterfaceOrientations'] = ['UIInterfaceOrientationLandscapeRight', 'UIInterfaceOrientationLandscapeLeft']
 pl.pop('UISupportedInterfaceOrientations~ipad', None)
 pl['UIRequiresFullScreen'] = True
 pl['UIStatusBarHidden'] = True
@@ -71,4 +71,4 @@ s = s.replace('TARGETED_DEVICE_FAMILY = "1,2";', 'TARGETED_DEVICE_FAMILY = 1;')
 if os.environ.get('BUILD_NUMBER'): s = re.sub(r'CURRENT_PROJECT_VERSION = [^;]+;', 'CURRENT_PROJECT_VERSION = %s;' % os.environ['BUILD_NUMBER'], s)
 if os.environ.get('APP_VERSION'): s = re.sub(r'MARKETING_VERSION = [^;]+;', 'MARKETING_VERSION = %s;' % os.environ['APP_VERSION'], s)
 pbx.write_text(s)
-print('iOS project ready: portrait, iPhone only, icon, launch screen, AdMob app id', pl['GADApplicationIdentifier'], '| real ad units:', ', '.join(real_units) or 'none (test ads)')
+print('iOS project ready: landscape, iPhone only, icon, launch screen, AdMob app id', pl['GADApplicationIdentifier'], '| real ad units:', ', '.join(real_units) or 'none (test ads)')

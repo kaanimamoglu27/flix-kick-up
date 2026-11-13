@@ -43,6 +43,27 @@ export const factoryLevel = () => 1 + SV.unl.length;
 let sound = (() => { try { return localStorage.getItem('flix_fabrika_snd') !== '0'; } catch { return true; } })(); SFX.enabled = sound;
 
 // ---------------- renderer ----------------
+
+// ---------------- 2.2 landscape: the game is played sideways; a phone held upright turns the whole game 90° ----------------
+const IS_TOUCH = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+export let VW = innerWidth, VH = innerHeight, ROT = 0; let rotPref = -90, rotManual = false;
+try { const v = localStorage.getItem('flix_fab_rot'); if (v) { rotPref = +v; rotManual = true; } } catch {}
+function layout() {
+  ROT = IS_TOUCH && innerHeight > innerWidth ? rotPref : 0;
+  VW = ROT ? innerHeight : innerWidth; VH = ROT ? innerWidth : innerHeight;
+  const w = document.getElementById('wrap'); if (!w) return;
+  w.style.width = VW + 'px'; w.style.height = VH + 'px';
+  w.style.transform = ROT === 90 ? `translate(${innerWidth}px,0) rotate(90deg)` : ROT === -90 ? `translate(0,${innerHeight}px) rotate(-90deg)` : 'translate(0,0)';
+  const de = document.documentElement; de.classList.toggle('rot', !!ROT); de.classList.toggle('land', VW > VH * 1.15);
+  de.style.setProperty('--lw', VW + 'px'); de.style.setProperty('--lh', VH + 'px');
+}
+function lpt(e) { const x = e.clientX, y = e.clientY; if (ROT === 90) return { x: y, y: innerWidth - x }; if (ROT === -90) return { x: innerHeight - y, y: x }; return { x, y }; }
+export function flipRot() { rotPref = rotPref === 90 ? -90 : 90; rotManual = true; try { localStorage.setItem('flix_fab_rot', rotPref); } catch {} layout(); resize(); }
+{ let gHold = 0, gSide = 0; addEventListener('devicemotion', ev => { if (rotManual || !ev.accelerationIncludingGravity) return; let gx = ev.accelerationIncludingGravity.x, gy = ev.accelerationIncludingGravity.y; if (gx == null) return;
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent)) { gx = -gx; gy = -gy; } const side = Math.abs(gx) > 6 && Math.abs(gy) < 5 ? (gx > 0 ? 90 : -90) : 0;
+  if (side && side === gSide) { if (++gHold === 20 && side !== rotPref) { rotPref = side; layout(); resize(); } } else { gSide = side; gHold = 0; } }); }
+layout();
+const WRAP = document.getElementById('wrap') || document.body;
 const canvas = $('#gl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 const DPR_MAX = Math.min(devicePixelRatio || 1, 2); let dpr = DPR_MAX, fpsAcc = 0, fpsN = 0, fpsT = 0; renderer.setPixelRatio(dpr);
@@ -490,7 +511,7 @@ function buildTruck() {
   const wheels = []; for (const x of [-2.2, -0.6, 2.4]) for (const s of [-1, 1]) { const w = add(new THREE.CylinderGeometry(0.42, 0.42, 0.3, 16), MT.dark, g, x, 0.42, s * 1.0); w.rotation.x = Math.PI / 2; wheels.push(w); }
   g.rotation.y = Math.PI; g.position.set(22.6, 0, 22.0);
   outl(g); outl(dock); const stars = starRow(g, -0.6, 0.6, -1.09); stars.rotation.y = Math.PI;
-  const bub = document.createElement('div'); bub.className = 'bub truck'; document.body.appendChild(bub);
+  const bub = document.createElement('div'); bub.className = 'bub truck'; WRAP.appendChild(bub);
   const cash = new Pile(24.3, 14.6, 'cash', 80, 2, 2, 0.7);
   TR = { g, wheels, cont, load: [], state: 'dock', t: 0, idle: 0, zone: new THREE.Vector3(22.6, 0, 16.6), bub, cash, stars, x: 22.6 };
   ZONES.truck = null;
@@ -505,7 +526,7 @@ function stepTruck(dt) {
   else if (T.state === 'back') { T.x = Math.max(22.6, T.x - dt * 12); if (T.x <= 22.6) { T.state = 'dock'; T.idle = 0; const v = T.load.reduce((a, b) => a + b, 0) * PROD.truckMult * profitMult(); T.load = []; payCash(v, T.cash, new THREE.Vector3(22.6, 2, 19)); SFX.truck(); toast('Kamyon döndü: ₺' + fmt(v) + ' kazandın!'); confetti(new THREE.Vector3(22.6, 2, 18)); } }
   T.g.position.x = T.x; const sp = T.state === 'go' ? T.v : T.state === 'back' ? -12 : 0; T.wheels.forEach(w => w.rotation.y += sp * dt * 2.4);
   const show = T.state === 'dock' && !panelOpen(); T.bub.style.opacity = show ? 1 : 0;
-  if (show) { T.bub.innerHTML = `🚚 <b>${T.load.length}/${cap}</b>`; const v = new THREE.Vector3(T.x, 3.6, 22).project(camera); T.bub.style.transform = `translate(${(v.x + 1) / 2 * innerWidth}px,${(1 - v.y) / 2 * innerHeight}px) translate(-50%,-100%)`; }
+  if (show) { T.bub.innerHTML = `🚚 <b>${T.load.length}/${cap}</b>`; const v = new THREE.Vector3(T.x, 3.6, 22).project(camera); T.bub.style.transform = `translate(${(v.x + 1) / 2 * VW}px,${(1 - v.y) / 2 * VH}px) translate(-50%,-100%)`; }
 }
 // ---- FLIX Top line: rubber tank → ball machine ----
 function buildTopLine() {
@@ -658,7 +679,7 @@ function buildStage() { const x = 8.8, z = 6.0, g = new THREE.Group(); g.positio
     const bm = add(new THREE.ConeGeometry(0.9, 3.2, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xfff2b0, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide }), g, s * 1.0, 1.5, -0.4); bm.rotation.z = -s * 0.55; bm.rotation.x = 0.3; bm.castShadow = false; bm.visible = false; beams.push(bm); }
   outl(g); box(x - 1.8, x + 1.8, z - 1.65, z - 1.3);
   SG = { g, beams, zone: new THREE.Vector3(x, 0, z + 0.1), ring: zoneRing(x, z + 1.0, 0xff3ad0, T_('ŞOV')) };
-  SH.el = document.createElement('div'); SH.el.style.cssText = 'position:fixed;left:0;right:0;top:22%;text-align:center;pointer-events:none;z-index:40;font-family:BC,sans-serif;font-style:italic;font-weight:900;color:#fff;text-shadow:0 4px 0 #1b1330,0 0 18px rgba(0,0,0,.4);display:none'; document.body.appendChild(SH.el); }
+  SH.el = document.createElement('div'); SH.el.style.cssText = 'position:fixed;left:0;right:0;top:22%;text-align:center;pointer-events:none;z-index:40;font-family:BC,sans-serif;font-style:italic;font-weight:900;color:#fff;text-shadow:0 4px 0 #1b1330,0 0 18px rgba(0,0,0,.4);display:none'; WRAP.appendChild(SH.el); }
 function showStart() { SH.on = true; SH.combo = 0; SH.earned = 0; SH.y = 2.4; SH.v = 0; SH.g = 11; SH.still = 0; P.act = { kind: 'show', t: 0 }; joy.on = false; joy.x = joy.y = 0;
   P.o.position.set(SG.zone.x, 0, SG.zone.z); P.o.rotation.y = 0; SH.ball = makeFlix(bestCol(), 0.7); scene.add(SH.ball);
   SH.crowd.forEach(c => scene.remove(c.o)); SH.crowd = []; const nC = has('stadyum') ? 9 : 6; for (let i = 0; i < nC; i++) { const o = personMesh(i % 3 === 0); o.position.set(8.8 - (nC - 1) * 0.33 + i * 0.66 + rnd(-0.12, 0.12), 0, 8.3 + (i % 2) * 0.55); o.rotation.y = Math.PI; scene.add(o); SH.crowd.push({ o, ph: rnd(0, 6) }); }
@@ -982,7 +1003,7 @@ function buildPlayer() {
   H = makeHero(SV.cos.skin, SV.cos.acc, 0.78); P = { o: H.g, stack: [], walk: 0, tick: 0, speed: 6.2 };
   scene.add(H.g); H.g.position.set(SV.px ?? 0, 0, SV.pz ?? 3);
   P.hold = new THREE.Group(); P.hold.position.set(0, 1.0, 0.62); H.g.add(P.hold);
-  const lbl = document.createElement('div'); lbl.id = 'cap'; document.body.appendChild(lbl); P.lbl = lbl;
+  const lbl = document.createElement('div'); lbl.id = 'cap'; WRAP.appendChild(lbl); P.lbl = lbl;
 }
 export const patronLv = () => 1 + lv('spd') + lv('cap') + lv('kar') + lv('cek') + lv('pazar');
 const PTIER = [[1, 0xffffff, 'Çırak'], [5, 0xcd7f32, 'Usta'], [15, 0xd9dee6, 'Şef'], [30, 0xffc83a, 'Patron'], [50, 0x5ff0ff, 'Efsane']];
@@ -993,7 +1014,7 @@ function syncPatron(anim) { const l = patronLv(), t = patronTier(); if (!pRing) 
   if (anim && t[0] !== pTierShown) { toast('Yeni unvan: ' + t[2] + '! Halkan ve boyun büyüdü'); confetti(P.o.position.clone().setY(1)); SFX.milestone(); } pTierShown = t[0]; }
 export function onUpgrade() { syncPatron(true); syncOffice(); floatText('+1 Sv', '#25a855'); }
 const floats = [];
-export function floatText(txt, col = '#ffc20e') { const el = document.createElement('div'); el.className = 'ft'; el.textContent = txt; el.style.color = col; document.body.appendChild(el); floats.push({ el, t: 0 }); }
+export function floatText(txt, col = '#ffc20e') { const el = document.createElement('div'); el.className = 'ft'; el.textContent = txt; el.style.color = col; WRAP.appendChild(el); floats.push({ el, t: 0 }); }
 export function setLook() { const pos = P.o.position.clone(), ry = P.o.rotation.y; scene.remove(H.g); H = makeHero(SV.cos.skin, SV.cos.acc, 0.78); H.g.position.copy(pos); H.g.rotation.y = ry; scene.add(H.g); H.g.add(P.hold); P.o = H.g; syncPatron(false); confetti(pos.clone().setY(1)); }
 export const capOf = () => 4 + lv('cap') + cosB().cap;
 const wcap = () => 2 + lv('wcap') + cosB().wc;
@@ -1119,7 +1140,7 @@ function stepCustomers(dt) {
     const C = K.reduce((a, b) => b.cust.length < a.cust.length ? b : a, K[0]);
     if (C.cust.length < perK) { const o = personMesh(); o.position.set(32, 0, 20.3); scene.add(o);
       const want = tutDone() ? Math.min(7, 1 + Math.floor(rnd(0, 2 + L * 0.3)) + (bonusOn('musteri') ? 1 : 0)) : 1; const oc = ['mavi', 'sari', 'kirmizi'].filter(has), ord = tutDone() && oc.length && Math.random() < 0.6 ? oc[Math.floor(rnd(0, oc.length))] : 'mix';
-      const bub = document.createElement('div'); bub.className = 'bub'; document.body.appendChild(bub); const c = { o, want, got: 0, value: 0, bub, state: 'queue', t: 0, C, walk: 0, ord, pat: 0, hit: 0 }; C.cust.push(c); customers.push(c); } }
+      const bub = document.createElement('div'); bub.className = 'bub'; WRAP.appendChild(bub); const c = { o, want, got: 0, value: 0, bub, state: 'queue', t: 0, C, walk: 0, ord, pat: 0, hit: 0 }; C.cust.push(c); customers.push(c); } }
   const hide = panelOpen();
   for (const c of customers) { const C = c.C, j = C.cust.indexOf(c), p = c.o.position; let tgt;
     if (c.state === 'leave') tgt = p.z < 20.4 ? new THREE.Vector3(p.x + (p.x > C.x ? 0.01 : -0.01), 0, 20.8) : new THREE.Vector3(-30, 0, 20.8);
@@ -1132,7 +1153,7 @@ function stepCustomers(dt) {
       else { c.pat += c.t; if (c.pat > 9) { c.ord = 'mix'; c.pat = 0; } } }
       if (c.got >= c.want) { c.state = 'leave'; C.cust.splice(j, 1); payCash(c.value * profitMult(), C.cash, new THREE.Vector3(C.x, 1.5, 14.2)); c.bub.className = 'bub ok'; c.bub.innerHTML = c.hit ? '😍' : '😊'; const bb = c.bub; setTimeout(() => bb.remove(), 1500); } }
     if (c.state === 'queue') { const h = `<b>${c.want - c.got}</b><i class="fl"></i><i class="od" style="background:${ORDERS[c.ord].c}"></i>`; if (c.bh !== h) { c.bub.innerHTML = h; c.bh = h; } c.bub.classList.toggle('wait', c.pat > 5); }
-    const v = p.clone().add(new THREE.Vector3(0, 2.6, 0)).project(camera); c.bub.style.transform = `translate(${(v.x + 1) / 2 * innerWidth}px,${(1 - v.y) / 2 * innerHeight}px) translate(-50%,-100%)`; c.bub.style.opacity = (c.state === 'leave') || hide || j > 3 ? 0 : 1; }
+    const v = p.clone().add(new THREE.Vector3(0, 2.6, 0)).project(camera); c.bub.style.transform = `translate(${(v.x + 1) / 2 * VW}px,${(1 - v.y) / 2 * VH}px) translate(-50%,-100%)`; c.bub.style.opacity = (c.state === 'leave') || hide || j > 3 ? 0 : 1; }
   for (let i = customers.length - 1; i >= 0; i--) { const c = customers[i]; if (c.state === 'leave' && c.o.position.x < -29) { scene.remove(c.o); c.bub.remove(); customers.splice(i, 1); } }
 }
 // ---- endless contracts ("sipariş"): N FLIX of one colour, sold anywhere, pays a bonus + gems ----
@@ -1148,8 +1169,8 @@ function payCash(v, pile = cashPile, from = new THREE.Vector3(4.0, 1.5, 14.2)) {
 
 // ---------------- joystick ----------------
 const joy = { on: false, ox: 0, oy: 0, x: 0, y: 0 }; const jb = $('#joy'), jk = $('#joyk');
-canvas.addEventListener('pointerdown', e => { SFX.unlock(); if (SH.on) { showTap(); return; } joy.on = true; joy.ox = e.clientX; joy.oy = e.clientY; joy.x = joy.y = 0; jb.style.left = e.clientX + 'px'; jb.style.top = e.clientY + 'px'; jb.classList.add('on'); jk.style.transform = 'translate(-50%,-50%)'; try { canvas.setPointerCapture(e.pointerId); } catch {} });
-canvas.addEventListener('pointermove', e => { if (!joy.on) return; document.body.classList.add('moved'); let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const l = Math.hypot(dx, dy), R = 46; if (l > R) { dx *= R / l; dy *= R / l; } joy.x = dx / R; joy.y = dy / R; jk.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`; });
+canvas.addEventListener('pointerdown', e => { SFX.unlock(); if (SH.on) { showTap(); return; } const q = lpt(e); joy.on = true; joy.ox = q.x; joy.oy = q.y; joy.x = joy.y = 0; jb.style.left = q.x + 'px'; jb.style.top = q.y + 'px'; jb.classList.add('on'); jk.style.transform = 'translate(-50%,-50%)'; try { canvas.setPointerCapture(e.pointerId); } catch {} });
+canvas.addEventListener('pointermove', e => { if (!joy.on) return; document.body.classList.add('moved'); const q = lpt(e); let dx = q.x - joy.ox, dy = q.y - joy.oy; const l = Math.hypot(dx, dy), R = 46; if (l > R) { dx *= R / l; dy *= R / l; } joy.x = dx / R; joy.y = dy / R; jk.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`; });
 const end = () => { joy.on = false; joy.x = joy.y = 0; jb.classList.remove('on'); }; canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
 const keys = {}; addEventListener('keydown', e => { keys[e.key] = 1; if (SH.on && (e.key === ' ' || e.key === 'Enter')) showTap(); }); addEventListener('keyup', e => keys[e.key] = 0);
 
@@ -1380,7 +1401,7 @@ function animWalk(h, w, moving, carry) { const s = moving ? Math.sin(w) : 0; pos
 let moneyBump = 0; export function bumpMoney() { moneyBump = 1; }
 
 // ---------------- loop ----------------
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth / innerHeight < 0.6 ? 46 : 34; camera.updateProjectionMatrix(); }
+function resize() { layout(); renderer.setSize(VW, VH, false); camera.aspect = VW / VH; camera.fov = VW / VH < 0.6 ? 46 : VW / VH > 1.5 ? 30 : 34; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize);
 let last = performance.now(), saveT = 0, minT = 60, shownMoney = SV.money, hudT = 0, paused = false;
 export function setPaused(p) { paused = p; last = performance.now(); }
@@ -1423,9 +1444,9 @@ function tick(dt, T) {
   { const st = 1.0; const sx = Math.round(camLook.x / st) * st, sz = Math.round(camLook.z / st) * st; if (sx !== sunAt.x || sz !== sunAt.z) { sunAt.set(sx, 0, sz); sun.position.copy(sunAt).add(new THREE.Vector3(-9, 22, 8)); sun.target.position.copy(sunAt); } }
   shownMoney += (SV.money - shownMoney) * Math.min(1, dt * 10); $('#money b').textContent = fmt(Math.round(shownMoney)); moneyBump = Math.max(0, moneyBump - dt * 4); $('#money').style.transform = `scale(${1 + Math.sin(moneyBump * Math.PI) * 0.12})`;
   const v = P.o.position.clone().add(new THREE.Vector3(0, 2.9 + P.stack.reduce((a, o) => a + hOf(o), 0) * 0.78, 0)).project(camera);
-  P.lbl.style.transform = `translate(${(v.x + 1) / 2 * innerWidth}px,${(1 - v.y) / 2 * innerHeight}px) translate(-50%,-100%)`; P.lbl.textContent = P.stack.length >= capOf() ? 'DOLU' : ''; P.lbl.style.opacity = P.stack.length >= capOf() ? 1 : 0;
+  P.lbl.style.transform = `translate(${(v.x + 1) / 2 * VW}px,${(1 - v.y) / 2 * VH}px) translate(-50%,-100%)`; P.lbl.textContent = P.stack.length >= capOf() ? 'DOLU' : ''; P.lbl.style.opacity = P.stack.length >= capOf() ? 1 : 0;
   if (pRing) { pRing.position.set(P.o.position.x, 0.06, P.o.position.z); pRing.material.opacity = 0.55 + Math.sin(T * 3) * 0.2; }
-  for (let i = floats.length - 1; i >= 0; i--) { const f = floats[i]; f.t += dt; const fv = P.o.position.clone().add(new THREE.Vector3(0, 3.2 + f.t * 1.5, 0)).project(camera); f.el.style.transform = `translate(${(fv.x + 1) / 2 * innerWidth}px,${(1 - fv.y) / 2 * innerHeight}px) translate(-50%,-100%)`; f.el.style.opacity = Math.max(0, 1 - f.t / 1.3); if (f.t > 1.3) { f.el.remove(); floats.splice(i, 1); } }
+  for (let i = floats.length - 1; i >= 0; i--) { const f = floats[i]; f.t += dt; const fv = P.o.position.clone().add(new THREE.Vector3(0, 3.2 + f.t * 1.5, 0)).project(camera); f.el.style.transform = `translate(${(fv.x + 1) / 2 * VW}px,${(1 - fv.y) / 2 * VH}px) translate(-50%,-100%)`; f.el.style.opacity = Math.max(0, 1 - f.t / 1.3); if (f.t > 1.3) { f.el.remove(); floats.splice(i, 1); } }
   hudT -= dt; if (hudT <= 0) { hudT = 0.5; refreshHUD(); }
   minT -= dt; if (minT <= 0) { minT = 60; SV.ipm = SV.ipm ? SV.ipm * 0.7 + earnMin * 0.3 : earnMin; earnMin = 0; }
   saveT -= dt; if (saveT <= 0) { saveT = 4; SV.px = P.o.position.x; SV.pz = P.o.position.z; save(); }
