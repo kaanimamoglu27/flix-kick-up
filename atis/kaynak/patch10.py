@@ -26,3 +26,11 @@ rep("else if (h === 'hit' || h === 'rim') { SFX.thud(vy0);", "else if (h === 'cl
 open('game10.js', 'w').write(src); print('game10.js +cloth', len(src))
 rep("window.__A = {buyWorld,", "window.__A = {boxes: () => boxes, facadeTex, buyWorld,")
 open('game10.js', 'w').write(src); print('game10.js +api', len(src))
+# v11 (1.5.3): animals never knock FLIX off a roof: pigeons fly off (no effect), cats/dogs slow it a little, only people bounce it
+rep("    if (d < 1e-5) _n.set(0, 1, 0); else _n.divideScalar(d);\n    B.p.copy(_c).addScaledVector(_n, RAD + c.r); const vn = B.v.dot(_n);",
+    "    if (c.a && c.a.kind !== 'person' && c.a.kind !== 'kid') { if (!B.hitA) B.hitA = []; if (!B.hitA.includes(c.a)) { B.hitA.push(c.a); B.lastA = c.a; hit = 'actor'; if (c.a.kind !== 'pigeon') B.v.multiplyScalar(0.85); } continue; }\n    if (d < 1e-5) _n.set(0, 1, 0); else _n.divideScalar(d);\n    B.p.copy(_c).addScaledVector(_n, RAD + c.r); const vn = B.v.dot(_n);")
+open('game10.js', 'w').write(src); print('game10.js +animals', len(src))
+# v11: free the GPU memory of the previous level (geometries, materials, textures were never released: ~60 textures + 200 geometries leaked per level)
+rep("function buildLevel(i) {\n  if (world) scene.remove(world);",
+    "function disposeTree(root) {\n  const geos = new Set(), mats = new Set(), texs = new Set();\n  root.traverse((o) => { if (o.geometry) geos.add(o.geometry); const m = o.material; if (m) (Array.isArray(m) ? m : [m]).forEach((mm) => { mats.add(mm); for (const k in mm) { const v = mm[k]; if (v && v.isTexture) texs.add(v); } }); });\n  geos.forEach((g) => g.dispose()); mats.forEach((m) => m.dispose()); texs.forEach((t) => t.dispose());\n}\nfunction buildLevel(i) {\n  if (world) { scene.remove(world); try { disposeTree(world); } catch (e) {} }")
+open('game10.js', 'w').write(src); print('game10.js +dispose', len(src))

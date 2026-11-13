@@ -735,6 +735,7 @@ function stepBody(B, dt, wind, lv) {
   if (lv.actors) for (const c of lv.actors) {
     if (c.off) continue;
     _c.set(c.x, clamp(B.p.y, c.y0 + c.r, c.y0 + c.h - c.r), c.z); _n.subVectors(B.p, _c); const d = _n.length(); if (d >= RAD + c.r) continue;
+    if (c.a && c.a.kind !== 'person' && c.a.kind !== 'kid') { if (!B.hitA) B.hitA = []; if (!B.hitA.includes(c.a)) { B.hitA.push(c.a); B.lastA = c.a; hit = 'actor'; if (c.a.kind !== 'pigeon') B.v.multiplyScalar(0.85); } continue; }
     if (d < 1e-5) _n.set(0, 1, 0); else _n.divideScalar(d);
     B.p.copy(_c).addScaledVector(_n, RAD + c.r); const vn = B.v.dot(_n);
     if (vn < 0) { B.v.addScaledVector(_n, -1.5 * vn); B.v.multiplyScalar(0.75); B.v.y = Math.max(B.v.y, 2.2); }
@@ -1668,8 +1669,13 @@ function prop3(P, top, g) {
   if (P.t === 'rail') { const rm = std(0xf4eee2, 0.6); addBox(g, rm, P.x - 0.05, P.x + 0.05, top + 0.85, top + 0.95, P.z1, P.z0, false); for (let z = P.z0; z > P.z1; z -= 1.2) addBox(g, rm, P.x - 0.05, P.x + 0.05, top, top + 0.9, z - 0.08, z, false); boxes.push({b: [P.x - 0.08, P.x + 0.08, top, top + 0.95, P.z1, P.z0], kind: 'soft'}); return true; }
   return streetProp(P, top, g);
 }
+function disposeTree(root) {
+  const geos = new Set(), mats = new Set(), texs = new Set();
+  root.traverse((o) => { if (o.geometry) geos.add(o.geometry); const m = o.material; if (m) (Array.isArray(m) ? m : [m]).forEach((mm) => { mats.add(mm); for (const k in mm) { const v = mm[k]; if (v && v.isTexture) texs.add(v); } }); });
+  geos.forEach((g) => g.dispose()); mats.forEach((m) => m.dispose()); texs.forEach((t) => t.dispose());
+}
 function buildLevel(i) {
-  if (world) scene.remove(world);
+  if (world) { scene.remove(world); try { disposeTree(world); } catch (e) {} }
   LV = LEVELS[i]; boxes = []; stars = []; sock = null; world = new THREE.Group(); scene.add(world); seed = 11 + (LV.seedI !== undefined ? LV.seedI : i) * 7; CUR_THEME = LV.theme || 'sokak'; FLAGS.length = 0; SPIN.length = 0; OCC.length = 0; scene.fog.color.setHex(THEMES[CUR_THEME].fog); scene.fog.far = CUR_THEME === 'uzay' ? 160 : 110;
   buildGround3();
   for (const P of LV.props) {
