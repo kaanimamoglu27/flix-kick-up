@@ -1,5 +1,7 @@
 # Flix Kick Up online sunucusu
 
+Aynı serviste ikinci uç nokta: **`/net`**: Flix Direktör (Sen Olsaydın) online düelloları ve FLIX Bomb online odaları için paylaşımlı belge + oda servisi (`src/net.js`, test `test/net.test.js`). İstemci uygulamalarda `flix-net.js` (`window.claude.use('db'|'user'|'room')`). `/ws` (Kick Up 1'e 1) hiç değişmedi; bağlantılar yola göre ayrılıyor. `/net` verisi bellekte, `NET_DATA_FILE`'a (varsayılan /tmp) 15 sn'de bir yazılır.
+
 Gerçek zamanlı 1'e 1 online maç için hafif bir Node.js sunucusu: tek bağımlılık `ws`, veritabanı yok, hesap yok. Oyuncular yalnızca bir isimle (oyundaki "ADIN" alanı) oynar.
 
 ## Çalıştırma
