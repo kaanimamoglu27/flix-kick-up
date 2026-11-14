@@ -12,7 +12,7 @@ Her oyunun kendi reposu var. Bir oyunla çalışırken o oyunun reposunu kullan.
 | Flix Bomba | [Flix-Bomba](https://github.com/kaanimamoglu27/Flix-Bomba) | `bomba/` |
 | Flix Birleştir | [Flix-Birlestir](https://github.com/kaanimamoglu27/Flix-Birlestir) | `birlestir/` |
 
-Geliştirilmeyen oyunlar: Flix Kart (`kart/`), Flix Çember (`cember/`), Flix Kayıp Tüyler (`kayip-tuyler/`). `321/` klasöründe yalnızca tanıtım videoları var.
+Geliştirilmeyen oyun: Flix Kart (`kart/`). `321/` klasöründe yalnızca tanıtım videoları var.
 
 ---
 
