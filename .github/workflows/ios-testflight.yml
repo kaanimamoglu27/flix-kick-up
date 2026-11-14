@@ -14,7 +14,7 @@ on:
       app:
         description: 'Which game'
         type: choice
-        options: [kickup, direktor, atis, fabrika]
+        options: [kickup]
         default: kickup
       version:
         description: 'Version shown in the App Store (e.g. 1.0)'
