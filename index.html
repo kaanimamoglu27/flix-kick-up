@@ -450,6 +450,34 @@ svg { display: block; }
 .moderow:disabled { opacity: .55; }
 .hflix { flex: 1; align-self: stretch; position: relative; min-height: 90px; pointer-events: auto; cursor: pointer; touch-action: none; }
 .hflix canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* v13: short screens (iPhone SE, and iPad running this iPhone app in compatibility mode = 375x667 pt or smaller).
+   The home column used to be taller than the screen there, so the bottom tile row (Dolap, Sahneler, Borular, Nasıl?) was cut off.
+   The logo now scales with the screen height and the column tightens step by step so every control stays on screen. */
+.logo-img { width: min(76vw, 300px, 40vh); }
+.home-actions { flex: none; }
+@media (max-height: 760px) {
+  .hflix { min-height: 56px; }
+  .home-actions { gap: 10px; }
+  .btn.big { font-size: 26px; padding: 14px 22px; }
+  .home-actions .btn.alt { padding: 13px 22px; }
+  .tile { padding: 9px 4px 9px; gap: 5px; }
+}
+@media (max-height: 600px) {
+  .home { padding-top: calc(8px + env(safe-area-inset-top, 0px)); padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .logo { margin-top: 4px; gap: 4px; }
+  .logo-img { width: min(76vw, 300px, 30vh); }
+  .slogan { margin-top: 6px; font-size: 12px; }
+  .hflix { min-height: 24px; }
+  .home-actions { gap: 8px; }
+  .btn.big { font-size: 22px; padding: 11px 22px; }
+  .home-actions .btn.alt { font-size: 16px; padding: 10px 22px; }
+  .tile { padding: 7px 4px 7px; gap: 3px; font-size: 12px; }
+  .tile svg { width: 24px; height: 24px; }
+}
+@media (max-height: 500px) {
+  .slogan { display: none; }
+  .hflix { min-height: 0; }
+}
 </style>
 </head>
 <body>
@@ -592,7 +620,7 @@ svg { display: block; }
             <li>Tur arası reklamlar: birkaç turda bir, turlar arasında. Online maç sırasında reklam açılmaz.</li>
             <li>Banner: açıksa yalnızca ana menünün altında görünür, oyun sırasında görünmez.</li>
           </ul>
-          <p>AdMob reklam göstermek ve ölçmek için cihazın reklam kimliğini (yalnızca izin verirsen), yaklaşık konumunu (IP adresinden), reklam etkileşimlerini ve tanılama verilerini kullanabilir. Avrupa'da ve İngiltere'de önce Google'ın onay ekranı çıkar. iPhone sana "takip izni" sorusunu sorar; izin vermezsen reklamlar kişiselleştirilmeden gösterilir, oyun aynı şekilde çalışır. Ayrıntı: <a class="ext" data-url="https://policies.google.com/privacy">Google Gizlilik Politikası</a>.</p>
+          <p>AdMob reklam göstermek ve ölçmek için cihazın reklam kimliğini (yalnızca izin verirsen), yaklaşık konumunu (IP adresinden), reklam etkileşimlerini ve tanılama verilerini kullanabilir. Avrupa'da ve İngiltere'de önce Google'ın onay ekranı çıkar. Cihazın sana "takip izni" sorusunu sorar; izin vermezsen reklamlar kişiselleştirilmeden gösterilir, oyun aynı şekilde çalışır. Ayrıntı: <a class="ext" data-url="https://policies.google.com/privacy">Google Gizlilik Politikası</a>.</p>
           <h3>Satın almalar ve Reklamsız</h3>
           <p>Uygulama içi satın almalar (tüy paketleri, Başlangıç Paketi ve Reklamsız) Apple App Store (StoreKit) üzerinden yapılır. Ödeme bilgilerin bize ulaşmaz; Apple yalnızca hangi ürünün alındığını uygulamaya bildirir. "Reklamsız" tur arası reklamları ve banner'ı kalıcı olarak kapatır; ödüllü reklamlar isteğe bağlı olarak kalır. Satın alımlarını Mağaza'daki "Satın alımları geri yükle" ile geri yükleyebilirsin.</p>
           <h3>Çocuklar</h3>
@@ -615,7 +643,7 @@ svg { display: block; }
             <li>Interstitial ads: every few runs, between runs. No ads open during an online match.</li>
             <li>Banner: if enabled, only at the bottom of the main menu, never during play.</li>
           </ul>
-          <p>To show and measure ads, AdMob may use the device's advertising identifier (only if you allow it), approximate location (from the IP address), ad interactions and diagnostics. In the EEA and UK, Google's consent form is shown first. Your iPhone asks whether to allow tracking; if you decline, ads are not personalised and the game works the same. See the <a class="ext" data-url="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
+          <p>To show and measure ads, AdMob may use the device's advertising identifier (only if you allow it), approximate location (from the IP address), ad interactions and diagnostics. In the EEA and UK, Google's consent form is shown first. Your device asks whether to allow tracking; if you decline, ads are not personalised and the game works the same. See the <a class="ext" data-url="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
           <h3>Purchases and No Ads</h3>
           <p>In-app purchases (feather packs, the Starter Pack and No Ads) are handled by Apple's App Store (StoreKit). We never receive your payment details; Apple only tells the app which product was bought. "No Ads" permanently turns off interstitial and banner ads; rewarded ads stay optional. You can restore purchases with "Restore purchases" in the Store.</p>
           <h3>Children</h3>
