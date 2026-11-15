@@ -1,0 +1,70 @@
+# iPhone simülatöründe açılış testi: uygulamayı simülatör için derler, iPhone simülatöründe açar,
+# ekran görüntüsü ve uygulama konsolunu (WebView JS hataları, reklam ve satın alma logları) sim-test dalına yazar.
+name: iPhone simulator smoke test
+run-name: Simulator smoke test (Kick Up)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  smoke:
+    runs-on: macos-15
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_*.app | grep -vi beta | sort -V | tail -1)
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+      - name: Prepare iOS project (same as the TestFlight workflow)
+        run: |
+          npm ci
+          npx cap add ios --packagemanager CocoaPods
+          python3 tools/ios_setup.py
+      - name: Build for the simulator
+        run: |
+          set -o pipefail
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/dd" CODE_SIGNING_ALLOWED=NO build | tail -n 40
+          echo "TEST_APP=$RUNNER_TEMP/dd/Build/Products/Debug-iphonesimulator/App.app" >> "$GITHUB_ENV"
+      - name: Boot an iPhone simulator
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          j=json.load(sys.stdin); c=[]
+          for rt,ds in j['devices'].items():
+              for d in ds:
+                  if d['name'].startswith('iPhone') and 'SE' not in d['name']: c.append((rt,d['name'],d['udid']))
+          c.sort(); print(c[-1][2])")
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID"; xcrun simctl bootstatus "$UDID" -b
+      - name: Launch, log and screenshot
+        run: |
+          set +e
+          OUT="$RUNNER_TEMP/out"; mkdir -p "$OUT"
+          xcrun simctl install "$UDID" "$TEST_APP"
+          xcrun simctl spawn "$UDID" log stream --level debug --style compact --predicate 'process == "App"' > "$OUT/console.log" 2>&1 &
+          LP=$!
+          sleep 3
+          xcrun simctl launch "$UDID" com.flixtoys.kickup > "$OUT/launch.txt" 2>&1
+          sleep 12; xcrun simctl io "$UDID" screenshot "$OUT/1-12s.png"
+          sleep 25; xcrun simctl io "$UDID" screenshot "$OUT/2-37s.png"
+          xcrun simctl spawn "$UDID" launchctl list | grep -i flixtoys > "$OUT/running.txt"
+          kill $LP
+          ls "$HOME/Library/Logs/DiagnosticReports" 2>/dev/null | grep -i "^App" > "$OUT/crashes.txt"
+          grep -E '⚡️|To Native|JS Eval|error|Error|AdMob|GAD|ad load|purchase|CdvPurchase' "$OUT/console.log" | grep -v 'PluginMethod' | head -400 > "$OUT/console_filtered.log"
+          wc -l "$OUT"/*.log; cat "$OUT/running.txt"; cat "$OUT/crashes.txt"; head -80 "$OUT/console_filtered.log"
+      - name: Save results to the sim-test branch
+        run: |
+          cd "$RUNNER_TEMP/out"
+          git init -q; git checkout -q -b sim-test
+          git add -A; git -c user.name=ci -c user.email=ci@example.com commit -qm "sim test ${{ github.run_id }}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" sim-test
