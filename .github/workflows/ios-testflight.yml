@@ -19,7 +19,7 @@ on:
       version:
         description: 'Version shown in the App Store (e.g. 1.0)'
         required: true
-        default: '1.0'
+        default: '1.5.1'
 jobs:
   upload:
     runs-on: macos-15-intel
@@ -63,7 +63,7 @@ jobs:
           ADMOB_BANNER_ID: ${{ inputs.app == 'kickup' && secrets.KICKUP_ADMOB_BANNER_ID || inputs.app == 'atis' && secrets.ATIS_ADMOB_BANNER_ID || inputs.app == 'fabrika' && secrets.FABRIKA_ADMOB_BANNER_ID || '' }}
           # Kick Up online server (repository variable, not a secret). Overrides ONLINE_SERVER_URL in online-config.js.
           ONLINE_SERVER_URL: ${{ inputs.app == 'kickup' && vars.KICKUP_ONLINE_SERVER_URL || '' }}
-        run: python3 tools/ios_setup.py
+        run: python3 tools/ios_setup.py && python3 tools/ads_audit.py
       - name: App Store Connect key
         env:
           ASC_KEY_P8: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
