@@ -14,7 +14,7 @@ on:
       app:
         description: 'Which game'
         type: choice
-        options: [kickup, jump]
+        options: [kickup]
         default: kickup
       version:
         description: 'Version shown in the App Store (e.g. 1.0)'
@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 90
     defaults:
       run:
-        working-directory: ${{ inputs.app == 'jump' && 'jump/app' || inputs.app == 'direktor' && 'direktor/app' || inputs.app == 'atis' && 'atis/app' || inputs.app == 'fabrika' && 'fabrika/app' || 'app' }}
+        working-directory: ${{ inputs.app == 'direktor' && 'direktor/app' || inputs.app == 'atis' && 'atis/app' || inputs.app == 'fabrika' && 'fabrika/app' || 'app' }}
     env:
       ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -38,13 +38,6 @@ jobs:
           [ -n "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" ] || { echo "::error::Secret APP_STORE_CONNECT_PRIVATE_KEY is missing"; exit 1; }
         working-directory: .
       - uses: actions/checkout@v4
-      # Flix Jump lives in its own public repo (kaanimamoglu27/Flix-Jump); it is built here with this repo's signing secrets.
-      - name: Get Flix Jump
-        if: inputs.app == 'jump'
-        uses: actions/checkout@v4
-        with:
-          repository: kaanimamoglu27/Flix-Jump
-          path: jump
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -54,9 +47,6 @@ jobs:
           sudo xcode-select -s "$X"
           xcodebuild -version
       - run: npm ci
-      - name: Build Flix Jump's game (src/ -> index.html -> app/www)
-        if: inputs.app == 'jump'
-        run: python3 ../src/build.py && npm run build
       - name: Create the iOS project
         run: npx cap add ios --packagemanager CocoaPods
       - name: Configure the iOS project
@@ -125,7 +115,7 @@ jobs:
           echo "::endgroup::"
           echo "::group::App Store Connect API (what this key can see)"
           python3 -m venv "$RUNNER_TEMP/venv" && "$RUNNER_TEMP/venv/bin/pip" install -q pyjwt cryptography >/dev/null 2>&1
-          APP="${{ inputs.app }}" BID="${BID:-}" "$RUNNER_TEMP/venv/bin/python" - <<'PY'
+          BID="${BID:-}" "$RUNNER_TEMP/venv/bin/python" - <<'PY'
           import os, time, json, urllib.request, urllib.error, jwt
           key = open(os.environ['KEY_PATH']).read()
           tok = jwt.encode({'iss': os.environ['ASC_ISSUER_ID'], 'iat': int(time.time()), 'exp': int(time.time()) + 600, 'aud': 'appstoreconnect-v1'},
@@ -138,7 +128,7 @@ jobs:
                   try: msg = json.load(e)['errors'][0].get('detail', '')
                   except Exception: msg = ''
                   return e.code, msg
-          bid = os.environ.get('BID') or ('com.flixtoys.jump' if os.environ.get('APP') == 'jump' else 'com.flixtoys.kickup')
+          bid = os.environ.get('BID') or 'com.flixtoys.kickup'
           s, j = get('/v1/bundleIds?filter[identifier]=' + bid + '&limit=20')
           if s == 200:
               ids = [b for b in j['data'] if b['attributes']['identifier'] == bid]
