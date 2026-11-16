@@ -19,7 +19,7 @@ on:
       version:
         description: 'Version shown in the App Store (e.g. 1.0)'
         required: true
-        default: '1.5.1'
+        default: '1.5.2'
 jobs:
   upload:
     runs-on: macos-15-intel
