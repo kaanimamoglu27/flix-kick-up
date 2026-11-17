@@ -31,9 +31,23 @@
   // Non-consumables the store reports as owned on this launch (e.g. "No Ads" after a reinstall) are handed to the game
   // once per launch. The game also keeps them in its own save, so they work offline and before the store has loaded.
   const synced = new Set();
+  // 2.x fix (17 Kasım 2026): store.owned() also counts the plugin's temporary "virtual.<id>" transaction that exists while
+  // the Apple payment sheet is open (state "initiated"). receiptUpdated fires right then, so a non-consumable was handed out
+  // before the player paid, and stayed even when the sheet was closed. Only a real, approved or finished transaction counts.
+  function realOwned(id) {
+    if (!store) return false;
+    for (const r of store.localReceipts || []) for (const t of r.transactions || []) {
+      if (String(t.transactionId || '').startsWith('virtual.')) continue;
+      if (t.state !== 'approved' && t.state !== 'finished') continue;
+      if (t.isConsumed || t.isPending) continue;
+      if (t.expirationDate && +t.expirationDate <= Date.now()) continue;
+      if ((t.products || []).some(p => p.id === id)) return true;
+    }
+    return false;
+  }
   function syncOwned() {
     if (!store || !window.__fkuGrant) return;
-    for (const id of NON_CONSUMABLE) if (!synced.has(id) && store.owned(id)) { synced.add(id); window.__fkuGrant(id, null); }
+    for (const id of NON_CONSUMABLE) if (!synced.has(id) && realOwned(id)) { synced.add(id); window.__fkuGrant(id, null); }
   }
   function initStore() {
     if (!window.CdvPurchase) { console.warn('CdvPurchase missing'); return; }
@@ -82,7 +96,7 @@
       if (!store) throw new Error('store unavailable');
       const err = await store.restorePurchases();
       if (err) throw err;
-      return NON_CONSUMABLE.filter(id => store.owned(id));
+      return NON_CONSUMABLE.filter(id => realOwned(id));
     },
     // localized price string from the store, e.g. "₺119,99"; null until the store has loaded
     price(id) { const p = store && store.get(id); return p && p.pricing ? p.pricing.price : null; },

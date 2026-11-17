@@ -68,13 +68,14 @@
   }
 
   async function init() {
-    if (ios && CFG.requestTracking) await askTracking();
-    // Google's consent message (EU / UK only), after Apple's question
+    // Order matters (Apple rejected FLIX Jump 1.3.5 under Guideline 5.1.1(iv), 17 Nov 2026): Google's consent message
+    // (EU / UK / CH only) comes FIRST, then Apple's "Allow tracking?" question, then AdMob starts.
     try {
       let c = await A.requestConsentInfo();
-      if (c && c.isConsentFormAvailable && c.status === 'REQUIRED') c = await A.showConsentForm();
+      if (c && c.isConsentFormAvailable && c.status === 'REQUIRED') { if (ios) await whenActive(); c = await A.showConsentForm(); }
       if (c && c.canRequestAds === false) canRequest = false;
     } catch (e) {}
+    if (ios && CFG.requestTracking) await askTracking();
     try {
       await A.initialize({initializeForTesting: units.rewarded.isTesting || units.inter.isTesting || (CFG.testDevices || []).length > 0, testingDevices: CFG.testDevices || []});
     } catch (e) { console.warn('admob init', e); return; }
