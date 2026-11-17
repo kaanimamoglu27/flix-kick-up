@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   ipad-screenshots:
-    runs-on: macos-15-intel
+    runs-on: macos-15  # Apple silicon: the Intel runner is too slow for the simulator (launch and screenshot calls timed out)
     timeout-minutes: 55
     defaults:
       run:
@@ -74,7 +74,7 @@ jobs:
           xcrun simctl boot "$IPAD_UDID"
           xcrun simctl bootstatus "$IPAD_UDID" -b
       - name: Capture one isolated launch per screen
-        timeout-minutes: 20
+        timeout-minutes: 30
         run: |
           set -euo pipefail
           # macOS has no `timeout`; a hung simctl call must fail fast instead of eating the whole job
@@ -101,9 +101,9 @@ jobs:
               html=html.replace('</body>',script+'</body>')
           Path(os.environ['INSTALLED'],'public','index.html').write_text(html,encoding='utf-8')
           PY
-            t 60 xcrun simctl terminate "$IPAD_UDID" com.flixtoys.kickup || true
+            t 120 xcrun simctl terminate "$IPAD_UDID" com.flixtoys.kickup || true
             sleep 2
-            t 180 xcrun simctl launch "$IPAD_UDID" com.flixtoys.kickup
+            t 300 xcrun simctl launch "$IPAD_UDID" com.flixtoys.kickup
             sleep 18
             case "$stage" in
               home) name="01-home";;
@@ -111,7 +111,10 @@ jobs:
               sahneler) name="03-sahneler";;
               ayarlar) name="04-ayarlar";;
             esac
-            t 120 xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/$name.png"
+            t 300 xcrun simctl io "$IPAD_UDID" screenshot "$GITHUB_WORKSPACE/ipad-screenshots/$name.png"
+            # small copy in the log, so the result can be checked without downloading the artifact
+            sips -s format jpeg -s formatOptions 60 -Z 700 "$GITHUB_WORKSPACE/ipad-screenshots/$name.png" --out "$RUNNER_TEMP/$name.jpg" >/dev/null
+            echo "THUMB-BEGIN $name"; base64 -i "$RUNNER_TEMP/$name.jpg" | fold -w 4000; echo "THUMB-END $name"
             echo "::endgroup::"
           done
       - name: Upload screenshots
