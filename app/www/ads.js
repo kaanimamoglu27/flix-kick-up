@@ -9,7 +9,7 @@
      FlixAds.setScreen(name)    -> 'menu' | 'game' | 'over': the banner (if enabled) only shows on the menu
      FlixAds.privacyOptionsRequired() -> true when Google's consent message applies (EEA / UK / CH): Settings then shows "Gizlilik Seçenekleri"
      FlixAds.showPrivacyOptions() -> reopens Google's consent form so the player can change or withdraw consent
-   A 'flixprivacy' event fires on window once the consent status is known (Kick Up has no Settings button for it yet).
+   A 'flixprivacy' event fires on window once the consent status is known (Settings > Gizlilik Seçenekleri listens to it).
    Every call resolves and never throws; a full-screen ad resolves only after it is closed. */
 (function () {
   const Cap = window.Capacitor;
