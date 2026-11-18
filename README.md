@@ -3,7 +3,12 @@
 Bu repo yalnızca Flix Kick Up'ındır. Diğer oyunların her biri kendi reposunda:
 
 | Oyun | Repo |
-|---|---|
+|## 6 dil ve Nasıl oynanır eklemeleri (2026-11-18)
+- **Diller:** Türkçe (varsayılan), English (oyunun kendi `EN` sözlüğü, seçince sayfa yenilenir), Français, Deutsch, Español, العربية. Ayarlar'daki TR/EN düğmeleri yerine 6 dilli seçici. Daha önce İngilizce seçmiş oyuncunun dili korunur. FR/DE/ES/AR'da yasal metinler İngilizce gösterilir.
+- Çeviri tablosu `i18n/ceviri_*.tsv`. Yeni metin: tabloya satır ekle, `python3 i18n/apply_i18n.py flix-kick-up.html index.html`, sonra `cd app && python3 tools/build_www.py`.
+- Nasıl oynanır'a iki bölüm: PUANLAR VE ENGELLER, REKLAMLAR.
+
+---|---|
 | Flix Kick Up | [flix-kick-up](https://github.com/kaanimamoglu27/flix-kick-up) (bu repo: oyun kökte, iOS paketi `app/`) |
 | Flix Arkana | [Flix-Arkana](https://github.com/kaanimamoglu27/Flix-Arkana) |
 | Flix Atış | [Flix-Atis](https://github.com/kaanimamoglu27/Flix-Atis) |
