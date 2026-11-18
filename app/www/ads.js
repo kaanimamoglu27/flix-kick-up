@@ -7,6 +7,9 @@
      FlixAds.rewardedReady()    -> true when a rewarded ad is loaded
      FlixAds.setAdsRemoved(on)  -> "No Ads" bought / restored: interstitial and banner stop for good
      FlixAds.setScreen(name)    -> 'menu' | 'game' | 'over': the banner (if enabled) only shows on the menu
+     FlixAds.privacyOptionsRequired() -> true when Google's consent message applies (EEA / UK / CH): Settings then shows "Gizlilik Seçenekleri"
+     FlixAds.showPrivacyOptions() -> reopens Google's consent form so the player can change or withdraw consent
+   A 'flixprivacy' event fires on window once the consent status is known (Kick Up has no Settings button for it yet).
    Every call resolves and never throws; a full-screen ad resolves only after it is closed. */
 (function () {
   const Cap = window.Capacitor;
@@ -37,13 +40,32 @@
   };
   for (const k in fmt) Object.assign(fmt[k], {state: 'idle', loadedAt: 0, p: null, fails: 0, timer: 0});
 
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   let started = false, canRequest = true, removed = false, showing = false, screen = 'menu', bannerOn = false, bannerMade = false;
+  let privacyRequired = false;
   const startedP = init();
 
+  // Google UMP consent: whether ads may be requested and whether the privacy options entry point must be shown
+  function consentInfo(c) {
+    if (!c) return;
+    canRequest = c.canRequestAds !== false;
+    privacyRequired = c.privacyOptionsRequirementStatus === 'REQUIRED';
+  }
+  function announcePrivacy() { try { window.dispatchEvent(new Event('flixprivacy')); } catch (e) {} }
+
+  // Reopens Google's consent form (EEA / UK / CH). Resolves after it is closed; ads start or stop to match the new choice.
+  async function showPrivacyOptions() {
+    const could = canRequest;
+    try { await A.showPrivacyOptionsForm(); } catch (e) { console.warn('privacy options', e && e.message); }
+    try { consentInfo(await A.requestConsentInfo()); } catch (e) {}
+    announcePrivacy();
+    if (started && canRequest && !could) { load('rewarded'); if (CFG.interstitial !== false) load('inter'); syncBanner(); }
+    if (!canRequest) hideBanner();
+    return true;
+  }
+
   // iOS silently ignores the tracking request while the app is still launching (not yet "active"): no question
-  // appears and the status stays notDetermined. ads.js runs in <head> during launch, so wait until the page has
-  // loaded, is on screen, and a moment has passed.
+  // appears and the status stays notDetermined. ads.js runs during launch, so wait until the page has loaded,
+  // is on screen, and a moment has passed. (Apple rejected FLIX Kick Up 1.5 (13) for this, Guideline 2.1.)
   function whenActive() {
     return new Promise((resolve) => {
       const go = () => {
@@ -55,39 +77,41 @@
     });
   }
   function trackingStatus() { return A.trackingAuthorizationStatus().then((t) => t && t.status, () => null); }
-  // Apple's "Allow tracking?" question. Asked BEFORE AdMob starts, so no ad SDK collects anything first.
+  function pause(ms) { return new Promise((r) => setTimeout(r, ms)); }
+  // Apple's "Allow tracking?" question. Asked after Google's consent message and BEFORE AdMob starts, so no ad SDK collects anything first.
   async function askTracking() {
     for (let tries = 0; tries < 4; tries++) {
       if ((await trackingStatus()) !== 'notDetermined') return;   // answered before, or tracking turned off in Settings
       await whenActive();
       try { await A.requestTrackingAuthorization(); } catch (e) { return; }
       if ((await trackingStatus()) !== 'notDetermined') return;   // the user answered
-      // the question did not show (app not active yet): try again a little later
-      await sleep(1500);
+      await pause(1500);                                          // the question did not show: try again a little later
     }
   }
 
   async function init() {
     // Order matters (Apple rejected FLIX Jump 1.3.5 under Guideline 5.1.1(iv), 17 Nov 2026): Google's consent message
-    // (EU / UK / CH only) comes FIRST, then Apple's "Allow tracking?" question, then AdMob starts.
+    // (EU / UK / CH only) comes FIRST, then Apple's "Allow tracking?" question, then AdMob starts. Asking Google's
+    // tracking question after the player already chose "Ask App Not to Track" read as asking twice.
     try {
       let c = await A.requestConsentInfo();
       if (c && c.isConsentFormAvailable && c.status === 'REQUIRED') { if (ios) await whenActive(); c = await A.showConsentForm(); }
-      if (c && c.canRequestAds === false) canRequest = false;
+      consentInfo(c);
     } catch (e) {}
     if (ios && CFG.requestTracking) await askTracking();
+    announcePrivacy();
     try {
       await A.initialize({initializeForTesting: units.rewarded.isTesting || units.inter.isTesting || (CFG.testDevices || []).length > 0, testingDevices: CFG.testDevices || []});
     } catch (e) { console.warn('admob init', e); return; }
     started = true;
     if (!canRequest) return;
-    load('rewarded'); load('inter'); syncBanner();
+    load('rewarded'); if (CFG.interstitial !== false) load('inter'); syncBanner();
   }
 
   function load(kind) {
     const f = fmt[kind];
     if (!started || !canRequest || showing) return Promise.resolve(false);
-    if (kind === 'inter' && removed) return Promise.resolve(false);
+    if (kind === 'inter' && (removed || CFG.interstitial === false)) return Promise.resolve(false);
     if (f.state === 'ready' && Date.now() - f.loadedAt > EXPIRE_MS) f.state = 'idle';
     if (f.state !== 'idle') return f.p;
     clearTimeout(f.timer); f.state = 'loading';
@@ -166,6 +190,7 @@
     bannerOn = false; A.hideBanner().catch(() => {});
   }
 
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   window.FlixAds = {
     showRewarded,
@@ -176,6 +201,8 @@
       if (removed) { clearTimeout(fmt.inter.timer); hideBanner(); }
       else { load('inter'); syncBanner(); }
     },
-    setScreen(name) { screen = name; syncBanner(); }
+    setScreen(name) { screen = name; syncBanner(); },
+    privacyOptionsRequired: () => privacyRequired,
+    showPrivacyOptions
   };
 })();
