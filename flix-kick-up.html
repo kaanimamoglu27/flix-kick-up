@@ -598,6 +598,7 @@ svg { display: block; }
         <button class="toggle" id="tSound" aria-pressed="true"><span>Ses</span><i></i></button>
         <button class="toggle" id="tVibe" aria-pressed="true"><span>Titreşim</span><i></i></button>
         <div class="langrow"><span>Dil</span><div class="seg two" id="langSeg"><button data-lang="tr">Türkçe</button><button data-lang="en">English</button></div></div>
+        <button class="toggle link" id="restoreRow" style="display:none"><span>Satın alımları geri yükle</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
         <button class="toggle link" data-legal="privacy"><span>Gizlilik Politikası</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
         <button class="toggle link" data-legal="terms"><span>Kullanım Koşulları</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
         <button class="toggle link" data-legal="licenses"><span>Lisanslar ve Teşekkürler</span><svg viewBox="0 0 24 24" fill="none" stroke="#1b1330" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
@@ -3164,14 +3165,19 @@ svg { display: block; }
       g.appendChild(b);
     });
     const rs = document.createElement("button"); rs.className = "restore"; rs.textContent = L("Satın alımları geri yükle");
-    rs.addEventListener("click", () => {
-      if (!(window.FlixNative && FlixNative.restore)) return toast(L("Geri yüklenecek bir şey yok (test sürümü)."));
-      FlixNative.restore().then((ids) => { ids = ids || []; if (ids.includes("kickup_starter_v2")) grantStarter(); if (ids.includes("kickup_noads_v2")) grantNoAds(); toast(ids.length ? L("Satın alımlar geri yüklendi.") : L("Geri yüklenecek bir satın alım bulunamadı.")); refreshHome(); buildStore(); }, () => toast(L("Mağazaya şu an ulaşılamıyor.")));
-    });
+    rs.addEventListener("click", restorePurchases);
     el.appendChild(rs);
     const fine = document.createElement("p"); fine.className = "fine"; fine.textContent = window.FlixNative ? L("Ödemeler Apple hesabın üzerinden yapılır.") : L("Test sürümü: gerçek ödeme alınmaz, butona basınca tüyler hemen eklenir. App Store sürümünde ödeme Apple üzerinden yapılacak."); el.appendChild(fine);
   }
   $("openStore").addEventListener("click", () => { beep(600, 0.05); openSheet("store"); });
+  // "Restore purchases" (App Store rule for non-consumables): in the store and in Settings (app only)
+  let restoring = false;
+  function restorePurchases() {
+    if (!(window.FlixNative && FlixNative.restore)) return toast(L("Geri yüklenecek bir şey yok (test sürümü)."));
+    if (restoring) return; restoring = true;
+    FlixNative.restore().then((ids) => { ids = ids || []; if (ids.includes("kickup_starter_v2")) grantStarter(); if (ids.includes("kickup_noads_v2")) grantNoAds(); toast(ids.length ? L("Satın alımlar geri yüklendi.") : L("Geri yüklenecek bir satın alım bulunamadı.")); refreshHome(); if (sheetOpen === "store") buildStore(); }, () => toast(L("Mağazaya şu an ulaşılamıyor."))).finally(() => { restoring = false; });
+  }
+  if (NATIVE_APP) { $("restoreRow").style.display = ""; $("restoreRow").addEventListener("click", () => { beep(600, 0.05); restorePurchases(); }); }
 
   // ---------- online: 1v1 match on the Flix Kick Up server (online.js, address in online-config.js) ----------
   // The server owns rooms, quick match, ready, the 3-2-1 countdown, the 60 s clock, the winner and rematch;
