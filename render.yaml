@@ -13,6 +13,6 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
-      # the iOS app connects from capacitor://localhost, the web build from GitHub Pages
+      # the iOS app connects from capacitor://localhost, the web builds from GitHub Pages and flixgamestudios.com/oyna/
       - key: ALLOWED_ORIGINS
-        value: capacitor://localhost,https://kaanimamoglu27.github.io,http://localhost:8000
+        value: capacitor://localhost,https://kaanimamoglu27.github.io,https://www.flixgamestudios.com,https://flixgamestudios.com,http://localhost:8000
