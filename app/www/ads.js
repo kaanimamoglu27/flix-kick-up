@@ -140,7 +140,8 @@
         resolve({shown, rewarded});
         load(kind);
       };
-      const listen = (ev, fn) => A.addListener(ev, fn).then((h) => { if (done) { try { h.remove(); } catch (e) {} } else hs.push(h); });
+      // Capacitor's iOS bridge returns the listener handle directly (not a promise): calling .then on it threw, so no loaded ad was ever shown
+      const listen = (ev, fn) => Promise.resolve(A.addListener(ev, fn)).then((h) => { if (done) { try { h.remove(); } catch (e) {} } else hs.push(h); });
       showing = true; hideBanner();
       Promise.all([
         listen(f.ev.dismissed, () => finish(true)),
